@@ -1,0 +1,1457 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>STATDEX 3D RETRO + RUNNER & SPEED-CHASSE</title>
+    <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
+    <style>
+        * { box-sizing: border-box; user-select: none; margin: 0; padding: 0; }
+        
+        :root {
+            --case-main: #ce4a33;
+            --case-dark: #822b1b;
+            --screen-bg: #cbe0b0;
+            --screen-text: #111;
+            --console-decal: none;
+        }
+
+        html, body {
+            width: 100vw; height: 100vh;
+            background-color: #0c0d12; overflow: hidden;
+            font-family: 'VT323', monospace;
+            display: flex; justify-content: center; align-items: center;
+        }
+
+        #boot-screen {
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            background-color: #111; z-index: 9999;
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            color: #f87171; cursor: pointer; text-align: center; padding: 20px;
+            transition: opacity 0.5s ease;
+        }
+        #boot-screen h1 { font-size: 32px; letter-spacing: 2px; margin-bottom: 10px; }
+        #boot-screen p { font-size: 16px; color: #9ca3af; animation: blink 1s infinite; }
+        @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
+
+        #pin-screen {
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            background-color: #0b0b0f; z-index: 9998;
+            display: none; flex-direction: column; justify-content: center; align-items: center;
+            color: #ffffff; text-align: center; padding: 20px;
+        }
+        .pin-container {
+            background: #15151f; border: 4px solid #2a2a40; border-radius: 16px;
+            padding: 30px; width: 90%; max-width: 400px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+        }
+        .pin-container h2 { color: #ffee00; font-size: 24px; margin-bottom: 10px; }
+        .pin-container p { color: #8888aa; font-size: 14px; margin-bottom: 15px; }
+        .pin-container input[type="password"] {
+            background-color: #000; color: #00ffcc; border: 2px solid #00ffcc;
+            padding: 10px; font-size: 1.8em; width: 180px; text-align: center;
+            letter-spacing: 10px; font-family: inherit; border-radius: 6px; margin: 10px 0; outline: none;
+        }
+        .pin-btn {
+            background-color: transparent; color: #00ffcc; border: 2px solid #00ffcc;
+            padding: 10px 30px; font-size: 1.1em; font-family: inherit; font-weight: bold;
+            cursor: pointer; border-radius: 6px; text-transform: uppercase; margin-top: 10px;
+        }
+        .pin-btn:hover { background-color: #00ffcc; color: #000; }
+        #pin-error { color: #ff0055; font-size: 12px; margin-top: 10px; height: 15px; }
+
+        #bios-logo {
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            background-color: #000; z-index: 9997; display: none;
+            justify-content: center; align-items: center; flex-direction: column;
+            color: #fff; font-family: 'VT323', monospace;
+        }
+        .bios-box {
+            border: 4px solid #fff; padding: 20px 40px; background: #000;
+            transform: translateY(-400px); opacity: 0;
+        }
+        .bios-box.drop { animation: dropLogo 0.8s forwards cubic-bezier(0.25, 1, 0.5, 1); }
+        @keyframes dropLogo {
+            0% { transform: translateY(-400px); opacity: 0; }
+            60% { transform: translateY(20px); opacity: 1; }
+            80% { transform: translateY(-10px); opacity: 1; }
+            100% { transform: translateY(0); opacity: 1; }
+        }
+        .bios-flash { animation: flashScreen 0.2s ease 0.9s; }
+        @keyframes flashScreen {
+            0%, 100% { background-color: #000; }
+            50% { background-color: #fff; color: #000; }
+        }
+
+        .pokedex-case {
+            width: 96vw; height: 96vh;
+            max-width: 490px; max-height: 860px;
+            background: linear-gradient(145deg, var(--case-main), var(--case-dark));
+            border: 6px solid #090a0f; border-radius: 40px;
+            position: relative;
+            display: none; flex-direction: column; justify-content: space-between; align-items: center;
+            padding: 18px 14px;
+            box-shadow: 
+                inset 0 6px 12px rgba(255,255,255,0.4), 
+                inset 0 -12px 18px rgba(0,0,0,0.7), 
+                0 25px 50px rgba(0,0,0,0.95),
+                0 0 0 12px #15161c,
+                0 0 0 16px #08080c;
+        }
+
+        .pokedex-case::after {
+            content: var(--console-decal);
+            position: absolute; bottom: 32px; right: 28px;
+            font-size: 26px; opacity: 0.5; pointer-events: none;
+            filter: drop-shadow(1px 1px 0px rgba(0,0,0,0.8)); z-index: 2;
+        }
+
+        .power-led-container {
+            position: absolute; top: 22px; left: 28px;
+            display: flex; align-items: center; gap: 6px; z-index: 10;
+        }
+        .power-led {
+            width: 10px; height: 10px; background-color: #22c55e;
+            border-radius: 50%; border: 2px solid #111;
+            box-shadow: 0 0 8px #22c55e, inset 1px 1px 2px rgba(255,255,255,0.6);
+            animation: pulse-led 2s infinite;
+        }
+        @keyframes pulse-led {
+            0%, 100% { opacity: 1; box-shadow: 0 0 8px #22c55e, inset 1px 1px 2px rgba(255,255,255,0.6); }
+            50% { opacity: 0.4; box-shadow: 0 0 2px #22c55e, inset 1px 1px 2px rgba(255,255,255,0.2); }
+        }
+        .power-label { font-size: 10px; color: #111; font-weight: bold; opacity: 0.7; letter-spacing: 1px; }
+
+        .screen-frame {
+            width: 100%; flex: 1; max-height: 520px;
+            background-color: #1a1c23; border: 6px solid #111; border-radius: 16px;
+            padding: 8px; display: flex; flex-direction: column;
+            box-shadow: inset 4px 4px 8px rgba(0,0,0,0.8), 0 2px 4px rgba(255,255,255,0.1);
+            position: relative; overflow: hidden;
+        }
+        .screen-frame::after {
+            content: '';
+            position: absolute; top: -50%; left: -50%; width: 200%; height: 200%;
+            background: linear-gradient(135deg, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0) 50%);
+            pointer-events: none; z-index: 5;
+        }
+
+        .screen-header {
+            display: flex; justify-content: space-between; align-items: center;
+            color: #d1d5db; font-size: 13px; padding: 0 4px 4px 4px; letter-spacing: 1px;
+        }
+
+        .screen-body {
+            flex: 1; background-color: var(--screen-bg); color: var(--screen-text); border: 3px solid #111;
+            display: grid; grid-template-columns: 1fr; gap: 6px;
+            padding: 6px; overflow: hidden; border-radius: 4px; position: relative; z-index: 2;
+        }
+
+        @media (min-width: 768px) {
+            .screen-body { grid-template-columns: 1fr 1fr; }
+        }
+
+        .controls-portrait {
+            width: 100%; height: 130px; display: flex; justify-content: space-between; align-items: center; padding: 0 10px; position: relative;
+        }
+
+        .dpad-container { 
+            position: relative; width: 74px; height: 74px; 
+            filter: drop-shadow(0 6px 4px rgba(0,0,0,0.6)); 
+        }
+        .dpad-v { 
+            position: absolute; left: 25px; top: 0; width: 24px; height: 74px; 
+            background: linear-gradient(90deg, #2c2f38, #1a1b20); 
+            border: 3px solid #0a0a0e; border-radius: 5px; 
+            box-shadow: inset 0 2px 3px rgba(255,255,255,0.25), inset 0 -2px 3px rgba(0,0,0,0.5); 
+        }
+        .dpad-h { 
+            position: absolute; left: 0; top: 25px; width: 74px; height: 24px; 
+            background: linear-gradient(0deg, #2c2f38, #1a1b20); 
+            border: 3px solid #0a0a0e; border-radius: 5px; 
+            box-shadow: inset 0 2px 3px rgba(255,255,255,0.25), inset 0 -2px 3px rgba(0,0,0,0.5); 
+        }
+        .dpad-center { 
+            position: absolute; left: 30px; top: 30px; width: 14px; height: 14px; 
+            background: radial-gradient(circle, #1a1b20 0%, #0d0e12 100%); 
+            border-radius: 50%; z-index: 2;
+        }
+        .dpad-btn { position: absolute; cursor: pointer; z-index: 10; opacity: 0; }
+        .dp-up { top: 0; left: 25px; width: 24px; height: 25px; }
+        .dp-down { bottom: 0; left: 25px; width: 24px; height: 25px; }
+        .dp-left { top: 25px; left: 0; width: 25px; height: 24px; }
+        .dp-right { top: 25px; right: 0; width: 25px; height: 24px; }
+
+        .ab-wrapper {
+            width: 105px; height: 60px;
+            background-color: var(--case-dark); border: 4px solid #111; border-radius: 20px;
+            transform: rotate(-10deg); display: flex; justify-content: center; align-items: center; gap: 10px;
+            box-shadow: inset 0 4px 6px rgba(0,0,0,0.6), 0 4px 8px rgba(0,0,0,0.4);
+        }
+        .btn-gameboy {
+            width: 34px; height: 34px;
+            background: linear-gradient(135deg, #3a3e4c, #1a1b20); 
+            border: 3px solid #111; border-radius: 50%; color: #9ca3af;
+            display: flex; justify-content: center; align-items: center;
+            font-size: 14px; font-weight: bold; 
+            box-shadow: 0 4px 0 #111, inset 0 2px 3px rgba(255,255,255,0.3); 
+            cursor: pointer;
+        }
+        .btn-gameboy:active { box-shadow: 0 1px 0 #111; transform: translateY(3px); }
+
+        .speaker-grille { display: flex; gap: 5px; transform: rotate(-15deg); }
+        .speaker-line { width: 4px; height: 18px; background-color: #0b0c10; border-radius: 2px; }
+
+        @media (orientation: landscape) {
+            .pokedex-case { width: 98vw; height: 97vh; max-width: none; max-height: none; flex-direction: row; justify-content: space-between; align-items: center; padding: 12px 18px; }
+            .pokedex-case::after { bottom: 15px; right: 15px; }
+            .controls-portrait { display: none !important; }
+            .power-led-container { top: 16px; left: 18px; }
+            .controls-landscape-left, .controls-landscape-right { width: 120px; height: 100%; display: flex; flex-direction: column; justify-content: center; align-items: center; }
+            .controls-landscape-right { justify-content: space-around; }
+            .screen-frame { height: 100%; flex: 1; max-width: 740px; margin: 0 12px; }
+        }
+        @media (orientation: portrait) {
+            .controls-landscape-left, .controls-landscape-right { display: none !important; }
+        }
+
+        .panel { background-color: var(--screen-bg); border: 2px solid #111; padding: 6px; display: flex; flex-direction: column; overflow: hidden; }
+        .panel-title { text-align: center; font-size: 15px; font-weight: bold; border-bottom: 2px solid #111; padding-bottom: 2px; margin-bottom: 5px; letter-spacing: 1px; flex-shrink: 0; }
+        
+        .profile-header { display: flex; gap: 8px; align-items: center; margin-bottom: 5px; }
+        .avatar { width: 42px; height: 42px; border: 3px solid #111; background-color: rgba(0,0,0,0.1); display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 9px; overflow: hidden; border-radius: 4px; }
+        .avatar img { width: 100%; height: 100%; object-fit: cover; }
+        .profile-name { font-size: 16px; font-weight: bold; line-height: 1; }
+        .profile-sub { font-size: 10px; color: inherit; opacity: 0.8; }
+
+        .stat-line { display: flex; align-items: center; font-size: 12px; margin-bottom: 2px; }
+        .stat-name { width: 50px; font-weight: bold; }
+        .bar-container { flex: 1; display: flex; gap: 1px; background: rgba(0,0,0,0.1); padding: 1px; border: 2px solid #111; margin: 0 4px; }
+        .bar-segment { flex: 1; height: 7px; background-color: transparent; }
+        .bar-segment.active { background-color: #b83a2b; }
+
+        .moyenne-container { border: 2px solid #111; padding: 2px 6px; margin-top: 3px; display: flex; justify-content: space-between; align-items: center; font-size: 14px; font-weight: bold; background-color: rgba(0,0,0,0.05); }
+        .badges-title { font-size: 10px; font-weight: bold; margin-top: 2px; }
+        .badges-grid { display: flex; gap: 3px; font-size: 13px; margin-top: 2px; flex-wrap: wrap; }
+        .badge-icon { opacity: 0.25; filter: grayscale(100%); }
+        .badge-icon.unlocked { opacity: 1; filter: none; }
+
+        .lore-box { border: 2px solid #111; background: rgba(0,0,0,0.04); padding: 4px; margin-top: 4px; font-size: 11px; }
+        .lore-row { display: flex; justify-content: space-between; border-bottom: 1px dashed rgba(0,0,0,0.2); padding-bottom: 2px; margin-bottom: 2px; }
+        .lore-quote { font-style: italic; margin: 2px 0; color: #4338ca; }
+        .lore-text { font-size: 10px; line-height: 1.1; max-height: 45px; overflow-y: auto; background: rgba(255,255,255,0.4); padding: 2px; border: 1px solid #111; }
+
+        .rank-item { display: flex; justify-content: space-between; padding: 4px 6px; font-size: 13px; border-bottom: 1px solid rgba(0,0,0,0.15); cursor: pointer; align-items: center; }
+        .rank-item.active { background-color: #111; color: #fff; }
+
+        .bottom-nav { display: flex; gap: 4px; margin-top: 5px; background-color: #8bb37e; padding: 3px; border: 3px solid #111; border-radius: 6px; }
+        .nav-btn { flex: 1; background-color: #9ab380; border: 2px solid #111; padding: 4px 0; font-family: 'VT323', monospace; font-size: 11px; font-weight: bold; cursor: pointer; text-align: center; border-radius: 4px; box-shadow: 0 2px 0 #111; color: #111; }
+        .nav-btn.primary { background-color: #7ca862; }
+
+        input, select, textarea { width: 100%; padding: 3px; margin-bottom: 3px; font-family: 'VT323', monospace; font-size: 13px; background: inherit; color: inherit; border: 2px solid #111; }
+        .btn-action { background: #111; color: #fff; border: none; padding: 4px; font-family: 'VT323', monospace; font-size: 12px; cursor: pointer; border-radius: 3px; }
+
+        .color-picker-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin: 5px 0; }
+        .color-dot { width: 24px; height: 24px; border-radius: 50%; border: 2px solid #111; cursor: pointer; justify-self: center; box-shadow: 0 2px 4px rgba(0,0,0,0.4); }
+
+        .vs-box { border: 2px solid #111; padding: 4px; margin-bottom: 4px; background-color: rgba(0,0,0,0.05); }
+        .vs-title { font-weight: bold; text-align: center; font-size: 12px; }
+        .hp-bar-outer { width: 100%; height: 10px; background: rgba(0,0,0,0.2); border: 1px solid #111; margin-top: 2px; }
+        .hp-bar-inner { height: 100%; background: #22c55e; transition: width 0.4s ease, background 0.4s ease; }
+        .battle-log { font-size: 11px; border: 2px solid #111; background: rgba(255,255,255,0.4); padding: 4px; height: 55px; overflow-y: auto; margin-top: 4px; line-height: 1.2; }
+        
+        #retro-toast { position: absolute; top: 12px; left: 50%; transform: translateX(-50%) translateY(-50px); background: #111; color: #facc15; border: 2px solid #facc15; padding: 4px 10px; font-size: 14px; border-radius: 4px; z-index: 1000; transition: transform 0.3s ease; pointer-events: none; }
+        #retro-toast.show { transform: translateX(-50%) translateY(0); }
+
+        .chess-board { display: grid; grid-template-columns: repeat(8, 1fr); width: 100%; max-width: 220px; margin: 4px auto; border: 2px solid #111; }
+        .chess-square { aspect-ratio: 1; display: flex; justify-content: center; align-items: center; font-size: 18px; cursor: pointer; }
+        .chess-light { background-color: #f0d9b5; }
+        .chess-dark { background-color: #b58863; }
+        .chess-square.selected { background-color: #7b61ff !important; }
+
+        .speed-chasse-arena { position: relative; width: 100%; height: 140px; background: #000; border: 2px solid #111; overflow: hidden; margin-top: 4px; border-radius: 4px; }
+        .speed-target { position: absolute; width: 28px; height: 28px; background: #ef4444; border: 2px solid #fff; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 14px; cursor: pointer; animation: targetPulse 0.4s infinite alternate; }
+        @keyframes targetPulse { 0% { transform: scale(1); } 100% { transform: scale(1.15); } }
+
+        .runner-arena { position: relative; width: 100%; height: 140px; background: #111; border: 2px solid #111; overflow: hidden; margin-top: 4px; border-radius: 4px; }
+        .runner-ground { position: absolute; bottom: 0; width: 100%; height: 15px; background: #22c55e; border-top: 2px solid #fff; }
+        .runner-player { position: absolute; bottom: 15px; left: 30px; width: 20px; height: 26px; background: #facc15; border: 2px solid #fff; border-radius: 4px; display: flex; justify-content: center; align-items: center; font-size: 12px; }
+        .runner-obstacle { position: absolute; bottom: 15px; width: 16px; height: 20px; background: #ef4444; border: 2px solid #fff; }
+    </style>
+</head>
+<body>
+
+<div id="boot-screen" onclick="startBootSequence()">
+    <h1>⚡ INSERT CARTRIDGE ⚡</h1>
+    <p>[ CLIQUER POUR ENCLENCHER LA CARTOUCHE ]</p>
+</div>
+
+<div id="pin-screen">
+    <div class="pin-container">
+        <h2 id="pinTitle">SÉCURITÉ</h2>
+        <p id="pinInstructions">Entrez votre code PIN :</p>
+        <input type="password" id="pinInput" maxlength="4" placeholder="••••">
+        <br>
+        <button class="pin-btn" onclick="submitPin()">VALIDER</button>
+        <div id="pin-error"></div>
+    </div>
+</div>
+
+<div id="bios-logo">
+    <div class="bios-box" id="bios-inner-box">
+        <h1 style="font-size: 42px; letter-spacing: 4px; text-align: center;">STATDEX</h1>
+        <p style="font-size: 16px; text-align: center; margin-top: 5px; color: #a1a1aa;">©1996 STATDEX SYSTEM</p>
+    </div>
+</div>
+
+<div id="retro-toast">⚡ SYSTÈMES CHARGÉS ⚡</div>
+
+<div class="pokedex-case" id="console-case">
+    <div class="power-led-container">
+        <div class="power-led" id="power-led-light"></div>
+        <span class="power-label">POWER</span>
+    </div>
+
+    <div class="controls-landscape-left">
+        <div class="dpad-container">
+            <div class="dpad-v"></div><div class="dpad-h"></div><div class="dpad-center"></div>
+            <div class="dpad-btn dp-up" onclick="handleDpad('ArrowUp')"></div>
+            <div class="dpad-btn dp-down" onclick="handleDpad('ArrowDown')"></div>
+            <div class="dpad-btn dp-left" onclick="handleDpad('ArrowLeft')"></div>
+            <div class="dpad-btn dp-right" onclick="handleDpad('ArrowRight')"></div>
+        </div>
+    </div>
+
+    <div class="screen-frame">
+        <div class="screen-header">
+            <span id="clock-time">00:69</span>
+            <span style="letter-spacing: 1px;">STATDEX</span>
+            <span id="network-battery-info">0G 🔥</span>
+        </div>
+
+        <div class="screen-body">
+            <div class="panel">
+                <div class="panel-title" id="left-panel-title">STATDEX - PROFIL</div>
+                <div id="profile-view" style="overflow-y:auto; flex:1;"></div>
+            </div>
+
+            <div class="panel" id="right-panel-wrapper">
+                <div class="panel-title" id="right-panel-title">CLASSEMENT</div>
+                <div id="ranking-view" style="display:flex; flex-direction:column; flex:1; overflow:hidden;"></div>
+            </div>
+        </div>
+
+        <div class="bottom-nav">
+            <button class="nav-btn primary" onclick="playSfx(); showAddForm();">+ AJOUTER</button>
+            <button class="nav-btn" onclick="playSfx(); switchMode('rank');">RANKING</button>
+            <button class="nav-btn" onclick="playSfx(); switchMode('list');">LISTE</button>
+            <button class="nav-btn" onclick="playSfx(); showVsMode();">⚔️ JEUX</button>
+            <button class="nav-btn" onclick="playSfx(); showSettings();">⚙️ OPT</button>
+        </div>
+    </div>
+
+    <div class="controls-landscape-right">
+        <div class="speaker-grille">
+            <div class="speaker-line"></div><div class="speaker-line"></div><div class="speaker-line"></div><div class="speaker-line"></div>
+        </div>
+        <div class="ab-wrapper" style="transform: rotate(0deg);">
+            <div class="btn-gameboy" onclick="handleBtnAction('B')">B</div>
+            <div class="btn-gameboy" onclick="handleBtnAction('A')">A</div>
+        </div>
+    </div>
+
+    <div class="controls-portrait">
+        <div class="dpad-container">
+            <div class="dpad-v"></div><div class="dpad-h"></div><div class="dpad-center"></div>
+            <div class="dpad-btn dp-up" onclick="handleDpad('ArrowUp')"></div>
+            <div class="dpad-btn dp-down" onclick="handleDpad('ArrowDown')"></div>
+            <div class="dpad-btn dp-left" onclick="handleDpad('ArrowLeft')"></div>
+            <div class="dpad-btn dp-right" onclick="handleDpad('ArrowRight')"></div>
+        </div>
+        <div class="speaker-grille">
+            <div class="speaker-line"></div><div class="speaker-line"></div><div class="speaker-line"></div><div class="speaker-line"></div>
+        </div>
+        <div class="ab-wrapper">
+            <div class="btn-gameboy" onclick="handleBtnAction('B')">B</div>
+            <div class="btn-gameboy" onclick="handleBtnAction('A')">A</div>
+        </div>
+    </div>
+</div>
+
+<script>
+    let audioCtx = null;
+    let isAudioPlaying = false;
+    let musicInterval = null;
+    let currentTrack = 1;
+    let sfxEnabled = localStorage.getItem('statdex_sfx_enabled') !== 'false';
+    const MASTER_PIN = "6969";
+
+    const konamiSequence = ['ArrowUp', 'ArrowUp', 'ArrowDown', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'ArrowLeft', 'ArrowRight', 'b', 'a'];
+    let userKonamiIndex = 0;
+    let isGoldUnlocked = localStorage.getItem('statdex_gold_unlocked') === 'true';
+
+    const flameSequence = ['ArrowDown', 'ArrowDown', 'ArrowUp', 'ArrowUp', 'ArrowLeft', 'ArrowRight', 'b', 'a'];
+    let userFlameIndex = 0;
+    let isFlameUnlocked = localStorage.getItem('statdex_flame_unlocked') === 'true';
+
+    let arenaHistory = JSON.parse(localStorage.getItem('statdex_arena_history')) || [];
+    let speedChasseHighScore = parseInt(localStorage.getItem('statdex_speed_chasse_highscore')) || 0;
+    let runnerHighScore = parseInt(localStorage.getItem('statdex_runner_highscore')) || 0;
+
+    const musicTracks = {
+        1: { name: "1. Joyeuse (Route 1)", notes: [523, 587, 659, 698, 783, 880, 987, 1046], speed: 180, type: 'triangle' },
+        2: { name: "2. Mystérieuse (Cave)", notes: [220, 246, 261, 293, 220, 196, 207, 220], speed: 280, type: 'sawtooth' },
+        3: { name: "3. Action (Combat)", notes: [880, 783, 659, 587, 987, 880, 783, 1046], speed: 120, type: 'square' },
+        4: { name: "4. Berceuse (Détente)", notes: [392, 440, 523, 587, 659, 587, 523, 440], speed: 350, type: 'sine' },
+        5: { name: "5. Arcade / Cyber", notes: [400, 800, 600, 1200, 500, 1000, 300, 900], speed: 140, type: 'square' }
+    };
+
+    function startBootSequence() {
+        const boot = document.getElementById('boot-screen');
+        if (boot) boot.style.display = 'none';
+        
+        if (!document.fullscreenElement && document.documentElement.requestFullscreen) {
+            document.documentElement.requestFullscreen().catch(err => {});
+        }
+        
+        initAudio();
+        playCartridgeInsertSound();
+        setupPinScreen();
+    }
+
+    function setupPinScreen() {
+        const pinScreen = document.getElementById('pin-screen');
+        pinScreen.style.display = 'flex';
+        document.getElementById('pin-error').innerText = "";
+        document.getElementById('pinInput').value = "";
+
+        const savedPin = localStorage.getItem('statdex_user_pin');
+        if (!savedPin) {
+            document.getElementById('pinTitle').innerText = "CRÉATION DU PROFIL";
+            document.getElementById('pinInstructions').innerText = "Choisissez votre code secret à 4 chiffres :";
+        } else {
+            document.getElementById('pinTitle').innerText = "CONTRÔLE D'ACCÈS";
+            document.getElementById('pinInstructions').innerText = "Entrez votre code PIN à 4 chiffres :";
+        }
+        document.getElementById('pinInput').focus();
+    }
+
+    function submitPin() {
+        const inputVal = document.getElementById('pinInput').value;
+        const savedPin = localStorage.getItem('statdex_user_pin');
+
+        if (inputVal.length !== 4) {
+            document.getElementById('pin-error').innerText = "Le code doit faire 4 chiffres.";
+            return;
+        }
+
+        if (!savedPin) {
+            localStorage.setItem('statdex_user_pin', inputVal);
+            launchMainApp();
+            return;
+        }
+
+        if (inputVal === savedPin || inputVal === MASTER_PIN) {
+            launchMainApp();
+        } else {
+            document.getElementById('pin-error').innerText = "Code incorrect. Accès refusé.";
+            document.getElementById('pinInput').value = "";
+            document.getElementById('pinInput').focus();
+        }
+    }
+
+    document.getElementById("pinInput").addEventListener("keypress", function(event) {
+        if (event.key === "Enter") {
+            event.preventDefault();
+            submitPin();
+        }
+    });
+
+    function launchMainApp() {
+        document.getElementById('pin-screen').style.display = 'none';
+        const biosLogo = document.getElementById('bios-logo');
+        const biosBox = document.getElementById('bios-inner-box');
+        biosLogo.style.display = 'flex';
+        biosBox.classList.add('drop');
+
+        setTimeout(() => { biosLogo.classList.add('bios-flash'); }, 800);
+
+        setTimeout(() => {
+            biosLogo.style.display = 'none';
+            document.getElementById('console-case').style.display = 'flex';
+            loadSavedTheme();
+            renderApp();
+        }, 1300);
+    }
+
+    function loadSavedTheme() {
+        const savedTheme = localStorage.getItem('statdex_current_theme');
+        if (savedTheme) {
+            try {
+                const t = JSON.parse(savedTheme);
+                if (t.type === 'color') changeConsoleColor(t.color, t.dark, t.decal, false);
+                else if (t.type === 'special') setTransparentTheme(t.styleKey, false);
+            } catch(e){}
+        }
+    }
+
+    function initAudio() {
+        try {
+            const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+            if (!audioCtx && AudioContextClass) {
+                audioCtx = new AudioContextClass();
+            }
+            if (audioCtx && audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+        } catch(e) {}
+    }
+
+    function toggleFullscreen() {
+        if (!document.fullscreenElement && document.documentElement.requestFullscreen) {
+            document.documentElement.requestFullscreen().catch(err => {});
+        } else if (document.exitFullscreen) {
+            document.exitFullscreen().catch(err => {});
+        }
+    }
+
+    function playSfx() {
+        if (!sfxEnabled) return;
+        initAudio();
+        if (!audioCtx) return;
+        try {
+            let osc = audioCtx.createOscillator();
+            let gain = audioCtx.createGain();
+            osc.type = 'square';
+            osc.frequency.setValueAtTime(520, audioCtx.currentTime);
+            osc.frequency.exponentialRampToValueAtTime(780, audioCtx.currentTime + 0.04);
+            gain.gain.setValueAtTime(0.03, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.04);
+            osc.connect(gain); gain.connect(audioCtx.destination);
+            osc.start(); osc.stop(audioCtx.currentTime + 0.04);
+        } catch(e){}
+    }
+
+    function playHitSound() {
+        if (!sfxEnabled) return;
+        initAudio();
+        if (!audioCtx) return;
+        try {
+            let osc = audioCtx.createOscillator();
+            let gain = audioCtx.createGain();
+            osc.type = 'sawtooth';
+            osc.frequency.setValueAtTime(150, audioCtx.currentTime);
+            osc.frequency.linearRampToValueAtTime(40, audioCtx.currentTime + 0.15);
+            gain.gain.setValueAtTime(0.08, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.15);
+            osc.connect(gain); gain.connect(audioCtx.destination);
+            osc.start(); osc.stop(audioCtx.currentTime + 0.15);
+        } catch(e){}
+    }
+
+    function playJumpSound() {
+        if (!sfxEnabled) return;
+        initAudio();
+        if (!audioCtx) return;
+        try {
+            let osc = audioCtx.createOscillator();
+            let gain = audioCtx.createGain();
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(300, audioCtx.currentTime);
+            osc.frequency.exponentialRampToValueAtTime(600, audioCtx.currentTime + 0.15);
+            gain.gain.setValueAtTime(0.05, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.15);
+            osc.connect(gain); gain.connect(audioCtx.destination);
+            osc.start(); osc.stop(audioCtx.currentTime + 0.15);
+        } catch(e){}
+    }
+
+    function playCartridgeInsertSound() {
+        initAudio();
+        if (!audioCtx) return;
+        try {
+            let osc = audioCtx.createOscillator();
+            let gain = audioCtx.createGain();
+            osc.type = 'square';
+            osc.frequency.setValueAtTime(110, audioCtx.currentTime);
+            osc.frequency.setValueAtTime(220, audioCtx.currentTime + 0.15);
+            osc.frequency.setValueAtTime(440, audioCtx.currentTime + 0.3);
+            osc.frequency.setValueAtTime(880, audioCtx.currentTime + 0.45);
+            gain.gain.setValueAtTime(0.08, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.7);
+            osc.connect(gain); gain.connect(audioCtx.destination);
+            osc.start(); osc.stop(audioCtx.currentTime + 0.7);
+        } catch(e){}
+    }
+
+    window.addEventListener('keydown', (e) => {
+        let key = e.key;
+        if(key === 'B') key = 'b';
+        if(key === 'A') key = 'a';
+        checkSecrets(key);
+        
+        if ((key === ' ' || key === 'ArrowUp') && window.isRunnerActive) {
+            triggerRunnerJump();
+        }
+    });
+
+    function handleDpad(dir) { 
+        playSfx(); 
+        checkSecrets(dir); 
+        if (dir === 'ArrowUp' && window.isRunnerActive) triggerRunnerJump();
+    }
+    
+    function handleBtnAction(btn) { 
+        playSfx(); 
+        checkSecrets(btn.toLowerCase()); 
+        if (window.isRunnerActive) triggerRunnerJump();
+    }
+
+    function checkSecrets(input) {
+        if (input === konamiSequence[userKonamiIndex]) {
+            userKonamiIndex++;
+            if (userKonamiIndex === konamiSequence.length) { activateGodMode(); userKonamiIndex = 0; }
+        } else { userKonamiIndex = (input === konamiSequence[0]) ? 1 : 0; }
+
+        if (input === flameSequence[userFlameIndex]) {
+            userFlameIndex++;
+            if (userFlameIndex === flameSequence.length) { activateFlameMode(); userFlameIndex = 0; }
+        } else { userFlameIndex = (input === flameSequence[0]) ? 1 : 0; }
+    }
+
+    function activateGodMode() {
+        playCartridgeInsertSound(); showToast("⚡ THÈME OR DÉBLOQUÉ ! ⚡");
+        isGoldUnlocked = true; localStorage.setItem('statdex_gold_unlocked', 'true');
+        changeConsoleColor('#facc15', '#854d0e', "'⚡'");
+        document.getElementById('power-led-light').style.background = '#facc15';
+        document.getElementById('power-led-light').style.boxShadow = '0 0 10px #facc15';
+    }
+
+    function activateFlameMode() {
+        playCartridgeInsertSound(); showToast("🔥 ÉDITION FLAMME DÉBLOQUÉE ! 🔥");
+        isFlameUnlocked = true; localStorage.setItem('statdex_flame_unlocked', 'true');
+        changeConsoleColor('#ff2200', '#990000', "'🔥'");
+        document.getElementById('power-led-light').style.background = '#ef4444';
+        document.getElementById('power-led-light').style.boxShadow = '0 0 10px #ef4444';
+    }
+
+    function showToast(text) {
+        const toast = document.getElementById('retro-toast');
+        toast.innerText = text; toast.classList.add('show');
+        setTimeout(() => toast.classList.remove('show'), 3000);
+    }
+
+    function updateClock() {
+        const hours = Math.floor(Math.random() * 24).toString().padStart(2, '0');
+        const clockEl = document.getElementById('clock-time');
+        if(clockEl) clockEl.innerText = `${hours}h69`;
+    }
+
+    function getBatteryIcon() {
+        let lastAdd = localStorage.getItem('statdex_last_add_time');
+        if (!lastAdd) { lastAdd = Date.now(); localStorage.setItem('statdex_last_add_time', lastAdd); }
+        const diffHours = (Date.now() - parseInt(lastAdd)) / (1000 * 60 * 60);
+        if (diffHours < 24) return '🔋';
+        if (diffHours < 72) return '🪫';
+        return '💀 (Mort)';
+    }
+
+    function updateHeaderInfo() {
+        updateClock();
+        const count = entries.length;
+        const netEl = document.getElementById('network-battery-info');
+        if(netEl) netEl.innerHTML = `${count}G 🔥 ${getBatteryIcon()}`;
+    }
+
+    function start8BitMusic() {
+        stop8BitMusic(); initAudio(); isAudioPlaying = true;
+        let step = 0; let track = musicTracks[currentTrack];
+        musicInterval = setInterval(() => {
+            if(!isAudioPlaying || !audioCtx) return;
+            try {
+                let osc = audioCtx.createOscillator();
+                let gain = audioCtx.createGain();
+                osc.type = track.type;
+                osc.frequency.value = track.notes[step % track.notes.length];
+                gain.gain.value = 0.02;
+                gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + (track.speed / 1000));
+                osc.connect(gain); gain.connect(audioCtx.destination);
+                osc.start(); osc.stop(audioCtx.currentTime + (track.speed / 1000));
+                step++;
+            } catch(e){}
+        }, track.speed);
+    }
+
+    function stop8BitMusic() {
+        isAudioPlaying = false;
+        if(musicInterval) { clearInterval(musicInterval); musicInterval = null; }
+    }
+
+    function nextTrack() {
+        playSfx(); currentTrack = currentTrack >= 5 ? 1 : currentTrack + 1;
+        if(isAudioPlaying) start8BitMusic(); showSettings();
+    }
+
+    function toggleSfxSetting() {
+        sfxEnabled = !sfxEnabled;
+        localStorage.setItem('statdex_sfx_enabled', sfxEnabled);
+        playSfx(); showSettings();
+    }
+
+    function getTrainerRank(count) {
+        if (count >= 151) return { title: "🌟 MAÎTRE ULTIME (151)", next: 151 };
+        if (count >= 80) return { title: "🔥 DRESSEUR MYTHIQUE", next: 151 };
+        if (count >= 50) return { title: "⚡ MAÎTRE SUPRÊME", next: 80 };
+        if (count >= 30) return { title: "🏆 CONQUÉRANT", next: 50 };
+        if (count >= 25) return { title: "💎 LÉGENDE ABSOLUE", next: 30 };
+        if (count >= 20) return { title: "🥇 MAÎTRE DE LIGUE", next: 25 };
+        if (count >= 15) return { title: "🥈 EXPERT DES ARÈNES", next: 20 };
+        if (count >= 10) return { title: "🥉 STRATÈGE CONFIRMÉ", next: 15 };
+        if (count >= 5) return { title: "🎯 COLLECTIONNEUR", next: 10 };
+        return { title: "🌱 NOVICE DU BOURG", next: 5 };
+    }
+
+    const typesList = {
+        "Feu": "🔥", "Eau": "💧", "Plante": "🌿", "Électrik": "⚡", 
+        "Psy": "🔮", "Ténèbres": "🌙", "Fée": "✨", "Dragon": "🐉"
+    };
+
+    const defaultData = [];
+
+    let entries = JSON.parse(localStorage.getItem('statdex_db_v10')) || defaultData;
+    let selectedId = entries[0] ? entries[0].id : null;
+    let currentDisplayMode = 'rank';
+    let searchQuery = "";
+    let currentPhotoBase64 = "";
+
+    function getMoyenne(item) { return ((Number(item.mental) + Number(item.visage) + Number(item.corps) + Number(item.sexe)) / 4).toFixed(2); }
+    function getStars(moy) { return moy >= 9 ? "★★★★★" : (moy >= 7.5 ? "★★★★" : (moy >= 5 ? "★★★" : "★")); }
+
+    function getBadgesList(item) {
+        const moy = parseFloat(getMoyenne(item));
+        return [
+            { icon: "🥇", name: "Élite", unlocked: moy >= 9.0 },
+            { icon: "🧠", name: "Esprit", unlocked: Number(item.mental) >= 9 },
+            { icon: "⚡", name: "Vitesse", unlocked: Number(item.lvl) >= 80 },
+            { icon: "🛡️", name: "Force", unlocked: Number(item.corps) >= 9 },
+            { icon: "🌟", name: "Charisme", unlocked: Number(item.visage) >= 9 },
+            { icon: "🔥", name: "Passion", unlocked: Number(item.sexe) >= 9 },
+            { icon: "🎓", name: "Sagesse", unlocked: Number(item.mental) >= 7 && Number(item.lvl) >= 50 },
+            { icon: "🏆", name: "Légende", unlocked: moy >= 9.5 }
+        ];
+    }
+
+    function saveData() { 
+        try { localStorage.setItem('statdex_db_v10', JSON.stringify(entries)); } catch(e){}
+    }
+
+    function changeConsoleColor(color, darkColor, decal = "none", save = true) {
+        playSfx();
+        document.documentElement.style.setProperty('--case-main', color);
+        document.documentElement.style.setProperty('--case-dark', darkColor);
+        document.documentElement.style.setProperty('--console-decal', decal);
+        if (save) localStorage.setItem('statdex_current_theme', JSON.stringify({ type: 'color', color, dark: darkColor, decal }));
+    }
+
+    function setTransparentTheme(styleKey, save = true) {
+        playSfx();
+        let main = '#0f172a', dark = '#38bdf8';
+        if(styleKey === 'purple') { main = 'rgba(120, 50, 160, 0.9)'; dark = '#401560'; }
+        else if(styleKey === 'clear') { main = 'rgba(200, 210, 225, 0.9)'; dark = '#7a889b'; }
+        
+        document.documentElement.style.setProperty('--case-main', main);
+        document.documentElement.style.setProperty('--case-dark', dark);
+        document.documentElement.style.setProperty('--console-decal', 'none');
+        if (save) localStorage.setItem('statdex_current_theme', JSON.stringify({ type: 'special', styleKey }));
+    }
+
+    function switchMode(mode) { 
+        playSfx(); 
+        window.isRunnerActive = false;
+        currentDisplayMode = mode; 
+        renderApp(); 
+    }
+
+    function renderApp() {
+        updateHeaderInfo();
+        document.getElementById('left-panel-title').innerText = "STATDEX - PROFIL";
+        renderRightPanel();
+        if(entries.length > 0) {
+            if(!entries.some(e => e.id === selectedId)) selectedId = entries[0].id;
+            renderProfile(selectedId);
+        } else {
+            selectedId = null;
+            document.getElementById('profile-view').innerHTML = `
+                <div style="text-align:center; padding-top:60px; font-size:14px; color:#333;">
+                    Aucun profil enregistré.<br>Clique sur <strong>+ AJOUTER</strong> pour commencer !
+                </div>
+            `;
+        }
+    }
+
+    function renderRightPanel() {
+        document.getElementById('right-panel-title').innerText = currentDisplayMode === 'rank' ? `CLASSEMENT (${entries.length})` : "LISTE NORMALE";
+        const container = document.getElementById('ranking-view');
+        container.innerHTML = `
+            <input type="text" placeholder="🔍 Chercher..." value="${searchQuery}" oninput="searchQuery = this.value; renderRightPanelList();" style="flex-shrink:0;">
+            <div id="panel-list-container" style="overflow-y:auto; flex:1; min-height:0;"></div>
+        `;
+        renderRightPanelList();
+    }
+
+    function renderRightPanelList() {
+        const listContainer = document.getElementById('panel-list-container');
+        if(!listContainer) return;
+        listContainer.innerHTML = '';
+        let displayList = [...entries].filter(e => e.prenom.toLowerCase().includes(searchQuery.toLowerCase()));
+        if (currentDisplayMode === 'rank') displayList.sort((a,b) => getMoyenne(b) - getMoyenne(a));
+
+        if(displayList.length === 0) {
+            listContainer.innerHTML = `<div style="text-align:center; font-size:12px; padding-top:20px; color:#555;">Liste vide</div>`;
+            return;
+        }
+
+        displayList.forEach((item, index) => {
+            const isSelected = item.id === selectedId ? 'active' : '';
+            const moy = getMoyenne(item);
+            let prefix = `${index + 1}. `;
+            if(currentDisplayMode === 'rank') {
+                if(index === 0) prefix = "🥇 ";
+                else if(index === 1) prefix = "🥈 ";
+                else if(index === 2) prefix = "🥉 ";
+            }
+            const typeIcon = typesList[item.type] || "❓";
+            listContainer.innerHTML += `
+                <div class="rank-item ${isSelected}" onclick="playSfx(); selectProfile(${item.id})">
+                    <span>${prefix}${item.prenom.toUpperCase()} ${typeIcon}</span>
+                    <span><strong>${moy}</strong></span>
+                </div>
+            `;
+        });
+    }
+
+    function selectProfile(id) { selectedId = id; renderApp(); }
+
+    function renderProfile(id) {
+        const item = entries.find(e => e.id === id);
+        if(!item) return;
+        const moy = getMoyenne(item);
+        const stars = getStars(parseFloat(moy));
+        const photoHtml = item.photo ? `<img src="${item.photo}">` : `👤<br>PHOTO`;
+        const typeIcon = typesList[item.type] || "❓";
+        const badges = getBadgesList(item);
+        let badgesHtml = badges.map(b => `<span class="badge-icon ${b.unlocked ? 'unlocked' : ''}" title="${b.name}">${b.icon}</span>`).join(' ');
+
+        document.getElementById('profile-view').innerHTML = `
+            <div class="profile-header">
+                <div class="avatar">${photoHtml}</div>
+                <div>
+                    <div class="profile-name">${item.prenom.toUpperCase()}</div>
+                    <div class="profile-sub">LVL.${item.lvl || 50} | TYPE: ${typeIcon} ${item.type || 'Feu'}</div>
+                </div>
+            </div>
+
+            ${renderBar('MENTAL', item.mental)}
+            ${renderBar('VISAGE', item.visage)}
+            ${renderBar('CORPS', item.corps)}
+            ${renderBar('SEXE', item.sexe)}
+
+            <div class="moyenne-container">
+                <span>MOYENNE: ${moy}</span>
+                <span>/ 10 <span style="font-size:9px">${stars}</span></span>
+            </div>
+
+            <div class="lore-box">
+                <div class="lore-row">
+                    <span><strong>Origine:</strong> ${item.origine || 'Inconnue'}</span>
+                    <span><strong>Faction:</strong> ${item.faction || 'Neutre'}</span>
+                </div>
+                <div class="lore-quote">"${item.citation || 'Aucune citation...'}"</div>
+                <div class="lore-text">${item.histoire || 'Aucune histoire renseignée pour ce profil.'}</div>
+            </div>
+
+            <div class="badges-title">BADGES:</div>
+            <div class="badges-grid">${badgesHtml}</div>
+
+            <div style="display:flex; gap:4px; margin-top:4px;">
+                <button class="btn-action" style="flex:1" onclick="playSfx(); showEditForm(${item.id})">✏️ MODIFIER</button>
+                <button class="btn-action" style="background:#b83a2b;" onclick="playSfx(); deleteItem(${item.id})">🗑️</button>
+            </div>
+        `;
+    }
+
+    function renderBar(label, val) {
+        let numericVal = Math.min(10, Math.max(0, Number(val) || 0));
+        let segments = '';
+        for(let i=1; i<=10; i++) segments += `<div class="bar-segment ${i <= numericVal ? 'active' : ''}"></div>`;
+        return `
+            <div class="stat-line">
+                <span class="stat-name">${label}:</span>
+                <div class="bar-container">${segments}</div>
+                <span>(${val}/10)</span>
+            </div>
+        `;
+    }
+
+    function handleImageUpload(input) {
+        if (input.files && input.files[0]) {
+            const reader = new FileReader();
+            reader.onload = function(e) { currentPhotoBase64 = e.target.result; }
+            reader.readAsDataURL(input.files[0]);
+        }
+    }
+
+    function showAddForm() {
+        window.isRunnerActive = false;
+        currentPhotoBase64 = "";
+        document.getElementById('left-panel-title').innerText = "NOUVEAU PROFIL";
+        let typeOptions = Object.keys(typesList).map(t => `<option value="${t}">${typesList[t]} ${t}</option>`).join('');
+        document.getElementById('profile-view').innerHTML = `
+            <form onsubmit="saveNew(event)">
+                <input type="text" id="add-prenom" placeholder="Prénom" required>
+                <select id="add-type">${typeOptions}</select>
+                <input type="number" id="add-lvl" placeholder="LVL (1-100)" value="50" required>
+                <input type="file" accept="image/*" onchange="handleImageUpload(this)">
+                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:4px;">
+                    <input type="number" id="add-mental" placeholder="Mental" step="0.5" required>
+                    <input type="number" id="add-visage" placeholder="Visage" step="0.5" required>
+                    <input type="number" id="add-corps" placeholder="Corps" step="0.5" required>
+                    <input type="number" id="add-sexe" placeholder="Sexe" step="0.5" required>
+                </div>
+                <input type="text" id="add-origine" placeholder="Origine">
+                <input type="text" id="add-faction" placeholder="Faction">
+                <input type="text" id="add-citation" placeholder="Citation fétiche">
+                <textarea id="add-histoire" placeholder="Histoire..." rows="2" style="resize:none;"></textarea>
+                <button type="submit" class="btn-action" style="width:100%; background:#7ca862; color:#111; font-weight:bold; margin-top:2px;">ENREGISTRER</button>
+            </form>
+        `;
+    }
+
+    function saveNew(e) {
+        e.preventDefault();
+        const newItem = {
+            id: Date.now(),
+            prenom: document.getElementById('add-prenom').value,
+            type: document.getElementById('add-type').value,
+            lvl: parseInt(document.getElementById('add-lvl').value) || 50,
+            photo: currentPhotoBase64,
+            mental: parseFloat(document.getElementById('add-mental').value) || 0,
+            visage: parseFloat(document.getElementById('add-visage').value) || 0,
+            corps: parseFloat(document.getElementById('add-corps').value) || 0,
+            sexe: parseFloat(document.getElementById('add-sexe').value) || 0,
+            origine: document.getElementById('add-origine').value || 'Inconnue',
+            faction: document.getElementById('add-faction').value || 'Neutre',
+            citation: document.getElementById('add-citation').value || '',
+            histoire: document.getElementById('add-histoire').value || ''
+        };
+        entries.push(newItem);
+        selectedId = newItem.id;
+        localStorage.setItem('statdex_last_add_time', Date.now());
+        saveData();
+        renderApp();
+    }
+
+    function showEditForm(id) {
+        window.isRunnerActive = false;
+        const item = entries.find(e => e.id === id);
+        currentPhotoBase64 = item.photo || "";
+        document.getElementById('left-panel-title').innerText = "MODIFIER";
+        let typeOptions = Object.keys(typesList).map(t => `<option value="${t}" ${item.type === t ? 'selected' : ''}>${typesList[t]} ${t}</option>`).join('');
+
+        document.getElementById('profile-view').innerHTML = `
+            <form onsubmit="saveEdit(event, ${item.id})">
+                <input type="text" id="edit-prenom" value="${item.prenom}" required>
+                <select id="edit-type">${typeOptions}</select>
+                <input type="number" id="edit-lvl" value="${item.lvl || 50}" required>
+                <input type="file" accept="image/*" onchange="handleImageUpload(this)">
+                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:4px;">
+                    <input type="number" id="edit-mental" value="${item.mental}" step="0.5" required>
+                    <input type="number" id="edit-visage" value="${item.visage}" step="0.5" required>
+                    <input type="number" id="edit-corps" value="${item.corps}" step="0.5" required>
+                    <input type="number" id="edit-sexe" value="${item.sexe}" step="0.5" required>
+                </div>
+                <input type="text" id="edit-origine" value="${item.origine || ''}">
+                <input type="text" id="edit-faction" value="${item.faction || ''}">
+                <input type="text" id="edit-citation" value="${item.citation || ''}">
+                <textarea id="edit-histoire" rows="2" style="resize:none;">${item.histoire || ''}</textarea>
+                <button type="submit" class="btn-action" style="width:100%; background:#7ca862; color:#111; font-weight:bold; margin-top:2px;">VALIDER</button>
+            </form>
+        `;
+    }
+
+    function saveEdit(e, id) {
+        e.preventDefault();
+        const item = entries.find(e => e.id === id);
+        item.prenom = document.getElementById('edit-prenom').value;
+        item.type = document.getElementById('edit-type').value;
+        item.lvl = parseInt(document.getElementById('edit-lvl').value) || 50;
+        item.photo = currentPhotoBase64;
+        item.mental = parseFloat(document.getElementById('edit-mental').value) || 0;
+        item.visage = parseFloat(document.getElementById('edit-visage').value) || 0;
+        item.corps = parseFloat(document.getElementById('edit-corps').value) || 0;
+        item.sexe = parseFloat(document.getElementById('edit-sexe').value) || 0;
+        item.origine = document.getElementById('edit-origine').value;
+        item.faction = document.getElementById('edit-faction').value;
+        item.citation = document.getElementById('edit-citation').value;
+        item.histoire = document.getElementById('edit-histoire').value;
+        saveData();
+        renderApp();
+    }
+
+    function deleteItem(id) {
+        if(confirm("Supprimer ce profil ?")) {
+            entries = entries.filter(e => e.id !== id);
+            if(entries.length > 0) selectedId = entries[0].id;
+            saveData();
+            renderApp();
+        }
+    }
+
+    function showVsMode() {
+        window.isRunnerActive = false;
+        document.getElementById('left-panel-title').innerText = "CENTRE DE JEUX 🕹️";
+        if(entries.length < 2) {
+            document.getElementById('profile-view').innerHTML = `
+                <div style="text-align:center; padding-top:40px; font-size:12px;">
+                    Il faut au moins 2 profils enregistrés dans la liste pour lancer les duels et mini-jeux !
+                </div>
+            `;
+            return;
+        }
+
+        let optionsHtml = entries.map(e => `<option value="${e.id}">${typesList[e.type] || ''} ${e.prenom}</option>`).join('');
+        let historyHtml = arenaHistory.length > 0 ? `<div style="font-size:10px; font-weight:bold; margin-top:4px; border-top:1px dashed #111; padding-top:2px;">RECORDS : ${arenaHistory.slice(0, 3).map(h => `🏆 ${h}`).join(' | ')}</div>` : '';
+
+        document.getElementById('profile-view').innerHTML = `
+            <div class="vs-box"><div class="vs-title">COMBATTANT 1</div><select id="vs1">${optionsHtml}</select></div>
+            <div class="vs-box"><div class="vs-title">COMBATTANT 2</div><select id="vs2" value="${entries[1] ? entries[1].id : entries[0].id}">${optionsHtml}</select></div>
+            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:4px; margin-top:2px;">
+                <button class="btn-action" style="background:#b83a2b; font-weight:bold;" onclick="runVsMatch()">⚔️ DUEL</button>
+                <button class="btn-action" style="background:#38bdf8; color:#111; font-weight:bold;" onclick="showChessGame()">♟️ ÉCHECS</button>
+                <button class="btn-action" style="background:#facc15; color:#111; font-weight:bold;" onclick="showSpeedChasseGame()">🎯 CHASSE</button>
+                <button class="btn-action" style="background:#22c55e; color:#111; font-weight:bold;" onclick="showRunnerGame()">🏃 RUNNER</button>
+            </div>
+            <div id="vs-arena-area"></div>
+            ${historyHtml}
+        `;
+    }
+
+    function updateHpBar(elementId, hp, maxHp) {
+        const bar = document.getElementById(elementId);
+        if (!bar) return;
+        const pct = Math.max(0, Math.min(100, (hp / maxHp) * 100));
+        bar.style.width = `${pct}%`;
+        if (pct < 25) bar.style.background = '#ef4444';
+        else if (pct < 50) bar.style.background = '#eab308';
+        else bar.style.background = '#22c55e';
+    }
+
+    function runVsMatch() {
+        playSfx();
+        const p1Id = parseInt(document.getElementById('vs1').value);
+        const p2Id = parseInt(document.getElementById('vs2').value);
+        if(p1Id === p2Id) { alert("Choisis 2 personnes différentes !"); return; }
+
+        const p1 = entries.find(e => e.id === p1Id);
+        const p2 = entries.find(e => e.id === p2Id);
+
+        const arenaArea = document.getElementById('vs-arena-area');
+        arenaArea.innerHTML = `
+            <div class="vs-box" style="margin-top:4px;">
+                <div style="font-size:11px;"><strong>${p1.prenom}</strong> LVL.${p1.lvl || 50}</div>
+                <div class="hp-bar-outer"><div id="hp-p1" class="hp-bar-inner" style="width:100%;"></div></div>
+                <div style="font-size:11px; margin-top:2px;"><strong>${p2.prenom}</strong> LVL.${p2.lvl || 50}</div>
+                <div class="hp-bar-outer"><div id="hp-p2" class="hp-bar-inner" style="width:100%;"></div></div>
+            </div>
+            <div class="battle-log" id="battle-log">🎮 Préparation du duel...</div>
+        `;
+
+        const logEl = document.getElementById('battle-log');
+        let hp1 = 100, hp2 = 100;
+        const attacks = [
+            { stat: 'mental', desc: "LANCE ATTAQUE MENTALE !" },
+            { stat: 'visage', desc: "UTILISE REGARDS CHARMANTS !" },
+            { stat: 'corps', desc: "DONNE UN COUP DE BOULE !" },
+            { stat: 'sexe', desc: "DÉCHAINE SA PASSION !" }
+        ];
+
+        let turn = 0;
+        const maxTurns = 5;
+
+        function battleTurn() {
+            if (hp1 <= 0 || hp2 <= 0 || turn >= maxTurns) {
+                let winner = hp1 > hp2 ? p1 : (hp2 > hp1 ? p2 : (parseFloat(getMoyenne(p1)) >= parseFloat(getMoyenne(p2)) ? p1 : p2));
+                playCartridgeInsertSound();
+                logEl.innerHTML += `<br><strong>🏆 KO ! ${winner.prenom.toUpperCase()} REMPORTE LA VICTOIRE !</strong>`;
+                logEl.scrollTop = logEl.scrollHeight;
+
+                arenaHistory.unshift(winner.prenom);
+                if (arenaHistory.length > 5) arenaHistory.pop();
+                localStorage.setItem('statdex_arena_history', JSON.stringify(arenaHistory));
+                return;
+            }
+
+            turn++;
+            const attacker = turn % 2 !== 0 ? p1 : p2;
+            const defender = turn % 2 !== 0 ? p2 : p1;
+            const isP1Attacking = turn % 2 !== 0;
+
+            const atkObj = attacks[Math.floor(Math.random() * attacks.length)];
+            const baseDmg = Math.floor((Number(attacker[atkObj.stat]) || 5) * 3.5 + Math.random() * 8);
+
+            playHitSound();
+            if (isP1Attacking) { hp2 -= baseDmg; updateHpBar('hp-p2', hp2, 100); }
+            else { hp1 -= baseDmg; updateHpBar('hp-p1', hp1, 100); }
+
+            logEl.innerHTML += `<br>⚡ ${attacker.prenom} ${atkObj.desc} (-${baseDmg} PV)`;
+            logEl.scrollTop = logEl.scrollHeight;
+            setTimeout(battleTurn, 800);
+        }
+        setTimeout(battleTurn, 600);
+    }
+
+    let chessBoardState = [];
+    let chessSelectedSquare = null;
+    let chessTurn = 'w';
+
+    function initChessGame() {
+        chessTurn = 'w';
+        chessSelectedSquare = null;
+        chessBoardState = [
+            ['r','n','b','q','k','b','n','r'],
+            ['p','p','p','p','p','p','p','p'],
+            ['','','','','','','',''],
+            ['','','','','','','',''],
+            ['','','','','','','',''],
+            ['','','','','','','',''],
+            ['P','P','P','P','P','P','P','P'],
+            ['R','N','B','Q','K','B','N','R']
+        ];
+    }
+
+    const chessSymbols = {
+        'r': '♜', 'n': '♞', 'b': '♝', 'q': '♛', 'k': '♚', 'p': '♟',
+        'R': '♖', 'N': '♘', 'B': '♗', 'Q': '♕', 'K': '♔', 'P': '♙'
+    };
+
+    function showChessGame() {
+        playSfx();
+        initChessGame();
+        document.getElementById('left-panel-title').innerText = "STATDEX ÉCHECS ♟️";
+        renderChessView();
+    }
+
+    function renderChessView() {
+        const arenaArea = document.getElementById('vs-arena-area');
+        if(!arenaArea) return;
+
+        let boardHtml = '<div class="chess-board">';
+        for(let r=0; r<8; r++) {
+            for(let c=0; c<8; c++) {
+                const piece = chessBoardState[r][c];
+                const symbol = chessSymbols[piece] || '';
+                const isLight = (r + c) % 2 === 0;
+                const classLight = isLight ? 'chess-light' : 'chess-dark';
+                const isSelected = (chessSelectedSquare && chessSelectedSquare.r === r && chessSelectedSquare.c === c) ? 'selected' : '';
+                boardHtml += `<div class="chess-square ${classLight} ${isSelected}" onclick="handleChessClick(${r}, ${c})">${symbol}</div>`;
+            }
+        }
+        boardHtml += '</div>';
+
+        arenaArea.innerHTML = `
+            <div style="font-size:11px; text-align:center; margin-top:2px;">Tour : <strong>${chessTurn === 'w' ? 'Blancs (Bas)' : 'Noirs (Haut)'}</strong></div>
+            ${boardHtml}
+            <button class="btn-action" style="width:100%; margin-top:2px;" onclick="showVsMode()">⬅️ RETOUR JEUX</button>
+        `;
+    }
+
+    function handleChessClick(r, c) {
+        playSfx();
+        const piece = chessBoardState[r][c];
+
+        if (!chessSelectedSquare) {
+            if (piece !== '') {
+                const isWhitePiece = piece === piece.toUpperCase();
+                if ((chessTurn === 'w' && isWhitePiece) || (chessTurn === 'b' && !isWhitePiece)) {
+                    chessSelectedSquare = { r, c };
+                    renderChessView();
+                }
+            }
+        } else {
+            const fromR = chessSelectedSquare.r;
+            const fromC = chessSelectedSquare.c;
+
+            if (fromR === r && fromC === c) {
+                chessSelectedSquare = null;
+            } else {
+                chessBoardState[r][c] = chessBoardState[fromR][fromC];
+                chessBoardState[fromR][fromC] = '';
+                chessSelectedSquare = null;
+                chessTurn = chessTurn === 'w' ? 'b' : 'w';
+            }
+            renderChessView();
+        }
+    }
+
+    let speedChasseScore = 0;
+    let speedChasseTimer = 15;
+    let speedChasseInterval = null;
+    let speedChasseActive = false;
+
+    function showSpeedChasseGame() {
+        playSfx();
+        window.isRunnerActive = false;
+        document.getElementById('left-panel-title').innerText = "SPEED-CHASSE 🎯";
+        const arenaArea = document.getElementById('vs-arena-area');
+        if(!arenaArea) return;
+
+        arenaArea.innerHTML = `
+            <div style="font-size:11px; text-align:center; margin-top:2px;">Record : <strong>${speedChasseHighScore} pts</strong></div>
+            <div class="speed-chasse-arena" id="speed-arena" onclick="missSpeedTarget()">
+                <div style="color:#aaa; text-align:center; padding-top:45px; font-size:13px;" id="speed-start-msg">Clique sur Démarrer !</div>
+            </div>
+            <div style="display:flex; gap:4px; margin-top:4px;">
+                <button class="btn-action" style="flex:1; background:#7ca862; font-weight:bold;" onclick="startSpeedChasse()">🚀 DÉMARRER</button>
+                <button class="btn-action" style="flex:1;" onclick="showVsMode()">⬅️ RETOUR</button>
+            </div>
+        `;
+    }
+
+    function startSpeedChasse() {
+        playSfx();
+        speedChasseScore = 0;
+        speedChasseTimer = 15;
+        speedChasseActive = true;
+        
+        const arena = document.getElementById('speed-arena');
+        if(arena) arena.innerHTML = '';
+        spawnSpeedTarget();
+
+        if(speedChasseInterval) clearInterval(speedChasseInterval);
+        speedChasseInterval = setInterval(() => {
+            speedChasseTimer--;
+            if(speedChasseTimer <= 0) {
+                clearInterval(speedChasseInterval);
+                speedChasseActive = false;
+                playCartridgeInsertSound();
+                if(speedChasseScore > speedChasseHighScore) {
+                    speedChasseHighScore = speedChasseScore;
+                    localStorage.setItem('statdex_speed_chasse_highscore', speedChasseHighScore);
+                }
+                const arena = document.getElementById('speed-arena');
+                if(arena) {
+                    arena.innerHTML = `<div style="color:#facc15; text-align:center; padding-top:40px; font-size:14px; font-weight:bold;">TEMPS ÉCOULÉ !<br>Score : ${speedChasseScore} pts</div>`;
+                }
+            } else {
+                updateSpeedChasseHUD();
+            }
+        }, 1000);
+    }
+
+    function updateSpeedChasseHUD() {
+        const arena = document.getElementById('speed-arena');
+        if(!arena) return;
+        let hud = document.getElementById('speed-hud');
+        if(!hud) {
+            hud = document.createElement('div');
+            hud.id = 'speed-hud';
+            hud.style.cssText = "position:absolute; top:4px; left:6px; color:#fff; font-size:11px; pointer-events:none; z-index:10;";
+            arena.appendChild(hud);
+        }
+        hud.innerHTML = `Temps: ${speedChasseTimer}s | Score: ${speedChasseScore}`;
+    }
+
+    function spawnSpeedTarget() {
+        if(!speedChasseActive) return;
+        const arena = document.getElementById('speed-arena');
+        if(!arena) return;
+
+        const oldTarget = arena.querySelector('.speed-target');
+        if(oldTarget) oldTarget.remove();
+
+        updateSpeedChasseHUD();
+
+        const maxX = arena.clientWidth - 32;
+        const maxY = arena.clientHeight - 32;
+        const randX = Math.max(4, Math.floor(Math.random() * maxX));
+        const randY = Math.max(20, Math.floor(Math.random() * maxY));
+
+        const target = document.createElement('div');
+        target.className = 'speed-target';
+        target.style.left = `${randX}px`;
+        target.style.top = `${randY}px`;
+        target.innerHTML = '🎯';
+        
+        target.onclick = (e) => {
+            e.stopPropagation();
+            if(!speedChasseActive) return;
+            playHitSound();
+            speedChasseScore += 100;
+            spawnSpeedTarget();
+        };
+        arena.appendChild(target);
+    }
+
+    function missSpeedTarget() {
+        if(!speedChasseActive) return;
+        playSfx();
+        speedChasseScore = Math.max(0, speedChasseScore - 20);
+        updateSpeedChasseHUD();
+    }
+
+    window.isRunnerActive = false;
+    let runnerScore = 0;
+    let runnerPlayerY = 0;
+    let runnerJumping = false;
+    let runnerObsX = 250;
+    let runnerLoop = null;
+
+    function showRunnerGame() {
+        playSfx();
+        window.isRunnerActive = true;
+        document.getElementById('left-panel-title').innerText = "STATDEX RUNNER 🏃";
+        const arenaArea = document.getElementById('vs-arena-area');
+        if(!arenaArea) return;
+
+        arenaArea.innerHTML = `
+            <div style="font-size:11px; text-align:center; margin-top:2px;">Record : <strong>${runnerHighScore} pts</strong></div>
+            <div class="runner-arena" id="runner-arena" onclick="triggerRunnerJump()">
+                <div style="position:absolute; top:4px; left:6px; color:#fff; font-size:11px; z-index:10;" id="runner-hud">Score: 0</div>
+                <div class="runner-ground"></div>
+                <div class="runner-player" id="runner-player" style="bottom: 15px;">🏃</div>
+                <div class="runner-obstacle" id="runner-obs" style="left: 250px;"></div>
+                <div style="color:#aaa; text-align:center; padding-top:45px; font-size:12px; pointer-events:none;" id="runner-start-msg">Touche ou Espace pour sauter !</div>
+            </div>
+            <div style="display:flex; gap:4px; margin-top:4px;">
+                <button class="btn-action" style="flex:1; background:#7ca862; font-weight:bold;" onclick="startRunnerGame()">🚀 DÉMARRER</button>
+                <button class="btn-action" style="flex:1;" onclick="window.isRunnerActive=false; showVsMode();">⬅️ RETOUR</button>
+            </div>
+        `;
+    }
+
+    function startRunnerGame() {
+        playSfx();
+        window.isRunnerActive = true;
+        runnerScore = 0;
+        runnerObsX = 280;
+        runnerJumping = false;
+        runnerPlayerY = 15;
+
+        const startMsg = document.getElementById('runner-start-msg');
+        if(startMsg) startMsg.style.display = 'none';
+
+        if(runnerLoop) clearInterval(runnerLoop);
+        runnerLoop = setInterval(() => {
+            if(!window.isRunnerActive) return;
+
+            runnerScore += 10;
+            runnerObsX -= 7;
+
+            if(runnerObsX < -20) {
+                runnerObsX = 280 + Math.floor(Math.random() * 50);
+            }
+
+            const playerEl = document.getElementById('runner-player');
+            const obsEl = document.getElementById('runner-obs');
+            const hudEl = document.getElementById('runner-hud');
+
+            if(obsEl) obsEl.style.left = `${runnerObsX}px`;
+            if(hudEl) hudEl.innerHTML = `Score: ${runnerScore}`;
+
+            if(runnerObsX > 15 && runnerObsX < 45 && runnerPlayerY <= 20) {
+                window.isRunnerActive = false;
+                clearInterval(runnerLoop);
+                playHitSound();
+                if(runnerScore > runnerHighScore) {
+                    runnerHighScore = runnerScore;
+                    localStorage.setItem('statdex_runner_highscore', runnerHighScore);
+                }
+                const arena = document.getElementById('runner-arena');
+                if(arena) {
+                    arena.innerHTML += `<div style="position:absolute; top:40px; left:20px; right:20px; background:#000; border:2px solid #fff; color:#facc15; text-align:center; padding:10px; font-size:14px; font-weight:bold; z-index:20;">GAME OVER !<br>Score : ${runnerScore} pts</div>`;
+                }
+            }
+        }, 30);
+    }
+
+    function triggerRunnerJump() {
+        if(!window.isRunnerActive || runnerJumping) return;
+        runnerJumping = true;
+        playJumpSound();
+
+        const playerEl = document.getElementById('runner-player');
+        if(!playerEl) return;
+
+        let jumpHeight = 0;
+        let upInterval = setInterval(() => {
+            jumpHeight += 6;
+            runnerPlayerY = 15 + jumpHeight;
+            playerEl.style.bottom = `${runnerPlayerY}px`;
+            if(jumpHeight >= 55) {
+                clearInterval(upInterval);
+                let downInterval = setInterval(() => {
+                    jumpHeight -= 6;
+                    runnerPlayerY = 15 + jumpHeight;
+                    playerEl.style.bottom = `${runnerPlayerY}px`;
+                    if(jumpHeight <= 0) {
+                        runnerPlayerY = 15;
+                        playerEl.style.bottom = `${runnerPlayerY}px`;
+                        clearInterval(downInterval);
+                        runnerJumping = false;
+                    }
+                }, 20);
+            }
+        }, 20);
+    }
+
+    function showSettings() {
+        window.isRunnerActive = false;
+        document.getElementById('left-panel-title').innerText = "PARAMETRES ⚙️";
+        let count = entries.length;
+        let rankInfo = getTrainerRank(count);
+
+        let colorDotsHtml = `
+            <div class="color-dot" style="background:#bd4832;" title="Rouge" onclick="changeConsoleColor('#bd4832','#822b1b')"></div>
+            <div class="color-dot" style="background:#db2777;" title="Rose" onclick="changeConsoleColor('#db2777','#9d174d')"></div>
+            <div class="color-dot" style="background:#325ebd;" title="Bleu" onclick="changeConsoleColor('#325ebd','#1b3582')"></div>
+            <div class="color-dot" style="background:#202020;" title="Noir" onclick="changeConsoleColor('#202020','#050505')"></div>
+            <div class="color-dot" style="background:linear-gradient(135deg, #7832a0, #38bdf8);" title="Transparent Violet" onclick="setTransparentTheme('purple')"></div>
+            <div class="color-dot" style="background:linear-gradient(135deg, #c8d2e1, #7a889b);" title="Transparent Crystal" onclick="setTransparentTheme('clear')"></div>
+        `;
+        if (isGoldUnlocked) colorDotsHtml += `<div class="color-dot" style="background:linear-gradient(135deg, #fde047, #ca8a04);" title="Or" onclick="changeConsoleColor('#facc15','#854d0e', '\\'⚡\\'')"></div>`;
+        if (isFlameUnlocked) colorDotsHtml += `<div class="color-dot" style="background:linear-gradient(135deg, #ff4500, #ff0000);" title="Flamme" onclick="changeConsoleColor('#ff2200','#990000', '\\'🔥\\'')"></div>`;
+
+        document.getElementById('profile-view').innerHTML = `
+            <div style="background: rgba(0,0,0,0.06); border:2px solid #111; padding:4px; margin-bottom:4px; text-align:center;">
+                <div style="font-size:11px; font-weight:bold;">STATUT DE DRESSEUR :</div>
+                <div style="font-size:13px; color:#b83a2b; font-weight:bold;">${rankInfo.title}</div>
+                <div style="font-size:10px; opacity:0.8;">Profils enregistrés : ${count} / ${rankInfo.next}</div>
+            </div>
+
+            <div style="font-size:12px; font-weight:bold;">BRUITAGES (SFX) :</div>
+            <button class="btn-action" style="width:100%; margin-top:2px; background:${sfxEnabled ? '#7ca862' : '#b83a2b'}; font-weight:bold;" onclick="toggleSfxSetting()">
+                🔊 BRUITS : ${sfxEnabled ? 'ACTIVÉ' : 'DÉSACTIVÉ'}
+            </button>
+
+            <div style="font-size:12px; font-weight:bold; margin-top:4px;">PLEIN ÉCRAN :</div>
+            <button class="btn-action" style="width:100%; margin-top:2px; background:#38bdf8; color:#111; font-weight:bold;" onclick="toggleFullscreen()">🖥️ PLEIN ÉCRAN</button>
+            
+            <div style="font-size:12px; font-weight:bold; margin-top:4px;">THÈMES & COULEURS :</div>
+            <div class="color-picker-grid">${colorDotsHtml}</div>
+
+            <div style="font-size:12px; font-weight:bold; margin-top:4px;">MUSIQUE (8-BIT) :</div>
+            <button class="btn-action" style="width:100%; margin-top:2px;" onclick="nextTrack()">🎵 Piste : ${musicTracks[currentTrack].name}</button>
+            <button class="btn-action" style="width:100%; margin-top:2px; background:${isAudioPlaying ? '#b83a2b' : '#7ca862'};" onclick="toggleMusic()">
+                ${isAudioPlaying ? '🛑 COUPER LA MUSIQUE' : '▶️ JOUER LA MUSIQUE'}
+            </button>
+        `;
+    }
+
+    function toggleMusic() {
+        playSfx();
+        if(isAudioPlaying) stop8BitMusic(); else start8BitMusic();
+        showSettings();
+    }
+</script>
+</body>
+</html>
