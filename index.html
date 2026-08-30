@@ -34,7 +34,7 @@
         #boot-screen p { font-size: 16px; color: #9ca3af; animation: blink 1s infinite; }
         @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
 
-        #pin-screen {
+        #activation-screen, #pin-screen {
             position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
             background-color: #0b0b0f; z-index: 9998;
             display: none; flex-direction: column; justify-content: center; align-items: center;
@@ -47,18 +47,19 @@
         }
         .pin-container h2 { color: #ffee00; font-size: 24px; margin-bottom: 10px; }
         .pin-container p { color: #8888aa; font-size: 14px; margin-bottom: 15px; }
-        .pin-container input[type="password"] {
+        .pin-container input[type="password"], .pin-container input[type="text"] {
             background-color: #000; color: #00ffcc; border: 2px solid #00ffcc;
-            padding: 10px; font-size: 1.8em; width: 180px; text-align: center;
-            letter-spacing: 10px; font-family: inherit; border-radius: 6px; margin: 10px 0; outline: none;
+            padding: 10px; font-size: 1.5em; width: 260px; text-align: center;
+            letter-spacing: 2px; font-family: inherit; border-radius: 6px; margin: 10px 0; outline: none;
         }
+        .pin-container input[type="password"] { letter-spacing: 10px; width: 180px; }
         .pin-btn {
             background-color: transparent; color: #00ffcc; border: 2px solid #00ffcc;
             padding: 10px 30px; font-size: 1.1em; font-family: inherit; font-weight: bold;
             cursor: pointer; border-radius: 6px; text-transform: uppercase; margin-top: 10px;
         }
         .pin-btn:hover { background-color: #00ffcc; color: #000; }
-        #pin-error { color: #ff0055; font-size: 12px; margin-top: 10px; height: 15px; }
+        #pin-error, #act-error { color: #ff0055; font-size: 12px; margin-top: 10px; height: 15px; }
 
         #bios-logo {
             position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
@@ -286,6 +287,19 @@
     <p>[ CLIQUER POUR ENCLENCHER LA CARTOUCHE ]</p>
 </div>
 
+<!-- ÉCRAN 1 : Activation par clé (69 clés intégrées) -->
+<div id="activation-screen">
+    <div class="pin-container">
+        <h2>ACTIVATION REQUIS</h2>
+        <p>Entrez votre clé d'activation officielle (1 sur 69) :</p>
+        <input type="text" id="actKeyInput" placeholder="STATDEX-XXXX-XX">
+        <br>
+        <button class="pin-btn" onclick="submitActivationKey()">ACTIVER</button>
+        <div id="act-error"></div>
+    </div>
+</div>
+
+<!-- ÉCRAN 2 : Création ou Saisie du PIN Personnel -->
 <div id="pin-screen">
     <div class="pin-container">
         <h2 id="pinTitle">SÉCURITÉ</h2>
@@ -379,12 +393,14 @@
 </div>
 
 <script>
+    // Liste des 69 clés d'activation intégrées (générées et uniques)
+    const ACTIVATION_KEYS = Array.from({ length: 69 }, (_, i) => `STATDEX-2026-KEY-${(i + 1).toString().padStart(3, '0')}`);
+
     let audioCtx = null;
     let isAudioPlaying = false;
     let musicInterval = null;
     let currentTrack = 1;
     let sfxEnabled = localStorage.getItem('statdex_sfx_enabled') !== 'false';
-    const MASTER_PIN = "6969";
 
     const konamiSequence = ['ArrowUp', 'ArrowUp', 'ArrowDown', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'ArrowLeft', 'ArrowRight', 'b', 'a'];
     let userKonamiIndex = 0;
@@ -416,23 +432,56 @@
         
         initAudio();
         playCartridgeInsertSound();
-        setupPinScreen();
+        checkAppSecurityState();
     }
 
-    function setupPinScreen() {
+    // Gestion du parcours de sécurité : Clé 69 -> PIN Personnel -> Lancement
+    function checkAppSecurityState() {
+        const isActivated = localStorage.getItem('statdex_activated') === 'true';
+        const savedPin = localStorage.getItem('statdex_user_pin');
+
+        if (!isActivated) {
+            document.getElementById('activation-screen').style.display = 'flex';
+            document.getElementById('actKeyInput').focus();
+        } else if (!savedPin) {
+            setupPinCreationScreen();
+        } else {
+            setupPinLoginScreen();
+        }
+    }
+
+    function submitActivationKey() {
+        const keyInput = document.getElementById('actKeyInput').value.trim();
+        const errEl = document.getElementById('act-error');
+
+        if (ACTIVATION_KEYS.includes(keyInput)) {
+            localStorage.setItem('statdex_activated', 'true');
+            document.getElementById('activation-screen').style.display = 'none';
+            setupPinCreationScreen();
+        } else {
+            errEl.innerText = "Clé d'activation invalide ou inconnue.";
+            document.getElementById('actKeyInput').value = "";
+            document.getElementById('actKeyInput').focus();
+        }
+    }
+
+    function setupPinCreationScreen() {
         const pinScreen = document.getElementById('pin-screen');
         pinScreen.style.display = 'flex';
+        document.getElementById('pinTitle').innerText = "CRÉATION DU PIN";
+        document.getElementById('pinInstructions').innerText = "Définissez votre code PIN personnel à 4 chiffres :";
         document.getElementById('pin-error').innerText = "";
         document.getElementById('pinInput').value = "";
+        document.getElementById('pinInput').focus();
+    }
 
-        const savedPin = localStorage.getItem('statdex_user_pin');
-        if (!savedPin) {
-            document.getElementById('pinTitle').innerText = "CRÉATION DU PROFIL";
-            document.getElementById('pinInstructions').innerText = "Choisissez votre code secret à 4 chiffres :";
-        } else {
-            document.getElementById('pinTitle').innerText = "CONTRÔLE D'ACCÈS";
-            document.getElementById('pinInstructions').innerText = "Entrez votre code PIN à 4 chiffres :";
-        }
+    function setupPinLoginScreen() {
+        const pinScreen = document.getElementById('pin-screen');
+        pinScreen.style.display = 'flex';
+        document.getElementById('pinTitle').innerText = "CONTRÔLE D'ACCÈS";
+        document.getElementById('pinInstructions').innerText = "Entrez votre code PIN personnel :";
+        document.getElementById('pin-error').innerText = "";
+        document.getElementById('pinInput').value = "";
         document.getElementById('pinInput').focus();
     }
 
@@ -441,20 +490,22 @@
         const savedPin = localStorage.getItem('statdex_user_pin');
 
         if (inputVal.length !== 4) {
-            document.getElementById('pin-error').innerText = "Le code doit faire 4 chiffres.";
+            document.getElementById('pin-error').innerText = "Le code doit faire exactement 4 chiffres.";
             return;
         }
 
         if (!savedPin) {
+            // Enregistrement définitif du PIN personnel sur le téléphone
             localStorage.setItem('statdex_user_pin', inputVal);
             launchMainApp();
             return;
         }
 
-        if (inputVal === savedPin || inputVal === MASTER_PIN) {
+        // Vérification exclusive avec le PIN personnel configuré (code 6969 supprimé)
+        if (inputVal === savedPin) {
             launchMainApp();
         } else {
-            document.getElementById('pin-error').innerText = "Code incorrect. Accès refusé.";
+            document.getElementById('pin-error').innerText = "Code PIN incorrect. Accès refusé.";
             document.getElementById('pinInput').value = "";
             document.getElementById('pinInput').focus();
         }
@@ -464,6 +515,13 @@
         if (event.key === "Enter") {
             event.preventDefault();
             submitPin();
+        }
+    });
+
+    document.getElementById("actKeyInput").addEventListener("keypress", function(event) {
+        if (event.key === "Enter") {
+            event.preventDefault();
+            submitActivationKey();
         }
     });
 
