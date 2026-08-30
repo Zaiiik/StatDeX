@@ -292,7 +292,7 @@
     <div class="pin-container">
         <h2>ACTIVATION REQUIS</h2>
         <p>Entrez votre clé d'accès unique (1 sur 69) :</p>
-        <input type="text" id="actKeyInput" placeholder="STATDEX-2026-KEY-XXX">
+        <input type="text" id="actKeyInput" placeholder="STATDEX-69-XXXX-XXXX">
         <br>
         <button class="pin-btn" onclick="submitActivationKey()">ACTIVER</button>
         <div id="act-error"></div>
@@ -393,8 +393,78 @@
 </div>
 
 <script>
-    // Liste initiale des 69 clés d'activation uniques (stockées et gérées via localStorage pour l'usage unique)
-    const MASTER_ACTIVATION_KEYS = Array.from({ length: 69 }, (_, i) => `STATDEX-2026-KEY-${(i + 1).toString().padStart(3, '0')}`);
+    // Liste des 69 clés d'activation uniques, aléatoires et stylées (avec clin d'œil au 69)
+    const MASTER_ACTIVATION_KEYS = [
+        "STATDEX-69-X9K2-W8Q4",
+        "STATDEX-69-M3P7-V5L1",
+        "STATDEX-69-R8T6-Z2H9",
+        "STATDEX-69-J4F3-N7X8",
+        "STATDEX-69-K5V1-Q9M2",
+        "STATDEX-69-B7W8-X3P4",
+        "STATDEX-69-L2N9-H6R5",
+        "STATDEX-69-Z1T4-V8K3",
+        "STATDEX-69-P9M5-F2J7",
+        "STATDEX-69-X6Q1-W4N8",
+        "STATDEX-69-H3R7-K5Z2",
+        "STATDEX-69-V8F4-M1T9",
+        "STATDEX-69-N2P6-Q7X3",
+        "STATDEX-69-W5K9-J3L8",
+        "STATDEX-69-T1M8-Z6H4",
+        "STATDEX-69-R7V2-X9P5",
+        "STATDEX-69-Q4N3-K1F7",
+        "STATDEX-69-J8W6-M5T2",
+        "STATDEX-69-H9X1-V3Z8",
+        "STATDEX-69-K2P4-L7R6",
+        "STATDEX-69-M6T5-Q8H1",
+        "STATDEX-69-Z3F9-N2W7",
+        "STATDEX-69-X1R8-J6K4",
+        "STATDEX-69-V5M2-P3T9",
+        "STATDEX-69-W8N7-X4H1",
+        "STATDEX-69-T2K6-Q1F5",
+        "STATDEX-69-R9P3-V8Z4",
+        "STATDEX-69-H4M1-J7L2",
+        "STATDEX-69-K6W8-N3X9",
+        "STATDEX-69-M1T4-Z5R7",
+        "STATDEX-69-Q7F2-P8V6",
+        "STATDEX-69-X3H9-W1K5",
+        "STATDEX-69-V2N8-J4T3",
+        "STATDEX-69-N6R1-Q5M7",
+        "STATDEX-69-W9P4-Z2X8",
+        "STATDEX-69-T5K3-H6F1",
+        "STATDEX-69-R1M7-V9L4",
+        "STATDEX-69-H8T2-X6P3",
+        "STATDEX-69-K4F9-Q3N1",
+        "STATDEX-69-M7W6-J1Z8",
+        "STATDEX-69-Z2N5-R4K2",
+        "STATDEX-69-X5Q8-P7T1",
+        "STATDEX-69-V1H3-W9M6",
+        "STATDEX-69-N8K4-F2X5",
+        "STATDEX-69-W3R9-J5Z7",
+        "STATDEX-69-T7M1-Q6P8",
+        "STATDEX-69-R2V6-X3H4",
+        "STATDEX-69-H5N3-K9T2",
+        "STATDEX-69-K9P8-M1F4",
+        "STATDEX-69-M4X2-Z7W9",
+        "STATDEX-69-Q1T6-V2R3",
+        "STATDEX-69-X8F7-N4K5",
+        "STATDEX-69-V6M9-H1P1",
+        "STATDEX-69-N3W4-J8Z6",
+        "STATDEX-69-W2K1-T5Q9",
+        "STATDEX-69-T9R8-X7M3",
+        "STATDEX-69-R4H2-P1V5",
+        "STATDEX-69-H1Z7-N9F6",
+        "STATDEX-69-K3T5-W6X2",
+        "STATDEX-69-M8P6-Q2L1",
+        "STATDEX-69-Z9N1-J3R8",
+        "STATDEX-69-X2V4-K7H9",
+        "STATDEX-69-V7W3-M5T1",
+        "STATDEX-69-N5F8-X1P6",
+        "STATDEX-69-W1M2-Z4K7",
+        "STATDEX-69-T3H6-Q9R3",
+        "STATDEX-69-R6K9-V8N2",
+        "STATDEX-69-H7P5-J2X1",
+        "STATDEX-69-K1V4-M3T8"
+    ];
 
     let audioCtx = null;
     let isAudioPlaying = false;
