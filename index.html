@@ -287,12 +287,12 @@
     <p>[ CLIQUER POUR ENCLENCHER LA CARTOUCHE ]</p>
 </div>
 
-<!-- ÉCRAN 1 : Activation par clé (69 clés intégrées) -->
+<!-- ÉCRAN 1 : Activation par clé unique (69 clés d'accès) -->
 <div id="activation-screen">
     <div class="pin-container">
         <h2>ACTIVATION REQUIS</h2>
-        <p>Entrez votre clé d'activation officielle (1 sur 69) :</p>
-        <input type="text" id="actKeyInput" placeholder="STATDEX-XXXX-XX">
+        <p>Entrez votre clé d'accès unique (1 sur 69) :</p>
+        <input type="text" id="actKeyInput" placeholder="STATDEX-2026-KEY-XXX">
         <br>
         <button class="pin-btn" onclick="submitActivationKey()">ACTIVER</button>
         <div id="act-error"></div>
@@ -393,8 +393,8 @@
 </div>
 
 <script>
-    // Liste des 69 clés d'activation intégrées (générées et uniques)
-    const ACTIVATION_KEYS = Array.from({ length: 69 }, (_, i) => `STATDEX-2026-KEY-${(i + 1).toString().padStart(3, '0')}`);
+    // Liste initiale des 69 clés d'activation uniques (stockées et gérées via localStorage pour l'usage unique)
+    const MASTER_ACTIVATION_KEYS = Array.from({ length: 69 }, (_, i) => `STATDEX-2026-KEY-${(i + 1).toString().padStart(3, '0')}`);
 
     let audioCtx = null;
     let isAudioPlaying = false;
@@ -435,7 +435,7 @@
         checkAppSecurityState();
     }
 
-    // Gestion du parcours de sécurité : Clé 69 -> PIN Personnel -> Lancement
+    // Gestion du parcours de sécurité : Clé unique (usage unique) -> PIN Personnel -> Lancement
     function checkAppSecurityState() {
         const isActivated = localStorage.getItem('statdex_activated') === 'true';
         const savedPin = localStorage.getItem('statdex_user_pin');
@@ -454,7 +454,23 @@
         const keyInput = document.getElementById('actKeyInput').value.trim();
         const errEl = document.getElementById('act-error');
 
-        if (ACTIVATION_KEYS.includes(keyInput)) {
+        // Récupérer les clés déjà consommées
+        let consumedKeys = JSON.parse(localStorage.getItem('statdex_consumed_keys')) || [];
+
+        // Vérifier si la clé fait partie de la liste maître et n'a pas déjà été utilisée
+        if (MASTER_ACTIVATION_KEYS.includes(keyInput)) {
+            if (consumedKeys.includes(keyInput)) {
+                errEl.innerText = "Cette clé a déjà été utilisée (usage unique).";
+                document.getElementById('actKeyInput').value = "";
+                document.getElementById('actKeyInput').focus();
+                return;
+            }
+
+            // Consommer la clé de manière unique
+            consumedKeys.push(keyInput);
+            localStorage.setItem('statdex_consumed_keys', JSON.stringify(consumedKeys));
+            
+            // Valider l'activation globale de cet appareil/compte
             localStorage.setItem('statdex_activated', 'true');
             document.getElementById('activation-screen').style.display = 'none';
             setupPinCreationScreen();
@@ -495,13 +511,13 @@
         }
 
         if (!savedPin) {
-            // Enregistrement définitif du PIN personnel sur le téléphone
+            // Enregistrement définitif du PIN personnel
             localStorage.setItem('statdex_user_pin', inputVal);
             launchMainApp();
             return;
         }
 
-        // Vérification exclusive avec le PIN personnel configuré (code 6969 supprimé)
+        // Vérification exclusive avec le PIN personnel configuré
         if (inputVal === savedPin) {
             launchMainApp();
         } else {
