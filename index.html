@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Solo Leveling - Powerbuilding Tracker V8.3</title>
+    <title>Solo Leveling - Powerbuilding Tracker V8.5</title>
     <style>
         :root {
             --bg-color: #050507;
@@ -104,6 +104,22 @@
         }
         .btn-action:active { background: var(--accent-purple); color: white; }
 
+        .rest-timer-box {
+            background: linear-gradient(135deg, rgba(0,230,118,0.1), rgba(0,0,0,0.6));
+            border: 2px solid var(--success);
+            border-radius: 10px;
+            padding: 10px 15px;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 0 10px rgba(0,230,118,0.2);
+        }
+        .timer-display { font-size: 1.4rem; font-weight: bold; color: var(--success); font-family: monospace; }
+        .timer-controls { display: flex; gap: 5px; }
+        .btn-timer { background: #222; color: #fff; border: 1px solid #444; padding: 5px 10px; border-radius: 6px; font-size: 0.75rem; cursor: pointer; font-weight: bold; }
+        .btn-timer.start { background: var(--success); color: #000; border-color: var(--success); }
+
         .block-selector { display: flex; gap: 6px; margin-bottom: 10px; overflow-x: auto; padding-bottom: 4px; }
         .block-tab {
             background: rgba(0,0,0,0.5); color: #888; border: 1px solid #333; padding: 6px 10px;
@@ -157,6 +173,14 @@
             display: none;
         }
 
+        .history-card {
+            background: rgba(0,0,0,0.5); border: 1px solid #333; border-radius: 8px;
+            padding: 10px 12px; margin-bottom: 8px; font-size: 0.8rem;
+        }
+        .history-header { display: flex; justify-content: space-between; font-weight: bold; color: var(--accent-purple); margin-bottom: 4px; }
+        .history-days-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; margin-top: 6px; }
+        .history-day-tag { background: rgba(255,255,255,0.05); padding: 3px; border-radius: 4px; font-size: 0.65rem; text-align: center; }
+
         .inventory-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-top: 10px; }
         .inventory-card {
             background: var(--highlight); border-radius: 12px; padding: 12px;
@@ -178,7 +202,7 @@
         .inv-image-container {
             width: 50px; height: 50px; background: rgba(0,0,0,0.5); border-radius: 8px;
             border: 1px dashed #555; display: flex; align-items: center; justify-content: center;
-            overflow: hidden; cursor: pointer; position: relative; margin-bottom: 6px;
+            overflow: hidden; cursor: pointer; position: relative; margin-bottom: 6px; flex-shrink: 0;
         }
         .inv-image-container img { width: 100%; height: 100%; object-fit: cover; }
         .inv-image-container span { font-size: 1.2rem; }
@@ -272,9 +296,14 @@
                     <div class="stats-grid" style="grid-template-columns: 1fr;">
                         <div class="stat-box">
                             <div class="stat-value" id="val-weekly-tonnage">0 kg</div>
-                            <div class="stat-label">Charge Totale Validée (Semaine)</div>
+                            <div class="stat-label">Charge Totale Validée (Semaine Actuelle)</div>
                         </div>
                     </div>
+                </div>
+
+                <h2>Historique Complet des Semaines & Jours</h2>
+                <div class="profile-card" id="history-container">
+                    <p style="font-size:0.75rem; color:#888; text-align:center;">Aucun historique enregistré pour le moment. Validez vos premières séances !</p>
                 </div>
 
                 <h2>Records Personnels (1RM)</h2>
@@ -292,6 +321,18 @@
                 <h2>Programme Powerbuilding</h2>
                 <p class="subtitle" id="current-block-subtitle">Bloc 1 (Hypertrophie / Force)</p>
                 
+                <div class="rest-timer-box">
+                    <div>
+                        <div style="font-size: 0.65rem; color: #aaa; text-transform: uppercase;">⏱️ Chrono de Repos</div>
+                        <div class="timer-display" id="timer-display">01:30</div>
+                    </div>
+                    <div class="timer-controls">
+                        <button class="btn-timer start" onclick="toggleTimer()">Start</button>
+                        <button class="btn-timer" onclick="resetTimer()">Reset</button>
+                        <button class="btn-timer" onclick="addTimerSeconds(30)">+30s</button>
+                    </div>
+                </div>
+
                 <div class="block-selector" id="block-tabs"></div>
                 <div class="day-selector" id="day-tabs"></div>
                 <div id="workout-container"></div>
@@ -458,6 +499,59 @@
             } catch (e) { console.log(e); }
         }
 
+        let timerSecondsLeft = 90;
+        let timerInterval = null;
+        let isTimerRunning = false;
+
+        function updateTimerDisplay() {
+            const m = Math.floor(timerSecondsLeft / 60).toString().padStart(2, '0');
+            const s = (timerSecondsLeft % 60).toString().padStart(2, '0');
+            const display = document.getElementById('timer-display');
+            if (display) display.innerText = `${m}:${s}`;
+        }
+
+        function toggleTimer() {
+            playSound('click');
+            const btn = document.querySelector('.btn-timer.start');
+            if (!isTimerRunning) {
+                if (timerSecondsLeft <= 0) timerSecondsLeft = 90;
+                isTimerRunning = true;
+                if(btn) { btn.innerText = "Pause"; btn.style.background = "var(--warning)"; btn.style.color = "#000"; }
+                timerInterval = setInterval(() => {
+                    if (timerSecondsLeft > 0) {
+                        timerSecondsLeft--;
+                        updateTimerDisplay();
+                    } else {
+                        clearInterval(timerInterval);
+                        isTimerRunning = false;
+                        playSound('success');
+                        if(btn) { btn.innerText = "Start"; btn.style.background = "var(--success)"; }
+                        alert("Fin du temps de repos ! Reprenez votre série.");
+                    }
+                }, 1000);
+            } else {
+                clearInterval(timerInterval);
+                isTimerRunning = false;
+                if(btn) { btn.innerText = "Start"; btn.style.background = "var(--success)"; }
+            }
+        }
+
+        function resetTimer() {
+            playSound('click');
+            clearInterval(timerInterval);
+            isTimerRunning = false;
+            timerSecondsLeft = 90;
+            updateTimerDisplay();
+            const btn = document.querySelector('.btn-timer.start');
+            if(btn) { btn.innerText = "Start"; btn.style.background = "var(--success)"; }
+        }
+
+        function addTimerSeconds(sec) {
+            playSound('click');
+            timerSecondsLeft += sec;
+            updateTimerDisplay();
+        }
+
         let userData = {
             weight: 85, height: 175, bodyFat: 15,
             squat: 50, bench: 50, deadlift: 50,
@@ -486,6 +580,8 @@
             { name: "Bloc 3", subtitle: "Semaine 3 (85%) - 3x3 Intensification" },
             { name: "Bloc 4", subtitle: "Semaine 4 (60%) - Deload Récupération" }
         ];
+
+        let workoutHistory = [];
 
         function roundTo25(val) {
             return Math.round(val / 2.5) * 2.5;
@@ -712,6 +808,9 @@
 
                 const savedCustomSets = localStorage.getItem('solo_leveling_custom_sets');
                 if (savedCustomSets) customSetData = JSON.parse(savedCustomSets);
+
+                const savedHistory = localStorage.getItem('solo_leveling_history');
+                if (savedHistory) workoutHistory = JSON.parse(savedHistory);
             } catch (e) { console.log(e); }
         }
 
@@ -722,7 +821,11 @@
                 localStorage.setItem('solo_leveling_block', currentBlockIndex);
                 localStorage.setItem('solo_leveling_state', JSON.stringify(workoutState));
                 localStorage.setItem('solo_leveling_custom_sets', JSON.stringify(customSetData));
-            } catch (e) { console.log(e); }
+                localStorage.setItem('solo_leveling_history', JSON.stringify(workoutHistory));
+            } catch (e) { 
+                console.log("Erreur de quota LocalStorage :", e);
+                alert("Attention : Le stockage local est plein (probablement à cause d'images trop lourdes). Essayez de réimporter des images plus légères ou supprimez des objets.");
+            }
         }
 
         function initAutoDateAndBlock() {
@@ -742,7 +845,7 @@
             document.getElementById('panel-' + tabName).classList.add('active');
             if (btnElement) btnElement.classList.add('active');
             if (tabName === 'settings') loadSettingsToInputs();
-            if (tabName === 'profile') updateProfileUI();
+            if (tabName === 'profile') { updateProfileUI(); renderHistoryUI(); }
             if (tabName === 'inventory') renderInventory();
         }
 
@@ -841,6 +944,33 @@
             });
 
             document.getElementById('val-weekly-tonnage').innerText = totalTonnage.toLocaleString() + " kg";
+            return totalTonnage;
+        }
+
+        function renderHistoryUI() {
+            const container = document.getElementById('history-container');
+            if (!workoutHistory || workoutHistory.length === 0) {
+                container.innerHTML = `<p style="font-size:0.75rem; color:#888; text-align:center;">Aucun historique enregistré pour le moment. Validez vos séances !</p>`;
+                return;
+            }
+
+            let html = '';
+            [...workoutHistory].reverse().forEach(entry => {
+                html += `
+                    <div class="history-card">
+                        <div class="history-header">
+                            <span>${entry.blockName}</span>
+                            <span style="color:var(--success);">${entry.totalTonnage.toLocaleString()} kg total</span>
+                        </div>
+                        <div style="font-size:0.65rem; color:#aaa; margin-bottom:4px;">Validé le : ${entry.date}</div>
+                        <div class="history-days-grid">
+                `;
+                for (let dayName in entry.dayTonnes) {
+                    html += `<div class="history-day-tag"><b>${dayName}</b><br>${entry.dayTonnes[dayName].toLocaleString()} kg</div>`;
+                }
+                html += `</div></div>`;
+            });
+            container.innerHTML = html;
         }
 
         function initWorkoutSystem() {
@@ -1036,16 +1166,40 @@
             document.getElementById('hidden-file-input').click();
         }
 
+        /* Compression automatique des images pour éviter de saturer le localStorage */
         function handleImageUpload(input) {
             if (input.files && input.files[0] && activeImageEditId) {
                 const reader = new FileReader();
                 reader.onload = function(e) {
-                    let item = inventoryItems.find(i => i.id === activeImageEditId);
-                    if (item) {
-                        item.image = e.target.result;
-                        saveToLocalStorage();
-                        renderInventory();
-                    }
+                    const img = new Image();
+                    img.onload = function() {
+                        const canvas = document.createElement('canvas');
+                        const MAX_SIZE = 150; // Redimensionne proprement en 150x150 max (très léger)
+                        let width = img.width;
+                        let height = img.height;
+                        
+                        if (width > height) {
+                            if (width > MAX_SIZE) { height *= MAX_SIZE / width; width = MAX_SIZE; }
+                        } else {
+                            if (height > MAX_SIZE) { width *= MAX_SIZE / height; height = MAX_SIZE; }
+                        }
+
+                        canvas.width = width;
+                        canvas.height = height;
+                        const ctx = canvas.getContext('2d');
+                        ctx.drawImage(img, 0, 0, width, height);
+                        
+                        // Compression en JPEG qualité 0.7 (très léger pour LocalStorage)
+                        const compressedDataUrl = canvas.toDataURL('image/jpeg', 0.7);
+
+                        let item = inventoryItems.find(i => i.id === activeImageEditId);
+                        if (item) {
+                            item.image = compressedDataUrl;
+                            saveToLocalStorage();
+                            renderInventory();
+                        }
+                    };
+                    img.src = e.target.result;
                 };
                 reader.readAsDataURL(input.files[0]);
             }
@@ -1085,11 +1239,29 @@
             if (fileInput.files && fileInput.files[0]) {
                 const reader = new FileReader();
                 reader.onload = function(e) {
-                    newItem.image = e.target.result;
-                    inventoryItems.push(newItem);
-                    saveToLocalStorage();
-                    renderInventory();
-                    closeAddItemModal();
+                    const img = new Image();
+                    img.onload = function() {
+                        const canvas = document.createElement('canvas');
+                        const MAX_SIZE = 150;
+                        let width = img.width;
+                        let height = img.height;
+                        if (width > height) {
+                            if (width > MAX_SIZE) { height *= MAX_SIZE / width; width = MAX_SIZE; }
+                        } else {
+                            if (height > MAX_SIZE) { width *= MAX_SIZE / height; height = MAX_SIZE; }
+                        }
+                        canvas.width = width;
+                        canvas.height = height;
+                        const ctx = canvas.getContext('2d');
+                        ctx.drawImage(img, 0, 0, width, height);
+                        newItem.image = canvas.toDataURL('image/jpeg', 0.7);
+
+                        inventoryItems.push(newItem);
+                        saveToLocalStorage();
+                        renderInventory();
+                        closeAddItemModal();
+                    };
+                    img.src = e.target.result;
                 };
                 reader.readAsDataURL(fileInput.files[0]);
             } else {
@@ -1156,11 +1328,55 @@
                 userData.prCount++;
             }
             userData.level = 1 + Math.floor(userData.workoutsCompleted / 3);
+
+            recordCurrentWeekToHistory();
             
             saveToLocalStorage();
             updateProfileUI();
             document.getElementById('modal-rating').style.display = 'none';
             switchTab('profile', document.querySelectorAll('.nav-item')[0]);
+        }
+
+        function recordCurrentWeekToHistory() {
+            const programsByBlock = getPrograms();
+            const blockProg = programsByBlock[currentBlockIndex];
+            if (!blockProg) return;
+
+            let dayTonnes = {};
+            let weekTonnage = 0;
+
+            blockProg.forEach((day, dIdx) => {
+                let daySum = 0;
+                day.exercises.forEach((ex, exIdx) => {
+                    for (let s = 0; s < ex.sets; s++) {
+                        if (workoutState[currentBlockIndex]?.[dIdx]?.[exIdx]?.[s]) {
+                            let reps = customSetData[currentBlockIndex]?.[dIdx]?.[exIdx]?.[s]?.reps ?? ex.defaultReps;
+                            let weight = customSetData[currentBlockIndex]?.[dIdx]?.[exIdx]?.[s]?.weight ?? ex.defaultWeight;
+                            daySum += (reps * weight);
+                        }
+                    }
+                });
+                dayTonnes[day.dayName] = daySum;
+                weekTonnage += daySum;
+            });
+
+            const blockNameStr = blocksData[currentBlockIndex].name;
+            const todayStr = new Date().toLocaleDateString('fr-FR');
+
+            let existingEntry = workoutHistory.find(h => h.blockIndex === currentBlockIndex);
+            if (existingEntry) {
+                existingEntry.totalTonnage = weekTonnage;
+                existingEntry.dayTonnes = dayTonnes;
+                existingEntry.date = todayStr;
+            } else {
+                workoutHistory.push({
+                    blockIndex: currentBlockIndex,
+                    blockName: blockNameStr,
+                    totalTonnage: weekTonnage,
+                    dayTonnes: dayTonnes,
+                    date: todayStr
+                });
+            }
         }
 
         loadFromLocalStorage();
