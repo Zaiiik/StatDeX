@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Solo Leveling - Powerbuilding Tracker V8.5</title>
+    <title>Solo Leveling - Powerbuilding Tracker V8.9</title>
     <style>
         :root {
             --bg-color: #050507;
@@ -87,10 +87,14 @@
             margin-bottom: 15px;
             text-align: center;
             box-shadow: 0 0 15px var(--glow-purple);
+            cursor: pointer;
+            transition: transform 0.1s ease;
         }
+        .rank-card:active { transform: scale(0.98); }
         .rank-title { font-size: 0.75rem; text-transform: uppercase; color: #aaa; letter-spacing: 1px; }
         .rank-badge { font-size: 1.6rem; font-weight: 900; text-transform: uppercase; margin: 5px 0; text-shadow: 0 0 10px currentColor; }
         .sbd-total-display { font-size: 0.85rem; color: #eee; }
+        .rank-hint { font-size: 0.65rem; color: var(--accent-rose); margin-top: 6px; text-transform: uppercase; letter-spacing: 0.5px; }
 
         .stats-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-top: 10px; }
         .stat-box { background: rgba(255, 0, 127, 0.08); padding: 10px; border-radius: 8px; text-align: center; border: 1px solid rgba(255,0,127,0.2); }
@@ -141,6 +145,9 @@
             background: var(--highlight); border-radius: 10px; padding: 12px; margin-bottom: 10px;
             border-left: 4px solid var(--accent-rose);
         }
+        .exercise-card.smart-progression-active {
+            border-left-color: var(--warning);
+        }
         .exercise-title { font-size: 0.95rem; color: white; margin-bottom: 3px; font-weight: bold; }
         .exercise-meta { font-size: 0.75rem; color: #aaa; margin-bottom: 8px; }
 
@@ -155,6 +162,12 @@
         .set-input-mini {
             background: #050507; border: 1px solid #444; color: white; border-radius: 4px;
             padding: 3px 5px; font-size: 0.75rem; width: 50px; text-align: center;
+        }
+        .set-input-mini.smart-adjusted {
+            border-color: var(--warning);
+            color: var(--warning);
+            font-weight: bold;
+            background: rgba(255, 234, 0, 0.08);
         }
         
         .btn-check {
@@ -173,13 +186,27 @@
             display: none;
         }
 
-        .history-card {
-            background: rgba(0,0,0,0.5); border: 1px solid #333; border-radius: 8px;
-            padding: 10px 12px; margin-bottom: 8px; font-size: 0.8rem;
+        .history-card-item {
+            background: rgba(0,0,0,0.4); border: 1px solid #333; border-radius: 8px;
+            padding: 12px; margin-bottom: 8px; font-size: 0.8rem; cursor: pointer;
+            display: flex; justify-content: space-between; align-items: center;
+            transition: all 0.15s ease;
         }
-        .history-header { display: flex; justify-content: space-between; font-weight: bold; color: var(--accent-purple); margin-bottom: 4px; }
-        .history-days-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; margin-top: 6px; }
-        .history-day-tag { background: rgba(255,255,255,0.05); padding: 3px; border-radius: 4px; font-size: 0.65rem; text-align: center; }
+        .history-card-item:active { transform: scale(0.98); background: rgba(189,0,255,0.08); }
+        .history-card-item:hover { border-color: var(--accent-purple); }
+        .history-info div:first-child { font-weight: bold; color: var(--accent-purple); font-size: 0.85rem; }
+        .history-info div:last-child { font-size: 0.65rem; color: #aaa; margin-top: 2px; }
+        .history-right { text-align: right; }
+        .history-tonnage { font-family: monospace; font-weight: bold; font-size: 0.9rem; color: var(--success); }
+        .history-hint { font-size: 0.6rem; color: var(--accent-rose); text-transform: uppercase; margin-top: 2px; }
+
+        .modal-history-grid { display: flex; flex-direction: column; gap: 8px; margin: 15px 0; text-align: left; max-height: 50dvh; overflow-y: auto; }
+        .modal-history-row {
+            background: rgba(0,0,0,0.4); border: 1px solid #333; border-radius: 8px;
+            padding: 10px; display: flex; justify-content: space-between; align-items: center;
+        }
+        .modal-history-row div:first-child { font-weight: bold; font-size: 0.8rem; color: white; }
+        .modal-history-row div:last-child { font-family: monospace; font-weight: bold; font-size: 0.85rem; color: var(--success); }
 
         .inventory-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-top: 10px; }
         .inventory-card {
@@ -231,6 +258,21 @@
             width: 100%; padding: 8px; background: #050507; border: 1px solid #444; color: white;
             border-radius: 6px; font-size: 0.9rem; text-align: center;
         }
+        .settings-toggle-row { display: flex; justify-content: space-between; align-items: center; margin-top: 10px; }
+        .settings-toggle-row span { font-size: 0.8rem; color: #fff; font-weight: bold; }
+        
+        .switch { position: relative; display: inline-block; width: 46px; height: 24px; }
+        .switch input { opacity: 0; width: 0; height: 0; }
+        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #333; transition: .3s; border-radius: 24px; border: 1px solid #555; }
+        .slider:before { position: absolute; content: ""; height: 16px; width: 16px; left: 3px; bottom: 3px; background-color: white; transition: .3s; border-radius: 50%; }
+        input:checked + .slider { background-color: var(--success); border-color: var(--success); }
+        input:checked + .slider:before { transform: translateX(22px); }
+
+        .chart-container { position: relative; width: 100%; height: 180px; margin-top: 10px; background: rgba(0,0,0,0.3); border-radius: 8px; border: 1px solid #333; padding: 10px; }
+        .chart-svg { width: 100%; height: 100%; overflow: visible; }
+        .chart-legend { display: flex; justify-content: center; gap: 15px; font-size: 0.7rem; margin-top: 6px; color: #aaa; }
+        .legend-item { display: flex; align-items: center; gap: 4px; }
+        .legend-dot { width: 8px; height: 8px; border-radius: 50%; }
 
         .modal {
             display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; height: 100dvh;
@@ -241,6 +283,21 @@
             border: 2px solid var(--accent-purple); width: 100%; max-width: 340px; text-align: center;
             box-shadow: 0 0 20px var(--glow-purple); max-height: 90dvh; overflow-y: auto;
         }
+        
+        .showcase-list { display: flex; flex-direction: column; gap: 8px; margin: 15px 0; text-align: left; }
+        .showcase-item {
+            background: rgba(0,0,0,0.4); border: 1px solid #333; border-radius: 8px;
+            padding: 10px; display: flex; justify-content: space-between; align-items: center;
+        }
+        .showcase-item.current-user-rank {
+            border-color: var(--accent-purple);
+            background: rgba(189, 0, 255, 0.1);
+            box-shadow: 0 0 10px rgba(189, 0, 255, 0.3);
+        }
+        .showcase-rank-info div:first-child { font-weight: bold; font-size: 0.85rem; }
+        .showcase-rank-info div:last-child { font-size: 0.65rem; color: #aaa; margin-top: 2px; }
+        .showcase-ratio { font-family: monospace; font-weight: bold; font-size: 0.9rem; color: var(--success); }
+
         .stars-container { display: flex; justify-content: center; gap: 8px; font-size: 2.2rem; margin: 15px 0; color: #444; cursor: pointer; }
         .stars-container span.active { color: var(--warning); text-shadow: 0 0 10px var(--warning); }
 
@@ -274,10 +331,23 @@
             <div id="panel-profile" class="panel active">
                 <h2>Rang & Niveau de Powerlifting</h2>
                 
-                <div class="rank-card">
+                <div class="rank-card" onclick="playSound('click'); openRankShowcaseModal()">
                     <div class="rank-title">Rang Powerlifting (SBD / Poids Corporel)</div>
                     <div class="rank-badge" id="rank-name">NOVICE</div>
                     <div class="sbd-total-display">Total : <strong id="val-sbd-total" style="color:var(--success);">150 kg</strong> (<span id="val-sbd-ratio" style="color:var(--accent-purple); font-weight:bold;">1.76x</span> PDC)</div>
+                    <div class="rank-hint">🔍 Cliquer pour voir la vitrine des rangs & objectifs</div>
+                </div>
+
+                <h2>Évolution Physique (Suivi Avancé)</h2>
+                <div class="profile-card">
+                    <div style="font-size:0.75rem; color:#aaa; margin-bottom:5px;">Poids (kg) & Masse Grasse (%) au fil des semaines</div>
+                    <div class="chart-container">
+                        <svg class="chart-svg" id="body-evolution-chart" viewBox="0 0 300 130"></svg>
+                    </div>
+                    <div class="chart-legend">
+                        <div class="legend-item"><div class="legend-dot" style="background:var(--success);"></div>Poids (kg)</div>
+                        <div class="legend-item"><div class="legend-dot" style="background:var(--accent-rose);"></div>Body Fat (%)</div>
+                    </div>
                 </div>
 
                 <h2>Statistiques du Chasseur</h2>
@@ -296,14 +366,15 @@
                     <div class="stats-grid" style="grid-template-columns: 1fr;">
                         <div class="stat-box">
                             <div class="stat-value" id="val-weekly-tonnage">0 kg</div>
-                            <div class="stat-label">Charge Totale Validée (Semaine Actuelle)</div>
+                            <div class="stat-label">Charge Totale Validée (Bloc Actuel)</div>
                         </div>
                     </div>
                 </div>
 
-                <h2>Historique Complet des Semaines & Jours</h2>
+                <h2>Historique Complet des Blocs</h2>
+                <p class="subtitle">Cliquez sur un bloc validé pour voir le détail par jour</p>
                 <div class="profile-card" id="history-container">
-                    <p style="font-size:0.75rem; color:#888; text-align:center;">Aucun historique enregistré pour le moment. Validez vos premières séances !</p>
+                    <p style="font-size:0.75rem; color:#888; text-align:center;">Aucun historique enregistré pour le moment. Validez vos blocs !</p>
                 </div>
 
                 <h2>Records Personnels (1RM)</h2>
@@ -374,6 +445,19 @@
                 </div>
 
                 <div class="profile-card">
+                    <h3>Paliers de Progression Intelligents</h3>
+                    <p style="font-size: 0.7rem; color: #aaa; margin-bottom: 8px;">Ajustement intelligent des charges pour les exercices de renforcement et d'hypertrophie (fourchette 8/12 répétitions).</p>
+                    <div class="settings-toggle-row">
+                        <span>Activer l'ajustement auto</span>
+                        <label class="switch">
+                            <input type="checkbox" id="setting-auto-progression" onchange="toggleAutoProgression(this)">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                    <button class="btn-action" onclick="playSound('click'); openSmartProgressionModal()" style="margin-top:12px; background:rgba(255,234,0,0.15); border-color:var(--warning); color:var(--warning);">⚙️ Configurer mes performances (8/12 rep)</button>
+                </div>
+
+                <div class="profile-card">
                     <h3>Sélection du Bloc Actif</h3>
                     <div class="settings-input-group">
                         <label>Bloc Actif par défaut</label>
@@ -412,6 +496,37 @@
         </nav>
     </div>
 
+    <!-- Modale de Configuration des Paliers Intelligents (8/12 reps hypertrophie) -->
+    <div id="modal-smart-progression" class="modal">
+        <div class="modal-content" style="max-width: 360px;">
+            <h2>Paliers Intelligents (8/12 Reps)</h2>
+            <p class="subtitle">Saisissez vos performances de référence pour ajuster automatiquement les charges d'hypertrophie.</p>
+            <div class="showcase-list" id="smart-progression-inputs-container" style="max-height: 45dvh; overflow-y: auto; padding-right: 4px;"></div>
+            <button class="btn-action" onclick="playSound('success'); saveSmartProgressionData()" style="background:var(--warning); color:#000; border:none; font-weight:bold; margin-top:10px;">Enregistrer les charges</button>
+            <button class="btn-action" onclick="playSound('click'); closeSmartProgressionModal()" style="margin-top:6px; background:transparent; border-color:#555; color:#aaa;">Fermer</button>
+        </div>
+    </div>
+
+    <!-- Modale de la Vitrine des Rangs -->
+    <div id="modal-rank-showcase" class="modal">
+        <div class="modal-content" style="max-width: 360px;">
+            <h2>Vitrine des Rangs SBD</h2>
+            <p class="subtitle">Objectifs basés sur le ratio (Total SBD / Poids de corps)</p>
+            <div class="showcase-list" id="showcase-list-container"></div>
+            <button class="btn-action" onclick="playSound('click'); closeRankShowcaseModal()" style="margin-top:5px;">Fermer</button>
+        </div>
+    </div>
+
+    <!-- Modale du Détail d'Historique -->
+    <div id="modal-history-detail" class="modal">
+        <div class="modal-content" style="max-width: 360px;">
+            <h2 id="modal-history-title">Détail Bloc</h2>
+            <p class="subtitle" id="modal-history-date">Validé le : --</p>
+            <div class="modal-history-grid" id="modal-history-grid-container"></div>
+            <button class="btn-action" onclick="playSound('click'); closeHistoryDetailModal()" style="margin-top:5px;">Fermer</button>
+        </div>
+    </div>
+
     <div id="modal-rating" class="modal">
         <div class="modal-content" style="max-width: 320px;">
             <h2>Séance Terminée !</h2>
@@ -425,6 +540,18 @@
                 <span onclick="playSound('click'); setRating(5)">★</span>
             </div>
             <button class="btn-action" onclick="playSound('success'); finishWorkoutFinal()">Valider & Gagner XP</button>
+        </div>
+    </div>
+
+    <!-- Modale de Victoire Finale (Uniquement après le Bloc 4) -->
+    <div id="modal-sunday-victory" class="modal">
+        <div class="modal-content" style="max-width: 340px; border-color: var(--success); box-shadow: 0 0 25px rgba(0,230,118,0.5);">
+            <h2 style="color: var(--success); text-shadow: 0 0 10px rgba(0,230,118,0.6);">🎉 Cycle Complet 4 Blocs Bouclé !</h2>
+            <p class="subtitle" style="color: #fff; margin: 10px 0;">Félicitations Chasseur ! Tu as validé l'intégralité du Bloc 1 au Bloc 4 avec brio.</p>
+            <div style="font-size: 0.75rem; color: #aaa; margin-bottom: 15px; background: rgba(0,230,118,0.08); padding: 10px; border-radius: 6px; border: 1px solid rgba(0,230,118,0.2);">
+                Tous tes blocs sont enregistrés dans l'historique. Prêt à relancer un nouveau cycle complet ?
+            </div>
+            <button class="btn-action" onclick="playSound('success'); resetCycleAndRestartMonday()" style="background: var(--success); color: #000; border: none; font-weight: bold; box-shadow: 0 0 12px rgba(0,230,118,0.4);">🔄 Réinitialiser & Repartir au Bloc 1</button>
         </div>
     </div>
 
@@ -555,8 +682,18 @@
         let userData = {
             weight: 85, height: 175, bodyFat: 15,
             squat: 50, bench: 50, deadlift: 50,
-            prCount: 0, workoutsCompleted: 0, trophies: 0, level: 1, theme: 'purple'
+            prCount: 0, workoutsCompleted: 0, trophies: 0, level: 1, theme: 'purple',
+            autoProgression: true
         };
+
+        // Stockage des performances de référence pour les exercices non-SBD (hypertrophie/isolation)
+        let smartHypertrophyRefs = {};
+
+        let bodyHistory = [
+            { date: 'S1', weight: 86.0, bodyFat: 15.5 },
+            { date: 'S2', weight: 85.5, bodyFat: 15.2 },
+            { date: 'S3', weight: 85.0, bodyFat: 15.0 }
+        ];
 
         const defaultInventory = [
             { id: '1', name: 'Singlet A7 Competitor', image: '', emoji: '👕', rarity: 'ÉPIQUE', equipped: true },
@@ -575,10 +712,10 @@
         let activeImageEditId = null;
 
         const blocksData = [
-            { name: "Bloc 1", subtitle: "Semaine 1 (75%) - 5x5 Force Base" },
-            { name: "Bloc 2", subtitle: "Semaine 2 (80%) - 4x4 Progression" },
-            { name: "Bloc 3", subtitle: "Semaine 3 (85%) - 3x3 Intensification" },
-            { name: "Bloc 4", subtitle: "Semaine 4 (60%) - Deload Récupération" }
+            { name: "Bloc 1", subtitle: "Bloc 1 (75%) - Force Base" },
+            { name: "Bloc 2", subtitle: "Bloc 2 (80%) - Progression" },
+            { name: "Bloc 3", subtitle: "Bloc 3 (85%) - Intensification" },
+            { name: "Bloc 4", subtitle: "Bloc 4 (60%) - Deload Récupération" }
         ];
 
         let workoutHistory = [];
@@ -587,16 +724,141 @@
             return Math.round(val / 2.5) * 2.5;
         }
 
+        const ranksConfig = [
+            { minRatio: 7.5, name: '🔥 LÉGENDE', color: '#ff0033' },
+            { minRatio: 6.5, name: '⚡ ÉLITE', color: '#ffea00' },
+            { minRatio: 5.5, name: '💎 AVANCÉ', color: '#00d2ff' },
+            { minRatio: 4.5, name: '⚔️ INTERMÉDIAIRE', color: '#bd00ff' },
+            { minRatio: 3.5, name: '🛡️ APPRENTI', color: '#00ff66' },
+            { minRatio: 0.0, name: '🌱 NOVICE', color: '#aaaaaa' }
+        ];
+
         function getSBDRank(total, bodyWeight) {
             if (!bodyWeight || bodyWeight <= 0) bodyWeight = 85;
             const ratio = total / bodyWeight;
+            for (let r of ranksConfig) {
+                if (ratio >= r.minRatio) return r;
+            }
+            return ranksConfig[ranksConfig.length - 1];
+        }
 
-            if (ratio >= 7.5) return { name: '🔥 LÉGENDE', color: '#ff0033' };
-            if (ratio >= 6.5) return { name: '⚡ ÉLITE', color: '#ffea00' };
-            if (ratio >= 5.5) return { name: '💎 AVANCÉ', color: '#00d2ff' };
-            if (ratio >= 4.5) return { name: '⚔️ INTERMÉDIAIRE', color: '#bd00ff' };
-            if (ratio >= 3.5) return { name: '🛡️ APPRENTI', color: '#00ff66' };
-            return { name: '🌱 NOVICE', color: '#aaaaaa' };
+        function openRankShowcaseModal() {
+            const container = document.getElementById('showcase-list-container');
+            const currentTotal = userData.squat + userData.bench + userData.deadlift;
+            const bw = userData.weight || 85;
+            const userRankObj = getSBDRank(currentTotal, bw);
+
+            let html = '';
+            ranksConfig.forEach(r => {
+                const isCurrent = (r.name === userRankObj.name);
+                const targetSBDWeight = Math.round(r.minRatio * bw);
+                html += `
+                    <div class="showcase-item ${isCurrent ? 'current-user-rank' : ''}">
+                        <div class="showcase-rank-info">
+                            <div style="color:${r.color};">${r.name} ${isCurrent ? ' (Votre Rang)' : ''}</div>
+                            <div>Objectif SBD min. : ~<strong>${targetSBDWeight} kg</strong></div>
+                        </div>
+                        <div class="showcase-ratio">≥ ${r.minRatio}x PDC</div>
+                    </div>
+                `;
+            });
+            container.innerHTML = html;
+            document.getElementById('modal-rank-showcase').style.display = 'flex';
+        }
+
+        function closeRankShowcaseModal() {
+            document.getElementById('modal-rank-showcase').style.display = 'none';
+        }
+
+        function openHistoryDetailModal(index) {
+            const entry = workoutHistory[index];
+            if (!entry) return;
+
+            document.getElementById('modal-history-title').innerText = entry.blockName;
+            document.getElementById('modal-history-date').innerText = `Validé le : ${entry.date} | Total : ${entry.totalTonnage.toLocaleString()} kg`;
+
+            const container = document.getElementById('modal-history-grid-container');
+            let html = '';
+            for (let dayName in entry.dayTonnes) {
+                html += `
+                    <div class="modal-history-row">
+                        <div>📅 ${dayName}</div>
+                        <div>${entry.dayTonnes[dayName].toLocaleString()} kg</div>
+                    </div>
+                `;
+            }
+            container.innerHTML = html;
+            document.getElementById('modal-history-detail').style.display = 'flex';
+        }
+
+        function closeHistoryDetailModal() {
+            document.getElementById('modal-history-detail').style.display = 'none';
+        }
+
+        function getAllHypertrophyExercisesList() {
+            let list = [];
+            const programs = getPrograms();
+            if (programs && programs[0]) {
+                programs[0].forEach(day => {
+                    day.exercises.forEach(ex => {
+                        // Exclure les mouvements SBD principaux pour que les charges SBD restent strictement liées au 1RM
+                        const isSBD = ['Développé Couché', 'Soulevé de Terre', 'Squat', 'Squat (Volume)', 'Spoto Press'].includes(ex.name);
+                        if (!isSBD && !list.includes(ex.name)) {
+                            list.push(ex.name);
+                        }
+                    });
+                });
+            }
+            return list;
+        }
+
+        function openSmartProgressionModal() {
+            const container = document.getElementById('smart-progression-inputs-container');
+            const exoList = getAllHypertrophyExercisesList();
+            
+            let html = '';
+            exoList.forEach(exoName => {
+                let saved = smartHypertrophyRefs[exoName] || { reps: 10, weight: 0 };
+                html += `
+                    <div class="settings-input-group" style="background:rgba(0,0,0,0.3); padding:8px; border-radius:6px; margin-bottom:8px; border:1px solid #333;">
+                        <label style="color:var(--warning); font-weight:bold;">${exoName}</label>
+                        <div style="display:flex; gap:6px; margin-top:4px;">
+                            <div style="flex:1;">
+                                <span style="font-size:0.6rem; color:#aaa;">Reps (8-12)</span>
+                                <input type="number" id="smart-reps-${CSS.escape(exoName)}" value="${saved.reps}" min="1" max="30" style="width:100%;">
+                            </div>
+                            <div style="flex:1;">
+                                <span style="font-size:0.6rem; color:#aaa;">Charge (kg)</span>
+                                <input type="number" id="smart-weight-${CSS.escape(exoName)}" value="${saved.weight}" step="0.5" style="width:100%;">
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+            container.innerHTML = html;
+            document.getElementById('modal-smart-progression').style.display = 'flex';
+        }
+
+        function closeSmartProgressionModal() {
+            document.getElementById('modal-smart-progression').style.display = 'none';
+        }
+
+        function saveSmartProgressionData() {
+            const exoList = getAllHypertrophyExercisesList();
+            exoList.forEach(exoName => {
+                const repsInput = document.getElementById(`smart-reps-${CSS.escape(exoName)}`);
+                const weightInput = document.getElementById(`smart-weight-${CSS.escape(exoName)}`);
+                if (repsInput && weightInput) {
+                    smartHypertrophyRefs[exoName] = {
+                        reps: parseInt(repsInput.value) || 10,
+                        weight: parseFloat(weightInput.value) || 0
+                    };
+                }
+            });
+            saveToLocalStorage();
+            closeSmartProgressionModal();
+            initWorkoutSystem();
+            alert("Paliers de progression intelligents mis à jour pour l'hypertrophie !");
         }
 
         function getPrograms() {
@@ -648,8 +910,10 @@
                         { name: "Mollets Presse", defaultReps: 12, defaultWeight: 45, sets: 4 },
                         { name: "Relevé de jambes", defaultReps: 12, defaultWeight: 0, sets: 3 }
                     ]},
-                    { dayName: "Dimanche", title: "Dimanche - REPOS (Bloc 1)", exercises: [
-                        { name: "Mobilité globale", defaultReps: 1, defaultWeight: 0, sets: 1 }
+                    { dayName: "Dimanche", title: "Dimanche - REPOS ACTIF (Bloc 1)", exercises: [
+                        { name: "Mobilité globale & Récupération", defaultReps: 1, defaultWeight: 0, sets: 1 },
+                        { name: "Steps de récupération (Optionnel)", defaultReps: 5000, defaultWeight: 0, sets: 1 },
+                        { name: "Abdos / Core de fin de semaine", defaultReps: 20, defaultWeight: 0, sets: 3 }
                     ]}
                 ],
                 [
@@ -695,8 +959,10 @@
                         { name: "Mollets Presse", defaultReps: 12, defaultWeight: 50, sets: 4 },
                         { name: "Relevé de jambes", defaultReps: 12, defaultWeight: 0, sets: 3 }
                     ]},
-                    { dayName: "Dimanche", title: "Dimanche - REPOS (Bloc 2)", exercises: [
-                        { name: "Mobilité globale", defaultReps: 1, defaultWeight: 0, sets: 1 }
+                    { dayName: "Dimanche", title: "Dimanche - REPOS ACTIF (Bloc 2)", exercises: [
+                        { name: "Mobilité globale & Récupération", defaultReps: 1, defaultWeight: 0, sets: 1 },
+                        { name: "Steps de récupération (Optionnel)", defaultReps: 5000, defaultWeight: 0, sets: 1 },
+                        { name: "Abdos / Core de fin de semaine", defaultReps: 20, defaultWeight: 0, sets: 3 }
                     ]}
                 ],
                 [
@@ -742,8 +1008,10 @@
                         { name: "Mollets Presse", defaultReps: 10, defaultWeight: 60, sets: 4 },
                         { name: "Relevé de jambes", defaultReps: 10, defaultWeight: 0, sets: 3 }
                     ]},
-                    { dayName: "Dimanche", title: "Dimanche - REPOS (Bloc 3)", exercises: [
-                        { name: "Mobilité globale", defaultReps: 1, defaultWeight: 0, sets: 1 }
+                    { dayName: "Dimanche", title: "Dimanche - REPOS ACTIF (Bloc 3)", exercises: [
+                        { name: "Mobilité globale & Récupération", defaultReps: 1, defaultWeight: 0, sets: 1 },
+                        { name: "Steps de récupération (Optionnel)", defaultReps: 5000, defaultWeight: 0, sets: 1 },
+                        { name: "Abdos / Core de fin de semaine", defaultReps: 20, defaultWeight: 0, sets: 3 }
                     ]}
                 ],
                 [
@@ -778,8 +1046,10 @@
                         { name: "Squat (Léger)", defaultReps: 8, defaultWeight: roundTo25(s * 0.50), sets: 3 },
                         { name: "Mollets", defaultReps: 12, defaultWeight: 30, sets: 3 }
                     ]},
-                    { dayName: "Dimanche", title: "Dimanche - REPOS TOTAL (Deload)", exercises: [
-                        { name: "Repos complet et récupération", defaultReps: 1, defaultWeight: 0, sets: 1 }
+                    { dayName: "Dimanche", title: "Dimanche - REPOS ACTIF (Deload)", exercises: [
+                        { name: "Mobilité globale & Récupération", defaultReps: 1, defaultWeight: 0, sets: 1 },
+                        { name: "Steps de récupération (Optionnel)", defaultReps: 3000, defaultWeight: 0, sets: 1 },
+                        { name: "Abdos légers (Optionnel)", defaultReps: 15, defaultWeight: 0, sets: 2 }
                     ]}
                 ]
             ];
@@ -795,6 +1065,12 @@
             try {
                 const savedUser = localStorage.getItem('solo_leveling_user');
                 if (savedUser) userData = JSON.parse(savedUser);
+
+                const savedSmart = localStorage.getItem('solo_leveling_smart_refs');
+                if (savedSmart) smartHypertrophyRefs = JSON.parse(savedSmart);
+
+                const savedBodyHist = localStorage.getItem('solo_leveling_body_hist');
+                if (savedBodyHist) bodyHistory = JSON.parse(savedBodyHist);
 
                 const savedInv = localStorage.getItem('solo_leveling_inv');
                 if (savedInv) inventoryItems = JSON.parse(savedInv);
@@ -817,15 +1093,14 @@
         function saveToLocalStorage() {
             try {
                 localStorage.setItem('solo_leveling_user', JSON.stringify(userData));
+                localStorage.setItem('solo_leveling_smart_refs', JSON.stringify(smartHypertrophyRefs));
+                localStorage.setItem('solo_leveling_body_hist', JSON.stringify(bodyHistory));
                 localStorage.setItem('solo_leveling_inv', JSON.stringify(inventoryItems));
                 localStorage.setItem('solo_leveling_block', currentBlockIndex);
                 localStorage.setItem('solo_leveling_state', JSON.stringify(workoutState));
                 localStorage.setItem('solo_leveling_custom_sets', JSON.stringify(customSetData));
                 localStorage.setItem('solo_leveling_history', JSON.stringify(workoutHistory));
-            } catch (e) { 
-                console.log("Erreur de quota LocalStorage :", e);
-                alert("Attention : Le stockage local est plein (probablement à cause d'images trop lourdes). Essayez de réimporter des images plus légères ou supprimez des objets.");
-            }
+            } catch (e) { console.log(e); }
         }
 
         function initAutoDateAndBlock() {
@@ -839,13 +1114,20 @@
             initWorkoutSystem();
         }
 
+        function toggleAutoProgression(checkbox) {
+            userData.autoProgression = checkbox.checked;
+            saveToLocalStorage();
+            initWorkoutSystem();
+            alert(userData.autoProgression ? "Paliers de progression intelligents activés !" : "Paliers de progression intelligents désactivés.");
+        }
+
         function switchTab(tabName, btnElement) {
             document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
             document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
             document.getElementById('panel-' + tabName).classList.add('active');
             if (btnElement) btnElement.classList.add('active');
             if (tabName === 'settings') loadSettingsToInputs();
-            if (tabName === 'profile') { updateProfileUI(); renderHistoryUI(); }
+            if (tabName === 'profile') { updateProfileUI(); renderBodyChart(); renderHistoryUI(); }
             if (tabName === 'inventory') renderInventory();
         }
 
@@ -892,6 +1174,51 @@
             calculateWeeklyTonnage();
         }
 
+        function renderBodyChart() {
+            const svg = document.getElementById('body-evolution-chart');
+            if (!svg || bodyHistory.length === 0) return;
+
+            const width = 300;
+            const height = 130;
+            const padding = 20;
+
+            const weights = bodyHistory.map(b => b.weight);
+            const bfs = bodyHistory.map(b => b.bodyFat);
+
+            const minW = Math.min(...weights) - 1;
+            const maxW = Math.max(...weights) + 1;
+            const minB = Math.min(...bfs) - 1;
+            const maxB = Math.max(...bfs) + 1;
+
+            const getX = (i) => padding + (i / Math.max(1, bodyHistory.length - 1)) * (width - 2 * padding);
+            const getYWeight = (w) => height - padding - ((w - minW) / Math.max(1, maxW - minW)) * (height - 2 * padding);
+            const getYBF = (bf) => height - padding - ((bf - minB) / Math.max(1, maxB - minB)) * (height - 2 * padding);
+
+            let weightPoints = "";
+            let bfPoints = "";
+            let circlesHtml = "";
+
+            bodyHistory.forEach((item, i) => {
+                const x = getX(i);
+                const yW = getYWeight(item.weight);
+                const yB = getYBF(item.bodyFat);
+
+                weightPoints += `${x},${yW} `;
+                bfPoints += `${x},${yB} `;
+
+                circlesHtml += `
+                    <circle cx="${x}" cy="${yW}" r="3.5" fill="#00e676" />
+                    <circle cx="${x}" cy="${yB}" r="3.5" fill="#ff007f" />
+                `;
+            });
+
+            svg.innerHTML = `
+                <polyline fill="none" stroke="#00e676" stroke-width="2" points="${weightPoints}" />
+                <polyline fill="none" stroke="#ff007f" stroke-width="2" points="${bfPoints}" />
+                ${circlesHtml}
+            `;
+        }
+
         function loadSettingsToInputs() {
             document.getElementById('set-weight').value = userData.weight;
             document.getElementById('set-height').value = userData.height;
@@ -900,18 +1227,31 @@
             document.getElementById('set-bench').value = userData.bench;
             document.getElementById('set-deadlift').value = userData.deadlift;
             document.getElementById('set-default-block').value = currentBlockIndex;
+            document.getElementById('setting-auto-progression').checked = userData.autoProgression;
         }
 
         function saveSettingsData() {
-            userData.weight = parseFloat(document.getElementById('set-weight').value) || userData.weight;
+            const newWeight = parseFloat(document.getElementById('set-weight').value) || userData.weight;
+            const newBF = parseFloat(document.getElementById('set-bf').value) || userData.bodyFat;
+
+            if (newWeight !== userData.weight || newBF !== userData.bodyFat) {
+                userData.weight = newWeight;
+                userData.bodyFat = newBF;
+                bodyHistory.push({
+                    date: `S${bodyHistory.length + 1}`,
+                    weight: newWeight,
+                    bodyFat: newBF
+                });
+            }
+
             userData.height = parseInt(document.getElementById('set-height').value) || userData.height;
-            userData.bodyFat = parseFloat(document.getElementById('set-bf').value) || userData.bodyFat;
             userData.squat = parseFloat(document.getElementById('set-squat').value) || userData.squat;
             userData.bench = parseFloat(document.getElementById('set-bench').value) || userData.bench;
             userData.deadlift = parseFloat(document.getElementById('set-deadlift').value) || userData.deadlift;
             
             saveToLocalStorage();
             updateProfileUI();
+            renderBodyChart();
             initWorkoutSystem();
             alert("Informations sauvegardées & Rang recalculé !");
             switchTab('profile', document.querySelectorAll('.nav-item')[0]);
@@ -933,6 +1273,13 @@
                             
                             let reps = ex.defaultReps;
                             let weight = ex.defaultWeight;
+                            
+                            const isSBD = ['Développé Couché', 'Soulevé de Terre', 'Squat', 'Squat (Volume)', 'Spoto Press'].includes(ex.name);
+                            if (userData.autoProgression && !isSBD && smartHypertrophyRefs[ex.name]) {
+                                reps = smartHypertrophyRefs[ex.name].reps;
+                                weight = smartHypertrophyRefs[ex.name].weight;
+                            }
+
                             if (customSetData[currentBlockIndex]?.[dIdx]?.[exIdx]?.[s]) {
                                 reps = customSetData[currentBlockIndex][dIdx][exIdx][s].reps ?? reps;
                                 weight = customSetData[currentBlockIndex][dIdx][exIdx][s].weight ?? weight;
@@ -950,25 +1297,24 @@
         function renderHistoryUI() {
             const container = document.getElementById('history-container');
             if (!workoutHistory || workoutHistory.length === 0) {
-                container.innerHTML = `<p style="font-size:0.75rem; color:#888; text-align:center;">Aucun historique enregistré pour le moment. Validez vos séances !</p>`;
+                container.innerHTML = `<p style="font-size:0.75rem; color:#888; text-align:center;">Aucun historique enregistré pour le moment. Validez vos blocs !</p>`;
                 return;
             }
 
             let html = '';
-            [...workoutHistory].reverse().forEach(entry => {
+            [...workoutHistory].forEach((entry, originalIndex) => {
                 html += `
-                    <div class="history-card">
-                        <div class="history-header">
-                            <span>${entry.blockName}</span>
-                            <span style="color:var(--success);">${entry.totalTonnage.toLocaleString()} kg total</span>
+                    <div class="history-card-item" onclick="playSound('click'); openHistoryDetailModal(${originalIndex})">
+                        <div class="history-info">
+                            <div>${entry.blockName}</div>
+                            <div>Validé le : ${entry.date}</div>
                         </div>
-                        <div style="font-size:0.65rem; color:#aaa; margin-bottom:4px;">Validé le : ${entry.date}</div>
-                        <div class="history-days-grid">
+                        <div class="history-right">
+                            <div class="history-tonnage">${entry.totalTonnage.toLocaleString()} kg</div>
+                            <div class="history-hint">🔍 Voir jours</div>
+                        </div>
+                    </div>
                 `;
-                for (let dayName in entry.dayTonnes) {
-                    html += `<div class="history-day-tag"><b>${dayName}</b><br>${entry.dayTonnes[dayName].toLocaleString()} kg</div>`;
-                }
-                html += `</div></div>`;
             });
             container.innerHTML = html;
         }
@@ -1052,7 +1398,9 @@
                 }
                 
                 let card = document.createElement('div');
-                card.className = 'exercise-card';
+                const isSBD = ['Développé Couché', 'Soulevé de Terre', 'Squat', 'Squat (Volume)', 'Spoto Press'].includes(ex.name);
+                const isSmartActiveForExo = userData.autoProgression && !isSBD && smartHypertrophyRefs[ex.name];
+                card.className = `exercise-card ${isSmartActiveForExo ? 'smart-progression-active' : ''}`;
                 
                 let setsHtml = '';
                 for (let s = 0; s < ex.sets; s++) {
@@ -1060,15 +1408,25 @@
                     let isDone = workoutState[currentBlockIndex][currentDayIndex][exIndex][s] || false;
                     if (isDone) completedSetsCount++;
 
-                    let currentReps = customSetData[currentBlockIndex][currentDayIndex][exIndex][s]?.reps ?? ex.defaultReps;
-                    let currentWeight = customSetData[currentBlockIndex][currentDayIndex][exIndex][s]?.weight ?? ex.defaultWeight;
+                    let currentReps = ex.defaultReps;
+                    let currentWeight = ex.defaultWeight;
+
+                    if (isSmartActiveForExo) {
+                        currentReps = smartHypertrophyRefs[ex.name].reps;
+                        currentWeight = smartHypertrophyRefs[ex.name].weight;
+                    }
+
+                    if (customSetData[currentBlockIndex][currentDayIndex][exIndex][s]) {
+                        currentReps = customSetData[currentBlockIndex][currentDayIndex][exIndex][s].reps ?? currentReps;
+                        currentWeight = customSetData[currentBlockIndex][currentDayIndex][exIndex][s].weight ?? currentWeight;
+                    }
 
                     setsHtml += `
                         <div class="set-row ${isDone ? 'done' : ''}">
                             <div class="set-info">
                                 <span>Série ${s + 1} :</span>
-                                <input type="number" class="set-input-mini" value="${currentReps}" onchange="updateSetVal(${exIndex}, ${s}, 'reps', this.value)" title="Répétitions"> reps 
-                                @ <input type="number" class="set-input-mini" value="${currentWeight}" step="0.5" onchange="updateSetVal(${exIndex}, ${s}, 'weight', this.value)" title="Poids en kg"> kg
+                                <input type="number" class="set-input-mini ${isSmartActiveForExo ? 'smart-adjusted' : ''}" value="${currentReps}" onchange="updateSetVal(${exIndex}, ${s}, 'reps', this.value)" title="Répétitions"> reps 
+                                @ <input type="number" class="set-input-mini ${isSmartActiveForExo ? 'smart-adjusted' : ''}" value="${currentWeight}" step="0.5" onchange="updateSetVal(${exIndex}, ${s}, 'weight', this.value)" title="Poids en kg"> kg
                             </div>
                             <button class="btn-check ${isDone ? 'active' : ''}" onclick="toggleSet(${exIndex}, ${s})">${isDone ? '✓' : ''}</button>
                         </div>
@@ -1076,7 +1434,7 @@
                 }
 
                 card.innerHTML = `
-                    <div class="exercise-title">${ex.name}</div>
+                    <div class="exercise-title">${ex.name} ${isSmartActiveForExo ? '<span style="font-size:0.65rem; color:var(--warning);">⚡ [Paliers Intelligents]</span>' : ''}</div>
                     <div class="exercise-meta">${ex.sets} série(s) prévue(s)</div>
                     ${setsHtml}
                 `;
@@ -1095,9 +1453,16 @@
             if (!customSetData[currentBlockIndex][currentDayIndex][exIndex][setIndex]) {
                 const programsByBlock = getPrograms();
                 const ex = programsByBlock[currentBlockIndex][currentDayIndex].exercises[exIndex];
+                let baseR = ex.defaultReps;
+                let baseW = ex.defaultWeight;
+                const isSBD = ['Développé Couché', 'Soulevé de Terre', 'Squat', 'Squat (Volume)', 'Spoto Press'].includes(ex.name);
+                if (userData.autoProgression && !isSBD && smartHypertrophyRefs[ex.name]) {
+                    baseR = smartHypertrophyRefs[ex.name].reps;
+                    baseW = smartHypertrophyRefs[ex.name].weight;
+                }
                 customSetData[currentBlockIndex][currentDayIndex][exIndex][setIndex] = {
-                    reps: ex.defaultReps,
-                    weight: ex.defaultWeight
+                    reps: baseR,
+                    weight: baseW
                 };
             }
             customSetData[currentBlockIndex][currentDayIndex][exIndex][setIndex][field] = parseFloat(val) || 0;
@@ -1110,7 +1475,49 @@
             workoutState[currentBlockIndex][currentDayIndex][exIndex][setIndex] = !currentState;
             playSound(currentState ? 'click' : 'check');
             saveToLocalStorage();
+            
+            if (currentDayIndex === 6) {
+                checkSundayCompletion();
+            }
+
             initWorkoutSystem();
+        }
+
+        function checkSundayCompletion() {
+            if (isDayCompleted(currentBlockIndex, 6)) {
+                recordCurrentBlockToHistory();
+                saveToLocalStorage();
+
+                if (currentBlockIndex === 3) {
+                    setTimeout(() => {
+                        document.getElementById('modal-sunday-victory').style.display = 'flex';
+                    }, 300);
+                } else {
+                    setTimeout(() => {
+                        currentBlockIndex++;
+                        currentDayIndex = 0;
+                        saveToLocalStorage();
+                        initWorkoutSystem();
+                        updateProfileUI();
+                        alert(`Félicitations ! Bloc ${currentBlockIndex} validé et enregistré. Passage au Bloc ${currentBlockIndex + 1}.`);
+                    }, 300);
+                }
+            }
+        }
+
+        function resetCycleAndRestartMonday() {
+            document.getElementById('modal-sunday-victory').style.display = 'none';
+
+            workoutState = {};
+            customSetData = {};
+            currentBlockIndex = 0;
+            currentDayIndex = 0;
+
+            saveToLocalStorage();
+            updateProfileUI();
+            initWorkoutSystem();
+
+            switchTab('workout', document.querySelectorAll('.nav-item')[1]);
         }
 
         function renderInventory() {
@@ -1166,7 +1573,6 @@
             document.getElementById('hidden-file-input').click();
         }
 
-        /* Compression automatique des images pour éviter de saturer le localStorage */
         function handleImageUpload(input) {
             if (input.files && input.files[0] && activeImageEditId) {
                 const reader = new FileReader();
@@ -1174,7 +1580,7 @@
                     const img = new Image();
                     img.onload = function() {
                         const canvas = document.createElement('canvas');
-                        const MAX_SIZE = 150; // Redimensionne proprement en 150x150 max (très léger)
+                        const MAX_SIZE = 150; 
                         let width = img.width;
                         let height = img.height;
                         
@@ -1189,7 +1595,6 @@
                         const ctx = canvas.getContext('2d');
                         ctx.drawImage(img, 0, 0, width, height);
                         
-                        // Compression en JPEG qualité 0.7 (très léger pour LocalStorage)
                         const compressedDataUrl = canvas.toDataURL('image/jpeg', 0.7);
 
                         let item = inventoryItems.find(i => i.id === activeImageEditId);
@@ -1294,8 +1699,17 @@
                 for (let s = 0; s < ex.sets; s++) {
                     if (workoutState[currentBlockIndex][currentDayIndex][exIdx]?.[s]) {
                         exDoneCount++;
-                        let r = customSetData[currentBlockIndex]?.[currentDayIndex]?.[exIdx]?.[s]?.reps ?? ex.defaultReps;
-                        let w = customSetData[currentBlockIndex]?.[currentDayIndex]?.[exIdx]?.[s]?.weight ?? ex.defaultWeight;
+                        let r = ex.defaultReps;
+                        let w = ex.defaultWeight;
+                        const isSBD = ['Développé Couché', 'Soulevé de Terre', 'Squat', 'Squat (Volume)', 'Spoto Press'].includes(ex.name);
+                        if (userData.autoProgression && !isSBD && smartHypertrophyRefs[ex.name]) {
+                            r = smartHypertrophyRefs[ex.name].reps;
+                            w = smartHypertrophyRefs[ex.name].weight;
+                        }
+                        if (customSetData[currentBlockIndex]?.[currentDayIndex]?.[exIdx]?.[s]) {
+                            r = customSetData[currentBlockIndex][currentDayIndex][exIdx][s].reps ?? r;
+                            w = customSetData[currentBlockIndex][currentDayIndex][exIdx][s].weight ?? w;
+                        }
                         sessionTonnage += (r * w);
                     }
                 }
@@ -1329,35 +1743,50 @@
             }
             userData.level = 1 + Math.floor(userData.workoutsCompleted / 3);
 
-            recordCurrentWeekToHistory();
+            if (currentDayIndex === 6) {
+                checkSundayCompletion();
+            }
             
             saveToLocalStorage();
             updateProfileUI();
+            renderBodyChart();
             document.getElementById('modal-rating').style.display = 'none';
-            switchTab('profile', document.querySelectorAll('.nav-item')[0]);
+
+            if (currentDayIndex !== 6) {
+                switchTab('profile', document.querySelectorAll('.nav-item')[0]);
+            }
         }
 
-        function recordCurrentWeekToHistory() {
+        function recordCurrentBlockToHistory() {
             const programsByBlock = getPrograms();
             const blockProg = programsByBlock[currentBlockIndex];
             if (!blockProg) return;
 
             let dayTonnes = {};
-            let weekTonnage = 0;
+            let blockTonnage = 0;
 
             blockProg.forEach((day, dIdx) => {
                 let daySum = 0;
                 day.exercises.forEach((ex, exIdx) => {
                     for (let s = 0; s < ex.sets; s++) {
                         if (workoutState[currentBlockIndex]?.[dIdx]?.[exIdx]?.[s]) {
-                            let reps = customSetData[currentBlockIndex]?.[dIdx]?.[exIdx]?.[s]?.reps ?? ex.defaultReps;
-                            let weight = customSetData[currentBlockIndex]?.[dIdx]?.[exIdx]?.[s]?.weight ?? ex.defaultWeight;
+                            let reps = ex.defaultReps;
+                            let weight = ex.defaultWeight;
+                            const isSBD = ['Développé Couché', 'Soulevé de Terre', 'Squat', 'Squat (Volume)', 'Spoto Press'].includes(ex.name);
+                            if (userData.autoProgression && !isSBD && smartHypertrophyRefs[ex.name]) {
+                                reps = smartHypertrophyRefs[ex.name].reps;
+                                weight = smartHypertrophyRefs[ex.name].weight;
+                            }
+                            if (customSetData[currentBlockIndex]?.[dIdx]?.[exIdx]?.[s]) {
+                                reps = customSetData[currentBlockIndex][dIdx][exIdx][s].reps ?? reps;
+                                weight = customSetData[currentBlockIndex][dIdx][exIdx][s].weight ?? weight;
+                            }
                             daySum += (reps * weight);
                         }
                     }
                 });
                 dayTonnes[day.dayName] = daySum;
-                weekTonnage += daySum;
+                blockTonnage += daySum;
             });
 
             const blockNameStr = blocksData[currentBlockIndex].name;
@@ -1365,14 +1794,14 @@
 
             let existingEntry = workoutHistory.find(h => h.blockIndex === currentBlockIndex);
             if (existingEntry) {
-                existingEntry.totalTonnage = weekTonnage;
+                existingEntry.totalTonnage = blockTonnage;
                 existingEntry.dayTonnes = dayTonnes;
                 existingEntry.date = todayStr;
             } else {
                 workoutHistory.push({
                     blockIndex: currentBlockIndex,
                     blockName: blockNameStr,
-                    totalTonnage: weekTonnage,
+                    totalTonnage: blockTonnage,
                     dayTonnes: dayTonnes,
                     date: todayStr
                 });
@@ -1383,6 +1812,7 @@
         setTheme(userData.theme);
         initAutoDateAndBlock();
         updateProfileUI();
+        renderBodyChart();
         initWorkoutSystem();
         renderInventory();
     </script>
