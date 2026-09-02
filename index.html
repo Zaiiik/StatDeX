@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Solo Leveling - Powerbuilding Tracker V9.1</title>
+    <title>Solo Leveling - Powerbuilding Tracker V12.2</title>
     <style>
         :root {
             --bg-color: #050507;
@@ -407,6 +407,14 @@
                 <button class="auth-primary" onclick="activateLoggedAccount()">Activer ma licence</button>
                 <button class="auth-secondary" onclick="logoutLeveling()">Se déconnecter</button>
                 <div id="auth-msg-activate" class="auth-msg"></div>
+            </div>
+
+            <div id="auth-screen-blocked" class="auth-screen">
+                <div class="auth-title" style="color:#ff5b6e;">⛔ Licence désactivée</div>
+                <div class="auth-sub">Cette licence Lifetime a été désactivée par l'administrateur. Ton compte et tes données sont conservés, mais l'accès à LEVELING-APP est bloqué.</div>
+                <button class="auth-primary" onclick="retryLicenseCheck()" style="background:#ff5b6e;">Revérifier ma licence</button>
+                <button class="auth-secondary" onclick="logoutLeveling()">Se déconnecter</button>
+                <div id="auth-msg-blocked" class="auth-msg"></div>
             </div>
         </div>
     </div>
@@ -2244,6 +2252,8 @@
         let cloudLoadedOnce = false;
         let cloudSaveTimer = null;
         let suppressCloudSave = false;
+        let licenseWatchTimer = null;
+        let lastLicenseStatus = 'UNKNOWN';
 
         function showAuthScreen(name) {
             document.querySelectorAll('.auth-screen').forEach(el => el.classList.remove('active'));
@@ -2299,11 +2309,23 @@
             const { data, error } = await sb.auth.signInWithPassword({ email, password });
             if (error) return setAuthMessage('login', error.message, 'error');
             cloudUser = data.user;
-            const licensed = await checkCurrentUserLicense();
-            if (licensed) {
+            const info = await getCurrentLicenseStatus();
+            lastLicenseStatus = info.status || 'UNKNOWN';
+
+            if (info.status === 'ACTIVE' && info.enabled === true && info.has_license === true) {
+                cloudLicensed = true;
                 await unlockLevelingApp();
                 return;
             }
+
+            cloudLicensed = false;
+
+            if (info.status === 'DISABLED') {
+                showAuthScreen('blocked');
+                setAuthMessage('blocked', 'Cette licence est actuellement désactivée.', 'error');
+                return;
+            }
+
             const pending = sessionStorage.getItem('leveling_pending_license');
             if (pending) {
                 document.getElementById('auth-logged-license-key').value = pending;
@@ -2337,17 +2359,86 @@
             return true;
         }
 
+        async function getCurrentLicenseStatus() {
+            if (!cloudUser) return { status:'NO_SESSION', has_license:false, enabled:false };
+
+            const { data, error } = await sb.rpc('current_license_status');
+            if (error) {
+                console.warn('License status:', error.message);
+                return { status:'ERROR', has_license:false, enabled:false, error:error.message };
+            }
+
+            const row = Array.isArray(data) ? data[0] : data;
+            return row || { status:'NO_LICENSE', has_license:false, enabled:false };
+        }
+
         async function checkCurrentUserLicense() {
-            const { data, error } = await sb.from('profiles').select('license_id, username, app_data').single();
-            if (error) return false;
-            cloudLicensed = !!data.license_id;
+            const info = await getCurrentLicenseStatus();
+            lastLicenseStatus = info.status || 'UNKNOWN';
+            cloudLicensed = info.status === 'ACTIVE' && info.enabled === true && info.has_license === true;
             return cloudLicensed;
+        }
+
+        function stopLicenseWatch() {
+            if (licenseWatchTimer) clearInterval(licenseWatchTimer);
+            licenseWatchTimer = null;
+        }
+
+        function startLicenseWatch() {
+            stopLicenseWatch();
+            licenseWatchTimer = setInterval(() => {
+                if (cloudUser) enforceLicenseAccess(false);
+            }, 30000);
+        }
+
+        async function enforceLicenseAccess(showMessage=true) {
+            if (!cloudUser) return false;
+
+            const info = await getCurrentLicenseStatus();
+            lastLicenseStatus = info.status || 'UNKNOWN';
+
+            if (info.status === 'ACTIVE' && info.enabled === true && info.has_license === true) {
+                cloudLicensed = true;
+                return true;
+            }
+
+            cloudLicensed = false;
+            stopLicenseWatch();
+
+            const app = document.getElementById('app-container');
+            const gate = document.getElementById('auth-gate');
+            if (app) app.classList.add('auth-locked');
+            if (gate) gate.classList.remove('hidden');
+
+            if (info.status === 'DISABLED') {
+                showAuthScreen('blocked');
+                if (showMessage) setAuthMessage('blocked', 'Licence désactivée par l’administrateur.', 'error');
+            } else if (info.status === 'NO_LICENSE') {
+                showAuthScreen('activate');
+                if (showMessage) setAuthMessage('activate', 'Aucune licence active n’est associée à ce compte.', 'error');
+            } else {
+                showAuthScreen('login');
+                if (showMessage) setAuthMessage('login', 'Impossible de vérifier la licence. Réessaie.', 'error');
+            }
+            return false;
+        }
+
+        async function retryLicenseCheck() {
+            setAuthMessage('blocked', 'Vérification...');
+            const ok = await enforceLicenseAccess(false);
+
+            if (ok) {
+                setAuthMessage('blocked', 'Licence réactivée ✓', 'success');
+                await unlockLevelingApp();
+            } else if (lastLicenseStatus === 'DISABLED') {
+                setAuthMessage('blocked', 'La licence est toujours désactivée.', 'error');
+            }
         }
 
         function exportAppData() {
             saveActiveProgramState();
             return {
-                version:12, userData, smartHypertrophyRefs, bodyHistory,
+                version:'12.2', userData, smartHypertrophyRefs, bodyHistory,
                 currentBlockIndex, activeProgramKey, programWorkoutStates,
                 programCustomSetData, workoutHistory
             };
@@ -2395,16 +2486,23 @@
         }
 
         async function unlockLevelingApp() {
+            const allowed = await enforceLicenseAccess(false);
+            if (!allowed) return;
+
             if (!cloudLoadedOnce) await loadCloudData();
             document.getElementById('auth-gate').classList.add('hidden');
             document.getElementById('app-container').classList.remove('auth-locked');
+
             const emailEl = document.getElementById('cloud-account-email');
             if (emailEl && cloudUser) emailEl.textContent = cloudUser.email || 'Compte connecté';
+
             setTheme(userData.theme);
             updateProfileUI(); renderBodyChart(); initWorkoutSystem(); renderPowerHome(); renderHistoryUI();
+            startLicenseWatch();
         }
 
         async function logoutLeveling() {
+            stopLicenseWatch();
             await saveCloudData();
             await sb.auth.signOut();
             cloudUser = null; cloudLicensed = false; cloudLoadedOnce = false;
@@ -2415,16 +2513,55 @@
 
         async function initSupabaseGate() {
             const { data:{ session } } = await sb.auth.getSession();
-            if (!session) { showAuthScreen('license'); return; }
-            cloudUser = session.user;
-            const licensed = await checkCurrentUserLicense();
-            if (licensed) await unlockLevelingApp();
-            else {
-                const pending = sessionStorage.getItem('leveling_pending_license');
-                if (pending) document.getElementById('auth-logged-license-key').value = pending;
-                showAuthScreen('activate');
+
+            if (!session) {
+                cloudUser = null;
+                cloudLicensed = false;
+                document.getElementById('app-container').classList.add('auth-locked');
+                document.getElementById('auth-gate').classList.remove('hidden');
+                showAuthScreen('license');
+                return;
             }
+
+            cloudUser = session.user;
+
+            const info = await getCurrentLicenseStatus();
+            lastLicenseStatus = info.status || 'UNKNOWN';
+
+            if (info.status === 'ACTIVE' && info.enabled === true && info.has_license === true) {
+                cloudLicensed = true;
+                await unlockLevelingApp();
+                return;
+            }
+
+            cloudLicensed = false;
+            document.getElementById('app-container').classList.add('auth-locked');
+            document.getElementById('auth-gate').classList.remove('hidden');
+
+            if (info.status === 'DISABLED') {
+                showAuthScreen('blocked');
+                setAuthMessage('blocked', 'Cette licence est actuellement désactivée.', 'error');
+                return;
+            }
+
+            const pending = sessionStorage.getItem('leveling_pending_license');
+            if (pending) document.getElementById('auth-logged-license-key').value = pending;
+            showAuthScreen('activate');
         }
+
+        window.addEventListener('focus', () => {
+            if (cloudUser) enforceLicenseAccess(false);
+        });
+
+        document.addEventListener('visibilitychange', () => {
+            if (document.visibilityState === 'visible' && cloudUser) {
+                enforceLicenseAccess(false);
+            }
+        });
+
+        window.addEventListener('online', () => {
+            if (cloudUser) enforceLicenseAccess(false);
+        });
 
         loadFromLocalStorage();
         setTheme(userData.theme);
