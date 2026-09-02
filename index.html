@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Solo Leveling - Powerbuilding Tracker V12.3</title>
+    <title>LEVELING-APP — Powerbuilding Tracker V12.4</title>
     <style>
         :root {
             --bg-color: #050507;
@@ -49,9 +49,9 @@
             display: flex; justify-content: space-between; align-items: center;
             box-shadow: 0 0 15px var(--glow-purple); flex-shrink: 0; z-index: 100;
         }
-        header h1 { 
-            font-size: 1rem; margin: 0; color: var(--accent-purple); 
-            text-shadow: 0 0 10px var(--glow-purple); text-transform: uppercase; 
+        header h1 {
+            font-size: 1rem; margin: 0; color: var(--accent-purple);
+            text-shadow: 0 0 10px var(--glow-purple); text-transform: uppercase;
             letter-spacing: 1.5px; font-weight: 900;
         }
         .hud-stats { display: flex; gap: 5px; font-size: 0.7rem; }
@@ -100,7 +100,7 @@
         .stat-box { background: rgba(255, 0, 127, 0.08); padding: 10px; border-radius: 8px; text-align: center; border: 1px solid rgba(255,0,127,0.2); }
         .stat-value { font-size: 1.2rem; font-weight: bold; color: white; }
         .stat-label { font-size: 0.7rem; color: #aaa; margin-top: 2px; }
-        
+       
         .btn-action {
             background: transparent; border: 1px solid var(--accent-purple); color: var(--accent-purple);
             padding: 10px; border-radius: 8px; font-size: 0.85rem; cursor: pointer; margin-top: 12px; width: 100%;
@@ -158,7 +158,7 @@
         }
         .set-row.done { background: rgba(0, 230, 118, 0.08); border-color: var(--success); }
         .set-info { font-size: 0.8rem; color: #ccc; flex-grow: 1; display: flex; gap: 5px; align-items: center; flex-wrap: wrap; }
-        
+       
         .set-input-mini {
             background: #050507; border: 1px solid #444; color: white; border-radius: 4px;
             padding: 3px 5px; font-size: 0.75rem; width: 50px; text-align: center;
@@ -169,7 +169,7 @@
             font-weight: bold;
             background: rgba(255, 234, 0, 0.08);
         }
-        
+       
         .btn-check {
             background: #222; color: #777; border: none;
             width: 34px; height: 34px; border-radius: 50%; cursor: pointer;
@@ -249,7 +249,7 @@
             position: absolute; top: 8px; right: 8px; background: var(--success); color: #000;
             font-size: 0.6rem; font-weight: bold; padding: 2px 6px; border-radius: 4px; text-transform: uppercase; cursor: pointer;
         }
-        
+       
         .inv-image-container {
             width: 50px; height: 50px; background: rgba(0,0,0,0.5); border-radius: 8px;
             border: 1px dashed #555; display: flex; align-items: center; justify-content: center;
@@ -260,7 +260,7 @@
 
         .inv-name { font-size: 0.8rem; font-weight: bold; color: white; margin-bottom: 2px; word-break: break-word; }
         .inv-rarity { font-size: 0.65rem; text-transform: uppercase; font-weight: bold; margin-bottom: 6px; }
-        
+       
         .rarity-common-text { color: #888; }
         .rarity-rare-text { color: #00d2ff; }
         .rarity-epic-text { color: #bd00ff; }
@@ -284,7 +284,7 @@
         }
         .settings-toggle-row { display: flex; justify-content: space-between; align-items: center; margin-top: 10px; }
         .settings-toggle-row span { font-size: 0.8rem; color: #fff; font-weight: bold; }
-        
+       
         .switch { position: relative; display: inline-block; width: 46px; height: 24px; }
         .switch input { opacity: 0; width: 0; height: 0; }
         .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #333; transition: .3s; border-radius: 24px; border: 1px solid #555; }
@@ -307,7 +307,7 @@
             border: 2px solid var(--accent-purple); width: 100%; max-width: 340px; text-align: center;
             box-shadow: 0 0 20px var(--glow-purple); max-height: 90dvh; overflow-y: auto;
         }
-        
+       
         .showcase-list { display: flex; flex-direction: column; gap: 8px; margin: 15px 0; text-align: left; }
         .showcase-item {
             background: rgba(0,0,0,0.4); border: 1px solid #333; border-radius: 8px;
@@ -335,89 +335,123 @@
         .nav-item.active { color: white; text-shadow: 0 0 8px var(--glow-purple); }
         .nav-icon { font-size: 1.1rem; display: block; }
         .nav-text { font-size: 0.55rem; text-transform: uppercase; margin-top: 2px; display: block; }
+   
+/* ================= LEVELING-APP V11 ================= */
+.leveling-brand{
+    position:relative;
+    margin:0;
+    font-size:clamp(1.25rem,3vw,2rem);
+    letter-spacing:.14em;
+    font-weight:1000;
+    color:#fff;
+    text-shadow:0 0 5px rgba(255,255,255,.45),0 0 18px var(--accent-purple),0 0 42px var(--accent-purple);
+    animation:v11BrandPulse 3s ease-in-out infinite;
+}
+.leveling-brand::after{
+    content:"";
+    position:absolute;left:-8%;right:-8%;bottom:-5px;height:2px;
+    background:linear-gradient(90deg,transparent,#fff,var(--accent-purple),#fff,transparent);
+    filter:blur(.5px);box-shadow:0 0 10px var(--accent-purple),0 0 24px var(--accent-purple);
+    animation:v11Sweep 2.8s linear infinite;
+}
+.leveling-brand i{font-style:normal;color:#fff;margin:0 .08em}
+.leveling-brand strong{color:#dca6ff}
+@keyframes v11BrandPulse{50%{text-shadow:0 0 8px #fff,0 0 24px var(--accent-purple),0 0 58px var(--accent-purple)}}
+@keyframes v11Sweep{0%,100%{opacity:.55;transform:scaleX(.75)}50%{opacity:1;transform:scaleX(1)}}
+
+.v11-card{background:linear-gradient(145deg,rgba(255,255,255,.055),rgba(255,255,255,.018));border:1px solid rgba(189,0,255,.32);border-radius:14px;padding:13px;box-shadow:0 0 25px rgba(189,0,255,.07)}
+.v11-identity-main{display:flex;align-items:center;gap:12px}
+.v11-avatar{width:50px;height:50px;border-radius:14px;display:grid;place-items:center;font-size:1.35rem;font-weight:1000;background:radial-gradient(circle at 35% 25%,#fff, #bd00ff 25%,#17001f 72%);box-shadow:0 0 18px rgba(189,0,255,.55);color:#fff}
+.v11-player-name{font-size:1.05rem;font-weight:900}
+.v11-player-id{font-size:.62rem;color:#777;margin-top:2px}
+.v11-sync-pill{font-size:.58rem;color:#9dffca;margin-top:8px}
+.v11-report-head{display:flex;justify-content:space-between;gap:10px;align-items:center;margin-bottom:12px}
+.v11-periods{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;margin:10px 0}
+.v11-period,.v11-btn{border:1px solid rgba(189,0,255,.4);background:rgba(189,0,255,.08);color:#eee;border-radius:9px;padding:9px;font-weight:800;cursor:pointer}
+.v11-period.active{background:rgba(189,0,255,.28);box-shadow:0 0 14px rgba(189,0,255,.25)}
+.v11-report-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.v11-report-stat{padding:11px;border-radius:12px;background:rgba(255,255,255,.035);border:1px solid rgba(255,255,255,.07)}
+.v11-report-stat b{display:block;font-size:1.1rem;margin-top:4px}
+.v11-report-stat span{font-size:.58rem;color:#777}
+.v11-session{padding:10px;border-bottom:1px solid rgba(255,255,255,.06)}
+.v11-session:last-child{border-bottom:0}
+.v11-session-top{display:flex;justify-content:space-between;gap:8px;font-weight:800}
+.v11-session-meta{font-size:.62rem;color:#888;margin-top:4px}
+.v11-mini-bar{height:5px;background:#17171d;border-radius:99px;overflow:hidden;margin-top:7px}
+.v11-mini-bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--accent-purple),#fff,var(--accent-purple));box-shadow:0 0 10px var(--accent-purple)}
+@media(max-width:650px){.v11-report-grid{grid-template-columns:repeat(2,1fr)}.v11-report-head{align-items:flex-start;flex-direction:column}.v11-periods{grid-template-columns:repeat(2,1fr)}}
 
 
-        /* ==================== V12 AUTH / CLOUD ==================== */
-        #app-container.auth-locked { visibility: hidden; }
-        #auth-gate {
-            position: fixed; inset: 0; z-index: 5000; display:flex; align-items:center; justify-content:center;
-            padding:22px; background:radial-gradient(circle at top, rgba(189,0,255,.18), #050507 45%);
-            color:var(--main-text); font-family:var(--font-family);
-        }
-        #auth-gate.hidden { display:none; }
-        .auth-card { width:100%; max-width:390px; background:#101015; border:1px solid #333; border-radius:18px; padding:22px; box-shadow:0 0 28px rgba(189,0,255,.25); }
-        .auth-brand { text-align:center; font-weight:1000; letter-spacing:1.6px; color:var(--accent-purple); text-shadow:0 0 12px var(--glow-purple); font-size:1.2rem; }
-        .auth-title { text-align:center; margin:10px 0 5px; font-size:1rem; color:#fff; text-transform:uppercase; }
-        .auth-sub { text-align:center; color:#999; font-size:.72rem; line-height:1.45; margin-bottom:16px; }
-        .auth-screen { display:none; }
-        .auth-screen.active { display:block; }
-        .auth-field { margin:10px 0; }
-        .auth-field label { display:block; color:var(--accent-rose); font-size:.68rem; font-weight:800; text-transform:uppercase; margin-bottom:5px; }
-        .auth-field input { width:100%; border:1px solid #3a3a44; background:#050507; color:#fff; border-radius:9px; padding:12px; font-size:.9rem; outline:none; }
-        .auth-field input:focus { border-color:var(--accent-purple); box-shadow:0 0 8px var(--glow-purple); }
-        .auth-primary { width:100%; border:0; border-radius:9px; padding:12px; margin-top:9px; background:var(--accent-purple); color:#fff; font-weight:900; text-transform:uppercase; cursor:pointer; }
-        .auth-secondary { width:100%; border:1px solid #444; border-radius:9px; padding:10px; margin-top:8px; background:transparent; color:#bbb; font-weight:700; cursor:pointer; }
-        .auth-msg { min-height:18px; margin-top:10px; text-align:center; font-size:.7rem; line-height:1.4; color:#aaa; }
-        .auth-msg.error { color:#ff5b6e; }
-        .auth-msg.success { color:var(--success); }
-        .cloud-badge { display:inline-flex; gap:5px; align-items:center; padding:4px 7px; border:1px solid rgba(0,230,118,.35); border-radius:7px; color:var(--success); font-size:.62rem; }
+.v11-avatar{overflow:hidden}
+.v11-avatar img{width:100%;height:100%;object-fit:cover}
+.v11-profile-preview{display:flex;align-items:center;gap:10px;margin:8px 0}
 
-    </style>
+
+/* ==================== V12.4 AUTH / CLOUD ==================== */
+#app-container.auth-locked{visibility:hidden}
+#auth-gate{position:fixed;inset:0;z-index:5000;display:flex;align-items:center;justify-content:center;padding:22px;background:radial-gradient(circle at top,rgba(189,0,255,.18),#050507 45%);color:var(--main-text);font-family:var(--font-family)}
+#auth-gate.hidden{display:none}.auth-card{width:100%;max-width:390px;background:#101015;border:1px solid #333;border-radius:18px;padding:22px;box-shadow:0 0 28px rgba(189,0,255,.25)}
+.auth-brand{text-align:center;font-weight:1000;letter-spacing:1.6px;color:var(--accent-purple);text-shadow:0 0 12px var(--glow-purple);font-size:1.2rem}.auth-title{text-align:center;margin:10px 0 5px;font-size:1rem;color:#fff;text-transform:uppercase}.auth-sub{text-align:center;color:#999;font-size:.72rem;line-height:1.45;margin-bottom:16px}
+.auth-screen{display:none}.auth-screen.active{display:block}.auth-field{margin:10px 0}.auth-field label{display:block;color:var(--accent-rose);font-size:.68rem;font-weight:800;text-transform:uppercase;margin-bottom:5px}.auth-field input{width:100%;border:1px solid #3a3a44;background:#050507;color:#fff;border-radius:9px;padding:12px;font-size:.9rem;outline:none}
+.auth-field input:focus{border-color:var(--accent-purple);box-shadow:0 0 8px var(--glow-purple)}.auth-primary{width:100%;border:0;border-radius:9px;padding:12px;margin-top:9px;background:var(--accent-purple);color:#fff;font-weight:900;text-transform:uppercase;cursor:pointer}.auth-secondary{width:100%;border:1px solid #444;border-radius:9px;padding:10px;margin-top:8px;background:transparent;color:#bbb;font-weight:700;cursor:pointer}
+.auth-msg{min-height:18px;margin-top:10px;text-align:center;font-size:.7rem;line-height:1.4;color:#aaa}.auth-msg.error{color:#ff5b6e}.auth-msg.success{color:var(--success)}.cloud-badge{display:inline-flex;gap:5px;align-items:center;padding:4px 7px;border:1px solid rgba(0,230,118,.35);border-radius:7px;color:var(--success);font-size:.62rem}
+
+</style>
+
+<style id="v10-style">
+/* ===== STATDEX V11 UPGRADE ===== */
+.v10-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin:10px 0}.v10-card{background:linear-gradient(145deg,rgba(25,25,35,.96),rgba(10,10,15,.96));border:1px solid #343443;border-radius:12px;padding:12px;box-shadow:0 8px 24px rgba(0,0,0,.25)}.v10-card h3{margin:0 0 8px;font-size:.8rem}.v10-xp{height:9px;background:#17171e;border-radius:99px;overflow:hidden;border:1px solid #333}.v10-xp>i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--accent-purple),var(--accent-rose));box-shadow:0 0 12px var(--accent-purple);transition:width .4s}.v10-big{font-size:1.35rem;font-weight:900}.v10-muted{font-size:.65rem;color:#888}.v10-quest{display:flex;justify-content:space-between;gap:8px;align-items:center;padding:8px;border:1px solid #292933;border-radius:8px;margin:5px 0;background:rgba(255,255,255,.02)}.v10-quest.done{border-color:var(--success);opacity:.75}.v10-ach{display:flex;align-items:center;gap:8px;padding:7px;border-bottom:1px solid #222;font-size:.7rem}.v10-ach:last-child{border-bottom:0}.v10-ach.locked{opacity:.35}.v10-statrow{display:grid;grid-template-columns:repeat(3,1fr);gap:7px}.v10-stat{background:rgba(0,0,0,.28);border-radius:8px;padding:8px;text-align:center}.v10-stat b{display:block;font-size:.95rem}.v10-chip{display:inline-flex;padding:4px 7px;border-radius:99px;border:1px solid #3b3b49;font-size:.58rem;color:#bbb;margin:2px}.v10-rec{border:1px solid var(--accent-purple);background:linear-gradient(90deg,rgba(189,0,255,.11),rgba(0,0,0,.15));border-radius:10px;padding:10px;margin:8px 0;font-size:.7rem}.v10-actions{display:flex;gap:6px;flex-wrap:wrap}.v10-actions button{flex:1;min-width:100px}.v10-preset{border:1px solid #444;background:#17171e;color:#ddd;border-radius:7px;padding:5px 8px;font-size:.6rem;cursor:pointer}.v10-preset.active{border-color:var(--accent-purple);box-shadow:0 0 8px rgba(189,0,255,.25)}.v10-toast{position:fixed;left:50%;bottom:78px;transform:translateX(-50%) translateY(20px);opacity:0;pointer-events:none;background:#111;border:1px solid var(--accent-purple);padding:10px 14px;border-radius:10px;z-index:9999;font-size:.72rem;box-shadow:0 0 20px rgba(189,0,255,.3);transition:.25s}.v10-toast.show{opacity:1;transform:translateX(-50%) translateY(0)}.v10-list{max-height:190px;overflow:auto}.v10-e1rm{font-family:monospace;font-size:.75rem}.v10-timerbar{height:4px;background:#222;border-radius:99px;margin-top:7px;overflow:hidden}.v10-timerbar i{display:block;height:100%;width:100%;background:var(--success);transition:width 1s linear}.v10-export{display:flex;gap:7px;margin-top:8px}.v10-export button{flex:1}.v10-empty{font-size:.68rem;color:#777;text-align:center;padding:10px}.v10-section-title{display:flex;justify-content:space-between;align-items:center;margin:14px 0 7px}.v10-section-title span{font-size:.6rem;color:#777}@media(max-width:600px){.v10-grid{grid-template-columns:1fr}.v10-statrow{grid-template-columns:repeat(3,1fr)}.v10-actions button{min-width:90px}}
+</style>
 </head>
 <body data-theme="purple">
 
-    <div id="auth-gate">
-        <div class="auth-card">
-            <div class="auth-brand">LEVELING-APP</div>
-
-            <div id="auth-screen-license" class="auth-screen active">
-                <div class="auth-title">🔑 Activation Lifetime</div>
-                <div class="auth-sub">Entre la clé Lifetime reçue en message privé. Une clé ne pourra être associée qu'à un seul compte.</div>
-                <div class="auth-field"><label>Clé d'activation</label><input id="auth-license-key" type="text" autocomplete="off" placeholder="LVL-XXXX-XXXX-XXXX"></div>
-                <button class="auth-primary" onclick="continueWithLicense()">Continuer</button>
-                <button class="auth-secondary" onclick="showAuthScreen('login')">J'ai déjà un compte</button>
-                <div id="auth-msg-license" class="auth-msg"></div>
-            </div>
-
-            <div id="auth-screen-signup" class="auth-screen">
-                <div class="auth-title">👤 Créer mon compte</div>
-                <div class="auth-sub">Ta licence sera liée définitivement à ce compte après création.</div>
-                <div class="auth-field"><label>Pseudo</label><input id="auth-signup-pseudo" type="text" maxlength="24" placeholder="Ton pseudo"></div>
-                <div class="auth-field"><label>Email</label><input id="auth-signup-email" type="email" autocomplete="email" placeholder="email@exemple.fr"></div>
-                <div class="auth-field"><label>Mot de passe</label><input id="auth-signup-password" type="password" autocomplete="new-password" minlength="8" placeholder="8 caractères minimum"></div>
-                <button class="auth-primary" onclick="createLevelingAccount()">Créer le compte & activer</button>
-                <button class="auth-secondary" onclick="showAuthScreen('license')">Retour</button>
-                <div id="auth-msg-signup" class="auth-msg"></div>
-            </div>
-
-            <div id="auth-screen-login" class="auth-screen">
-                <div class="auth-title">🔐 Connexion</div>
-                <div class="auth-sub">Connecte-toi pour récupérer ton profil et ta progression sur cet appareil.</div>
-                <div class="auth-field"><label>Email</label><input id="auth-login-email" type="email" autocomplete="email"></div>
-                <div class="auth-field"><label>Mot de passe</label><input id="auth-login-password" type="password" autocomplete="current-password"></div>
-                <button class="auth-primary" onclick="loginLevelingAccount()">Se connecter</button>
-                <button class="auth-secondary" onclick="showAuthScreen('license')">Nouvelle activation</button>
-                <div id="auth-msg-login" class="auth-msg"></div>
-            </div>
-
-            <div id="auth-screen-activate" class="auth-screen">
-                <div class="auth-title">🔑 Licence requise</div>
-                <div class="auth-sub">Ce compte n'a pas encore de licence Lifetime. Entre ta clé pour terminer l'activation.</div>
-                <div class="auth-field"><label>Clé Lifetime</label><input id="auth-logged-license-key" type="text" autocomplete="off" placeholder="LVL-XXXX-XXXX-XXXX"></div>
-                <button class="auth-primary" onclick="activateLoggedAccount()">Activer ma licence</button>
-                <button class="auth-secondary" onclick="logoutLeveling()">Se déconnecter</button>
-                <div id="auth-msg-activate" class="auth-msg"></div>
-            </div>
-
-            <div id="auth-screen-blocked" class="auth-screen">
-                <div class="auth-title" style="color:#ff5b6e;">⛔ Licence désactivée</div>
-                <div class="auth-sub">Cette licence Lifetime a été désactivée par l'administrateur. Ton compte et tes données sont conservés, mais l'accès à LEVELING-APP est bloqué.</div>
-                <button class="auth-primary" onclick="retryLicenseCheck()" style="background:#ff5b6e;">Revérifier ma licence</button>
-                <button class="auth-secondary" onclick="logoutLeveling()">Se déconnecter</button>
-                <div id="auth-msg-blocked" class="auth-msg"></div>
-            </div>
-        </div>
+<div id="auth-gate">
+  <div class="auth-card">
+    <div class="auth-brand">LEVELING-APP</div>
+    <div id="auth-screen-license" class="auth-screen active">
+      <div class="auth-title">🔑 Activation Lifetime</div>
+      <div class="auth-sub">Entre la clé Lifetime reçue en message privé. Une clé ne peut être associée qu'à un seul compte.</div>
+      <div class="auth-field"><label>Clé d'activation</label><input id="auth-license-key" type="text" autocomplete="off" placeholder="LVL-XXXX-XXXX-XXXX"></div>
+      <button class="auth-primary" onclick="continueWithLicense()">Continuer</button>
+      <button class="auth-secondary" onclick="showAuthScreen('login')">J'ai déjà un compte</button>
+      <div id="auth-msg-license" class="auth-msg"></div>
     </div>
+    <div id="auth-screen-signup" class="auth-screen">
+      <div class="auth-title">👤 Créer mon compte</div>
+      <div class="auth-sub">Ta licence sera liée définitivement à ce compte après création.</div>
+      <div class="auth-field"><label>Pseudo</label><input id="auth-signup-pseudo" type="text" maxlength="24" placeholder="Ton pseudo"></div>
+      <div class="auth-field"><label>Email</label><input id="auth-signup-email" type="email" autocomplete="email" placeholder="email@exemple.fr"></div>
+      <div class="auth-field"><label>Mot de passe</label><input id="auth-signup-password" type="password" autocomplete="new-password" minlength="8" placeholder="8 caractères minimum"></div>
+      <button class="auth-primary" onclick="createLevelingAccount()">Créer le compte & activer</button>
+      <button class="auth-secondary" onclick="showAuthScreen('license')">Retour</button>
+      <div id="auth-msg-signup" class="auth-msg"></div>
+    </div>
+    <div id="auth-screen-login" class="auth-screen">
+      <div class="auth-title">🔐 Connexion</div>
+      <div class="auth-sub">Connecte-toi pour récupérer ton profil et ta progression.</div>
+      <div class="auth-field"><label>Email</label><input id="auth-login-email" type="email" autocomplete="email"></div>
+      <div class="auth-field"><label>Mot de passe</label><input id="auth-login-password" type="password" autocomplete="current-password"></div>
+      <button class="auth-primary" onclick="loginLevelingAccount()">Se connecter</button>
+      <button class="auth-secondary" onclick="showAuthScreen('license')">Nouvelle activation</button>
+      <div id="auth-msg-login" class="auth-msg"></div>
+    </div>
+    <div id="auth-screen-activate" class="auth-screen">
+      <div class="auth-title">🔑 Licence requise</div>
+      <div class="auth-sub">Ce compte n'a pas encore de licence Lifetime active.</div>
+      <div class="auth-field"><label>Clé Lifetime</label><input id="auth-logged-license-key" type="text" autocomplete="off" placeholder="LVL-XXXX-XXXX-XXXX"></div>
+      <button class="auth-primary" onclick="activateLoggedAccount()">Activer ma licence</button>
+      <button class="auth-secondary" onclick="logoutLeveling()">Se déconnecter</button>
+      <div id="auth-msg-activate" class="auth-msg"></div>
+    </div>
+    <div id="auth-screen-blocked" class="auth-screen">
+      <div class="auth-title" style="color:#ff5b6e">⛔ Licence désactivée</div>
+      <div class="auth-sub">Cette licence Lifetime a été désactivée par l'administrateur. Ton compte et tes données sont conservés, mais l'accès à LEVELING-APP est bloqué.</div>
+      <button class="auth-primary" onclick="retryLicenseCheck()" style="background:#ff5b6e">Revérifier ma licence</button>
+      <button class="auth-secondary" onclick="logoutLeveling()">Se déconnecter</button>
+      <div id="auth-msg-blocked" class="auth-msg"></div>
+    </div>
+  </div>
+</div>
 
 
     <div id="app-container" class="auth-locked">
@@ -425,7 +459,9 @@
             <div class="hud-stats">
                 <div class="hud-stat">💀 Niv. <span id="hud-level">1</span></div>
             </div>
-            <h1>SOLO LEVELING</h1>
+            <h1 class="leveling-brand" aria-label="LEVELING-APP">
+                <span>LEVELING</span><i>-</i><strong>APP</strong>
+            </h1>
             <div class="hud-stats">
                 <div class="hud-stat">🔥 <span id="hud-days">1</span>j</div>
                 <div class="hud-stat">🏆 <span id="hud-trophies">0</span></div>
@@ -435,7 +471,30 @@
         <main>
             <div id="panel-profile" class="panel active">
                 <h2>Rang & Niveau de Powerlifting</h2>
-                
+                <div id="v10-profile-dashboard" class="v10-grid">
+                <div id="v11-identity-card" class="v11-card" style="grid-column:1/-1">
+                    <div class="v11-identity-main">
+                        <div class="v11-avatar" id="v11-avatar">L</div>
+                        <div>
+                            <div class="v10-muted">LEVELING-APP ACCOUNT</div>
+                            <div class="v11-player-name" id="v11-player-name">Joueur</div>
+                            <div class="v11-player-id" id="v11-player-id">Profil local</div>
+                        </div>
+                    </div>
+                    <div class="v11-sync-pill" id="v11-sync-pill">● Sauvegarde locale</div>
+                </div>
+
+  <div class="v10-card" style="grid-column:1/-1">
+    <div style="display:flex;justify-content:space-between;align-items:center"><div><div class="v10-muted">PLAYER STATUS</div><div class="v10-big">NIVEAU <span id="v10-level">1</span> · <span id="v10-rank">NOVICE</span></div></div><div style="text-align:right"><div class="v10-muted">XP TOTAL</div><b id="v10-total-xp">0</b></div></div>
+    <div style="display:flex;justify-content:space-between;margin:8px 0 4px;font-size:.62rem"><span id="v10-xp-label">0 / 1000 XP</span><span id="v10-next-xp">Prochain niveau</span></div><div class="v10-xp"><i id="v10-xp-bar"></i></div>
+    <div class="v10-statrow" style="margin-top:9px"><div class="v10-stat"><span class="v10-muted">SÉANCES</span><b id="v10-workouts">0</b></div><div class="v10-stat"><span class="v10-muted">SÉRIE</span><b id="v10-streak">0 🔥</b></div><div class="v10-stat"><span class="v10-muted">VOLUME</span><b id="v10-volume">0 kg</b></div></div>
+  </div>
+  <div class="v10-card"><div class="v10-section-title"><h3>🎯 QUÊTES DU JOUR</h3><span>XP BONUS</span></div><div id="v10-quests"></div></div>
+  <div class="v10-card"><div class="v10-section-title"><h3>🏆 SUCCÈS</h3><span id="v10-ach-count">0/0</span></div><div id="v10-achievements" class="v10-list"></div></div>
+  <div class="v10-card" style="grid-column:1/-1"><div class="v10-section-title"><h3>⚡ ANALYSE SBD</h3><span>1RM / OBJECTIFS</span></div><div class="v10-statrow"><div class="v10-stat"><span class="v10-muted">SQUAT 1RM</span><b id="v10-e1rm-squat">0 kg</b></div><div class="v10-stat"><span class="v10-muted">BENCH 1RM</span><b id="v10-e1rm-bench">0 kg</b></div><div class="v10-stat"><span class="v10-muted">DEADLIFT 1RM</span><b id="v10-e1rm-dead">0 kg</b></div></div><div id="v10-sbd-analysis" style="margin-top:8px"></div></div>
+</div>
+
+               
                 <div class="rank-card" onclick="playSound('click'); openRankShowcaseModal()">
                     <div class="rank-title">Rang Powerlifting (SBD / Poids Corporel)</div>
                     <div class="rank-badge" id="rank-name">NOVICE</div>
@@ -496,8 +555,9 @@
             <div id="panel-workout" class="panel">
                 <h2 id="workout-program-title">Programme Powerbuilding</h2>
                 <p class="subtitle" id="current-block-subtitle">Bloc 1 (Hypertrophie / Force)</p>
-                
-                <div class="rest-timer-box">
+               
+                <div id="v10-workout-intel" class="v10-rec"><b>⚡ SYSTEME DE PROGRESSION V11</b><div id="v10-rec-text" style="margin-top:4px;color:#aaa">Analyse de ta séance…</div></div>
+<div class="rest-timer-box">
                     <div>
                         <div style="font-size: 0.65rem; color: #aaa; text-transform: uppercase;">⏱️ Chrono de Repos</div>
                         <div class="timer-display" id="timer-display">01:30</div>
@@ -505,14 +565,14 @@
                     <div class="timer-controls">
                         <button class="btn-timer start" onclick="toggleTimer()">Start</button>
                         <button class="btn-timer" onclick="resetTimer()">Reset</button>
-                        <button class="btn-timer" onclick="addTimerSeconds(30)">+30s</button>
+                        <button class="btn-timer" onclick="addTimerSeconds(30)">+30s</button><button class="v10-preset" onclick="setV11Timer(60)">60s</button><button class="v10-preset" onclick="setV11Timer(120)">120s</button><button class="v10-preset" onclick="setV11Timer(180)">180s</button>
                     </div>
                 </div>
 
                 <div class="block-selector" id="block-tabs"></div>
                 <div class="day-selector" id="day-tabs"></div>
                 <div id="workout-container"></div>
-                
+               
                 <div id="validate-workout-container">
                     <button id="validate-workout-btn" onclick="playSound('success'); openRatingModal()">Valider la séance</button>
                 </div>
@@ -544,12 +604,42 @@
             </div>
 
             <div id="panel-settings" class="panel">
+                <div id="v11-profile-settings" class="v11-card" style="margin-bottom:12px">
+                    <div class="v10-muted">IDENTITÉ DU JOUEUR</div>
+                    <h3 style="margin:4px 0 10px">👤 Mon profil</h3>
+                    <div style="display:grid;gap:8px">
+                        <label style="font-size:.68rem;color:#aaa">Pseudo
+                            <input id="v11-name-input" type="text" maxlength="24" placeholder="Ton pseudo"
+                                style="width:100%;margin-top:4px;padding:10px;border-radius:8px;border:1px solid rgba(189,0,255,.35);background:#111;color:#fff">
+                        </label>
+                        <label style="font-size:.68rem;color:#aaa">Avatar (emoji)
+                            <input id="v11-avatar-input" type="text" maxlength="4" placeholder="⚔️"
+                                style="width:100%;margin-top:4px;padding:10px;border-radius:8px;border:1px solid rgba(189,0,255,.35);background:#111;color:#fff">
+                        </label>
+                        <button class="v11-btn" onclick="v11SaveProfile()">💾 Sauvegarder mon profil</button>
+                    </div>
+                </div>
+
                 <h2>Paramètres & Configuration</h2>
                 <p class="subtitle">Plein écran, thèmes & réajustement SBD automatique</p>
 
+
+                <div class="profile-card" id="cloud-account-card">
+                    <h3>☁️ Compte & Cloud</h3>
+                    <p style="font-size:.68rem;color:#aaa">Compte LEVELING-APP synchronisé avec Supabase et protégé par licence Lifetime.</p>
+                    <div style="display:flex;justify-content:space-between;align-items:center;gap:8px">
+                        <span id="cloud-account-email" style="font-size:.7rem;color:#fff;word-break:break-all">Non connecté</span>
+                        <span class="cloud-badge">☁️ CLOUD</span>
+                    </div>
+                    <div style="margin-top:8px;font-size:.6rem;color:#777;text-align:center">LEVELING-APP V12.4 · Base V11 conservée</div>
+                    <button class="btn-action" onclick="logoutLeveling()" style="border-color:#ff5555;color:#ff7777">Se déconnecter</button>
+                </div>
+
+                <div class="profile-card"><h3>💾 Sauvegarde V11</h3><p style="font-size:.68rem;color:#aaa">Sauvegarde complète de ta progression, XP, quêtes, succès et réglages.</p><div class="v10-export"><button class="btn-action" onclick="exportV11Data()">⬇️ Exporter</button><button class="btn-action" onclick="importV11Data()">⬆️ Importer</button></div><input id="v10-import-file" type="file" accept="application/json" style="display:none" onchange="handleV11Import(this)"></div>
+
                 <div class="profile-card">
                     <button class="btn-action" onclick="playSound('click'); toggleFullScreen()" style="background:var(--accent-purple); color:white; margin-top:0;">🖥️ Activer / Forcer le Plein Écran</button>
-                    
+                   
                     <div style="margin-top: 15px;">
                         <span style="font-size:0.75rem; color:var(--accent-rose); text-transform:uppercase; font-weight:bold;">Thème visuel & Ambiance :</span>
                         <div class="theme-picker">
@@ -597,14 +687,6 @@
                     <div class="settings-input-group"><label>Squat 1RM (kg)</label><input type="number" id="set-squat" step="2.5"></div>
                     <div class="settings-input-group"><label>Bench Press 1RM (kg)</label><input type="number" id="set-bench" step="2.5"></div>
                     <div class="settings-input-group"><label>Deadlift 1RM (kg)</label><input type="number" id="set-deadlift" step="2.5"></div>
-                </div>
-
-                <div class="profile-card" id="cloud-account-card">
-                    <h3>Compte & Cloud</h3>
-                    <p style="font-size:.72rem;color:#aaa;line-height:1.45;">Tes données sont synchronisées avec ton compte LEVELING-APP.</p>
-                    <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;"><span id="cloud-account-email" style="font-size:.72rem;color:#fff;word-break:break-all;">Non connecté</span><span class="cloud-badge">☁️ CLOUD</span></div>
-                    <div style="margin-top:8px;font-size:.62rem;color:#777;text-align:center;">LEVELING-APP V12.3 · Licence Lifetime sécurisée</div>
-                    <button class="btn-action" onclick="logoutLeveling()" style="border-color:#ff5555;color:#ff7777;">Se déconnecter</button>
                 </div>
 
                 <div class="profile-card">
@@ -711,7 +793,6 @@
 
     <input type="file" id="hidden-file-input" accept="image/*" style="display:none;" onchange="handleImageUpload(this)">
 
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
         let audioCtx = null;
         function initAudio() {
@@ -945,7 +1026,7 @@
         function openSmartProgressionModal() {
             const container = document.getElementById('smart-progression-inputs-container');
             const exoList = getAllHypertrophyExercisesList();
-            
+           
             let html = '';
             exoList.forEach(exoName => {
                 let saved = smartHypertrophyRefs[exoName] || { reps: 10, weight: 0 };
@@ -1354,7 +1435,7 @@
         let currentDayIndex = 0;
         let selectedRating = 0;
         let workoutState = {};
-        let customSetData = {}; 
+        let customSetData = {};
 
         function loadFromLocalStorage() {
             try {
@@ -1413,7 +1494,6 @@
                 localStorage.setItem('solo_leveling_active_program', activeProgramKey);
                 localStorage.setItem('solo_leveling_program_states', JSON.stringify(programWorkoutStates));
                 localStorage.setItem('solo_leveling_program_custom_sets', JSON.stringify(programCustomSetData));
-                scheduleCloudSave();
             } catch (e) { console.log(e); }
         }
 
@@ -1479,7 +1559,7 @@
 
             document.getElementById('val-sbd-total').innerText = totalSBD + " kg";
             document.getElementById('val-sbd-ratio').innerText = ratio + "x";
-            
+           
             const rank = getSBDRank(totalSBD, bodyWeight);
             const rankBadge = document.getElementById('rank-name');
             rankBadge.innerText = rank.name;
@@ -1562,7 +1642,7 @@
             userData.squat = parseFloat(document.getElementById('set-squat').value) || userData.squat;
             userData.bench = parseFloat(document.getElementById('set-bench').value) || userData.bench;
             userData.deadlift = parseFloat(document.getElementById('set-deadlift').value) || userData.deadlift;
-            
+           
             saveToLocalStorage();
             updateProfileUI();
             renderBodyChart();
@@ -1580,14 +1660,14 @@
             blockProg.forEach((day, dIdx) => {
                 day.exercises.forEach((ex, exIdx) => {
                     for (let s = 0; s < ex.sets; s++) {
-                        if (workoutState[currentBlockIndex] && 
-                            workoutState[currentBlockIndex][dIdx] && 
-                            workoutState[currentBlockIndex][dIdx][exIdx] && 
+                        if (workoutState[currentBlockIndex] &&
+                            workoutState[currentBlockIndex][dIdx] &&
+                            workoutState[currentBlockIndex][dIdx][exIdx] &&
                             workoutState[currentBlockIndex][dIdx][exIdx][s]) {
-                            
+                           
                             let reps = ex.defaultReps;
                             let weight = ex.defaultWeight;
-                            
+                           
                             const isSBD = ['Développé Couché', 'Soulevé de Terre', 'Squat', 'Squat (Volume)', 'Spoto Press'].includes(ex.name);
                             if (userData.autoProgression && !isSBD && smartHypertrophyRefs[ex.name]) {
                                 reps = smartHypertrophyRefs[ex.name].reps;
@@ -1667,7 +1747,7 @@
 
             const tabsContainer = document.getElementById('day-tabs');
             tabsContainer.innerHTML = '';
-            
+           
             activeProgramDays.forEach((dayObj, index) => {
                 const tab = document.createElement('div');
                 let isCompleted = isDayCompleted(currentBlockIndex, index);
@@ -1704,7 +1784,7 @@
             const activeProgramDays = programsByBlock[currentBlockIndex];
             const currentDay = activeProgramDays[currentDayIndex];
             container.innerHTML = `<h3>${currentDay.title}</h3>`;
-            
+           
             if (!workoutState[currentBlockIndex]) workoutState[currentBlockIndex] = {};
             if (!workoutState[currentBlockIndex][currentDayIndex]) workoutState[currentBlockIndex][currentDayIndex] = {};
             if (!customSetData[currentBlockIndex]) customSetData[currentBlockIndex] = {};
@@ -1720,12 +1800,12 @@
                 if (!customSetData[currentBlockIndex][currentDayIndex][exIndex]) {
                     customSetData[currentBlockIndex][currentDayIndex][exIndex] = {};
                 }
-                
+               
                 let card = document.createElement('div');
                 const isSBD = ['Développé Couché', 'Soulevé de Terre', 'Squat', 'Squat (Volume)', 'Spoto Press'].includes(ex.name);
                 const isSmartActiveForExo = userData.autoProgression && !isSBD && smartHypertrophyRefs[ex.name];
                 card.className = `exercise-card ${isSmartActiveForExo ? 'smart-progression-active' : ''}`;
-                
+               
                 let setsHtml = '';
                 for (let s = 0; s < ex.sets; s++) {
                     totalSetsCount++;
@@ -1749,7 +1829,7 @@
                         <div class="set-row ${isDone ? 'done' : ''}">
                             <div class="set-info">
                                 <span>Série ${s + 1} :</span>
-                                <input type="number" class="set-input-mini ${isSmartActiveForExo ? 'smart-adjusted' : ''}" value="${currentReps}" onchange="updateSetVal(${exIndex}, ${s}, 'reps', this.value)" title="Répétitions"> reps 
+                                <input type="number" class="set-input-mini ${isSmartActiveForExo ? 'smart-adjusted' : ''}" value="${currentReps}" onchange="updateSetVal(${exIndex}, ${s}, 'reps', this.value)" title="Répétitions"> reps
                                 @ <input type="number" class="set-input-mini ${isSmartActiveForExo ? 'smart-adjusted' : ''}" value="${currentWeight}" step="0.5" onchange="updateSetVal(${exIndex}, ${s}, 'weight', this.value)" title="Poids en kg"> kg
                             </div>
                             <button class="btn-check ${isDone ? 'active' : ''}" onclick="toggleSet(${exIndex}, ${s})">${isDone ? '✓' : ''}</button>
@@ -1799,7 +1879,7 @@
             workoutState[currentBlockIndex][currentDayIndex][exIndex][setIndex] = !currentState;
             playSound(currentState ? 'click' : 'check');
             saveToLocalStorage();
-            
+           
             if (currentDayIndex === 6) {
                 checkSundayCompletion();
             }
@@ -1958,7 +2038,7 @@
         function renderInventory() {
             const grid = document.getElementById('inventory-grid');
             grid.innerHTML = '';
-            
+           
             let equippedCount = inventoryItems.filter(i => i.equipped).length;
             document.getElementById('inventory-sub').innerHTML = `Gérez vos équipements de force et consommables. <span style="color:var(--success); font-weight:bold;">(${equippedCount} équipés)</span>`;
 
@@ -1971,7 +2051,7 @@
 
                 let slot = document.createElement('div');
                 slot.className = `inventory-card ${item.equipped ? 'equipped' : ''} ${rarityClass}`;
-                
+               
                 let imageContent = item.image ? `<img src="${item.image}" alt="${item.name}">` : `<span>${item.emoji || '📦'}</span>`;
 
                 slot.innerHTML = `
@@ -2015,10 +2095,10 @@
                     const img = new Image();
                     img.onload = function() {
                         const canvas = document.createElement('canvas');
-                        const MAX_SIZE = 150; 
+                        const MAX_SIZE = 150;
                         let width = img.width;
                         let height = img.height;
-                        
+                       
                         if (width > height) {
                             if (width > MAX_SIZE) { height *= MAX_SIZE / width; width = MAX_SIZE; }
                         } else {
@@ -2029,7 +2109,7 @@
                         canvas.height = height;
                         const ctx = canvas.getContext('2d');
                         ctx.drawImage(img, 0, 0, width, height);
-                        
+                       
                         const compressedDataUrl = canvas.toDataURL('image/jpeg', 0.7);
 
                         let item = inventoryItems.find(i => i.id === activeImageEditId);
@@ -2123,7 +2203,7 @@
         function openRatingModal() {
             selectedRating = 0;
             document.querySelectorAll('.stars-container span').forEach(s => s.classList.remove('active'));
-            
+           
             const programsByBlock = getPrograms();
             const currentDay = programsByBlock[currentBlockIndex][currentDayIndex];
             let recapHTML = `<b>Séance :</b> ${currentDay.title}<br><b>Détail validé :</b><br>`;
@@ -2181,7 +2261,7 @@
             if (currentDayIndex === 6) {
                 checkSundayCompletion();
             }
-            
+           
             saveToLocalStorage();
             updateProfileUI();
             renderBodyChart();
@@ -2243,358 +2323,6 @@
             }
         }
 
-
-        // ==================== V12 SUPABASE AUTH + CLOUD ====================
-        const SUPABASE_URL = 'https://jmejktyindxzzsqwthsk.supabase.co';
-        const SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_2eS6-xR0i4DZ4H4YI4Uj2w_FXSC_yUP';
-        const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
-        let cloudUser = null;
-        let cloudLicensed = false;
-        let cloudLoadedOnce = false;
-        let cloudSaveTimer = null;
-        let suppressCloudSave = false;
-        let licenseWatchTimer = null;
-        let lastLicenseStatus = 'UNKNOWN';
-        let licenseCheckPromise = null;
-
-        function showAuthScreen(name) {
-            document.querySelectorAll('.auth-screen').forEach(el => el.classList.remove('active'));
-            const el = document.getElementById('auth-screen-' + name);
-            if (el) el.classList.add('active');
-            document.querySelectorAll('.auth-msg').forEach(el => { el.textContent=''; el.className='auth-msg'; });
-        }
-
-        function setAuthMessage(screen, text, type='') {
-            const el = document.getElementById('auth-msg-' + screen);
-            if (!el) return;
-            el.textContent = text;
-            el.className = 'auth-msg' + (type ? ' ' + type : '');
-        }
-
-        function normalizeLicenseKey(v) { return String(v || '').trim().toUpperCase(); }
-
-        function continueWithLicense() {
-            const key = normalizeLicenseKey(document.getElementById('auth-license-key').value);
-            if (!/^LVL-[A-Z0-9]{4}-[A-Z0-9]{4}-[A-Z0-9]{4}$/.test(key)) {
-                setAuthMessage('license', 'Format attendu : LVL-XXXX-XXXX-XXXX', 'error');
-                return;
-            }
-            sessionStorage.setItem('leveling_pending_license', key);
-            showAuthScreen('signup');
-        }
-
-        async function createLevelingAccount() {
-            const pseudo = document.getElementById('auth-signup-pseudo').value.trim();
-            const email = document.getElementById('auth-signup-email').value.trim();
-            const password = document.getElementById('auth-signup-password').value;
-            const key = sessionStorage.getItem('leveling_pending_license');
-            if (!key) return showAuthScreen('license');
-            if (pseudo.length < 2) return setAuthMessage('signup','Entre un pseudo valide.','error');
-            if (!email || password.length < 8) return setAuthMessage('signup','Email valide et mot de passe de 8 caractères minimum.','error');
-            setAuthMessage('signup','Création du compte...');
-            const { data, error } = await sb.auth.signUp({ email, password, options:{ data:{ username:pseudo } } });
-            if (error) return setAuthMessage('signup', error.message, 'error');
-            if (!data.session) {
-                setAuthMessage('signup','Compte créé. Confirme ton email puis connecte-toi. Ta clé reste réservée uniquement sur cet appareil jusqu’à la connexion.','success');
-                setTimeout(() => showAuthScreen('login'), 1800);
-                return;
-            }
-            cloudUser = data.user;
-            const ok = await activateLicenseForCurrentUser(key, 'signup');
-            if (ok) await unlockLevelingApp();
-        }
-
-        async function loginLevelingAccount() {
-            const email = document.getElementById('auth-login-email').value.trim();
-            const password = document.getElementById('auth-login-password').value;
-            setAuthMessage('login','Connexion...');
-            const { data, error } = await sb.auth.signInWithPassword({ email, password });
-            if (error) return setAuthMessage('login', error.message, 'error');
-            cloudUser = data.user;
-            const info = await getCurrentLicenseStatus();
-            lastLicenseStatus = info.status || 'UNKNOWN';
-
-            if (info.status === 'ACTIVE' && info.enabled === true && info.has_license === true) {
-                cloudLicensed = true;
-                await unlockLevelingApp();
-                return;
-            }
-
-            cloudLicensed = false;
-
-            if (info.status === 'DISABLED') {
-                showAuthScreen('blocked');
-                setAuthMessage('blocked', 'Cette licence est actuellement désactivée.', 'error');
-                return;
-            }
-
-            const pending = sessionStorage.getItem('leveling_pending_license');
-            if (pending) {
-                document.getElementById('auth-logged-license-key').value = pending;
-            }
-            showAuthScreen('activate');
-        }
-
-        async function activateLoggedAccount() {
-            const key = normalizeLicenseKey(document.getElementById('auth-logged-license-key').value);
-            if (!/^LVL-[A-Z0-9]{4}-[A-Z0-9]{4}-[A-Z0-9]{4}$/.test(key)) {
-                return setAuthMessage('activate','Format attendu : LVL-XXXX-XXXX-XXXX','error');
-            }
-            const ok = await activateLicenseForCurrentUser(key, 'activate');
-            if (ok) await unlockLevelingApp();
-        }
-
-        async function activateLicenseForCurrentUser(key, screen) {
-            setAuthMessage(screen,'Vérification de la licence...');
-            const { data, error } = await sb.rpc('activate_lifetime_license', { p_license_key:key });
-            if (error) {
-                const friendly = error.message.includes('LICENSE_NOT_FOUND') ? 'Clé invalide.' :
-                    error.message.includes('LICENSE_DISABLED') ? 'Cette clé a été désactivée.' :
-                    error.message.includes('LICENSE_ALREADY_USED') ? 'Cette clé est déjà liée à un autre compte.' :
-                    error.message.includes('USER_ALREADY_LICENSED') ? 'Ce compte possède déjà une autre licence.' : error.message;
-                setAuthMessage(screen, friendly, 'error');
-                return false;
-            }
-            cloudLicensed = true;
-            sessionStorage.removeItem('leveling_pending_license');
-            setAuthMessage(screen,'Licence Lifetime activée ✓','success');
-            return true;
-        }
-
-        async function getCurrentLicenseStatus() {
-            if (!cloudUser) return { status:'NO_SESSION', has_license:false, enabled:false };
-            if (licenseCheckPromise) return licenseCheckPromise;
-
-            licenseCheckPromise = (async () => {
-                try {
-                    const { data, error } = await sb.rpc('current_license_status');
-                    if (error) {
-                        console.warn('License status:', error.message);
-                        return { status:'ERROR', has_license:false, enabled:false, error:error.message };
-                    }
-                    const row = Array.isArray(data) ? data[0] : data;
-                    return row || { status:'NO_LICENSE', has_license:false, enabled:false };
-                } finally {
-                    licenseCheckPromise = null;
-                }
-            })();
-
-            return licenseCheckPromise;
-        }
-
-        async function checkCurrentUserLicense() {
-            const info = await getCurrentLicenseStatus();
-            lastLicenseStatus = info.status || 'UNKNOWN';
-            cloudLicensed = info.status === 'ACTIVE' && info.enabled === true && info.has_license === true;
-            return cloudLicensed;
-        }
-
-        function stopLicenseWatch() {
-            if (licenseWatchTimer) clearInterval(licenseWatchTimer);
-            licenseWatchTimer = null;
-        }
-
-        function startLicenseWatch() {
-            stopLicenseWatch();
-            licenseWatchTimer = setInterval(() => {
-                if (cloudUser) enforceLicenseAccess(false);
-            }, 30000);
-        }
-
-        async function enforceLicenseAccess(showMessage=true) {
-            if (!cloudUser) return false;
-
-            const info = await getCurrentLicenseStatus();
-            lastLicenseStatus = info.status || 'UNKNOWN';
-
-            if (info.status === 'ACTIVE' && info.enabled === true && info.has_license === true) {
-                cloudLicensed = true;
-                return true;
-            }
-
-            cloudLicensed = false;
-            stopLicenseWatch();
-
-            const app = document.getElementById('app-container');
-            const gate = document.getElementById('auth-gate');
-            if (app) app.classList.add('auth-locked');
-            if (gate) gate.classList.remove('hidden');
-
-            if (info.status === 'DISABLED') {
-                showAuthScreen('blocked');
-                if (showMessage) setAuthMessage('blocked', 'Licence désactivée par l’administrateur.', 'error');
-            } else if (info.status === 'NO_LICENSE') {
-                showAuthScreen('activate');
-                if (showMessage) setAuthMessage('activate', 'Aucune licence active n’est associée à ce compte.', 'error');
-            } else {
-                showAuthScreen('login');
-                if (showMessage) setAuthMessage('login', 'Impossible de vérifier la licence. Réessaie.', 'error');
-            }
-            return false;
-        }
-
-        async function retryLicenseCheck() {
-            setAuthMessage('blocked', 'Vérification...');
-            const ok = await enforceLicenseAccess(false);
-
-            if (ok) {
-                setAuthMessage('blocked', 'Licence réactivée ✓', 'success');
-                await unlockLevelingApp();
-            } else if (lastLicenseStatus === 'DISABLED') {
-                setAuthMessage('blocked', 'La licence est toujours désactivée.', 'error');
-            }
-        }
-
-        function exportAppData() {
-            saveActiveProgramState();
-            return {
-                version:'12.3', userData, smartHypertrophyRefs, bodyHistory,
-                currentBlockIndex, activeProgramKey, programWorkoutStates,
-                programCustomSetData, workoutHistory
-            };
-        }
-
-        function importAppData(d) {
-            if (!d || typeof d !== 'object') return;
-            suppressCloudSave = true;
-            try {
-                if (d.userData) userData = d.userData;
-                if (d.smartHypertrophyRefs) smartHypertrophyRefs = d.smartHypertrophyRefs;
-                if (d.bodyHistory) bodyHistory = d.bodyHistory;
-                if (Number.isInteger(d.currentBlockIndex)) currentBlockIndex = d.currentBlockIndex;
-                if (d.activeProgramKey) activeProgramKey = d.activeProgramKey;
-                if (d.programWorkoutStates) programWorkoutStates = d.programWorkoutStates;
-                if (d.programCustomSetData) programCustomSetData = d.programCustomSetData;
-                if (d.workoutHistory) workoutHistory = d.workoutHistory;
-                loadActiveProgramState();
-                saveToLocalStorage();
-            } finally { suppressCloudSave = false; }
-        }
-
-        async function loadCloudData() {
-            if (!cloudUser || !cloudLicensed) return;
-            const { data, error } = await sb.from('profiles').select('app_data').single();
-            if (!error && data && data.app_data && Object.keys(data.app_data).length) {
-                importAppData(data.app_data);
-            } else if (!error) {
-                await saveCloudData();
-            }
-            cloudLoadedOnce = true;
-        }
-
-        async function saveCloudData() {
-            if (!cloudUser || !cloudLicensed || suppressCloudSave) return;
-            const payload = exportAppData();
-            const { error } = await sb.from('profiles').update({ app_data:payload, updated_at:new Date().toISOString() }).eq('id', cloudUser.id);
-            if (error) console.warn('Cloud save:', error.message);
-        }
-
-        function scheduleCloudSave() {
-            if (!cloudUser || !cloudLicensed || suppressCloudSave) return;
-            clearTimeout(cloudSaveTimer);
-            cloudSaveTimer = setTimeout(saveCloudData, 700);
-        }
-
-        async function unlockLevelingApp() {
-            const allowed = await enforceLicenseAccess(false);
-            if (!allowed) return;
-
-            if (!cloudLoadedOnce) await loadCloudData();
-            document.getElementById('auth-gate').classList.add('hidden');
-            document.getElementById('app-container').classList.remove('auth-locked');
-
-            const emailEl = document.getElementById('cloud-account-email');
-            if (emailEl && cloudUser) emailEl.textContent = cloudUser.email || 'Compte connecté';
-
-            setTheme(userData.theme);
-            updateProfileUI(); renderBodyChart(); initWorkoutSystem(); renderPowerHome(); renderHistoryUI();
-            startLicenseWatch();
-        }
-
-        async function logoutLeveling() {
-            stopLicenseWatch();
-            await saveCloudData();
-            await sb.auth.signOut();
-            cloudUser = null; cloudLicensed = false; cloudLoadedOnce = false;
-            document.getElementById('app-container').classList.add('auth-locked');
-            document.getElementById('auth-gate').classList.remove('hidden');
-            showAuthScreen('login');
-        }
-
-        async function initSupabaseGate() {
-            const { data:{ session } } = await sb.auth.getSession();
-
-            if (!session) {
-                cloudUser = null;
-                cloudLicensed = false;
-                document.getElementById('app-container').classList.add('auth-locked');
-                document.getElementById('auth-gate').classList.remove('hidden');
-                showAuthScreen('license');
-                return;
-            }
-
-            cloudUser = session.user;
-
-            const info = await getCurrentLicenseStatus();
-            lastLicenseStatus = info.status || 'UNKNOWN';
-
-            if (info.status === 'ACTIVE' && info.enabled === true && info.has_license === true) {
-                cloudLicensed = true;
-                await unlockLevelingApp();
-                return;
-            }
-
-            cloudLicensed = false;
-            document.getElementById('app-container').classList.add('auth-locked');
-            document.getElementById('auth-gate').classList.remove('hidden');
-
-            if (info.status === 'DISABLED') {
-                showAuthScreen('blocked');
-                setAuthMessage('blocked', 'Cette licence est actuellement désactivée.', 'error');
-                return;
-            }
-
-            const pending = sessionStorage.getItem('leveling_pending_license');
-            if (pending) document.getElementById('auth-logged-license-key').value = pending;
-            showAuthScreen('activate');
-        }
-
-        sb.auth.onAuthStateChange(async (event, session) => {
-            if (event === 'SIGNED_OUT' || !session) {
-                stopLicenseWatch();
-                cloudUser = null;
-                cloudLicensed = false;
-                cloudLoadedOnce = false;
-                document.getElementById('app-container').classList.add('auth-locked');
-                document.getElementById('auth-gate').classList.remove('hidden');
-                showAuthScreen('login');
-                return;
-            }
-
-            cloudUser = session.user;
-            if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED' || event === 'INITIAL_SESSION') {
-                await enforceLicenseAccess(false);
-            }
-        });
-
-        window.addEventListener('pagehide', () => {
-            if (cloudUser && cloudLicensed && !suppressCloudSave) saveCloudData();
-        });
-
-        window.addEventListener('focus', () => {
-            if (cloudUser) enforceLicenseAccess(false);
-        });
-
-        document.addEventListener('visibilitychange', () => {
-            if (document.visibilityState === 'visible' && cloudUser) {
-                enforceLicenseAccess(false);
-            }
-        });
-
-        window.addEventListener('online', () => {
-            if (cloudUser) enforceLicenseAccess(false);
-        });
-
         loadFromLocalStorage();
         setTheme(userData.theme);
         initAutoDateAndBlock();
@@ -2602,7 +2330,340 @@
         renderBodyChart();
         initWorkoutSystem();
         renderPowerHome();
-        initSupabaseGate();
-    </script>
+   
+</script>
+<script id="statdex-v10">
+/* ==================== STATDEX V11 SYSTEM ==================== */
+(function(){
+  const KEY='solo_leveling_v10';
+  const defaults={xp:0,totalXp:0,streak:0,lastWorkout:null,dayKey:null,quests:{},achievements:{},sessions:[],timer:90};
+  let v10=Object.assign({},defaults);
+  try{const saved=localStorage.getItem(KEY);if(saved)v10=Object.assign({},defaults,JSON.parse(saved));}catch(e){}
+  if(!Number.isFinite(v10.totalXp)||v10.totalXp===0)v10.totalXp=(userData.workoutsCompleted||0)*250;
+  function save(){
+    try{localStorage.setItem(KEY,JSON.stringify(v10));}catch(e){}
+    if(typeof window.scheduleCloudSave==='function') window.scheduleCloudSave();
+  }
+  window.__levelingV10Export=()=>JSON.parse(JSON.stringify(v10));
+  window.__levelingV10Import=(data)=>{
+    if(data&&typeof data==='object') v10=Object.assign({},defaults,data);
+    save(); setTimeout(render,0);
+  };
+  function levelInfo(){const lvl=1+Math.floor(v10.totalXp/1000),base=(lvl-1)*1000,next=lvl*1000;return {lvl,base,next,into:v10.totalXp-base,pct:Math.min(100,Math.round((v10.totalXp-base)/1000*100))};}
+  function today(){return new Date().toISOString().slice(0,10);}
+  function ensureDay(){const d=today();if(v10.dayKey!==d){v10.dayKey=d;v10.quests={};save();}}
+  function totalVolume(){let n=0;(workoutHistory||[]).forEach(h=>n+=Number(h.totalTonnage)||0);return n;}
+  function completedSetsToday(){const b=currentBlockIndex,d=currentDayIndex;let n=0;const prog=getPrograms()[b]?.[d];if(!prog)return 0;prog.exercises.forEach((ex,ei)=>{for(let si=0;si<ex.sets;si++)if(workoutState[b]?.[d]?.[ei]?.[si])n++;});return n;}
+  const ACH=[
+   ['first','⚔️ Éveil','Terminer ta première séance',()=>userData.workoutsCompleted>=1],
+   ['five','🗡️ Chasseur','5 séances terminées',()=>userData.workoutsCompleted>=5],
+   ['ten','💀 Exterminateur','10 séances terminées',()=>userData.workoutsCompleted>=10],
+   ['volume10k','🔥 10K','Accumuler 10 000 kg de volume',()=>totalVolume()>=10000],
+   ['volume50k','👑 50K','Accumuler 50 000 kg de volume',()=>totalVolume()>=50000],
+   ['pr5','💎 Briseur de records','5 PR / séances intenses',()=>userData.prCount>=5],
+   ['elite','⚡ Rang Élite','Atteindre 6.5x de ratio SBD/PDC',()=>((userData.squat+userData.bench+userData.deadlift)/(userData.weight||85))>=6.5],
+   ['level10','🌌 Monarque','Atteindre le niveau 10',()=>levelInfo().lvl>=10]
+  ];
+  function grantQuest(id,xp,label){ensureDay();if(v10.quests[id])return false;v10.quests[id]=true;v10.totalXp+=xp;v10.xp=v10.totalXp;toast('+'+xp+' XP · '+label);save();return true;}
+  function refreshQuests(){ensureDay();const vol=calculateWeeklyTonnage()||0, sets=completedSetsToday();const q=[
+   ['session', '⚔️ Terminer la séance',250,()=>false],
+   ['volume','🏋️ Atteindre 5 000 kg de volume',300,()=>vol>=5000],
+   ['sets','🎯 Valider 10 séries',250,()=>sets>=10]
+  ];document.getElementById('v10-quests').innerHTML=q.map(([id,label,xp,doneFn])=>{const done=!!v10.quests[id]||doneFn();if(done&&!v10.quests[id])grantQuest(id,xp,label.replace(/^\S+\s/,''));return `<div class="v10-quest ${done?'done':''}"><span>${label}</span><b style="color:var(--warning)">+${xp} XP ${done?'✓':''}</b></div>`}).join('');}
+  function refreshAchievements(){let unlocked=0;const el=document.getElementById('v10-achievements');el.innerHTML=ACH.map(a=>{const [id,name,desc,fn]=a;let ok=false;try{ok=!!fn()}catch(e){}if(ok){unlocked++;if(!v10.achievements[id]){v10.achievements[id]=true;userData.trophies=(userData.trophies||0)+1;saveToLocalStorage();}}return `<div class="v10-ach ${ok?'':'locked'}"><span style="font-size:1rem">${ok?'🏆':'🔒'}</span><div><b>${name}</b><div class="v10-muted">${desc}</div></div></div>`}).join('');document.getElementById('v10-ach-count').textContent=unlocked+'/'+ACH.length;}
+  function render(){ensureDay();const li=levelInfo();userData.level=li.lvl;const total=userData.squat+userData.bench+userData.deadlift,bw=userData.weight||85,ratio=total/bw,rank=getSBDRank(total,bw);document.getElementById('v10-level').textContent=li.lvl;document.getElementById('v10-rank').textContent=rank.name;document.getElementById('v10-total-xp').textContent=v10.totalXp.toLocaleString();document.getElementById('v10-xp-label').textContent=li.into+' / 1000 XP';document.getElementById('v10-xp-bar').style.width=li.pct+'%';document.getElementById('v10-next-xp').textContent=(li.next-v10.totalXp)+' XP restants';document.getElementById('v10-workouts').textContent=userData.workoutsCompleted||0;document.getElementById('v10-streak').textContent=(v10.streak||0)+' 🔥';document.getElementById('v10-volume').textContent=Math.round(totalVolume()).toLocaleString()+' kg';document.getElementById('v10-e1rm-squat').textContent=(userData.squat||0)+' kg';document.getElementById('v10-e1rm-bench').textContent=(userData.bench||0)+' kg';document.getElementById('v10-e1rm-dead').textContent=(userData.deadlift||0)+' kg';document.getElementById('v10-sbd-analysis').innerHTML=`<span class="v10-chip">Ratio ${ratio.toFixed(2)}x</span><span class="v10-chip">Prochain rang : ${nextRank(ratio)}</span><span class="v10-chip">Objectif +5% : ${Math.round(total*1.05)} kg</span>`;refreshQuests();refreshAchievements();}
+  function nextRank(r){for(let i=ranksConfig.length-1;i>=0;i--)if(r<ranksConfig[i].minRatio)return ranksConfig[i].name+' · '+Math.max(0,(ranksConfig[i].minRatio-r).toFixed(2))+'x';return 'MAX';}
+  function toast(msg){let t=document.getElementById('v10-toast');if(!t){t=document.createElement('div');t.id='v10-toast';t.className='v10-toast';document.body.appendChild(t)}t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2200);}
+  window.setV11Timer=function(sec){timerSecondsLeft=sec;clearInterval(timerInterval);isTimerRunning=false;updateTimerDisplay();v10.timer=sec;save();document.querySelectorAll('.v10-preset').forEach(b=>b.classList.remove('active'));toast('Repos réglé sur '+sec+' secondes');};
+  window.exportV11Data=function(){const data={version:'V11',exportedAt:new Date().toISOString(),userData,smartHypertrophyRefs,bodyHistory,inventoryItems,workoutHistory,workoutState,customSetData,activeProgramKey,currentBlockIndex,v10};const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'}),a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='statdex-v10-backup-'+today()+'.json';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),500);toast('Sauvegarde exportée');};
+  window.importV11Data=function(){document.getElementById('v10-import-file').click();};
+  window.handleV11Import=function(input){const file=input.files?.[0];if(!file)return;const r=new FileReader();r.onload=()=>{try{const d=JSON.parse(r.result);if(d.userData)userData=d.userData;if(d.smartHypertrophyRefs)smartHypertrophyRefs=d.smartHypertrophyRefs;if(d.bodyHistory)bodyHistory=d.bodyHistory;if(d.inventoryItems)inventoryItems=d.inventoryItems;if(d.workoutHistory)workoutHistory=d.workoutHistory;if(d.workoutState)workoutState=d.workoutState;if(d.customSetData)customSetData=d.customSetData;if(d.activeProgramKey)activeProgramKey=d.activeProgramKey;if(Number.isInteger(d.currentBlockIndex))currentBlockIndex=d.currentBlockIndex;if(d.v10)v10=Object.assign({},defaults,d.v10);saveToLocalStorage();save();updateProfileUI();renderBodyChart();initWorkoutSystem();renderPowerHome();render();toast('Sauvegarde importée avec succès');}catch(e){alert('Fichier de sauvegarde invalide.');}};r.readAsText(file);input.value='';};
+  function recommendation(){const prog=getPrograms()[currentBlockIndex]?.[currentDayIndex];if(!prog){return}let done=0,total=0;prog.exercises.forEach((ex,ei)=>{for(let si=0;si<ex.sets;si++){total++;if(workoutState[currentBlockIndex]?.[currentDayIndex]?.[ei]?.[si])done++;}});const pct=total?Math.round(done/total*100):0;let msg=pct===100?'🔥 Séance complète. Prochaine fois, vise +2,5 kg sur les isolations si toutes les reps cibles passent.':pct>50?'⚔️ Plus de la moitié validée. Garde 1–2 reps en réserve et termine proprement.':'🎯 Commence par les séries prévues. Le système mémorise tes performances pour ajuster la progression.';const el=document.getElementById('v10-rec-text');if(el)el.textContent=msg+' ('+done+'/'+total+' séries)';}
+  const oldFinish=window.finishWorkoutFinal;window.finishWorkoutFinal=function(){const before=userData.workoutsCompleted||0;oldFinish();if((userData.workoutsCompleted||0)>before){const now=new Date();const key=today();if(v10.lastWorkout){const prev=new Date(v10.lastWorkout),diff=Math.round((new Date(key)-prev)/86400000);v10.streak=diff===1?(v10.streak||0)+1:diff===0?(v10.streak||0):(1);}else v10.streak=1;v10.lastWorkout=key;v10.totalXp+=250+Math.max(0,selectedRating-3)*50;v10.xp=v10.totalXp;v10.sessions.push({date:key,program:activeProgramKey,day:currentDayIndex,rating:selectedRating,volume:calculateWeeklyTonnage()||0});grantQuest('session',250,'Séance terminée');save();render();}};
+  const oldUpdate=window.updateProfileUI;window.updateProfileUI=function(){oldUpdate();setTimeout(render,0);};
+  const oldInit=window.initWorkoutSystem;window.initWorkoutSystem=function(){oldInit();setTimeout(recommendation,0);setTimeout(render,0);};
+  const oldSet=window.toggleSet;window.toggleSet=function(ei,si){oldSet(ei,si);setTimeout(()=>{recommendation();refreshQuests();},20);};
+  render();
+})();
+</script>
+
+
+
+<script>
+/* ================= LEVELING-APP V11 FEATURES ================= */
+let v11ReportPeriod = 'day';
+
+function v11ReadHistory() {
+    try { return JSON.parse(localStorage.getItem('solo_leveling_history') || '[]'); }
+    catch(e) { return []; }
+}
+function v11DateMs(v) {
+    const t = Date.parse(v);
+    return Number.isFinite(t) ? t : 0;
+}
+function v11GetWorkoutEntries() {
+    const history = v11ReadHistory();
+    return history.map((h,i)=>({
+        id:i,
+        name:h.blockName || 'Séance',
+        date:h.date || '',
+        tonnage:Number(h.totalTonnage)||0,
+        days:h.dayTonnes || {}
+    }));
+}
+function v11PeriodStart(period) {
+    const d = new Date(); d.setHours(0,0,0,0);
+    if(period==='week') d.setDate(d.getDate()-6);
+    if(period==='month') d.setDate(d.getDate()-29);
+    if(period==='all') return 0;
+    return d.getTime();
+}
+function v11RenderReport() {
+    const el=document.getElementById('v11-report'); if(!el) return;
+    const entries=v11GetWorkoutEntries().filter(x=>v11DateMs(x.date)>=v11PeriodStart(v11ReportPeriod));
+    const total=entries.reduce((s,x)=>s+x.tonnage,0);
+    const sessions=entries.length;
+    const avg=sessions?total/sessions:0;
+    const best=entries.reduce((a,x)=>x.tonnage>a.tonnage?x:a,{tonnage:0,name:'—',date:'—'});
+    const currentSBD=(Number(userData.squat)||0)+(Number(userData.bench)||0)+(Number(userData.deadlift)||0);
+    const lines=entries.slice().reverse().map(x=>{
+        const pct=best.tonnage?Math.min(100,(x.tonnage/best.tonnage)*100):0;
+        return `<div class="v11-session"><div class="v11-session-top"><span>${x.name}</span><span>${x.tonnage.toLocaleString('fr-FR')} kg</span></div><div class="v11-session-meta">${x.date || 'Date inconnue'}</div><div class="v11-mini-bar"><i style="width:${pct}%"></i></div></div>`;
+    }).join('');
+    el.innerHTML=`
+      <div class="v11-report-grid">
+        <div class="v11-report-stat"><span>SÉANCES</span><b>${sessions}</b></div>
+        <div class="v11-report-stat"><span>VOLUME TOTAL</span><b>${Math.round(total).toLocaleString('fr-FR')} kg</b></div>
+        <div class="v11-report-stat"><span>MOYENNE / SÉANCE</span><b>${Math.round(avg).toLocaleString('fr-FR')} kg</b></div>
+        <div class="v11-report-stat"><span>SBD ACTUEL</span><b>${currentSBD.toLocaleString('fr-FR')} kg</b></div>
+      </div>
+      <div class="v11-card" style="margin-top:10px">
+        <div class="v10-muted">MEILLEURE SÉANCE DU PÉRIODE</div>
+        <div style="font-size:1rem;font-weight:900;margin-top:4px">${best.name} · ${best.tonnage ? best.tonnage.toLocaleString('fr-FR')+' kg' : '—'}</div>
+        <div class="v11-session-meta">${best.date || 'Aucune donnée'}</div>
+      </div>
+      <div class="v11-card" style="margin-top:10px">
+        <div class="v10-muted">HISTORIQUE</div>
+        ${lines || '<div class="v11-empty">Aucune séance sur cette période. Valide tes séances pour construire ton bilan.</div>'}
+      </div>`;
+}
+function v11SetReportPeriod(period,btn){
+    v11ReportPeriod=period;
+    document.querySelectorAll('.v11-period').forEach(x=>x.classList.remove('active'));
+    if(btn) btn.classList.add('active');
+    v11RenderReport();
+}
+function v11ExportReport(){
+    const payload={
+        app:'LEVELING-APP', version:'11.0',
+        generatedAt:new Date().toISOString(),
+        player:userData,
+        period:v11ReportPeriod,
+        workouts:v11GetWorkoutEntries()
+    };
+    const blob=new Blob([JSON.stringify(payload,null,2)],{type:'application/json'});
+    const a=document.createElement('a');
+    a.href=URL.createObjectURL(blob); a.download=`leveling-app-bilan-${new Date().toISOString().slice(0,10)}.json`;
+    a.click(); URL.revokeObjectURL(a.href);
+}
+
+function v11LoadProfileInputs(){
+    const n=document.getElementById('v11-name-input');
+    const a=document.getElementById('v11-avatar-input');
+    if(n) n.value=userData.playerName || userData.name || '';
+    if(a) a.value=userData.playerAvatar || '⚔️';
+}
+function v11SaveProfile(){
+    const n=document.getElementById('v11-name-input');
+    const a=document.getElementById('v11-avatar-input');
+    userData.playerName=(n?.value||'Joueur').trim().slice(0,24) || 'Joueur';
+    userData.playerAvatar=(a?.value||'⚔️').trim().slice(0,4) || '⚔️';
+    saveToLocalStorage();
+    v11RenderIdentity();
+    alert('Profil sauvegardé !');
+}
+
+function v11RenderIdentity(){
+    const name = userData.playerName || userData.name || 'Joueur';
+    const nameEl=document.getElementById('v11-player-name');
+    const avatar=document.getElementById('v11-avatar');
+    const id=document.getElementById('v11-player-id');
+    if(nameEl) nameEl.textContent=name;
+    if(avatar) avatar.textContent=userData.playerAvatar || (name.trim()[0]||'L').toUpperCase();
+    if(id) id.textContent=userData.accountId ? 'ID '+userData.accountId : 'Profil local • prêt pour synchronisation cloud';
+}
+const v11OriginalSwitchTab = window.switchTab;
+window.switchTab = function(tabName,btn){
+    v11OriginalSwitchTab(tabName,btn);
+    if(tabName==='reports'){v11RenderIdentity();v11RenderReport();} if(tabName==='settings'){v11LoadProfileInputs();}
+};
+const v11OriginalSave = window.saveToLocalStorage;
+window.saveToLocalStorage = function(){
+    if(typeof v11OriginalSave==='function') v11OriginalSave();
+    v11RenderIdentity();
+};
+setTimeout(()=>{v11RenderIdentity();v11RenderReport();},50);
+
+/*
+  CLOUD + ACTIVATION ARCHITECTURE
+  --------------------------------
+  This static build remains fully functional offline.
+  For real customer accounts, multi-browser sync and paid activation,
+  connect these hooks to a backend (Supabase/Firebase/your API).
+
+  Recommended data model:
+    users(id, email, display_name, created_at)
+    licenses(id, user_id, activation_hash, status, plan, expires_at, max_devices)
+    workout_sessions(id, user_id, started_at, duration, tonnage, rating, xp)
+    workout_sets(id, session_id, exercise, set_no, reps, weight, rir)
+    body_metrics(id, user_id, measured_at, weight, body_fat)
+    achievements(id, user_id, achievement_key, unlocked_at)
+
+  NEVER put a master activation secret in this HTML.
+  The browser should send an activation code to your API, and the API
+  should return a short-lived signed session/token after validation.
+*/
+</script>
+
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+const SUPABASE_URL='https://jmejktyindxzzsqwthsk.supabase.co';
+const SUPABASE_PUBLISHABLE_KEY='sb_publishable_2eS6-xR0i4DZ4H4YI4Uj2w_FXSC_yUP';
+const sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_PUBLISHABLE_KEY);
+let cloudUser=null,cloudLicensed=false,cloudLoadedOnce=false,cloudSaveTimer=null,suppressCloudSave=false,licenseWatchTimer=null,lastLicenseStatus='UNKNOWN';
+
+function showAuthScreen(name){
+  document.querySelectorAll('.auth-screen').forEach(el=>el.classList.remove('active'));
+  const el=document.getElementById('auth-screen-'+name); if(el)el.classList.add('active');
+  document.querySelectorAll('.auth-msg').forEach(el=>{el.textContent='';el.className='auth-msg'});
+}
+function setAuthMessage(screen,text,type=''){
+  const el=document.getElementById('auth-msg-'+screen); if(!el)return;
+  el.textContent=text;el.className='auth-msg'+(type?' '+type:'');
+}
+function normalizeLicenseKey(v){return String(v||'').trim().toUpperCase()}
+function continueWithLicense(){
+  const key=normalizeLicenseKey(document.getElementById('auth-license-key').value);
+  if(!/^LVL-[A-Z0-9]{4}-[A-Z0-9]{4}-[A-Z0-9]{4}$/.test(key))return setAuthMessage('license','Format attendu : LVL-XXXX-XXXX-XXXX','error');
+  sessionStorage.setItem('leveling_pending_license',key);showAuthScreen('signup');
+}
+async function createLevelingAccount(){
+  const pseudo=document.getElementById('auth-signup-pseudo').value.trim(),email=document.getElementById('auth-signup-email').value.trim(),password=document.getElementById('auth-signup-password').value,key=sessionStorage.getItem('leveling_pending_license');
+  if(!key)return showAuthScreen('license');
+  if(pseudo.length<2)return setAuthMessage('signup','Entre un pseudo valide.','error');
+  if(!email||password.length<8)return setAuthMessage('signup','Email valide et mot de passe de 8 caractères minimum.','error');
+  setAuthMessage('signup','Création du compte...');
+  const {data,error}=await sb.auth.signUp({email,password,options:{data:{username:pseudo}}});
+  if(error)return setAuthMessage('signup',error.message,'error');
+  if(!data.session){setAuthMessage('signup','Compte créé. Confirme ton email puis connecte-toi.','success');setTimeout(()=>showAuthScreen('login'),1700);return}
+  cloudUser=data.user;if(!userData.playerName)userData.playerName=pseudo;
+  const ok=await activateLicenseForCurrentUser(key,'signup');if(ok)await unlockLevelingApp();
+}
+async function loginLevelingAccount(){
+  const email=document.getElementById('auth-login-email').value.trim(),password=document.getElementById('auth-login-password').value;
+  setAuthMessage('login','Connexion...');
+  const {data,error}=await sb.auth.signInWithPassword({email,password});
+  if(error)return setAuthMessage('login',error.message,'error');
+  cloudUser=data.user;const info=await getCurrentLicenseStatus();lastLicenseStatus=info.status||'UNKNOWN';
+  if(info.status==='ACTIVE'&&info.enabled===true&&info.has_license===true){cloudLicensed=true;return unlockLevelingApp()}
+  cloudLicensed=false;
+  if(info.status==='DISABLED'){showBlockedGate('Cette licence est actuellement désactivée.');return}
+  const pending=sessionStorage.getItem('leveling_pending_license');if(pending)document.getElementById('auth-logged-license-key').value=pending;showAuthScreen('activate');
+}
+async function activateLoggedAccount(){
+  const key=normalizeLicenseKey(document.getElementById('auth-logged-license-key').value);
+  if(!/^LVL-[A-Z0-9]{4}-[A-Z0-9]{4}-[A-Z0-9]{4}$/.test(key))return setAuthMessage('activate','Format attendu : LVL-XXXX-XXXX-XXXX','error');
+  const ok=await activateLicenseForCurrentUser(key,'activate');if(ok)await unlockLevelingApp();
+}
+async function activateLicenseForCurrentUser(key,screen){
+  setAuthMessage(screen,'Vérification de la licence...');
+  const {error}=await sb.rpc('activate_lifetime_license',{p_license_key:key});
+  if(error){
+    const m=error.message||'',friendly=m.includes('LICENSE_NOT_FOUND')?'Clé invalide.':m.includes('LICENSE_DISABLED')?'Cette clé a été désactivée.':m.includes('LICENSE_ALREADY_USED')?'Cette clé est déjà liée à un autre compte.':m.includes('USER_ALREADY_LICENSED')?'Ce compte possède déjà une autre licence.':m;
+    setAuthMessage(screen,friendly,'error');return false;
+  }
+  cloudLicensed=true;sessionStorage.removeItem('leveling_pending_license');setAuthMessage(screen,'Licence Lifetime activée ✓','success');return true;
+}
+async function getCurrentLicenseStatus(){
+  if(!cloudUser)return{status:'NO_SESSION',has_license:false,enabled:false};
+  const {data,error}=await sb.rpc('current_license_status');
+  if(error){console.warn('License status:',error.message);return{status:'ERROR',has_license:false,enabled:false,error:error.message}}
+  const row=Array.isArray(data)?data[0]:data;return row||{status:'NO_LICENSE',has_license:false,enabled:false};
+}
+function stopLicenseWatch(){if(licenseWatchTimer)clearInterval(licenseWatchTimer);licenseWatchTimer=null}
+function startLicenseWatch(){stopLicenseWatch();licenseWatchTimer=setInterval(()=>{if(cloudUser)enforceLicenseAccess(false)},30000)}
+function showBlockedGate(message){
+  cloudLicensed=false;stopLicenseWatch();document.getElementById('app-container').classList.add('auth-locked');document.getElementById('auth-gate').classList.remove('hidden');showAuthScreen('blocked');setAuthMessage('blocked',message||'Licence désactivée par l’administrateur.','error');
+}
+async function enforceLicenseAccess(showMessage=true){
+  if(!cloudUser)return false;const info=await getCurrentLicenseStatus();lastLicenseStatus=info.status||'UNKNOWN';
+  if(info.status==='ACTIVE'&&info.enabled===true&&info.has_license===true){cloudLicensed=true;return true}
+  if(info.status==='DISABLED'){showBlockedGate(showMessage?'Licence désactivée par l’administrateur.':'Cette licence est actuellement désactivée.');return false}
+  cloudLicensed=false;stopLicenseWatch();document.getElementById('app-container').classList.add('auth-locked');document.getElementById('auth-gate').classList.remove('hidden');
+  if(info.status==='NO_LICENSE'){showAuthScreen('activate');if(showMessage)setAuthMessage('activate','Aucune licence active n’est associée à ce compte.','error')}
+  else{showAuthScreen('login');if(showMessage)setAuthMessage('login','Impossible de vérifier la licence. Réessaie.','error')}
+  return false;
+}
+async function retryLicenseCheck(){
+  setAuthMessage('blocked','Vérification...');const ok=await enforceLicenseAccess(false);
+  if(ok){setAuthMessage('blocked','Licence réactivée ✓','success');await unlockLevelingApp()}
+  else if(lastLicenseStatus==='DISABLED')setAuthMessage('blocked','La licence est toujours désactivée.','error');
+}
+function exportAppData(){
+  if(typeof saveActiveProgramState==='function')saveActiveProgramState();
+  return{version:'12.4',userData,smartHypertrophyRefs,bodyHistory,inventoryItems,currentBlockIndex,currentDayIndex,activeProgramKey,programWorkoutStates,programCustomSetData,workoutState,customSetData,workoutHistory,v10:(typeof window.__levelingV10Export==='function'?window.__levelingV10Export():null)};
+}
+function importAppData(d){
+  if(!d||typeof d!=='object')return;suppressCloudSave=true;
+  try{
+    if(d.userData)userData=d.userData;if(d.smartHypertrophyRefs)smartHypertrophyRefs=d.smartHypertrophyRefs;if(d.bodyHistory)bodyHistory=d.bodyHistory;if(d.inventoryItems)inventoryItems=d.inventoryItems;
+    if(Number.isInteger(d.currentBlockIndex))currentBlockIndex=d.currentBlockIndex;if(Number.isInteger(d.currentDayIndex))currentDayIndex=d.currentDayIndex;if(d.activeProgramKey)activeProgramKey=d.activeProgramKey;
+    if(d.programWorkoutStates)programWorkoutStates=d.programWorkoutStates;if(d.programCustomSetData)programCustomSetData=d.programCustomSetData;if(d.workoutState)workoutState=d.workoutState;if(d.customSetData)customSetData=d.customSetData;if(d.workoutHistory)workoutHistory=d.workoutHistory;
+    if(d.v10&&typeof window.__levelingV10Import==='function')window.__levelingV10Import(d.v10);
+    if(typeof loadActiveProgramState==='function')loadActiveProgramState();if(typeof saveToLocalStorage==='function')saveToLocalStorage();
+  }finally{suppressCloudSave=false}
+}
+async function loadCloudData(){
+  if(!cloudUser||!cloudLicensed)return;const {data,error}=await sb.from('profiles').select('app_data,username').eq('id',cloudUser.id).single();
+  if(!error&&data){if(data.username&&!userData.playerName)userData.playerName=data.username;if(data.app_data&&Object.keys(data.app_data).length)importAppData(data.app_data);else await saveCloudData()}
+  else if(error)console.warn('Cloud load:',error.message);cloudLoadedOnce=true;
+}
+async function saveCloudData(){
+  if(!cloudUser||!cloudLicensed||suppressCloudSave)return;const updates={app_data:exportAppData(),updated_at:new Date().toISOString()};if(userData.playerName)updates.username=userData.playerName;
+  const {error}=await sb.from('profiles').update(updates).eq('id',cloudUser.id);if(error)console.warn('Cloud save:',error.message);
+}
+function scheduleCloudSave(){if(!cloudUser||!cloudLicensed||suppressCloudSave)return;clearTimeout(cloudSaveTimer);cloudSaveTimer=setTimeout(saveCloudData,700)}
+window.scheduleCloudSave=scheduleCloudSave;
+const __v12LocalSave=window.saveToLocalStorage;
+window.saveToLocalStorage=function(){if(typeof __v12LocalSave==='function')__v12LocalSave();scheduleCloudSave()};
+function refreshV11UIAfterCloud(){
+  try{setTheme(userData.theme);updateProfileUI();renderBodyChart();initWorkoutSystem();renderPowerHome();renderHistoryUI();if(typeof v11RenderIdentity==='function')v11RenderIdentity();if(typeof v11RenderReport==='function')v11RenderReport();if(typeof v11LoadProfileInputs==='function')v11LoadProfileInputs()}catch(e){console.warn('UI refresh:',e)}
+}
+async function unlockLevelingApp(){
+  const allowed=await enforceLicenseAccess(false);if(!allowed)return;if(!cloudLoadedOnce)await loadCloudData();
+  document.getElementById('auth-gate').classList.add('hidden');document.getElementById('app-container').classList.remove('auth-locked');
+  const emailEl=document.getElementById('cloud-account-email');if(emailEl&&cloudUser)emailEl.textContent=cloudUser.email||'Compte connecté';
+  refreshV11UIAfterCloud();startLicenseWatch();
+}
+async function logoutLeveling(){
+  stopLicenseWatch();await saveCloudData();await sb.auth.signOut();cloudUser=null;cloudLicensed=false;cloudLoadedOnce=false;
+  document.getElementById('app-container').classList.add('auth-locked');document.getElementById('auth-gate').classList.remove('hidden');showAuthScreen('login');
+}
+async function initSupabaseGate(){
+  const {data:{session}}=await sb.auth.getSession();
+  if(!session){cloudUser=null;cloudLicensed=false;document.getElementById('app-container').classList.add('auth-locked');document.getElementById('auth-gate').classList.remove('hidden');showAuthScreen('license');return}
+  cloudUser=session.user;const info=await getCurrentLicenseStatus();lastLicenseStatus=info.status||'UNKNOWN';
+  if(info.status==='ACTIVE'&&info.enabled===true&&info.has_license===true){cloudLicensed=true;await unlockLevelingApp();return}
+  if(info.status==='DISABLED'){showBlockedGate('Cette licence est actuellement désactivée.');return}
+  cloudLicensed=false;document.getElementById('app-container').classList.add('auth-locked');document.getElementById('auth-gate').classList.remove('hidden');
+  const pending=sessionStorage.getItem('leveling_pending_license');if(pending)document.getElementById('auth-logged-license-key').value=pending;showAuthScreen('activate');
+}
+window.addEventListener('focus',()=>{if(cloudUser)enforceLicenseAccess(false)});
+document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible'&&cloudUser)enforceLicenseAccess(false)});
+window.addEventListener('online',()=>{if(cloudUser)enforceLicenseAccess(false)});
+initSupabaseGate();
+</script>
+
 </body>
 </html>
