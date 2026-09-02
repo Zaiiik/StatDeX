@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Solo Leveling - Powerbuilding Tracker V12.2</title>
+    <title>Solo Leveling - Powerbuilding Tracker V12.3</title>
     <style>
         :root {
             --bg-color: #050507;
@@ -603,6 +603,7 @@
                     <h3>Compte & Cloud</h3>
                     <p style="font-size:.72rem;color:#aaa;line-height:1.45;">Tes données sont synchronisées avec ton compte LEVELING-APP.</p>
                     <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;"><span id="cloud-account-email" style="font-size:.72rem;color:#fff;word-break:break-all;">Non connecté</span><span class="cloud-badge">☁️ CLOUD</span></div>
+                    <div style="margin-top:8px;font-size:.62rem;color:#777;text-align:center;">LEVELING-APP V12.3 · Licence Lifetime sécurisée</div>
                     <button class="btn-action" onclick="logoutLeveling()" style="border-color:#ff5555;color:#ff7777;">Se déconnecter</button>
                 </div>
 
@@ -2254,6 +2255,7 @@
         let suppressCloudSave = false;
         let licenseWatchTimer = null;
         let lastLicenseStatus = 'UNKNOWN';
+        let licenseCheckPromise = null;
 
         function showAuthScreen(name) {
             document.querySelectorAll('.auth-screen').forEach(el => el.classList.remove('active'));
@@ -2361,15 +2363,23 @@
 
         async function getCurrentLicenseStatus() {
             if (!cloudUser) return { status:'NO_SESSION', has_license:false, enabled:false };
+            if (licenseCheckPromise) return licenseCheckPromise;
 
-            const { data, error } = await sb.rpc('current_license_status');
-            if (error) {
-                console.warn('License status:', error.message);
-                return { status:'ERROR', has_license:false, enabled:false, error:error.message };
-            }
+            licenseCheckPromise = (async () => {
+                try {
+                    const { data, error } = await sb.rpc('current_license_status');
+                    if (error) {
+                        console.warn('License status:', error.message);
+                        return { status:'ERROR', has_license:false, enabled:false, error:error.message };
+                    }
+                    const row = Array.isArray(data) ? data[0] : data;
+                    return row || { status:'NO_LICENSE', has_license:false, enabled:false };
+                } finally {
+                    licenseCheckPromise = null;
+                }
+            })();
 
-            const row = Array.isArray(data) ? data[0] : data;
-            return row || { status:'NO_LICENSE', has_license:false, enabled:false };
+            return licenseCheckPromise;
         }
 
         async function checkCurrentUserLicense() {
@@ -2438,7 +2448,7 @@
         function exportAppData() {
             saveActiveProgramState();
             return {
-                version:'12.2', userData, smartHypertrophyRefs, bodyHistory,
+                version:'12.3', userData, smartHypertrophyRefs, bodyHistory,
                 currentBlockIndex, activeProgramKey, programWorkoutStates,
                 programCustomSetData, workoutHistory
             };
@@ -2548,6 +2558,28 @@
             if (pending) document.getElementById('auth-logged-license-key').value = pending;
             showAuthScreen('activate');
         }
+
+        sb.auth.onAuthStateChange(async (event, session) => {
+            if (event === 'SIGNED_OUT' || !session) {
+                stopLicenseWatch();
+                cloudUser = null;
+                cloudLicensed = false;
+                cloudLoadedOnce = false;
+                document.getElementById('app-container').classList.add('auth-locked');
+                document.getElementById('auth-gate').classList.remove('hidden');
+                showAuthScreen('login');
+                return;
+            }
+
+            cloudUser = session.user;
+            if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED' || event === 'INITIAL_SESSION') {
+                await enforceLicenseAccess(false);
+            }
+        });
+
+        window.addEventListener('pagehide', () => {
+            if (cloudUser && cloudLicensed && !suppressCloudSave) saveCloudData();
+        });
 
         window.addEventListener('focus', () => {
             if (cloudUser) enforceLicenseAccess(false);
