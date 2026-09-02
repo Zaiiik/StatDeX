@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>LEVELING-APP — Powerbuilding Tracker V12.5</title>
+    <title>LEVELING-APP — Powerbuilding Tracker V12.5.1</title>
     <style>
         :root {
             --bg-color: #050507;
@@ -660,7 +660,7 @@
                         <span id="cloud-account-email" style="font-size:.7rem;color:#fff;word-break:break-all">Non connecté</span>
                         <span class="cloud-badge">☁️ CLOUD</span>
                     </div>
-                    <div style="margin-top:8px;font-size:.6rem;color:#777;text-align:center">LEVELING-APP V12.5 · Base V11 conservée</div>
+                    <div style="margin-top:8px;font-size:.6rem;color:#777;text-align:center">LEVELING-APP V12.5.1 · Base V11 conservée</div>
                     <button class="btn-action" onclick="logoutLeveling()" style="border-color:#ff5555;color:#ff7777">Se déconnecter</button>
                 </div>
 
@@ -2654,7 +2654,7 @@ const SUPABASE_URL='https://jmejktyindxzzsqwthsk.supabase.co';
 const SUPABASE_PUBLISHABLE_KEY='sb_publishable_2eS6-xR0i4DZ4H4YI4Uj2w_FXSC_yUP';
 const sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_PUBLISHABLE_KEY);
 let cloudUser=null,cloudLicensed=false,cloudLoadedOnce=false,cloudSaveTimer=null,suppressCloudSave=false,licenseWatchTimer=null,lastLicenseStatus='UNKNOWN';
-const APP_VERSION='12.5';
+const APP_VERSION='12.5.1';
 
 function showAuthScreen(name){
   document.querySelectorAll('.auth-screen').forEach(el=>el.classList.remove('active'));
@@ -2696,8 +2696,33 @@ async function loginLevelingAccount(){
 }
 async function activateLoggedAccount(){
   const key=normalizeLicenseKey(document.getElementById('auth-logged-license-key').value);
-  if(!/^LVL-[A-Z0-9]{4}-[A-Z0-9]{4}-[A-Z0-9]{4}$/.test(key))return setAuthMessage('activate','Format attendu : LVL-XXXX-XXXX-XXXX','error');
-  const ok=await activateLicenseForCurrentUser(key,'activate');if(ok)await unlockLevelingApp();
+  if(!/^LVL-[A-Z0-9]{4}-[A-Z0-9]{4}-[A-Z0-9]{4}$/.test(key))
+    return setAuthMessage('activate','Format attendu : LVL-XXXX-XXXX-XXXX','error');
+
+  const ok=await activateLicenseForCurrentUser(key,'activate');
+  if(!ok)return;
+
+  setAuthMessage('activate','Licence activée. Synchronisation du compte…','success');
+
+  // Supabase peut avoir besoin d'un très court délai entre l'activation
+  // de la clé et la lecture du statut. On revérifie plusieurs fois.
+  for(let i=0;i<6;i++){
+    await new Promise(r=>setTimeout(r,i===0?150:450));
+    const info=await getCurrentLicenseStatus();
+    lastLicenseStatus=info.status||'UNKNOWN';
+
+    if(info.status==='ACTIVE'&&info.enabled===true&&info.has_license===true){
+      cloudLicensed=true;
+      await unlockLevelingApp();
+      return;
+    }
+  }
+
+  setAuthMessage(
+    'activate',
+    'La clé est activée mais la liaison du profil n’est pas encore reconnue. Actualise après avoir exécuté le patch SQL V12.5.1.',
+    'error'
+  );
 }
 async function activateLicenseForCurrentUser(key,screen){
   setAuthMessage(screen,'Vérification de la licence...');
@@ -2735,7 +2760,7 @@ async function retryLicenseCheck(){
 }
 function exportAppData(){
   if(typeof saveActiveProgramState==='function')saveActiveProgramState();
-  return{version:'12.5',userData,smartHypertrophyRefs,bodyHistory,inventoryItems,currentBlockIndex,currentDayIndex,activeProgramKey,programWorkoutStates,programCustomSetData,customProgramData,workoutState,customSetData,workoutHistory,v10:(typeof window.__levelingV10Export==='function'?window.__levelingV10Export():null)};
+  return{version:'12.5.1',userData,smartHypertrophyRefs,bodyHistory,inventoryItems,currentBlockIndex,currentDayIndex,activeProgramKey,programWorkoutStates,programCustomSetData,customProgramData,workoutState,customSetData,workoutHistory,v10:(typeof window.__levelingV10Export==='function'?window.__levelingV10Export():null)};
 }
 function importAppData(d){
   if(!d||typeof d!=='object')return;suppressCloudSave=true;
@@ -2796,7 +2821,16 @@ async function initSupabaseGate(){
   if(info.status==='ACTIVE'&&info.enabled===true&&info.has_license===true){cloudLicensed=true;await unlockLevelingApp();return}
   if(info.status==='DISABLED'){showBlockedGate('Cette licence est actuellement désactivée.');return}
   cloudLicensed=false;document.getElementById('app-container').classList.add('auth-locked');document.getElementById('auth-gate').classList.remove('hidden');
-  const pending=sessionStorage.getItem('leveling_pending_license');if(pending)document.getElementById('auth-logged-license-key').value=pending;showAuthScreen('activate');
+
+  if(info.status==='ERROR'){
+    showAuthScreen('login');
+    setAuthMessage('login','Impossible de vérifier la licence pour le moment. Recharge la page.','error');
+    return;
+  }
+
+  const pending=sessionStorage.getItem('leveling_pending_license');
+  if(pending)document.getElementById('auth-logged-license-key').value=pending;
+  showAuthScreen('activate');
 }
 window.addEventListener('focus',()=>{if(cloudUser)enforceLicenseAccess(false)});
 document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible'&&cloudUser)enforceLicenseAccess(false)});
