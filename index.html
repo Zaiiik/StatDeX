@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Solo Leveling - Powerbuilding Tracker V8.9</title>
+    <title>Solo Leveling - Powerbuilding Tracker V9.1</title>
     <style>
         :root {
             --bg-color: #050507;
@@ -208,6 +208,30 @@
         .modal-history-row div:first-child { font-weight: bold; font-size: 0.8rem; color: white; }
         .modal-history-row div:last-child { font-family: monospace; font-weight: bold; font-size: 0.85rem; color: var(--success); }
 
+        .power-program-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:12px; margin-top:14px; }
+        .power-program-card { background:var(--highlight); border:2px solid #333; border-radius:14px; padding:16px 12px; min-height:145px; display:flex; flex-direction:column; justify-content:center; align-items:center; text-align:center; cursor:pointer; transition:transform .15s, box-shadow .15s, border-color .15s; }
+        .power-program-card:active { transform:scale(.97); }
+        .power-program-card .program-icon { font-size:2rem; margin-bottom:8px; }
+        .power-program-card .program-title { font-size:.85rem; font-weight:900; text-transform:uppercase; letter-spacing:.8px; }
+        .power-program-card .program-desc { font-size:.62rem; color:#aaa; margin-top:5px; line-height:1.35; }
+        .power-program-card.sbd { border-color:#ffea00; box-shadow:0 0 10px rgba(255,234,0,.18); }
+        .power-program-card.sbd .program-title { color:#ffea00; text-shadow:0 0 8px rgba(255,234,0,.45); }
+        .power-program-card.powerbuilding { border-color:#ff0033; box-shadow:0 0 10px rgba(255,0,51,.18); }
+        .power-program-card.powerbuilding .program-title { color:#ff0033; text-shadow:0 0 8px rgba(255,0,51,.45); }
+        .power-program-card.hypertrophie { border-color:#00ff66; box-shadow:0 0 10px rgba(0,255,102,.18); }
+        .power-program-card.hypertrophie .program-title { color:#00ff66; text-shadow:0 0 8px rgba(0,255,102,.45); }
+        .power-program-card.fitgirl { border-color:#ff66b2; box-shadow:0 0 10px rgba(255,102,178,.18); }
+        .power-program-card.fitgirl .program-title { color:#ff66b2; text-shadow:0 0 8px rgba(255,102,178,.45); }
+        .power-detail { margin-top:14px; }
+        .power-detail-header { background:var(--highlight); border-radius:12px; padding:14px; border:1px solid #333; margin-bottom:12px; }
+        .power-detail-header h3 { margin:0 0 4px; font-size:1rem; text-transform:uppercase; }
+        .power-day-card { background:rgba(0,0,0,.35); border:1px solid #333; border-radius:10px; padding:12px; margin-bottom:10px; }
+        .power-day-title { font-weight:900; font-size:.82rem; margin-bottom:8px; }
+        .power-exercise { display:flex; justify-content:space-between; gap:8px; padding:7px 0; border-bottom:1px solid rgba(255,255,255,.06); font-size:.68rem; }
+        .power-exercise:last-child { border-bottom:none; }
+        .power-exercise-name { color:#eee; }
+        .power-exercise-prescription { color:#aaa; text-align:right; font-family:monospace; white-space:nowrap; }
+        .power-back { width:100%; margin-bottom:10px; }
         .inventory-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-top: 10px; }
         .inventory-card {
             background: var(--highlight); border-radius: 12px; padding: 12px;
@@ -389,7 +413,7 @@
             </div>
 
             <div id="panel-workout" class="panel">
-                <h2>Programme Powerbuilding</h2>
+                <h2 id="workout-program-title">Programme Powerbuilding</h2>
                 <p class="subtitle" id="current-block-subtitle">Bloc 1 (Hypertrophie / Force)</p>
                 
                 <div class="rest-timer-box">
@@ -413,13 +437,29 @@
                 </div>
             </div>
 
-            <div id="panel-inventory" class="panel">
-                <h2>Inventaire de l'Athlète</h2>
-                <p class="subtitle" id="inventory-sub">Gérez vos équipements de force et consommables.</p>
-                
-                <button class="btn-action" onclick="playSound('click'); openAddItemModal()" style="margin-top:0; margin-bottom:12px; background:rgba(189,0,255,0.15);">➕ Ajouter un nouvel objet</button>
-                
-                <div class="inventory-grid" id="inventory-grid"></div>
+            <div id="panel-power" class="panel">
+                <h2>⚡ POWER</h2>
+                <p class="subtitle">Choisis ton programme d'entraînement.</p>
+
+                <div id="power-program-selector" class="power-program-grid">
+                    <div class="power-program-card sbd" onclick="playSound('click'); openPowerProgram('sbd')">
+                        <div class="program-icon">🟡</div><div class="program-title">SBD</div>
+                        <div class="program-desc">4 jours · Squat / Bench / Deadlift</div>
+                    </div>
+                    <div class="power-program-card powerbuilding" onclick="playSound('click'); openPowerProgram('powerbuilding')">
+                        <div class="program-icon">🔴</div><div class="program-title">Powerbuilding</div>
+                        <div class="program-desc">5–6 jours · Force + hypertrophie</div>
+                    </div>
+                    <div class="power-program-card hypertrophie" onclick="playSound('click'); openPowerProgram('hypertrophie')">
+                        <div class="program-icon">🟢</div><div class="program-title">Hypertrophie</div>
+                        <div class="program-desc">5–6 jours · Programme complet</div>
+                    </div>
+                    <div class="power-program-card fitgirl" onclick="playSound('click'); openPowerProgram('fitgirl')">
+                        <div class="program-icon">🩷</div><div class="program-title">Fit Girl</div>
+                        <div class="program-desc">3–5 jours · 70% bas / 30% haut</div>
+                    </div>
+                </div>
+                <div id="power-program-detail" class="power-detail"></div>
             </div>
 
             <div id="panel-settings" class="panel">
@@ -491,7 +531,7 @@
         <nav>
             <button class="nav-item active" onclick="playSound('click'); switchTab('profile', this)"><span class="nav-icon">👤</span><span class="nav-text">Profil</span></button>
             <button class="nav-item" onclick="playSound('click'); switchTab('workout', this)"><span class="nav-icon">⚔️</span><span class="nav-text">Programme</span></button>
-            <button class="nav-item" onclick="playSound('click'); switchTab('inventory', this)"><span class="nav-icon">🎒</span><span class="nav-text">Inventaire</span></button>
+            <button class="nav-item" onclick="playSound('click'); switchTab('power', this)"><span class="nav-icon">⚡</span><span class="nav-text">Power</span></button>
             <button class="nav-item" onclick="playSound('click'); switchTab('settings', this)"><span class="nav-icon">⚙️</span><span class="nav-text">Réglages</span></button>
         </nav>
     </div>
@@ -861,7 +901,7 @@
             alert("Paliers de progression intelligents mis à jour pour l'hypertrophie !");
         }
 
-        function getPrograms() {
+        function getPowerbuildingPrograms() {
             const s = userData.squat;
             const b = userData.bench;
             const d = userData.deadlift;
@@ -1055,6 +1095,171 @@
             ];
         }
 
+        // ==================== PROGRAMMES POWER ====================
+        // Le programme sélectionné depuis l'onglet POWER devient immédiatement
+        // le programme affiché dans l'onglet PROGRAMME.
+        const sbdProgram = [
+            { dayName:"Jour 1", title:"Jour 1 - SQUAT & BENCH (Volume)", exercises:[
+                {name:"Squat (Lourd)", defaultReps:5, defaultWeight:0, sets:4, note:"75–80% 1RM · RPE 8"},
+                {name:"Bench Press (Pause)", defaultReps:5, defaultWeight:0, sets:5, note:"70–75% · pause 1–2 s poitrine"},
+                {name:"Squat Bulgare / Presse à cuisses", defaultReps:10, defaultWeight:0, sets:3, note:"8–10 reps par jambe"},
+                {name:"Tractions pronation / Tirage vertical", defaultReps:10, defaultWeight:0, sets:4, note:"8–10 reps"},
+                {name:"Relevés de jambes suspendu", defaultReps:12, defaultWeight:0, sets:3}
+            ]},
+            { dayName:"Jour 2", title:"Jour 2 - DEADLIFT & ACCESSOIRES", exercises:[
+                {name:"Deadlift (Classique / Sumo)", defaultReps:4, defaultWeight:0, sets:4, note:"3–5 reps · 75–80% · RPE 8"},
+                {name:"Développé couché serré", defaultReps:8, defaultWeight:0, sets:3, note:"6–8 reps · RPE 7–8"},
+                {name:"Rowing barre (Pendlay / buste penché)", defaultReps:8, defaultWeight:0, sets:4, note:"6–8 reps"},
+                {name:"Good Morning / RDL", defaultReps:10, defaultWeight:0, sets:3, note:"8–10 reps · charge modérée"},
+                {name:"Face Pull", defaultReps:15, defaultWeight:0, sets:4}
+            ]},
+            { dayName:"Jour 3", title:"Jour 3 - BENCH & SQUAT (Intensité)", exercises:[
+                {name:"Bench Press (Lourd)", defaultReps:4, defaultWeight:0, sets:4, note:"3–5 reps · 80–85% · RPE 8–8.5"},
+                {name:"Squat (Léger / Technique)", defaultReps:5, defaultWeight:0, sets:3, note:"65–70% · vitesse d’exécution"},
+                {name:"Dips lestés / Développé militaire", defaultReps:8, defaultWeight:0, sets:3, note:"6–8 reps"},
+                {name:"Curl biceps", defaultReps:12, defaultWeight:0, sets:3},
+                {name:"Extension triceps poulie", defaultReps:12, defaultWeight:0, sets:3}
+            ]},
+            { dayName:"Jour 4", title:"Jour 4 - DEADLIFT & HAUT DU CORPS", exercises:[
+                {name:"Deadlift (Variante / Rappel)", defaultReps:3, defaultWeight:0, sets:3, note:"3 reps · 80–85% ou blocs/déficit"},
+                {name:"Bench Press (Pump)", defaultReps:9, defaultWeight:0, sets:3, note:"8–10 reps · 65–70%"},
+                {name:"Lat Pulldown / Tractions neutres", defaultReps:10, defaultWeight:0, sets:4, note:"8–10 reps"},
+                {name:"Shrugs / Farmer’s Walk", defaultReps:10, defaultWeight:0, sets:3, note:"3 séries"},
+                {name:"Planche abdominale", defaultReps:45, defaultWeight:0, sets:3, note:"45 secondes"}
+            ]}
+        ];
+
+        const fitGirlProgram = [
+            {dayName:"Jour 1", title:"Jour 1 - LOWER A (Fessiers & chaîne postérieure)", exercises:[
+                {name:"Hip Thrust à la barre", defaultReps:10, defaultWeight:0, sets:4},
+                {name:"Soulevé de terre roumain (RDL)", defaultReps:10, defaultWeight:0, sets:4},
+                {name:"Squat bulgare", defaultReps:10, defaultWeight:0, sets:3, note:"par jambe · buste légèrement penché"},
+                {name:"Kickbacks fessiers poulie basse", defaultReps:15, defaultWeight:0, sets:3, note:"par jambe"}
+            ]},
+            {dayName:"Jour 2", title:"Jour 2 - UPPER (Épaules, dos & abdos)", exercises:[
+                {name:"Développé militaire haltères", defaultReps:10, defaultWeight:0, sets:3},
+                {name:"Tirage vertical / Tractions assistées", defaultReps:10, defaultWeight:0, sets:3},
+                {name:"Élévations latérales haltères", defaultReps:15, defaultWeight:0, sets:4, note:"12–15 reps"},
+                {name:"Oiseau", defaultReps:15, defaultWeight:0, sets:3},
+                {name:"Relevés de jambes / Crunchs", defaultReps:15, defaultWeight:0, sets:3}
+            ]},
+            {dayName:"Jour 3", title:"Jour 3 - LOWER B (Quadriceps & volume fessiers)", exercises:[
+                {name:"Squat / Goblet squat lourd / Presse", defaultReps:10, defaultWeight:0, sets:4, note:"8–10 reps"},
+                {name:"Hip Thrust unilatéral / Machine", defaultReps:12, defaultWeight:0, sets:3, note:"10–12 reps par jambe"},
+                {name:"Leg Extension", defaultReps:15, defaultWeight:0, sets:3, note:"12–15 reps"},
+                {name:"Fentes bulgares / Fentes marchées", defaultReps:10, defaultWeight:0, sets:3, note:"par jambe"},
+                {name:"Mollets debout", defaultReps:15, defaultWeight:0, sets:3}
+            ]},
+            {dayName:"Jour 4", title:"Jour 4 - LOWER C (Optionnel · Ischio-fessiers)", exercises:[
+                {name:"RDL unilatéral / Hip Thrust léger", defaultReps:12, defaultWeight:0, sets:4},
+                {name:"Leg Curl", defaultReps:15, defaultWeight:0, sets:4, note:"12–15 reps"},
+                {name:"Good Morning léger / Hip Thrust machine", defaultReps:12, defaultWeight:0, sets:3},
+                {name:"Abducteurs machine", defaultReps:20, defaultWeight:0, sets:4, note:"15–20 reps"},
+                {name:"Gainage (Planche)", defaultReps:45, defaultWeight:0, sets:3, note:"45 secondes"}
+            ]},
+            {dayName:"Jour 5", title:"Jour 5 - UPPER & CORE (Optionnel)", exercises:[
+                {name:"Développé incliné haltères", defaultReps:10, defaultWeight:0, sets:3},
+                {name:"Rowing poulie basse", defaultReps:10, defaultWeight:0, sets:3},
+                {name:"Élévations latérales", defaultReps:15, defaultWeight:0, sets:4},
+                {name:"Extension triceps poulie / Curl biceps", defaultReps:12, defaultWeight:0, sets:3, note:"optionnel"},
+                {name:"Crunchs poulie / Russian twists", defaultReps:15, defaultWeight:0, sets:3}
+            ]}
+        ];
+
+        // Programme Hypertrophie fourni par l'utilisateur — 5 jours
+        const hypertrophieProgram = [
+            { dayName:"Jour 1", title:"Jour 1 - Pectoraux / Triceps (Focus développé guidé)", exercises:[
+                {name:"Développé couché à la Smith machine (guidé)", defaultReps:10, defaultWeight:0, sets:4, note:"8–10 reps · repos 2 min"},
+                {name:"Développé incliné à la machine convergente", defaultReps:12, defaultWeight:0, sets:4, note:"10–12 reps"},
+                {name:"Écartés à la poulie vis-à-vis (mi-hauteur)", defaultReps:15, defaultWeight:0, sets:3, note:"12–15 reps"},
+                {name:"Dips assistés à la machine (buste penché vers l'avant)", defaultReps:12, defaultWeight:0, sets:3, note:"10–12 reps"},
+                {name:"Extension des triceps à la poulie haute (barre droite ou corde)", defaultReps:15, defaultWeight:0, sets:4, note:"12–15 reps"}
+            ]},
+            { dayName:"Jour 2", title:"Jour 2 - Dos / Biceps (Focus tirages poulies & machines)", exercises:[
+                {name:"Tirage vertical à la poulie haute (prise neutre ou large)", defaultReps:10, defaultWeight:0, sets:4, note:"8–10 reps"},
+                {name:"Tirage horizontal à la machine (assis, poitrine calée)", defaultReps:12, defaultWeight:0, sets:4, note:"10–12 reps"},
+                {name:"Pulldown bras tendus à la poulie haute", defaultReps:15, defaultWeight:0, sets:3, note:"12–15 reps"},
+                {name:"Curl biceps au pupitre (Larry Scott) à la machine", defaultReps:12, defaultWeight:0, sets:4, note:"10–12 reps"},
+                {name:"Curl incliné ou marteau à la poulie basse", defaultReps:15, defaultWeight:0, sets:3, note:"12–15 reps"}
+            ]},
+            { dayName:"Jour 3", title:"Jour 3 - Jambes (Focus Quadriceps)", exercises:[
+                {name:"Presse à cuisses inclinée (pieds bas et largeur d'épaules)", defaultReps:10, defaultWeight:0, sets:4, note:"8–10 reps"},
+                {name:"Leg extension à la machine assise", defaultReps:15, defaultWeight:0, sets:4, note:"12–15 reps · bien contracter en haut"},
+                {name:"Hack squat à la machine guidée", defaultReps:12, defaultWeight:0, sets:3, note:"10–12 reps"},
+                {name:"Fentes marchées ou fentes bulgares", defaultReps:12, defaultWeight:0, sets:3, note:"12 reps par jambe · optionnel"},
+                {name:"Flexion plantaire pour mollets à la presse", defaultReps:20, defaultWeight:0, sets:4, note:"15–20 reps"}
+            ]},
+            { dayName:"Jour 4", title:"Jour 4 - Épaules / Abdos", exercises:[
+                {name:"Développé militaire assis à la Smith machine ou machine dédiée", defaultReps:10, defaultWeight:0, sets:4, note:"8–10 reps"},
+                {name:"Élévations latérales à la poulie basse", defaultReps:15, defaultWeight:0, sets:4, note:"12–15 reps"},
+                {name:"Oiseau à la machine (rear delt fly)", defaultReps:15, defaultWeight:0, sets:4, note:"12–15 reps"},
+                {name:"Crunch à la poulie haute (abdominaux)", defaultReps:20, defaultWeight:0, sets:4, note:"15–20 reps"},
+                {name:"Relevé de jambes suspendu ou à la chaise romaine", defaultReps:15, defaultWeight:0, sets:3, note:"12–15 reps"}
+            ]},
+            { dayName:"Jour 5", title:"Jour 5 - Jambes (Focus Ischio-jambiers / Fessiers) & Finitions", exercises:[
+                {name:"Leg curl couché ou assis à la machine", defaultReps:12, defaultWeight:0, sets:4, note:"10–12 reps"},
+                {name:"Hip thrust à la machine guidée (ou au cadre guidé)", defaultReps:12, defaultWeight:0, sets:4, note:"10–12 reps · alternative sécurisée au soulevé de terre"},
+                {name:"Good morning à la Smith machine", defaultReps:12, defaultWeight:0, sets:3, note:"10–12 reps · charge modérée, amplitude contrôlée"},
+                {name:"Tirage horizontal bas à la poulie (rappel dos, prise serrée)", defaultReps:12, defaultWeight:0, sets:3, note:"12 reps"},
+                {name:"Superset Curl biceps poulie / Extension triceps corde", defaultReps:15, defaultWeight:0, sets:3, note:"15 reps"}
+            ]}
+        ];
+
+        let activeProgramKey = 'powerbuilding';
+        let programWorkoutStates = {};
+        let programCustomSetData = {};
+
+        function getProgramMeta(key) {
+            return {
+                sbd:{title:'SBD', color:'#ffea00', icon:'🟡', subtitle:'4 jours · Squat / Bench / Deadlift'},
+                powerbuilding:{title:'Powerbuilding', color:'#ff0033', icon:'🔴', subtitle:'Programme Powerbuilding actuel · 5–6 jours'},
+                hypertrophie:{title:'Hypertrophie', color:'#00ff66', icon:'🟢', subtitle:'5 jours · Pectoraux / Dos / Jambes / Épaules'},
+                fitgirl:{title:'Fit Girl', color:'#ff66b2', icon:'🩷', subtitle:'3–5 jours · 70% bas / 30% haut'}
+            }[key];
+        }
+
+        function getPrograms() {
+            if (activeProgramKey === 'powerbuilding') return getPowerbuildingPrograms();
+            if (activeProgramKey === 'sbd') {
+                const s = userData.squat, b = userData.bench, d = userData.deadlift;
+                const weights = {
+                    'Squat (Lourd)': roundTo25(s * 0.775),
+                    'Bench Press (Pause)': roundTo25(b * 0.725),
+                    'Deadlift (Classique / Sumo)': roundTo25(d * 0.775),
+                    'Bench Press (Lourd)': roundTo25(b * 0.825),
+                    'Squat (Léger / Technique)': roundTo25(s * 0.675),
+                    'Deadlift (Variante / Rappel)': roundTo25(d * 0.825),
+                    'Bench Press (Pump)': roundTo25(b * 0.675)
+                };
+                return [sbdProgram.map(day => ({...day, exercises:day.exercises.map(ex => ({...ex, defaultWeight:weights[ex.name] ?? ex.defaultWeight}))}))];
+            }
+            if (activeProgramKey === 'fitgirl') return [fitGirlProgram];
+            if (activeProgramKey === 'hypertrophie') return [hypertrophieProgram];
+            return [[]];
+        }
+
+        function saveActiveProgramState() {
+            programWorkoutStates[activeProgramKey] = workoutState;
+            programCustomSetData[activeProgramKey] = customSetData;
+        }
+
+        function loadActiveProgramState() {
+            workoutState = programWorkoutStates[activeProgramKey] || {};
+            customSetData = programCustomSetData[activeProgramKey] || {};
+        }
+
+        function selectTrainingProgram(key) {
+            saveActiveProgramState();
+            activeProgramKey = key;
+            currentBlockIndex = 0;
+            currentDayIndex = 0;
+            loadActiveProgramState();
+            saveToLocalStorage();
+            initWorkoutSystem();
+            const workoutBtn = document.querySelector('button.nav-item[onclick*="switchTab(\'workout\'"]');
+            switchTab('workout', workoutBtn);
+        }
+
         let currentBlockIndex = 0;
         let currentDayIndex = 0;
         let selectedRating = 0;
@@ -1079,11 +1284,26 @@
                 const savedBlock = localStorage.getItem('solo_leveling_block');
                 if (savedBlock !== null) currentBlockIndex = parseInt(savedBlock);
 
+                const savedActiveProgram = localStorage.getItem('solo_leveling_active_program');
+                if (savedActiveProgram) activeProgramKey = savedActiveProgram;
+
+                const savedProgramStates = localStorage.getItem('solo_leveling_program_states');
+                if (savedProgramStates) programWorkoutStates = JSON.parse(savedProgramStates);
+
+                const savedProgramCustom = localStorage.getItem('solo_leveling_program_custom_sets');
+                if (savedProgramCustom) programCustomSetData = JSON.parse(savedProgramCustom);
+
+
                 const savedWorkouts = localStorage.getItem('solo_leveling_state');
                 if (savedWorkouts) workoutState = JSON.parse(savedWorkouts);
 
                 const savedCustomSets = localStorage.getItem('solo_leveling_custom_sets');
                 if (savedCustomSets) customSetData = JSON.parse(savedCustomSets);
+
+                // Migration des anciennes données Powerbuilding.
+                if (!programWorkoutStates.powerbuilding && savedWorkouts) programWorkoutStates.powerbuilding = JSON.parse(savedWorkouts);
+                if (!programCustomSetData.powerbuilding && savedCustomSets) programCustomSetData.powerbuilding = JSON.parse(savedCustomSets);
+                loadActiveProgramState();
 
                 const savedHistory = localStorage.getItem('solo_leveling_history');
                 if (savedHistory) workoutHistory = JSON.parse(savedHistory);
@@ -1100,6 +1320,9 @@
                 localStorage.setItem('solo_leveling_state', JSON.stringify(workoutState));
                 localStorage.setItem('solo_leveling_custom_sets', JSON.stringify(customSetData));
                 localStorage.setItem('solo_leveling_history', JSON.stringify(workoutHistory));
+                localStorage.setItem('solo_leveling_active_program', activeProgramKey);
+                localStorage.setItem('solo_leveling_program_states', JSON.stringify(programWorkoutStates));
+                localStorage.setItem('solo_leveling_program_custom_sets', JSON.stringify(programCustomSetData));
             } catch (e) { console.log(e); }
         }
 
@@ -1128,7 +1351,7 @@
             if (btnElement) btnElement.classList.add('active');
             if (tabName === 'settings') loadSettingsToInputs();
             if (tabName === 'profile') { updateProfileUI(); renderBodyChart(); renderHistoryUI(); }
-            if (tabName === 'inventory') renderInventory();
+            if (tabName === 'power') renderPowerHome();
         }
 
         function toggleFullScreen() {
@@ -1322,7 +1545,9 @@
         function initWorkoutSystem() {
             const blocksContainer = document.getElementById('block-tabs');
             blocksContainer.innerHTML = '';
-            blocksData.forEach((block, bIdx) => {
+            const availableBlocks = activeProgramKey === 'powerbuilding' ? blocksData : [{name:'Programme', subtitle:getProgramMeta(activeProgramKey)?.subtitle || 'Programme'}];
+            if (currentBlockIndex >= availableBlocks.length) currentBlockIndex = 0;
+            availableBlocks.forEach((block, bIdx) => {
                 let tab = document.createElement('div');
                 tab.className = `block-tab ${bIdx === currentBlockIndex ? 'active' : ''}`;
                 tab.innerText = block.name;
@@ -1335,10 +1560,18 @@
                 blocksContainer.appendChild(tab);
             });
 
-            document.getElementById('current-block-subtitle').innerText = blocksData[currentBlockIndex].subtitle;
+            const meta = getProgramMeta(activeProgramKey);
+            document.getElementById('workout-program-title').innerText = `${meta ? meta.icon + ' ' : ''}Programme ${meta ? meta.title : 'Powerbuilding'}`;
+            document.getElementById('current-block-subtitle').innerText = (availableBlocks[currentBlockIndex] || availableBlocks[0]).subtitle;
 
             const programsByBlock = getPrograms();
-            const activeProgramDays = programsByBlock[currentBlockIndex];
+            const activeProgramDays = programsByBlock[currentBlockIndex] || [];
+            if (!activeProgramDays.length) {
+                document.getElementById('day-tabs').innerHTML = '';
+                document.getElementById('workout-container').innerHTML = '<div class="profile-card"><h3 style="color:var(--success)">🟢 Hypertrophie</h3><p style="font-size:.75rem;color:#aaa">Le programme complet sera chargé ici dès que tu me l\'auras envoyé.</p></div>';
+                document.getElementById('validate-workout-btn').style.display = 'none';
+                return;
+            }
             if (currentDayIndex >= activeProgramDays.length) currentDayIndex = 0;
 
             const tabsContainer = document.getElementById('day-tabs');
@@ -1520,6 +1753,117 @@
             switchTab('workout', document.querySelectorAll('.nav-item')[1]);
         }
 
+        // ==================== POWER : PROGRAMMES ====================
+        // Les programmes ci-dessous reprennent les consignes fournies pour cette version.
+        const powerPrograms = {
+            sbd: {
+                title: 'SBD', color: '#ffea00', icon: '🟡',
+                subtitle: '4 jours · Squat / Bench / Deadlift · Cycle 4 à 6 semaines',
+                days: [
+                    { name:'Jour 1', title:'Squat & Bench — Volume / Intensité modérée', exercises:[
+                        ['Squat (Lourd)','4 × 4–6 · 75–80% 1RM · RPE 8'],
+                        ['Bench Press (Technique / Volume)','5 × 5 · 70–75% · pause 1–2 s poitrine'],
+                        ['Squat Bulgare ou Presse à cuisses','3 × 8–10 / jambe'],
+                        ['Tractions pronation ou Tirage vertical','4 × 8–10'],
+                        ['Relevés de jambes suspendu (Abdos)','3 × 12']
+                    ]},
+                    { name:'Jour 2', title:'Deadlift & Accessoires — Volume', exercises:[
+                        ['Deadlift (Classique ou Sumo)','4 × 3–5 · 75–80% · RPE 8'],
+                        ['Développé couché serré','3 × 6–8 · RPE 7–8'],
+                        ['Rowing barre (Pendlay ou buste penché)','4 × 6–8'],
+                        ['Good Morning ou RDL (Roumain)','3 × 8–10 · charge modérée'],
+                        ['Face pull','4 × 15']
+                    ]},
+                    { name:'Jour 3', title:'Bench & Squat — Fréquence / Intensité', exercises:[
+                        ['Bench Press (Lourd)','4 × 3–5 · 80–85% · RPE 8–8,5'],
+                        ['Squat (Léger / Technique)','3 × 5 · 65–70% · vitesse d’exécution'],
+                        ['Dips lestés ou Développé militaire','3 × 6–8'],
+                        ['Curl biceps','3 × 12'],
+                        ['Extension triceps à la poulie','3 × 12']
+                    ]},
+                    { name:'Jour 4', title:'Deadlift & Haut du corps — Intensité', exercises:[
+                        ['Deadlift (Variante / rappel)','3 × 3 · 80–85% · blocs/déficit selon point faible'],
+                        ['Développé couché (Séries longues / Pump)','3 × 8–10 · 65–70%'],
+                        ['Lat Pulldown ou Tractions neutres','4 × 8–10'],
+                        ['Shrugs ou Farmer’s walk','3 séries'],
+                        ['Planche abdominale','3 × 45 s']
+                    ]}
+                ],
+                progression:'Cycle 4–6 semaines : +1 à 2,5 kg ou +2–3% par semaine sur les mouvements principaux, ou +1 répétition, puis deload avec charges réduites de 40–50%.'
+            },
+            fitgirl: {
+                title:'Fit Girl', color:'#ff66b2', icon:'🩷',
+                subtitle:'3 jours minimum · modulable jusqu’à 5 jours · ratio 70% bas / 30% haut',
+                days:[
+                    { name:'Jour 1', title:'Lower A — Focus Fessiers & Chaîne Postérieure (Lourd)', exercises:[
+                        ['Hip Thrust à la barre','4 × 8–10'],['Soulevé de terre roumain (RDL)','4 × 8–10'],['Squat bulgare','3 × 10 / jambe'],['Kickbacks fessiers à la poulie basse','3 × 12–15 / jambe']
+                    ]},
+                    { name:'Jour 2', title:'Upper — Épaules, Dos & Abdos', exercises:[
+                        ['Développé militaire aux haltères','3 × 10'],['Tirage vertical ou Tractions assistées','3 × 10'],['Élévations latérales aux haltères','4 × 12–15'],['Oiseau','3 × 15'],['Relevés de jambes suspendu ou crunchs','3 × 15']
+                    ]},
+                    { name:'Jour 3', title:'Lower B — Quadriceps & Volume Fessiers', exercises:[
+                        ['Squat barre / Goblet squat lourd ou Presse à cuisses','4 × 8–10'],['Hip Thrust unilatéral / machine','3 × 10–12 / jambe'],['Leg extension','3 × 12–15'],['Fentes bulgares ou fentes marchées','3 × 10 / jambe'],['Mollets debout','3 × 15']
+                    ]},
+                    { name:'Jour 4 (optionnel)', title:'Lower C — Ischio-Fessiers & Isolation', exercises:[
+                        ['RDL unilatéral ou Hip Thrust léger','4 × 12'],['Leg curl assis ou couché','4 × 12–15'],['Good Morning léger ou Hip Thrust machine','3 × 12'],['Abducteurs machine','4 × 15–20'],['Gainage (Planche)','3 × 45 s']
+                    ]},
+                    { name:'Jour 5 (optionnel)', title:'Upper & Core — Rappel Haut du corps & Taille', exercises:[
+                        ['Développé incliné aux haltères','3 × 10'],['Rowing poulie basse','3 × 10'],['Élévations latérales','4 × 15'],['Extension triceps poulie ou Curl biceps (optionnel)','3 × 12'],['Crunchs poulie ou Russian twists','3 × 15']
+                    ]}
+                ],
+                notes:'3 jours : Jour 1 / 2 / 3. À 4 jours : Lower / Upper / Lower / Upper. À 5 jours : Lower / Upper / Lower / Lower / Upper, en espaçant les séances fessiers/cuisses de 48 h.'
+            },
+            hypertrophie: {
+                title:'Hypertrophie', color:'#00ff66', icon:'🟢',
+                subtitle:'5 jours · Pectoraux / Dos / Jambes / Épaules',
+                days:[
+                    { name:'Jour 1', title:'Pectoraux / Triceps — Focus développé guidé', exercises:[
+                        ['Développé couché à la Smith machine (guidé)','4 × 8–10 · repos 2 min'],['Développé incliné à la machine convergente','4 × 10–12'],['Écartés à la poulie vis-à-vis (mi-hauteur)','3 × 12–15'],['Dips assistés à la machine (buste penché)','3 × 10–12'],['Extension triceps à la poulie haute','4 × 12–15']
+                    ]},
+                    { name:'Jour 2', title:'Dos / Biceps — Tirages poulies & machines', exercises:[
+                        ['Tirage vertical à la poulie haute','4 × 8–10'],['Tirage horizontal à la machine','4 × 10–12'],['Pulldown bras tendus à la poulie haute','3 × 12–15'],['Curl biceps au pupitre (Larry Scott) machine','4 × 10–12'],['Curl incliné ou marteau à la poulie basse','3 × 12–15']
+                    ]},
+                    { name:'Jour 3', title:'Jambes — Quadriceps / Mollets', exercises:[
+                        ['Presse à cuisses inclinée (pieds bas et largeur d’épaules)','4 × 8–10'],['Leg extension à la machine assise','4 × 12–15'],['Hack squat à la machine guidée','3 × 10–12'],['Fentes marchées ou fentes bulgares','3 × 12 / jambe · optionnel'],['Flexion plantaire pour mollets à la presse','4 × 15–20']
+                    ]},
+                    { name:'Jour 4', title:'Épaules / Abdos', exercises:[
+                        ['Développé militaire assis à la Smith machine / machine','4 × 8–10'],['Élévations latérales à la poulie basse','4 × 12–15'],['Oiseau à la machine (rear delt fly)','4 × 12–15'],['Crunch à la poulie haute','4 × 15–20'],['Relevé de jambes suspendu / chaise romaine','3 × 12–15']
+                    ]},
+                    { name:'Jour 5', title:'Jambes — Ischio-jambiers / Fessiers & Finitions', exercises:[
+                        ['Leg curl couché ou assis à la machine','4 × 10–12'],['Hip thrust à la machine guidée / cadre guidé','4 × 10–12'],['Good morning à la Smith machine','3 × 10–12'],['Tirage horizontal bas à la poulie','3 × 12 · rappel dos'],['Superset Curl biceps poulie / Extension triceps corde','3 × 15']
+                    ]}
+                ],
+                notes:'Répartition : J1 Pectoraux/Triceps · J2 Dos/Biceps · J3 Quadriceps/Mollets · J4 Épaules/Abdos · J5 Ischio-jambiers/Fessiers + finitions.'
+            }
+        };
+
+        function getCurrentPowerbuildingPreview() {
+            const programs = getPowerbuildingPrograms();
+            const days = programs && programs[0] ? programs[0].slice(0,6) : [];
+            return {
+                title:'Powerbuilding', color:'#ff0033', icon:'🔴',
+                subtitle:'Programme déjà présent dans l’application · 5–6 jours',
+                days:days.map(d => ({
+                    name:d.dayName, title:d.title.replace(/ \(Bloc 1\)/,'') ,
+                    exercises:d.exercises.map(e => [e.name, `${e.sets} × ${e.defaultReps}`])
+                })),
+                notes:'Le Powerbuilding utilise le programme déjà présent dans ton application.'
+            };
+        }
+
+        function renderPowerHome() {
+            const detail = document.getElementById('power-program-detail');
+            if (!detail) return;
+            const meta = getProgramMeta(activeProgramKey);
+            detail.innerHTML = `<div class="profile-card" style="border-color:${meta.color};box-shadow:0 0 12px ${meta.color}22"><div style="color:${meta.color};font-weight:900">${meta.icon} PROGRAMME ACTIF : ${meta.title.toUpperCase()}</div><p style="font-size:.72rem;color:#aaa;margin-bottom:0">Clique sur un programme pour le charger directement dans l’onglet Programme.</p></div>`;
+        }
+
+        function openPowerProgram(key) {
+            playSound('success');
+            selectTrainingProgram(key);
+        }
+
+
         function renderInventory() {
             const grid = document.getElementById('inventory-grid');
             grid.innerHTML = '';
@@ -1564,7 +1908,7 @@
             if (item) {
                 item.equipped = !item.equipped;
                 saveToLocalStorage();
-                renderInventory();
+                renderPowerHome();
             }
         }
 
@@ -1601,7 +1945,7 @@
                         if (item) {
                             item.image = compressedDataUrl;
                             saveToLocalStorage();
-                            renderInventory();
+                            renderPowerHome();
                         }
                     };
                     img.src = e.target.result;
@@ -1663,7 +2007,7 @@
 
                         inventoryItems.push(newItem);
                         saveToLocalStorage();
-                        renderInventory();
+                        renderPowerHome();
                         closeAddItemModal();
                     };
                     img.src = e.target.result;
@@ -1672,7 +2016,7 @@
             } else {
                 inventoryItems.push(newItem);
                 saveToLocalStorage();
-                renderInventory();
+                renderPowerHome();
                 closeAddItemModal();
             }
         }
@@ -1681,7 +2025,7 @@
             if (confirm("Voulez-vous vraiment supprimer cet objet de votre inventaire ?")) {
                 inventoryItems = inventoryItems.filter(i => i.id !== id);
                 saveToLocalStorage();
-                renderInventory();
+                renderPowerHome();
             }
         }
 
@@ -1814,7 +2158,7 @@
         updateProfileUI();
         renderBodyChart();
         initWorkoutSystem();
-        renderInventory();
+        renderPowerHome();
     </script>
 </body>
 </html>
