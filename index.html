@@ -3988,7 +3988,7 @@ const sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_PUBLISHABLE_KEY,{
   auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true,storage:window.localStorage}
 });
 let cloudUser=null,cloudLicensed=false,cloudLoadedOnce=false,cloudSaveTimer=null,suppressCloudSave=false,licenseWatchTimer=null,lastLicenseStatus='UNKNOWN';
-const APP_VERSION='14.1.5';
+const APP_VERSION='14.1.7';
 const ACCOUNT_LOCAL_KEYS=['solo_leveling_user','solo_leveling_smart_refs','solo_leveling_body_hist','solo_leveling_inv','solo_leveling_block','solo_leveling_day','solo_leveling_state','solo_leveling_custom_sets','solo_leveling_history','solo_leveling_active_program','solo_leveling_program_states','solo_leveling_program_custom_sets','solo_leveling_custom_program','leveling_last_local_save','leveling_last_cloud_sync','leveling_v10'];
 function clearLevelingAccountLocalData(){
   try{ACCOUNT_LOCAL_KEYS.forEach(k=>localStorage.removeItem(k));sessionStorage.removeItem('leveling_pending_license')}catch(e){console.warn('Local account cleanup:',e)}
@@ -4104,7 +4104,7 @@ async function retryLicenseCheck(){
 }
 function exportAppData(){
   if(typeof saveActiveProgramState==='function')saveActiveProgramState();
-  return{version:'14.1.5',userData,smartHypertrophyRefs,bodyHistory,inventoryItems,currentBlockIndex,currentDayIndex,activeProgramKey,programWorkoutStates,programCustomSetData,customProgramData,workoutState,customSetData,workoutHistory,v10:(typeof window.__levelingV10Export==='function'?window.__levelingV10Export():null)};
+  return{version:'14.1.7',userData,smartHypertrophyRefs,bodyHistory,inventoryItems,currentBlockIndex,currentDayIndex,activeProgramKey,programWorkoutStates,programCustomSetData,customProgramData,workoutState,customSetData,workoutHistory,v10:(typeof window.__levelingV10Export==='function'?window.__levelingV10Export():null)};
 }
 function importAppData(d){
   if(!d||typeof d!=='object')return;suppressCloudSave=true;
@@ -7162,7 +7162,7 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
     const oldExport=window.exportAppData;
     window.exportAppData=function(){
       const d=oldExport.apply(this,arguments) || {};
-      d.version='14.1.5';
+      d.version='14.1.7';
       try{d.v140Rpg=JSON.parse(localStorage.getItem('leveling_v140_rpg')||'{}')}catch(e){d.v140Rpg={}}
       d.validatedSessions=validatedSnapshot();
       d.cycleResetPending=localStorage.getItem('leveling_cycle_reset_pending')||'';
@@ -7756,6 +7756,184 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
   refreshViewport();
   window.addEventListener('resize',refreshViewport,{passive:true});
   window.visualViewport?.addEventListener('resize',refreshViewport,{passive:true});
+})();
+</script>
+
+
+<style id="v1416-ios-performance-css">
+/* V14.1.6 — mode performance automatique iPhone / iPad */
+html.leveling-ios,
+html.leveling-ios body{
+  overscroll-behavior:none!important;
+}
+
+html.leveling-ios body{
+  position:relative!important;
+  height:100%!important;
+  min-height:100%!important;
+  -webkit-text-size-adjust:100%;
+}
+
+html.leveling-ios #app-container{
+  height:var(--leveling-vh,100svh)!important;
+  min-height:var(--leveling-vh,100svh)!important;
+  max-height:var(--leveling-vh,100svh)!important;
+}
+
+/* Les particules et effets continus sont la première cause de jank sur WebKit mobile. */
+html.leveling-ios #ambiance-particles,
+html.leveling-ios .amb-p{
+  display:none!important;
+  animation:none!important;
+}
+
+/* Supprime les traitements GPU très coûteux d'iOS, sans changer la structure de l'app. */
+html.leveling-ios *,
+html.leveling-ios *::before,
+html.leveling-ios *::after{
+  backdrop-filter:none!important;
+  -webkit-backdrop-filter:none!important;
+}
+
+html.leveling-ios header,
+html.leveling-ios nav,
+html.leveling-ios .v10-card,
+html.leveling-ios .v11-card,
+html.leveling-ios .profile-card,
+html.leveling-ios .v135-rank-card,
+html.leveling-ios .rank-card,
+html.leveling-ios #v140-quests,
+html.leveling-ios #v140-sbd,
+html.leveling-ios #v140-coach,
+html.leveling-ios .auth-card,
+html.leveling-ios .modal-content,
+html.leveling-ios .v140-modalbox,
+html.leveling-ios .profile-v2-box{
+  box-shadow:none!important;
+}
+
+/* Les grosses ombres de texte + filtres répétés font repainter toute la page à chaque scroll. */
+html.leveling-ios header h1,
+html.leveling-ios .v135-rank-name,
+html.leveling-ios .v140-levelbig,
+html.leveling-ios .profile-v2-rank{
+  text-shadow:none!important;
+  filter:none!important;
+}
+
+/* Animations décoratives coupées, interactions conservées. */
+html.leveling-ios .theme-unlock-box,
+html.leveling-ios .pr-popup-box,
+html.leveling-ios .v135-rankup,
+html.leveling-ios .v1409-check,
+html.leveling-ios .v1410-calendar-icon{
+  animation:none!important;
+  filter:none!important;
+}
+
+html.leveling-ios main{
+  transform:translateZ(0);
+  will-change:scroll-position;
+  contain:layout paint;
+}
+</style>
+
+<script id="v1416-ios-performance-js">
+(function(){
+  const ua=navigator.userAgent||'';
+  const platform=navigator.platform||'';
+  const touch=Number(navigator.maxTouchPoints||0);
+  const isIOS=/iPhone|iPad|iPod/i.test(ua) || (platform==='MacIntel' && touch>1);
+
+  if(!isIOS)return;
+
+  document.documentElement.classList.add('leveling-ios');
+
+  function setViewport(){
+    const h=Math.round(window.visualViewport?.height || window.innerHeight || document.documentElement.clientHeight || 0);
+    if(h>0)document.documentElement.style.setProperty('--leveling-vh',h+'px');
+  }
+
+  setViewport();
+  window.addEventListener('orientationchange',()=>setTimeout(setViewport,180),{passive:true});
+  window.addEventListener('pageshow',()=>setTimeout(setViewport,80),{passive:true});
+  window.visualViewport?.addEventListener('resize',setViewport,{passive:true});
+
+  /* iOS : évite de laisser tourner des animations décoratives cachées après reprise PWA. */
+  document.addEventListener('visibilitychange',()=>{
+    if(document.visibilityState==='visible')setTimeout(setViewport,50);
+  });
+})();
+</script>
+
+
+<style id="v1417-android-fullscreen-fix">
+/* V14.1.7 — vrai viewport mobile Android/iOS */
+@media (max-width:760px){
+  html,body{
+    width:100%!important;
+    height:var(--leveling-vh,100svh)!important;
+    min-height:var(--leveling-vh,100svh)!important;
+    max-height:var(--leveling-vh,100svh)!important;
+    overflow:hidden!important;
+  }
+
+  #app-container{
+    width:100%!important;
+    height:var(--leveling-vh,100svh)!important;
+    min-height:var(--leveling-vh,100svh)!important;
+    max-height:var(--leveling-vh,100svh)!important;
+    overflow:hidden!important;
+  }
+
+  main{
+    flex:1 1 auto!important;
+    min-height:0!important;
+    overflow-y:auto!important;
+    padding-bottom:calc(92px + env(safe-area-inset-bottom,0px))!important;
+  }
+
+  nav{
+    position:absolute!important;
+    left:0!important;
+    right:0!important;
+    bottom:0!important;
+    width:100%!important;
+    box-sizing:border-box!important;
+    min-height:62px!important;
+    padding:7px 0 calc(8px + env(safe-area-inset-bottom,0px))!important;
+  }
+}
+</style>
+
+<script id="v1417-mobile-fullscreen-js">
+(function(){
+  function setVH(){
+    /* visualViewport = vraie zone visible, sans les barres navigateur/système */
+    const vv=window.visualViewport;
+    const h=Math.round(vv?.height || window.innerHeight || document.documentElement.clientHeight || 0);
+    if(h>0){
+      document.documentElement.style.setProperty('--leveling-vh',h+'px');
+    }
+  }
+
+  setVH();
+  setTimeout(setVH,100);
+  setTimeout(setVH,500);
+  setTimeout(setVH,1200);
+
+  window.addEventListener('resize',setVH,{passive:true});
+  window.addEventListener('orientationchange',()=>setTimeout(setVH,250),{passive:true});
+  window.addEventListener('pageshow',()=>setTimeout(setVH,100),{passive:true});
+  window.visualViewport?.addEventListener('resize',setVH,{passive:true});
+  window.visualViewport?.addEventListener('scroll',setVH,{passive:true});
+
+  document.addEventListener('visibilitychange',()=>{
+    if(document.visibilityState==='visible'){
+      setTimeout(setVH,80);
+      setTimeout(setVH,400);
+    }
+  });
 })();
 </script>
 
