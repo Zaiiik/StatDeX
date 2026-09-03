@@ -1,7 +1,7 @@
 {
   "name": "LEVELING-APP",
   "short_name": "LEVELING",
-  "description": "LEVELING-APP V12.7 — Profil, objectifs, PR automatiques et progression.",
+  "description": "LEVELING-APP V13.1 — Community Enhanced avec profils publics, Teams, classements et chat Team.",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
