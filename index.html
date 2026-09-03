@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>LEVELING-APP — Powerbuilding Tracker V12.6</title>
+    <title>LEVELING-APP — Powerbuilding Tracker V12.7</title>
     <meta name="theme-color" content="#09090f">
     <meta name="application-name" content="LEVELING-APP">
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -447,6 +447,44 @@ main{padding-bottom:calc(76px + var(--safe-bottom))}
 .ios-step{padding:8px 0;border-bottom:1px solid #25252d;font-size:.76rem;color:#ddd}.ios-step:last-child{border-bottom:0}
 @media(max-width:600px){header{padding-left:10px;padding-right:10px}.profile-card,.v11-card,.v10-card{border-radius:12px}button,.btn-action,.v11-btn{min-height:42px}.nav-item{min-height:48px}}
 
+
+/* ==================== V12.7 PROFILE & PROGRESSION ==================== */
+nav{
+  position:absolute!important;bottom:0!important;
+  min-height:calc(64px + env(safe-area-inset-bottom,0px))!important;
+  padding:8px 0 calc(12px + env(safe-area-inset-bottom,0px))!important;
+  box-sizing:border-box!important;align-items:flex-start!important;
+}
+.nav-item{
+  min-height:48px!important;padding:5px 4px 8px!important;
+  display:flex!important;flex-direction:column!important;
+  align-items:center!important;justify-content:center!important;
+}
+main{padding-bottom:calc(96px + env(safe-area-inset-bottom,0px))!important}
+@media (display-mode:standalone){
+  nav{padding-bottom:calc(16px + env(safe-area-inset-bottom,0px))!important}
+  main{padding-bottom:calc(104px + env(safe-area-inset-bottom,0px))!important}
+}
+.today-card{grid-column:1/-1;border:1px solid rgba(0,210,255,.38);background:linear-gradient(135deg,rgba(0,210,255,.08),rgba(189,0,255,.08));box-shadow:0 0 18px rgba(0,210,255,.08)}
+.today-head{display:flex;align-items:center;justify-content:space-between;gap:10px}.today-title{font-size:.95rem;font-weight:1000;color:#eafcff}.today-sub{font-size:.61rem;color:#8b94a6;margin-top:2px}
+.today-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;margin-top:10px}.today-stat{padding:9px 7px;border:1px solid #292935;border-radius:9px;background:rgba(0,0,0,.24);text-align:center}
+.today-stat span{display:block;font-size:.52rem;color:#777;text-transform:uppercase}.today-stat b{display:block;font-size:.72rem;margin-top:4px;color:#fff}.today-action{width:100%;margin-top:9px;background:linear-gradient(90deg,rgba(0,210,255,.18),rgba(189,0,255,.18));border-color:#00d2ff;color:#dffaff}
+@media(max-width:650px){.today-grid{grid-template-columns:repeat(2,1fr)}}
+.goal-card{grid-column:1/-1}.goal-row{display:grid;grid-template-columns:100px minmax(0,1fr) 74px;gap:8px;align-items:center;margin:9px 0}.goal-name{font-size:.67rem;font-weight:900;color:#ddd}
+.goal-track{height:8px;background:#09090e;border:1px solid #292934;border-radius:99px;overflow:hidden}.goal-fill{height:100%;width:0;background:linear-gradient(90deg,#00d2ff,#bd00ff);transition:.35s}
+.goal-input{width:100%;background:#09090e;border:1px solid #373743;color:#fff;border-radius:7px;padding:6px;text-align:center;font-size:.67rem}.goal-caption{font-size:.56rem;color:#777;text-align:right}
+.profile-v2-modal{display:none;position:fixed;inset:0;z-index:7200;background:rgba(0,0,0,.82);align-items:center;justify-content:center;padding:16px}.profile-v2-modal.show{display:flex}
+.profile-v2-box{width:100%;max-width:600px;max-height:90dvh;overflow:auto;background:#0e0e15;border:1px solid rgba(189,0,255,.55);border-radius:18px;padding:16px;box-shadow:0 0 35px rgba(189,0,255,.22)}
+.profile-v2-hero{display:flex;align-items:center;gap:14px}.profile-v2-avatar{width:86px;height:86px;border-radius:20px;overflow:hidden;display:grid;place-items:center;font-size:2rem;font-weight:1000;background:radial-gradient(circle at 35% 25%,#fff,#bd00ff 25%,#17001f 72%);border:2px solid #bd00ff;flex:none}
+.profile-v2-avatar img{width:100%;height:100%;object-fit:cover}.profile-v2-name{font-size:1.25rem;font-weight:1000}.profile-v2-rank{font-size:.7rem;color:#00d2ff;margin-top:3px}
+.profile-v2-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:13px}.profile-v2-stat{background:#09090e;border:1px solid #292934;border-radius:10px;padding:9px;text-align:center}.profile-v2-stat span{display:block;font-size:.52rem;color:#777;text-transform:uppercase}.profile-v2-stat b{font-size:.76rem}
+.profile-v2-section{margin-top:14px}.profile-v2-section h4{margin:0 0 7px;font-size:.72rem;color:#d66cff}.pr-list{display:flex;flex-direction:column;gap:6px}.pr-item{display:flex;justify-content:space-between;gap:8px;border:1px solid #292934;background:#09090e;border-radius:9px;padding:8px;font-size:.64rem}.pr-item b{color:#ffea00}
+@media(max-width:520px){.profile-v2-grid{grid-template-columns:repeat(2,1fr)}.profile-v2-avatar{width:72px;height:72px}}
+.pr-popup{display:none;position:fixed;inset:0;z-index:7600;background:rgba(0,0,0,.72);align-items:center;justify-content:center;padding:20px}.pr-popup.show{display:flex}
+.pr-popup-box{width:100%;max-width:360px;text-align:center;background:radial-gradient(circle at top,rgba(255,234,0,.13),#101017 60%);border:2px solid #ffea00;border-radius:18px;padding:20px;box-shadow:0 0 35px rgba(255,234,0,.27);animation:prPop .35s ease}
+@keyframes prPop{from{transform:scale(.78);opacity:0}to{transform:scale(1);opacity:1}}.pr-popup-icon{font-size:2.8rem}.pr-popup-title{font-size:1.15rem;font-weight:1000;color:#ffea00;text-shadow:0 0 14px rgba(255,234,0,.45)}.pr-popup-ex{font-weight:900;margin-top:7px}.pr-popup-detail{font-size:.7rem;color:#aaa;margin-top:5px}
+.click-profile-hint{cursor:pointer}.click-profile-hint:hover{border-color:rgba(0,210,255,.45)!important}
+
 </style>
 
 <style id="v10-style">
@@ -531,7 +569,7 @@ main{padding-bottom:calc(76px + var(--safe-bottom))}
             <div id="panel-profile" class="panel active">
                 <h2>Rang & Niveau de Powerlifting</h2>
                 <div id="v10-profile-dashboard" class="v10-grid">
-                <div id="v11-identity-card" class="v11-card" style="grid-column:1/-1">
+                <div id="v11-identity-card" class="v11-card click-profile-hint" style="grid-column:1/-1" onclick="playSound('click'); openProfileV2()">
                     <div class="v11-identity-main">
                         <div class="v11-avatar" id="v11-avatar">L</div>
                         <div>
@@ -542,6 +580,21 @@ main{padding-bottom:calc(76px + var(--safe-bottom))}
                     </div>
                     <div class="v11-sync-pill" id="v11-sync-pill">● Sauvegarde locale</div>
                 </div>
+
+
+  <div class="v10-card today-card" id="today-dashboard">
+    <div class="today-head">
+      <div><div class="today-title">☀️ AUJOURD’HUI</div><div class="today-sub" id="today-session-name">Analyse de ta journée…</div></div>
+      <div style="font-size:.62rem;color:#00d2ff;font-weight:900" id="today-progress-label">0%</div>
+    </div>
+    <div class="today-grid">
+      <div class="today-stat"><span>Programme</span><b id="today-program">—</b></div>
+      <div class="today-stat"><span>Volume semaine</span><b id="today-volume">0 kg</b></div>
+      <div class="today-stat"><span>Streak</span><b id="today-streak">0 🔥</b></div>
+      <div class="today-stat"><span>Dernier PR</span><b id="today-last-pr">—</b></div>
+    </div>
+    <button class="btn-action today-action" id="today-action-btn" onclick="playSound('click'); startOrResumeToday()">⚔️ COMMENCER LA SÉANCE</button>
+  </div>
 
   <div class="v10-card" style="grid-column:1/-1">
     <div style="display:flex;justify-content:space-between;align-items:center"><div><div class="v10-muted">PLAYER STATUS</div><div class="v10-big">NIVEAU <span id="v10-level">1</span> · <span id="v10-rank">NOVICE</span></div></div><div style="text-align:right"><div class="v10-muted">XP TOTAL</div><b id="v10-total-xp">0</b></div></div>
@@ -554,6 +607,12 @@ main{padding-bottom:calc(76px + var(--safe-bottom))}
 </div>
 
                
+                <div class="v10-card goal-card">
+                  <div class="v10-section-title"><h3>🎯 MES OBJECTIFS</h3><span>Progression</span></div>
+                  <div id="goal-rows"></div>
+                  <button class="btn-action" onclick="saveGoalsFromUI()" style="margin-top:8px">💾 Sauvegarder mes objectifs</button>
+                </div>
+
                 <div class="rank-card" onclick="playSound('click'); openRankShowcaseModal()">
                     <div class="rank-title">Rang Powerlifting (SBD / Poids Corporel)</div>
                     <div class="rank-badge" id="rank-name">NOVICE</div>
@@ -704,7 +763,7 @@ main{padding-bottom:calc(76px + var(--safe-bottom))}
                         <span class="cloud-badge" id="cloud-live-badge">☁️ CLOUD</span>
                     </div>
                     <div id="cloud-sync-detail" style="margin-top:8px;font-size:.62rem;color:#777;text-align:center">Initialisation du cloud…</div>
-                    <div style="margin-top:5px;font-size:.58rem;color:#555;text-align:center">LEVELING-APP V12.6 · PWA Mobile</div>
+                    <div style="margin-top:5px;font-size:.58rem;color:#555;text-align:center">LEVELING-APP V12.7 · Profil & Progression</div>
                     <button class="btn-action" onclick="logoutLeveling()" style="border-color:#ff5555;color:#ff7777">Se déconnecter</button>
                 </div>
 
@@ -1625,7 +1684,7 @@ main{padding-bottom:calc(76px + var(--safe-bottom))}
             document.getElementById('panel-' + tabName).classList.add('active');
             if (btnElement) btnElement.classList.add('active');
             if (tabName === 'settings') loadSettingsToInputs();
-            if (tabName === 'profile') { updateProfileUI(); renderBodyChart(); renderHistoryUI(); }
+            if (tabName === 'profile') { updateProfileUI(); renderBodyChart(); renderHistoryUI(); if(typeof renderTodayDashboard==='function')renderTodayDashboard(); if(typeof renderGoals==='function')renderGoals(); }
             if (tabName === 'power') renderPowerHome();
         }
 
@@ -1983,6 +2042,9 @@ main{padding-bottom:calc(76px + var(--safe-bottom))}
             workoutState[currentBlockIndex][currentDayIndex][exIndex][setIndex] = !currentState;
             playSound(currentState ? 'click' : 'check');
             saveToLocalStorage();
+            if(typeof scheduleCloudSave==='function')scheduleCloudSave();if(typeof updateResumeWorkoutBanner==='function')updateResumeWorkoutBanner();
+            if(!currentState && typeof detectAutomaticPR==='function')setTimeout(()=>detectAutomaticPR(exIndex,setIndex),30);
+            if(typeof renderTodayDashboard==='function')setTimeout(renderTodayDashboard,50);
            
             if (currentDayIndex === 6) {
                 checkSundayCompletion();
@@ -2728,6 +2790,70 @@ setTimeout(()=>{v11RenderIdentity();v11RenderReport();},50);
 </script>
 
 
+<script>
+
+/* ==================== LEVELING-APP V12.7 ==================== */
+function ensureV127Data(){
+  if(!userData.goals)userData.goals={squat:Math.max(100,Number(userData.squat||0)+20),bench:Math.max(80,Number(userData.bench||0)+15),deadlift:Math.max(120,Number(userData.deadlift||0)+25),weight:Number(userData.weight||75)};
+  if(!userData.prRecords)userData.prRecords={};if(!userData.recentPRs)userData.recentPRs=[];if(!userData.prSeenSets)userData.prSeenSets={};
+}
+function semverParts(v){return String(v||'0').split('.').map(x=>parseInt(x,10)||0)}
+function isVersionNewer(remote,current){const a=semverParts(remote),b=semverParts(current),n=Math.max(a.length,b.length);for(let i=0;i<n;i++){const x=a[i]||0,y=b[i]||0;if(x>y)return true;if(x<y)return false}return false}
+function escV127(v){return String(v??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]))}
+function currentExerciseSetValues(exIndex,setIndex){
+  const p=getPrograms()?.[currentBlockIndex]?.[currentDayIndex],ex=p?.exercises?.[exIndex];if(!ex)return null;
+  const custom=customSetData?.[currentBlockIndex]?.[currentDayIndex]?.[exIndex]?.[setIndex]||{},reps=Number(custom.reps??ex.defaultReps??0),weight=Number(custom.weight??ex.defaultWeight??0);
+  return {ex,reps,weight,e1rm:reps>0&&weight>0?weight*(1+reps/30):0,volume:reps*weight};
+}
+function prSetSignature(exIndex,setIndex,v){return [activeProgramKey,currentBlockIndex,currentDayIndex,exIndex,setIndex,v?.reps||0,v?.weight||0].join(':')}
+function detectAutomaticPR(exIndex,setIndex){
+  ensureV127Data();const v=currentExerciseSetValues(exIndex,setIndex);if(!v||v.weight<=0||v.reps<=0)return;
+  const sig=prSetSignature(exIndex,setIndex,v);if(userData.prSeenSets[sig])return;userData.prSeenSets[sig]=true;
+  const key=v.ex.name,old=userData.prRecords[key]||{weight:0,repsAtWeight:0,e1rm:0,volume:0},types=[];
+  if(v.weight>Number(old.weight||0))types.push(`Poids ${v.weight} kg`);
+  if(v.e1rm>Number(old.e1rm||0)+.01)types.push(`e1RM ${v.e1rm.toFixed(1)} kg`);
+  if(v.volume>Number(old.volume||0)+.01)types.push(`Volume ${Math.round(v.volume)} kg`);
+  if(Math.abs(v.weight-Number(old.weight||0))<.001&&v.reps>Number(old.repsAtWeight||0))types.push(`${v.reps} reps à ${v.weight} kg`);
+  if(!types.length){saveToLocalStorage();return}
+  userData.prRecords[key]={weight:Math.max(Number(old.weight||0),v.weight),repsAtWeight:v.weight>=Number(old.weight||0)?Math.max(Number(old.repsAtWeight||0),v.reps):Number(old.repsAtWeight||0),e1rm:Math.max(Number(old.e1rm||0),v.e1rm),volume:Math.max(Number(old.volume||0),v.volume),updatedAt:new Date().toISOString()};
+  const pr={exercise:key,reps:v.reps,weight:v.weight,e1rm:Number(v.e1rm.toFixed(1)),types,date:new Date().toISOString()};
+  userData.recentPRs.unshift(pr);userData.recentPRs=userData.recentPRs.slice(0,12);userData.prCount=Number(userData.prCount||0)+1;
+  saveToLocalStorage();if(typeof scheduleCloudSaveImmediate==='function')scheduleCloudSaveImmediate();showPRPopup(pr);renderTodayDashboard();renderGoals();
+}
+function showPRPopup(pr){document.getElementById('pr-popup-exercise').textContent=pr.exercise;document.getElementById('pr-popup-detail').textContent=`${pr.weight} kg × ${pr.reps} · ${pr.types.join(' · ')}`;document.getElementById('pr-popup')?.classList.add('show');playPRSound()}
+function closePRPopup(){document.getElementById('pr-popup')?.classList.remove('show')}
+function playPRSound(){try{const c=new (window.AudioContext||window.webkitAudioContext)(),n=c.currentTime;[440,659,880].forEach((f,i)=>{const o=c.createOscillator(),g=c.createGain();o.frequency.value=f;o.type='sine';g.gain.setValueAtTime(.0001,n+i*.08);g.gain.exponentialRampToValueAtTime(.12,n+i*.08+.02);g.gain.exponentialRampToValueAtTime(.0001,n+i*.08+.35);o.connect(g);g.connect(c.destination);o.start(n+i*.08);o.stop(n+i*.08+.38)})}catch(e){}}
+function getTodayWorkout(){return getPrograms()?.[currentBlockIndex]?.[currentDayIndex]||null}
+function todayCompletion(){const p=getTodayWorkout();if(!p)return{done:0,total:0,pct:0};let done=0,total=0;p.exercises.forEach((ex,ei)=>{for(let s=0;s<ex.sets;s++){total++;if(workoutState?.[currentBlockIndex]?.[currentDayIndex]?.[ei]?.[s])done++}});return{done,total,pct:total?Math.round(done/total*100):0}}
+function renderTodayDashboard(){
+  ensureV127Data();const meta=getProgramMeta(activeProgramKey),p=getTodayWorkout(),c=todayCompletion(),last=userData.recentPRs?.[0],el=id=>document.getElementById(id);
+  if(el('today-session-name'))el('today-session-name').textContent=p?.title||p?.dayName||'Séance du jour';if(el('today-program'))el('today-program').textContent=meta?.title||activeProgramKey;
+  if(el('today-progress-label'))el('today-progress-label').textContent=`${c.pct}% · ${c.done}/${c.total} séries`;if(el('today-volume'))el('today-volume').textContent=(calculateWeeklyTonnage()||0).toLocaleString()+' kg';
+  if(el('today-streak'))el('today-streak').textContent=`${(typeof v10!=='undefined'?v10.streak:0)||0} 🔥`;if(el('today-last-pr'))el('today-last-pr').textContent=last?`${last.exercise} ${last.weight}×${last.reps}`:'Aucun';
+  const btn=el('today-action-btn');if(btn)btn.textContent=c.done>0&&c.pct<100?'▶ REPRENDRE LA SÉANCE':'⚔️ COMMENCER LA SÉANCE';
+}
+function startOrResumeToday(){initWorkoutSystem();const b=document.querySelector("button.nav-item[onclick*=\"switchTab('workout'\"]");switchTab('workout',b)}
+function renderGoals(){
+  ensureV127Data();const box=document.getElementById('goal-rows');if(!box)return;
+  const rows=[['squat','Squat',Number(userData.squat||0),'kg'],['bench','Bench',Number(userData.bench||0),'kg'],['deadlift','Deadlift',Number(userData.deadlift||0),'kg'],['weight','Poids de corps',Number(userData.weight||0),'kg']];
+  box.innerHTML=rows.map(([k,label,current,unit])=>{const goal=Number(userData.goals[k]||0),pct=goal>0?Math.min(100,Math.max(0,current/goal*100)):0;return `<div class="goal-row"><div><div class="goal-name">${label}</div><div class="goal-caption">${current} / ${goal||0} ${unit}</div></div><div class="goal-track"><div class="goal-fill" style="width:${pct.toFixed(1)}%"></div></div><input class="goal-input" id="goal-${k}" type="number" step="${k==='weight'?'0.1':'2.5'}" value="${goal||''}"></div>`}).join('');
+}
+function saveGoalsFromUI(){ensureV127Data();['squat','bench','deadlift','weight'].forEach(k=>{const v=Number(document.getElementById('goal-'+k)?.value);if(v>0)userData.goals[k]=v});saveToLocalStorage();if(typeof scheduleCloudSaveImmediate==='function')scheduleCloudSaveImmediate();renderGoals();playSound('success')}
+function renderProfileV2(){
+  ensureV127Data();const total=Number(userData.squat||0)+Number(userData.bench||0)+Number(userData.deadlift||0),rank=getSBDRank(total,Number(userData.weight||0));
+  renderAvatarInto(document.getElementById('profile-v2-avatar'));const set=(id,v)=>{const e=document.getElementById(id);if(e)e.textContent=v};
+  set('profile-v2-name',userData.playerName||userData.name||'Joueur');set('profile-v2-rank',rank.name);set('profile-v2-program',`Programme actif : ${getProgramMeta(activeProgramKey)?.title||activeProgramKey}`);
+  set('pv2-level',userData.level||1);set('pv2-weight',`${userData.weight||0} kg`);set('pv2-height',`${userData.height||0} cm`);set('pv2-squat',`${userData.squat||0} kg`);set('pv2-bench',`${userData.bench||0} kg`);set('pv2-dead',`${userData.deadlift||0} kg`);set('pv2-total',`${total} kg`);set('pv2-workouts',userData.workoutsCompleted||0);set('pv2-prs',userData.prCount||0);
+  const best=document.getElementById('pv2-best-prs'),entries=Object.entries(userData.prRecords||{}).sort((a,b)=>(b[1].e1rm||0)-(a[1].e1rm||0)).slice(0,6);
+  if(best)best.innerHTML=entries.length?entries.map(([n,r])=>`<div class="pr-item"><span>${escV127(n)}</span><b>${Number(r.e1rm||0).toFixed(1)} kg e1RM</b></div>`).join(''):'<div style="font-size:.64rem;color:#777">Aucun PR automatique pour le moment.</div>';
+  const recent=document.getElementById('pv2-recent-prs'),prs=userData.recentPRs||[];if(recent)recent.innerHTML=prs.length?prs.slice(0,6).map(p=>`<div class="pr-item"><span>${escV127(p.exercise)} · ${p.weight} kg × ${p.reps}</span><b>${new Date(p.date).toLocaleDateString('fr-FR')}</b></div>`).join(''):'<div style="font-size:.64rem;color:#777">Aucun PR récent.</div>';
+  const hist=document.getElementById('pv2-history');if(hist)hist.textContent=`${workoutHistory?.length||0} bloc(s) enregistré(s) · ${typeof v10!=='undefined'?(v10.sessions?.length||0):0} séance(s) rapide(s) · ${Number(userData.trophies||0)} trophée(s).`;
+}
+function openProfileV2(){renderProfileV2();document.getElementById('profile-v2-modal')?.classList.add('show')}
+function closeProfileV2(){document.getElementById('profile-v2-modal')?.classList.remove('show')}
+setTimeout(()=>{try{ensureV127Data();renderTodayDashboard();renderGoals()}catch(e){console.warn('V12.7 UI',e)}},180);
+
+</script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
 const SUPABASE_URL='https://jmejktyindxzzsqwthsk.supabase.co';
@@ -2736,7 +2862,7 @@ const sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_PUBLISHABLE_KEY,{
   auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true,storage:window.localStorage}
 });
 let cloudUser=null,cloudLicensed=false,cloudLoadedOnce=false,cloudSaveTimer=null,suppressCloudSave=false,licenseWatchTimer=null,lastLicenseStatus='UNKNOWN';
-const APP_VERSION='12.6';
+const APP_VERSION='12.7';
 
 function showAuthScreen(name){
   document.querySelectorAll('.auth-screen').forEach(el=>el.classList.remove('active'));
@@ -2842,7 +2968,7 @@ async function retryLicenseCheck(){
 }
 function exportAppData(){
   if(typeof saveActiveProgramState==='function')saveActiveProgramState();
-  return{version:'12.6',userData,smartHypertrophyRefs,bodyHistory,inventoryItems,currentBlockIndex,currentDayIndex,activeProgramKey,programWorkoutStates,programCustomSetData,customProgramData,workoutState,customSetData,workoutHistory,v10:(typeof window.__levelingV10Export==='function'?window.__levelingV10Export():null)};
+  return{version:'12.7',userData,smartHypertrophyRefs,bodyHistory,inventoryItems,currentBlockIndex,currentDayIndex,activeProgramKey,programWorkoutStates,programCustomSetData,customProgramData,workoutState,customSetData,workoutHistory,v10:(typeof window.__levelingV10Export==='function'?window.__levelingV10Export():null)};
 }
 function importAppData(d){
   if(!d||typeof d!=='object')return;suppressCloudSave=true;
@@ -2964,12 +3090,9 @@ async function logoutLeveling(){
 
 async function checkAppRelease(){
   try{
-    const {data,error}=await sb.rpc('get_leveling_app_release');
-    if(error)return;
-    const r=Array.isArray(data)?data[0]:data;
-    if(!r||!r.latest_version)return;
-    const banner=document.getElementById('update-banner');
-    if(String(r.latest_version)!==String(APP_VERSION)){
+    const {data,error}=await sb.rpc('get_leveling_app_release');if(error)return;
+    const r=Array.isArray(data)?data[0]:data,banner=document.getElementById('update-banner');
+    if(r && r.is_active===true && r.latest_version && isVersionNewer(r.latest_version,APP_VERSION)){
       document.getElementById('update-version-label').textContent=`🚀 V${r.latest_version} disponible`;
       document.getElementById('update-message').textContent=r.message||'Une nouvelle version de LEVELING-APP est disponible.';
       banner?.classList.add('show');
@@ -3017,6 +3140,25 @@ registerLevelingSW();updateInstallUI();initSupabaseGate();
             <div class="ios-step">4. Ouvre ensuite LEVELING-APP depuis son icône : elle se lancera comme une vraie app.</div>
             <button class="btn-action" onclick="closeIOSInstallHelp()" style="margin-top:12px">Compris</button>
         </div>
+    </div>
+
+
+    <div id="profile-v2-modal" class="profile-v2-modal" onclick="if(event.target===this)closeProfileV2()">
+      <div class="profile-v2-box">
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:10px"><h3 style="margin:0;color:#d66cff">👤 PROFIL DU CHASSEUR</h3><button class="btn-action" onclick="closeProfileV2()" style="width:auto;margin:0;padding:7px 10px">Fermer</button></div>
+        <div class="profile-v2-hero" style="margin-top:12px"><div class="profile-v2-avatar" id="profile-v2-avatar">L</div><div><div class="profile-v2-name" id="profile-v2-name">Joueur</div><div class="profile-v2-rank" id="profile-v2-rank">NOVICE</div><div style="font-size:.61rem;color:#777;margin-top:4px" id="profile-v2-program">Programme actif</div></div></div>
+        <div class="profile-v2-grid">
+          <div class="profile-v2-stat"><span>Niveau</span><b id="pv2-level">1</b></div><div class="profile-v2-stat"><span>Poids</span><b id="pv2-weight">0 kg</b></div><div class="profile-v2-stat"><span>Taille</span><b id="pv2-height">0 cm</b></div>
+          <div class="profile-v2-stat"><span>Squat</span><b id="pv2-squat">0 kg</b></div><div class="profile-v2-stat"><span>Bench</span><b id="pv2-bench">0 kg</b></div><div class="profile-v2-stat"><span>Deadlift</span><b id="pv2-dead">0 kg</b></div>
+          <div class="profile-v2-stat"><span>Total SBD</span><b id="pv2-total">0 kg</b></div><div class="profile-v2-stat"><span>Séances</span><b id="pv2-workouts">0</b></div><div class="profile-v2-stat"><span>PR détectés</span><b id="pv2-prs">0</b></div>
+        </div>
+        <div class="profile-v2-section"><h4>🏆 Meilleurs PR automatiques</h4><div id="pv2-best-prs" class="pr-list"></div></div>
+        <div class="profile-v2-section"><h4>⚡ PR récents</h4><div id="pv2-recent-prs" class="pr-list"></div></div>
+        <div class="profile-v2-section"><h4>📚 Résumé historique</h4><div id="pv2-history" style="font-size:.66rem;color:#aaa"></div></div>
+      </div>
+    </div>
+    <div id="pr-popup" class="pr-popup" onclick="if(event.target===this)closePRPopup()">
+      <div class="pr-popup-box"><div class="pr-popup-icon">🏆</div><div class="pr-popup-title">PR DÉBLOQUÉ</div><div class="pr-popup-ex" id="pr-popup-exercise">Exercice</div><div class="pr-popup-detail" id="pr-popup-detail">Nouveau record</div><button class="btn-action" onclick="closePRPopup()" style="margin-top:14px;border-color:#ffea00;color:#ffea00">CONTINUER</button></div>
     </div>
 
 </body>
