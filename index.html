@@ -3988,7 +3988,7 @@ const sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_PUBLISHABLE_KEY,{
   auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true,storage:window.localStorage}
 });
 let cloudUser=null,cloudLicensed=false,cloudLoadedOnce=false,cloudSaveTimer=null,suppressCloudSave=false,licenseWatchTimer=null,lastLicenseStatus='UNKNOWN';
-const APP_VERSION='14.1.3';
+const APP_VERSION='14.1.5';
 const ACCOUNT_LOCAL_KEYS=['solo_leveling_user','solo_leveling_smart_refs','solo_leveling_body_hist','solo_leveling_inv','solo_leveling_block','solo_leveling_day','solo_leveling_state','solo_leveling_custom_sets','solo_leveling_history','solo_leveling_active_program','solo_leveling_program_states','solo_leveling_program_custom_sets','solo_leveling_custom_program','leveling_last_local_save','leveling_last_cloud_sync','leveling_v10'];
 function clearLevelingAccountLocalData(){
   try{ACCOUNT_LOCAL_KEYS.forEach(k=>localStorage.removeItem(k));sessionStorage.removeItem('leveling_pending_license')}catch(e){console.warn('Local account cleanup:',e)}
@@ -4104,7 +4104,7 @@ async function retryLicenseCheck(){
 }
 function exportAppData(){
   if(typeof saveActiveProgramState==='function')saveActiveProgramState();
-  return{version:'14.1.3',userData,smartHypertrophyRefs,bodyHistory,inventoryItems,currentBlockIndex,currentDayIndex,activeProgramKey,programWorkoutStates,programCustomSetData,customProgramData,workoutState,customSetData,workoutHistory,v10:(typeof window.__levelingV10Export==='function'?window.__levelingV10Export():null)};
+  return{version:'14.1.5',userData,smartHypertrophyRefs,bodyHistory,inventoryItems,currentBlockIndex,currentDayIndex,activeProgramKey,programWorkoutStates,programCustomSetData,customProgramData,workoutState,customSetData,workoutHistory,v10:(typeof window.__levelingV10Export==='function'?window.__levelingV10Export():null)};
 }
 function importAppData(d){
   if(!d||typeof d!=='object')return;suppressCloudSave=true;
@@ -7162,7 +7162,7 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
     const oldExport=window.exportAppData;
     window.exportAppData=function(){
       const d=oldExport.apply(this,arguments) || {};
-      d.version='14.1.3';
+      d.version='14.1.5';
       try{d.v140Rpg=JSON.parse(localStorage.getItem('leveling_v140_rpg')||'{}')}catch(e){d.v140Rpg={}}
       d.validatedSessions=validatedSnapshot();
       d.cycleResetPending=localStorage.getItem('leveling_cycle_reset_pending')||'';
@@ -7474,6 +7474,288 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
   document.addEventListener('visibilitychange',()=>{
     if(document.visibilityState==='visible')setTimeout(sync,80);
   });
+})();
+</script>
+
+
+<style id="v1414-cleanup-css">
+/* V14.1.4 — avatar header via vrai <img>, sans background-image */
+#v1402-account-btn{
+  position:relative!important;
+  overflow:hidden!important;
+  background-color:#0d0d13!important;
+  background-image:none!important;
+}
+#v1402-account-btn > *{display:none!important}
+#v1402-account-btn #v1414-header-avatar{
+  display:block!important;
+  width:100%!important;
+  height:100%!important;
+  object-fit:cover!important;
+  object-position:center!important;
+  border-radius:inherit!important;
+  pointer-events:none!important;
+}
+#v1402-account-btn #v1414-header-fallback{
+  display:flex!important;
+  position:absolute!important;
+  inset:0!important;
+  align-items:center!important;
+  justify-content:center!important;
+  font-size:1rem!important;
+  pointer-events:none!important;
+}
+#v1402-account-btn.v1414-has-photo #v1414-header-fallback{display:none!important}
+</style>
+
+<script id="v1414-cleanup-js">
+(function(){
+  function profileData(){
+    try{
+      if(typeof userData!=='undefined' && userData) return userData;
+    }catch(e){}
+    return window.userData || {};
+  }
+
+  function syncAvatar(){
+    const btn=document.getElementById('v1402-account-btn');
+    if(!btn)return;
+
+    let img=document.getElementById('v1414-header-avatar');
+    let fallback=document.getElementById('v1414-header-fallback');
+
+    if(!img){
+      img=document.createElement('img');
+      img.id='v1414-header-avatar';
+      img.alt='Avatar du profil';
+      img.decoding='async';
+      btn.prepend(img);
+    }
+    if(!fallback){
+      fallback=document.createElement('span');
+      fallback.id='v1414-header-fallback';
+      btn.appendChild(fallback);
+    }
+
+    const u=profileData();
+    const src=String(u.playerAvatarImage||'').trim();
+    const fb=String(u.playerAvatar||((u.playerName||'J').trim()[0]||'J')).trim()||'👤';
+
+    fallback.textContent=fb;
+
+    if(src){
+      if(img.getAttribute('src')!==src) img.src=src;
+      img.style.display='block';
+      btn.classList.add('v1414-has-photo');
+    }else{
+      img.removeAttribute('src');
+      img.style.display='none';
+      btn.classList.remove('v1414-has-photo');
+    }
+
+    img.onerror=function(){
+      btn.classList.remove('v1414-has-photo');
+      img.style.display='none';
+    };
+  }
+
+  function dateKey(d){
+    return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+  }
+
+  function trainingDays(){
+    try{
+      const s=JSON.parse(localStorage.getItem('leveling_v140_rpg')||'{}');
+      return [...new Set((Array.isArray(s.trainingDays)?s.trainingDays:[]).filter(x=>/^\d{4}-\d{2}-\d{2}$/.test(x)))].sort();
+    }catch(e){return []}
+  }
+
+  function realCurrentStreak(){
+    const set=new Set(trainingDays());
+    if(!set.size)return 0;
+
+    let d=new Date();
+    d.setHours(12,0,0,0);
+
+    /* Une série reste active si la dernière séance est aujourd'hui ou hier. */
+    if(!set.has(dateKey(d))){
+      d.setDate(d.getDate()-1);
+      if(!set.has(dateKey(d)))return 0;
+    }
+
+    let n=0;
+    while(set.has(dateKey(d)) && n<3660){
+      n++;
+      d.setDate(d.getDate()-1);
+    }
+    return n;
+  }
+
+  function syncStreak(){
+    const el=document.getElementById('today-streak');
+    if(el)el.textContent=`${realCurrentStreak()} 🔥`;
+  }
+
+  function syncQuestText(){
+    const box=document.getElementById('v140-quests');
+    if(!box)return;
+
+    let sets=0;
+    try{
+      const prog=getPrograms()?.[currentBlockIndex]?.[currentDayIndex];
+      (prog?.exercises||[]).forEach((ex,ei)=>{
+        for(let si=0;si<Number(ex.sets||0);si++){
+          if(workoutState?.[currentBlockIndex]?.[currentDayIndex]?.[ei]?.[si])sets++;
+        }
+      });
+    }catch(e){}
+
+    const cards=[...box.querySelectorAll('.v140-quest')];
+    const target=cards.find(c=>/15 séries/i.test(c.textContent||''));
+    const small=target?.querySelector('small');
+    if(small){
+      small.textContent=sets>15
+        ? `15/15+ · ${sets} séries validées`
+        : `${sets}/15 séries validées`;
+    }
+  }
+
+  function refresh(){
+    syncAvatar();
+    syncStreak();
+    syncQuestText();
+  }
+
+  window.v1414RefreshUI=refresh;
+
+  if(document.readyState==='loading'){
+    document.addEventListener('DOMContentLoaded',()=>setTimeout(refresh,400));
+  }else setTimeout(refresh,100);
+
+  /* Couvre chargement Supabase, navigation, retour onglet et changement d'avatar. */
+  let tries=0;
+  const timer=setInterval(()=>{
+    refresh();
+    tries++;
+    if(tries>=40)clearInterval(timer);
+  },500);
+
+  document.addEventListener('visibilitychange',()=>{
+    if(document.visibilityState==='visible')setTimeout(refresh,80);
+  });
+
+  if(typeof window.updateProfileUI==='function'&&!window.updateProfileUI.v1414){
+    const old=window.updateProfileUI;
+    window.updateProfileUI=function(){
+      const r=old.apply(this,arguments);
+      setTimeout(refresh,20);
+      return r;
+    };
+    window.updateProfileUI.v1414=1;
+  }
+
+  if(typeof window.handleProfileAvatar==='function'&&!window.handleProfileAvatar.v1414){
+    const old=window.handleProfileAvatar;
+    window.handleProfileAvatar=async function(){
+      const r=await old.apply(this,arguments);
+      setTimeout(refresh,30);
+      return r;
+    };
+    window.handleProfileAvatar.v1414=1;
+  }
+
+  if(typeof window.toggleSet==='function'&&!window.toggleSet.v1414){
+    const old=window.toggleSet;
+    window.toggleSet=function(){
+      const r=old.apply(this,arguments);
+      setTimeout(refresh,30);
+      return r;
+    };
+    window.toggleSet.v1414=1;
+  }
+})();
+</script>
+
+
+<style id="v1415-mobile-viewport-fix">
+/* V14.1.5 — correction iPhone/Android PWA + bas d'écran */
+@media (max-width: 760px){
+  html,body{
+    width:100%!important;
+    max-width:100%!important;
+    overflow:hidden!important;
+  }
+
+  /* 100svh évite que la barre système / zone de geste mange le bas de l'app. */
+  #app-container{
+    width:100%!important;
+    height:100svh!important;
+    min-height:100svh!important;
+    max-height:100svh!important;
+    overflow:hidden!important;
+  }
+
+  main{
+    min-height:0!important;
+    overflow-y:auto!important;
+    overscroll-behavior-y:contain!important;
+    -webkit-overflow-scrolling:touch!important;
+    padding-bottom:calc(96px + env(safe-area-inset-bottom, 0px))!important;
+  }
+
+  nav{
+    bottom:0!important;
+    height:auto!important;
+    min-height:calc(62px + env(safe-area-inset-bottom, 0px))!important;
+    padding:7px 0 calc(9px + env(safe-area-inset-bottom, 0px))!important;
+  }
+}
+
+/* Quand l'app est lancée depuis l'écran d'accueil. */
+@media (display-mode: standalone){
+  html,body{
+    width:100%!important;
+    height:100%!important;
+    min-height:100%!important;
+    overflow:hidden!important;
+    background:#050507!important;
+  }
+  #app-container{
+    height:100svh!important;
+    min-height:100svh!important;
+    max-height:100svh!important;
+  }
+}
+
+/* Fallback Safari iOS ancien qui ne gère pas correctement svh. */
+@supports not (height: 100svh){
+  @media (max-width:760px){
+    #app-container{
+      height:-webkit-fill-available!important;
+      min-height:-webkit-fill-available!important;
+    }
+  }
+}
+</style>
+
+<script id="v1415-mobile-viewport-js">
+(function(){
+  /* Classe utile pour les éventuelles différences PWA iOS / Android. */
+  const standalone =
+    (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches) ||
+    window.navigator.standalone === true;
+  if(standalone) document.documentElement.classList.add('leveling-standalone');
+
+  /* iOS peut conserver une ancienne hauteur après rotation / reprise. */
+  function refreshViewport(){
+    document.documentElement.style.setProperty(
+      '--leveling-vh',
+      `${Math.max(1, window.visualViewport?.height || window.innerHeight)}px`
+    );
+  }
+  refreshViewport();
+  window.addEventListener('resize',refreshViewport,{passive:true});
+  window.visualViewport?.addEventListener('resize',refreshViewport,{passive:true});
 })();
 </script>
 
