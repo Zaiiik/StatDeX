@@ -3140,7 +3140,7 @@ const sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_PUBLISHABLE_KEY,{
   auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true,storage:window.localStorage}
 });
 let cloudUser=null,cloudLicensed=false,cloudLoadedOnce=false,cloudSaveTimer=null,suppressCloudSave=false,licenseWatchTimer=null,lastLicenseStatus='UNKNOWN';
-const APP_VERSION='13.4.2';
+const APP_VERSION='13.4.3';
 const ACCOUNT_LOCAL_KEYS=['solo_leveling_user','solo_leveling_smart_refs','solo_leveling_body_hist','solo_leveling_inv','solo_leveling_block','solo_leveling_day','solo_leveling_state','solo_leveling_custom_sets','solo_leveling_history','solo_leveling_active_program','solo_leveling_program_states','solo_leveling_program_custom_sets','solo_leveling_custom_program','leveling_last_local_save','leveling_last_cloud_sync','leveling_v10'];
 function clearLevelingAccountLocalData(){
   try{ACCOUNT_LOCAL_KEYS.forEach(k=>localStorage.removeItem(k));sessionStorage.removeItem('leveling_pending_license')}catch(e){console.warn('Local account cleanup:',e)}
@@ -3384,17 +3384,29 @@ async function logoutLeveling(){
 }
 
 
+let releaseCheckBusy=false;
 async function checkAppRelease(){
+  if(releaseCheckBusy||!navigator.onLine)return;
+  releaseCheckBusy=true;
+  const banner=document.getElementById('update-banner');
   try{
-    const {data,error}=await sb.rpc('get_leveling_app_release');if(error)return;
-    const r=Array.isArray(data)?data[0]:data,banner=document.getElementById('update-banner');
-    if(r && r.is_active===true && r.latest_version && isVersionNewer(r.latest_version,APP_VERSION)){
-      document.getElementById('update-version-label').textContent=`🚀 V${r.latest_version} disponible`;
-      document.getElementById('update-message').textContent=r.message||'Une nouvelle version de LEVELING-APP est disponible.';
+    const {data,error}=await sb.rpc('get_leveling_app_release');
+    if(error){console.warn('Release check RPC:',error.message);return}
+    const r=Array.isArray(data)?data[0]:data;
+    const latest=String(r?.latest_version||'').trim();
+    const active=r?.is_active===true;
+    if(active && latest && isVersionNewer(latest,APP_VERSION)){
+      const label=document.getElementById('update-version-label'),msg=document.getElementById('update-message');
+      if(label)label.textContent=`🚀 V${latest} disponible`;
+      if(msg)msg.textContent=r.message||'Une nouvelle version de LEVELING-APP est disponible.';
       banner?.classList.add('show');
-    }else banner?.classList.remove('show');
+    }else{
+      banner?.classList.remove('show');
+    }
   }catch(e){console.warn('Release check:',e)}
+  finally{releaseCheckBusy=false}
 }
+const releasePollTimer=setInterval(()=>{if(cloudUser&&cloudLicensed&&document.visibilityState==='visible')checkAppRelease()},30000);
 
 async function initSupabaseGate(){
   const {data:{session}}=await sb.auth.getSession();
@@ -3414,9 +3426,9 @@ async function initSupabaseGate(){
   if(pending)document.getElementById('auth-logged-license-key').value=pending;
   showAuthScreen('activate');
 }
-window.addEventListener('focus',()=>{if(cloudUser)enforceLicenseAccess(false)});
-document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible'&&cloudUser){enforceLicenseAccess(false);if(navigator.onLine)scheduleCloudSave()}});
-window.addEventListener('online',()=>{setCloudStatus('syncing');if(cloudUser){enforceLicenseAccess(false);scheduleCloudSaveImmediate()}});
+window.addEventListener('focus',()=>{if(cloudUser){enforceLicenseAccess(false);if(cloudLicensed)checkAppRelease()}});
+document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible'&&cloudUser){enforceLicenseAccess(false);if(cloudLicensed)checkAppRelease();if(navigator.onLine)scheduleCloudSave()}});
+window.addEventListener('online',()=>{setCloudStatus('syncing');if(cloudUser){enforceLicenseAccess(false);if(cloudLicensed)checkAppRelease();scheduleCloudSaveImmediate()}});
 window.addEventListener('offline',()=>setCloudStatus('offline'));
 sb.auth.onAuthStateChange((event,session)=>{if(session?.user)cloudUser=session.user;else if(event==='SIGNED_OUT'){cloudUser=null;cloudLicensed=false}});
 document.addEventListener('pointerup',e=>{
