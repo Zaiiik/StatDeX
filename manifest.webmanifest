@@ -1,7 +1,7 @@
 {
   "name": "LEVELING-APP",
   "short_name": "LEVELING",
-  "description": "LEVELING-APP V13.1 — Community Enhanced avec profils publics, Teams, classements et chat Team.",
+  "description": "LEVELING-APP V13.3.1 — MP, notifications, Teams avec Capitaine/Gardien/Soldat et sauvegarde SBD.",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
