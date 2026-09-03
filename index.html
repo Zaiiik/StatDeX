@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>LEVELING-APP — Powerbuilding Tracker V13.4.2</title>
+    <title>LEVELING-APP — Powerbuilding Tracker V13.5.2</title>
     <meta name="theme-color" content="#09090f">
     <meta name="application-name" content="LEVELING-APP">
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -689,6 +689,82 @@ body[data-ambiance="shadow"] .main-title:before{content:"🌌 ";font-size:.72em}
 .v1341-redeem-status.ok{color:#00e676}.v1341-redeem-status.err{color:#ff687a}
 .v1341-founder{display:inline-flex;align-items:center;gap:4px;padding:3px 6px;border-radius:999px;border:1px solid rgba(255,234,0,.5);color:#ffea00;background:rgba(255,234,0,.06);font-size:.47rem;font-weight:1000}
 
+
+/* ==================== V13.5 · ASCENSION ==================== */
+html,body{max-width:100%;overflow-x:hidden}
+body{min-height:100dvh;padding-left:env(safe-area-inset-left,0);padding-right:env(safe-area-inset-right,0)}
+#app-container{min-height:100dvh}
+main{padding-bottom:calc(86px + env(safe-area-inset-bottom,0px))!important}
+header{padding-top:max(8px,env(safe-area-inset-top,0px))}
+.bottom-nav,nav{padding-left:env(safe-area-inset-left,0)!important;padding-right:env(safe-area-inset-right,0)!important}
+.timer-controls,.v10-timer-actions{display:flex;flex-wrap:wrap;gap:6px}
+.timer-controls button,.v10-timer-actions button,.v10-preset{min-width:0!important;flex:1 1 64px}
+.v135-rank-hub{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:12px 0}
+.v135-rank-card{background:linear-gradient(145deg,#11111a,#08080d);border:1px solid #343442;border-radius:14px;padding:12px;cursor:pointer;min-width:0}
+.v135-rank-card.xp{border-color:color-mix(in srgb,var(--accent-purple) 72%,#333)}
+.v135-rank-card.power{border-color:color-mix(in srgb,var(--accent-rose) 72%,#333)}
+.v135-rank-kicker{font-size:.52rem;color:#888;font-weight:900;letter-spacing:.08em}
+.v135-rank-name{font-size:.86rem;font-weight:1000;margin:4px 0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.v135-rank-meta{font-size:.58rem;color:#aaa}
+.v135-progress{height:6px;background:#25252d;border-radius:99px;overflow:hidden;margin-top:8px}
+.v135-progress i{display:block;height:100%;background:linear-gradient(90deg,var(--accent-purple),var(--accent-rose))}
+.v135-showcase{display:grid;gap:8px;margin-top:12px}
+.v135-rank-row{display:grid;grid-template-columns:34px 1fr auto;gap:9px;align-items:center;padding:10px;border:1px solid #2b2b35;border-radius:11px;background:#09090e}
+.v135-rank-row.current{border-color:var(--accent-rose);box-shadow:0 0 14px rgba(255,0,127,.15)}
+.v135-rank-row.done{opacity:.88}.v135-rank-row.locked{opacity:.48}
+.v135-rank-icon{font-size:1.2rem;text-align:center}.v135-rank-row b{font-size:.72rem}.v135-rank-row small{display:block;color:#888;font-size:.55rem;margin-top:2px}
+.v135-rank-state{font-size:.58rem;font-weight:900}
+.v135-rankup{position:fixed;inset:0;z-index:9999;display:none;place-items:center;background:rgba(0,0,0,.78);padding:20px}
+.v135-rankup.show{display:grid;animation:v135fade .28s ease}
+.v135-rankup-box{text-align:center;width:min(360px,92vw);padding:28px 18px;border-radius:20px;background:radial-gradient(circle at top,rgba(189,0,255,.22),#09090e 55%);border:1px solid var(--accent-purple);box-shadow:0 0 50px rgba(189,0,255,.28)}
+.v135-rankup-box .big{font-size:1.7rem;font-weight:1000;letter-spacing:.08em;color:#fff;text-shadow:0 0 18px var(--accent-purple)}
+@keyframes v135fade{from{opacity:0}to{opacity:1}}
+.v135-profile-nav{display:flex;gap:7px;overflow-x:auto;scroll-snap-type:x mandatory;padding:2px 0 9px;scrollbar-width:none}
+.v135-profile-nav::-webkit-scrollbar{display:none}.v135-profile-nav button{scroll-snap-align:start;flex:0 0 auto;min-height:38px;padding:8px 11px;font-size:.62rem}
+#panel-settings.compact-ready .compact-settings-grid{grid-template-columns:1fr!important}
+#panel-settings.compact-ready .compact-setting-section{display:none}
+#panel-settings.compact-ready .compact-setting-section.v135-selected{display:block}
+.v135-settings-tabs{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin:10px 0}
+.v135-settings-tabs button{padding:8px 4px;min-height:44px;font-size:.54rem}
+.v135-settings-tabs button.active{border-color:var(--accent-rose);color:#fff;box-shadow:0 0 10px rgba(255,0,127,.16)}
+#v134-theme-gallery{display:flex!important;overflow-x:auto!important;scroll-snap-type:x mandatory;gap:10px!important;padding-bottom:8px}
+#v134-theme-gallery>*{flex:0 0 min(82vw,300px);scroll-snap-align:center}
+body[data-ambiance="sakura"] .ambiance-particle-layer,body[data-ambiance="sakura"] #ambiance-particles{z-index:0!important;pointer-events:none!important;opacity:.58}
+@media(max-width:480px){
+  .v135-rank-hub{grid-template-columns:1fr}
+  .v135-settings-tabs{grid-template-columns:repeat(2,1fr)}
+  .v10-timer,.rest-timer{max-width:100%;overflow:hidden}
+  .v10-preset{padding-left:6px!important;padding-right:6px!important}
+}
+@media(max-width:360px){.v135-rank-card{padding:10px}.v135-settings-tabs button{font-size:.5rem}}
+@media(prefers-reduced-motion:reduce){.v135-rankup{animation:none!important}}
+
+
+/* V13.5.1 · VARIANTES + POIDS DU CORPS */
+.exercise-title.v1351-variant-title{cursor:pointer;display:flex;align-items:center;gap:7px;flex-wrap:wrap}
+.v1351-variant-chip{font-size:.5rem;color:#00d2ff;border:1px solid rgba(0,210,255,.35);border-radius:99px;padding:3px 6px;font-weight:900}
+.v1351-bodyweight-note{font-size:.56rem;color:#9a9aa5;font-weight:800;margin-left:5px}
+.v1351-variant-list{display:grid;gap:8px;margin-top:12px}
+.v1351-variant-btn{width:100%;text-align:left;padding:12px;border-radius:12px;background:#101017;border:1px solid #30303a;color:#fff}
+.v1351-variant-btn.active{border-color:var(--accent-rose);box-shadow:0 0 12px rgba(255,0,127,.16)}
+.v1351-variant-btn b{display:block;font-size:.78rem}.v1351-variant-btn small{display:block;color:#888;margin-top:3px;font-size:.56rem}
+
+
+/* V13.5.2 · PROFIL PROPRE + PROGRESSION + NOTIFICATIONS */
+.v1352-progress-hub{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin:12px 0}
+.v1352-progress-btn{background:linear-gradient(145deg,#111119,#09090d);border:1px solid #292934;border-radius:13px;padding:13px 9px;color:#fff;text-align:left}
+.v1352-progress-btn b{display:block;font-size:.72rem}.v1352-progress-btn small{display:block;color:#777;font-size:.54rem;margin-top:4px}
+.v1352-chart{width:100%;height:180px;background:#08080c;border:1px solid #24242d;border-radius:12px;margin-top:10px}
+.v1352-modal-statgrid{display:grid;grid-template-columns:repeat(2,1fr);gap:7px;margin-top:10px}
+.v1352-modal-stat{padding:10px;background:#0d0d13;border:1px solid #25252f;border-radius:10px;text-align:center}
+.v1352-modal-stat b{display:block;font-size:.9rem}.v1352-modal-stat span{font-size:.52rem;color:#777}
+.v1352-toggle{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px;background:#0d0d13;border:1px solid #272731;border-radius:10px;margin:7px 0}
+.v1352-toggle label{font-size:.67rem;font-weight:800}.v1352-toggle small{display:block;color:#777;font-size:.53rem;margin-top:2px}
+.v1352-toggle input{width:20px;height:20px;accent-color:var(--accent-rose)}
+.v1352-notif-status{font-size:.58rem;color:#888;margin:7px 0 10px;line-height:1.5}
+.v1352-profile-clean-hidden{display:none!important}
+@media(max-width:380px){.v1352-progress-hub{grid-template-columns:1fr}}
+
 </style>
 
 <style id="v10-style">
@@ -887,7 +963,7 @@ body[data-ambiance="shadow"] .main-title:before{content:"🌌 ";font-size:.72em}
                     <div class="timer-controls">
                         <button class="btn-timer start" onclick="toggleTimer()">Start</button>
                         <button class="btn-timer" onclick="resetTimer()">Reset</button>
-                        <button class="btn-timer" onclick="addTimerSeconds(30)">+30s</button><button class="v10-preset" onclick="setV11Timer(60)">60s</button><button class="v10-preset" onclick="setV11Timer(120)">120s</button><button class="v10-preset" onclick="setV11Timer(180)">180s</button>
+                        <button class="btn-timer" onclick="addTimerSeconds(30)">+30s</button><button class="v10-preset" onclick="setV11Timer(60)">60s</button><button class="v10-preset" onclick="setV11Timer(120)">120s</button>
                     </div>
                 </div>
 
@@ -2134,7 +2210,8 @@ body[data-ambiance="shadow"] .main-title:before{content:"🌌 ";font-size:.72em}
                                 reps = customSetData[currentBlockIndex][dIdx][exIdx][s].reps ?? reps;
                                 weight = customSetData[currentBlockIndex][dIdx][exIdx][s].weight ?? weight;
                             }
-                            totalTonnage += (reps * weight);
+                            const v1351Name = (typeof v1351SelectedExerciseName==='function') ? v1351SelectedExerciseName(exIdx, ex.name, dIdx) : ex.name;
+                            if (!(typeof v1351IsBodyweight==='function' && v1351IsBodyweight(v1351Name))) totalTonnage += (reps * weight);
                         }
                     }
                 });
@@ -2258,6 +2335,10 @@ body[data-ambiance="shadow"] .main-title:before{content:"🌌 ";font-size:.72em}
                 }
                
                 let card = document.createElement('div');
+                const v1351BaseName = ex.name;
+                const v1351DisplayName = (typeof v1351SelectedExerciseName==='function') ? v1351SelectedExerciseName(exIndex, ex.name) : ex.name;
+                const v1351Bodyweight = (typeof v1351IsBodyweight==='function') ? v1351IsBodyweight(v1351DisplayName) : false;
+                const v1351HasVariants = (typeof v1351VariantsFor==='function') ? v1351VariantsFor(ex.name).length > 1 : false;
                 const isSBD = ['Développé Couché', 'Soulevé de Terre', 'Squat', 'Squat (Volume)', 'Spoto Press'].includes(ex.name);
                 const isSmartActiveForExo = userData.autoProgression && !isSBD && smartHypertrophyRefs[ex.name];
                 card.className = `exercise-card ${isSmartActiveForExo ? 'smart-progression-active' : ''}`;
@@ -2286,7 +2367,7 @@ body[data-ambiance="shadow"] .main-title:before{content:"🌌 ";font-size:.72em}
                             <div class="set-info">
                                 <span>Série ${s + 1} :</span>
                                 <input type="number" class="set-input-mini ${isSmartActiveForExo ? 'smart-adjusted' : ''}" value="${currentReps}" onchange="updateSetVal(${exIndex}, ${s}, 'reps', this.value)" title="Répétitions"> reps
-                                @ <input type="number" class="set-input-mini ${isSmartActiveForExo ? 'smart-adjusted' : ''}" value="${currentWeight}" step="0.5" onchange="updateSetVal(${exIndex}, ${s}, 'weight', this.value)" title="Poids en kg"> kg
+                                ${v1351Bodyweight ? '<span class="v1351-bodyweight-note">· poids du corps</span>' : `@ <input type="number" class="set-input-mini ${isSmartActiveForExo ? 'smart-adjusted' : ''}" value="${currentWeight}" step="0.5" onchange="updateSetVal(${exIndex}, ${s}, 'weight', this.value)" title="Poids en kg"> kg`}
                             </div>
                             <button class="btn-check ${isDone ? 'active' : ''}" onclick="toggleSet(${exIndex}, ${s})">${isDone ? '✓' : ''}</button>
                         </div>
@@ -2294,7 +2375,7 @@ body[data-ambiance="shadow"] .main-title:before{content:"🌌 ";font-size:.72em}
                 }
 
                 card.innerHTML = `
-                    <div class="exercise-title">${ex.name} ${isSmartActiveForExo ? '<span style="font-size:0.65rem; color:var(--warning);">⚡ [Paliers Intelligents]</span>' : ''}</div>
+                    <div class="exercise-title ${v1351HasVariants?'v1351-variant-title':''}" ${v1351HasVariants?`onclick="playSound('click');v1351OpenVariant(${exIndex}, '${v1351BaseName.replace(/'/g,"&#39;")}')"`:''}>${(typeof v1352ExerciseLabel==='function'?v1352ExerciseLabel(v1351DisplayName):v1351DisplayName)} ${v1351HasVariants?'<span class="v1351-variant-chip">🔁 VARIANTES</span>':''} ${isSmartActiveForExo ? '<span style="font-size:0.65rem; color:var(--warning);">⚡ [Paliers Intelligents]</span>' : ''}</div>
                     <div class="exercise-meta">${ex.sets} série(s) prévue(s)</div>
                     ${setsHtml}
                 `;
@@ -3081,7 +3162,9 @@ function escV127(v){return String(v??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<'
 function currentExerciseSetValues(exIndex,setIndex){
   const p=getPrograms()?.[currentBlockIndex]?.[currentDayIndex],ex=p?.exercises?.[exIndex];if(!ex)return null;
   const custom=customSetData?.[currentBlockIndex]?.[currentDayIndex]?.[exIndex]?.[setIndex]||{},reps=Number(custom.reps??ex.defaultReps??0),weight=Number(custom.weight??ex.defaultWeight??0);
-  return {ex,reps,weight,e1rm:reps>0&&weight>0?weight*(1+reps/30):0,volume:reps*weight};
+  const selectedName=(typeof v1351SelectedExerciseName==='function')?v1351SelectedExerciseName(exIndex,ex.name):ex.name;
+  const bodyweight=(typeof v1351IsBodyweight==='function')?v1351IsBodyweight(selectedName):false;
+  return {ex:{...ex,name:selectedName},reps,weight:bodyweight?0:weight,e1rm:!bodyweight&&reps>0&&weight>0?weight*(1+reps/30):0,volume:bodyweight?0:reps*weight,bodyweight};
 }
 function prSetSignature(exIndex,setIndex,v){return [activeProgramKey,currentBlockIndex,currentDayIndex,exIndex,setIndex,v?.reps||0,v?.weight||0].join(':')}
 function detectAutomaticPR(exIndex,setIndex){
@@ -3140,7 +3223,7 @@ const sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_PUBLISHABLE_KEY,{
   auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true,storage:window.localStorage}
 });
 let cloudUser=null,cloudLicensed=false,cloudLoadedOnce=false,cloudSaveTimer=null,suppressCloudSave=false,licenseWatchTimer=null,lastLicenseStatus='UNKNOWN';
-const APP_VERSION='13.4.3';
+const APP_VERSION='13.5.2';
 const ACCOUNT_LOCAL_KEYS=['solo_leveling_user','solo_leveling_smart_refs','solo_leveling_body_hist','solo_leveling_inv','solo_leveling_block','solo_leveling_day','solo_leveling_state','solo_leveling_custom_sets','solo_leveling_history','solo_leveling_active_program','solo_leveling_program_states','solo_leveling_program_custom_sets','solo_leveling_custom_program','leveling_last_local_save','leveling_last_cloud_sync','leveling_v10'];
 function clearLevelingAccountLocalData(){
   try{ACCOUNT_LOCAL_KEYS.forEach(k=>localStorage.removeItem(k));sessionStorage.removeItem('leveling_pending_license')}catch(e){console.warn('Local account cleanup:',e)}
@@ -4091,6 +4174,371 @@ window.logoutLeveling=async function(){stopSocialNotifications();return __logout
 document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible'&&cloudUser&&cloudLicensed)refreshSocialNotifications(true)});
 
 setTimeout(()=>{initCompactSettings();if(cloudUser&&cloudLicensed)syncSocialProfile();renderCommunityHome()},500);
+</script>
+
+
+<!-- V13.5 · vitrines -->
+<div id="v135-xp-modal" class="modal">
+  <div class="modal-content" style="max-width:390px">
+    <h2>🎮 VITRINE RANG XP</h2>
+    <p class="subtitle">Ta progression dans LEVELING-APP</p>
+    <div id="v135-xp-showcase" class="v135-showcase"></div>
+    <button class="btn-action" onclick="v135Close('v135-xp-modal')" style="margin-top:12px">Fermer</button>
+  </div>
+</div>
+<div id="v135-power-modal" class="modal">
+  <div class="modal-content" style="max-width:390px">
+    <h2>🏋️ VITRINE POWERBUILDING</h2>
+    <p class="subtitle">Rang basé sur ton total Squat + Bench + Deadlift</p>
+    <div id="v135-power-showcase" class="v135-showcase"></div>
+    <button class="btn-action" onclick="v135Close('v135-power-modal')" style="margin-top:12px">Fermer</button>
+  </div>
+</div>
+<div id="v135-rankup" class="v135-rankup" onclick="this.classList.remove('show')">
+  <div class="v135-rankup-box">
+    <div style="font-size:.7rem;color:#aaa;font-weight:900">SYSTEM MESSAGE</div>
+    <div class="big">RANK UP</div>
+    <div id="v135-rankup-name" style="font-size:1.05rem;font-weight:1000;margin:12px 0"></div>
+    <div style="font-size:.62rem;color:#aaa">Nouveau rang débloqué · touche pour fermer</div>
+  </div>
+</div>
+
+
+<script>
+/* ==================== V13.5 · ASCENSION ==================== */
+const V135_XP_RANKS=[
+  {name:'ÉVEILLÉ',icon:'🌱',min:1},
+  {name:'CHASSEUR',icon:'⚔️',min:10},
+  {name:'SPARTAN',icon:'🛡️',min:20},
+  {name:'SENTINELLE',icon:'🔷',min:30},
+  {name:'SHADOW',icon:'🌑',min:40},
+  {name:'ASCENDANT',icon:'✨',min:50},
+  {name:'EMPEREUR',icon:'👑',min:67}
+];
+const V135_POWER_RANKS=[
+  {name:'RECRUE',icon:'🌱',min:0},
+  {name:'APPRENTI',icon:'🛡️',min:250},
+  {name:'INTERMÉDIAIRE',icon:'⚔️',min:350},
+  {name:'AVANCÉ',icon:'💎',min:425},
+  {name:'ÉLITE',icon:'⚡',min:500},
+  {name:'LÉGENDE',icon:'🔥',min:535},
+  {name:'MONARQUE',icon:'👑',min:569}
+];
+function v135XpRank(level){let r=V135_XP_RANKS[0];for(const x of V135_XP_RANKS)if(level>=x.min)r=x;return r}
+function v135PowerRank(total){let r=V135_POWER_RANKS[0];for(const x of V135_POWER_RANKS)if(total>=x.min)r=x;return r}
+function v135Next(arr,current){const i=arr.indexOf(current);return i>=0&&i<arr.length-1?arr[i+1]:null}
+function v135Close(id){document.getElementById(id).style.display='none'}
+function v135OpenXp(){
+  const lvl=Number(userData.level||1),cur=v135XpRank(lvl),next=v135Next(V135_XP_RANKS,cur),totalXp=(typeof v10!=='undefined'?Number(v10.totalXp||0):Math.max(0,(lvl-1)*1000));
+  document.getElementById('v135-xp-showcase').innerHTML=V135_XP_RANKS.map(r=>{
+    const current=r===cur,done=lvl>=r.min;
+    return `<div class="v135-rank-row ${current?'current':done?'done':'locked'}"><div class="v135-rank-icon">${done?r.icon:'🔒'}</div><div><b>${r.name}${current?' · TON RANG':''}</b><small>Niveau ${r.min}+ · ${(Math.max(0,r.min-1)*1000).toLocaleString()} XP total</small></div><div class="v135-rank-state">${current?'ACTUEL':done?'✓':'🔒'}</div></div>`
+  }).join('')+(next?`<div class="v10-muted" style="text-align:center;margin-top:7px">${totalXp.toLocaleString()} / ${((next.min-1)*1000).toLocaleString()} XP avant ${next.name}</div>`:`<div class="v10-muted" style="text-align:center;margin-top:7px">👑 Rang maximum atteint</div>`);
+  document.getElementById('v135-xp-modal').style.display='flex';
+}
+function v135OpenPower(){
+  const total=Number(userData.squat||0)+Number(userData.bench||0)+Number(userData.deadlift||0),cur=v135PowerRank(total),next=v135Next(V135_POWER_RANKS,cur);
+  document.getElementById('v135-power-showcase').innerHTML=V135_POWER_RANKS.map(r=>{
+    const current=r===cur,done=total>=r.min;
+    return `<div class="v135-rank-row ${current?'current':done?'done':'locked'}"><div class="v135-rank-icon">${done?r.icon:'🔒'}</div><div><b>${r.name}${current?' · TON RANG':''}</b><small>${r.min===0?'Départ':r.min+' kg SBD+'}</small></div><div class="v135-rank-state">${current?'ACTUEL':done?'✓':'🔒'}</div></div>`
+  }).join('')+(next?`<div class="v10-muted" style="text-align:center;margin-top:7px">${total} / ${next.min} kg avant ${next.name} · encore ${Math.max(0,next.min-total)} kg</div>`:`<div class="v10-muted" style="text-align:center;margin-top:7px">👑 MONARQUE · objectif 569 kg atteint</div>`);
+  document.getElementById('v135-power-modal').style.display='flex';
+}
+function v135RenderRankHub(){
+  const dash=document.getElementById('v10-profile-dashboard');if(!dash)return;
+  let hub=document.getElementById('v135-rank-hub');
+  if(!hub){hub=document.createElement('div');hub.id='v135-rank-hub';hub.className='v135-rank-hub';dash.parentNode.insertBefore(hub,dash)}
+  const lvl=Number(userData.level||1),xp=v135XpRank(lvl),nx=v135Next(V135_XP_RANKS,xp);
+  const total=Number(userData.squat||0)+Number(userData.bench||0)+Number(userData.deadlift||0),pw=v135PowerRank(total),np=v135Next(V135_POWER_RANKS,pw);
+  const xpPct=nx?Math.max(0,Math.min(100,(lvl-xp.min)/(nx.min-xp.min)*100)):100;
+  const pwPct=np?Math.max(0,Math.min(100,(total-pw.min)/(np.min-pw.min)*100)):100;
+  hub.innerHTML=`<div class="v135-rank-card xp" onclick="playSound('click');v135OpenXp()"><div class="v135-rank-kicker">🎮 RANG XP</div><div class="v135-rank-name">${xp.icon} ${xp.name}</div><div class="v135-rank-meta">Niveau ${lvl}${nx?' · prochain : '+nx.name:' · MAX'}</div><div class="v135-progress"><i style="width:${xpPct}%"></i></div></div>
+  <div class="v135-rank-card power" onclick="playSound('click');v135OpenPower()"><div class="v135-rank-kicker">🏋️ RANG POWERBUILDING</div><div class="v135-rank-name">${pw.icon} ${pw.name}</div><div class="v135-rank-meta">${total} kg SBD${np?' · '+np.min+' kg pour '+np.name:' · MAX'}</div><div class="v135-progress"><i style="width:${pwPct}%"></i></div></div>`;
+}
+function v135CheckRankUp(){
+  const lvl=Number(userData.level||1),r=v135XpRank(lvl),key='leveling_v135_last_xp_rank',old=localStorage.getItem(key);
+  if(!old){localStorage.setItem(key,r.name);return}
+  const oldI=V135_XP_RANKS.findIndex(x=>x.name===old),newI=V135_XP_RANKS.findIndex(x=>x.name===r.name);
+  if(newI>oldI){document.getElementById('v135-rankup-name').textContent=`${r.icon} ${r.name}`;document.getElementById('v135-rankup').classList.add('show');try{playSound('success')}catch(e){}}
+  localStorage.setItem(key,r.name);
+}
+function v135ApplyRankSystems(){
+  try{
+    hunterRanks.splice(0,hunterRanks.length,...V135_XP_RANKS.map(r=>[`${r.icon} ${r.name}`,r.min]));
+    ranksConfig.splice(0,ranksConfig.length,...V135_POWER_RANKS.slice().reverse().map(r=>({minRatio:0,name:`${r.icon} ${r.name}`,color:'var(--accent-rose)',minKg:r.min})));
+    getSBDRank=function(total){const r=v135PowerRank(Number(total||0));return {name:`${r.icon} ${r.name}`,color:'var(--accent-rose)',minRatio:0,minKg:r.min}};
+    openRankShowcaseModal=v135OpenPower;
+  }catch(e){console.warn('V13.5 ranks',e)}
+}
+function v135ProfileNav(){
+  const panel=document.getElementById('panel-profile');if(!panel||document.getElementById('v135-profile-nav'))return;
+  const nav=document.createElement('div');nav.id='v135-profile-nav';nav.className='v135-profile-nav';
+  nav.innerHTML=`<button onclick="v135OpenXp()">🎮 Niveau & XP</button><button onclick="document.getElementById('v10-quests')?.scrollIntoView({behavior:'smooth',block:'center'})">🎯 Quêtes</button><button onclick="v135OpenPower()">🏋️ Rang Power</button><button onclick="document.getElementById('body-evolution-chart')?.scrollIntoView({behavior:'smooth',block:'center'})">📈 Progression</button><button onclick="document.getElementById('val-weight')?.scrollIntoView({behavior:'smooth',block:'center'})">📊 Stats</button>`;
+  const h=panel.querySelector('h2');if(h)h.after(nav);
+}
+function v135Settings(){
+  const panel=document.getElementById('panel-settings');if(!panel)return;
+  if(typeof initCompactSettings==='function')initCompactSettings();
+  if(document.getElementById('v135-settings-tabs'))return;
+  const sections=[...panel.querySelectorAll('.compact-setting-section')];
+  if(!sections.length)return;
+  const account=sections.find(x=>x.textContent.includes('Compte & profil'));
+  const progression=sections.find(x=>x.textContent.includes('Progression'));
+  const ambiance=sections.find(x=>x.textContent.includes('Ambiance'));
+  const save=sections.find(x=>x.textContent.includes('Sauvegarde'));
+  const display=sections.find(x=>x.textContent.includes('Affichage'));
+  if(account){
+    const title=account.querySelector('.compact-setting-title');if(title)title.textContent='👤 Mon profil';
+    if(progression){
+      const body=account.querySelector('.compact-setting-body'),pbody=progression.querySelector('.compact-setting-body');
+      if(body&&pbody){const sep=document.createElement('div');sep.className='v10-muted';sep.style.cssText='margin:12px 0 7px;font-weight:900';sep.textContent='PERFORMANCES & PROGRESSION';body.appendChild(sep);while(pbody.firstChild)body.appendChild(pbody.firstChild)}
+      progression.remove();
+    }
+  }
+  const tabs=document.createElement('div');tabs.id='v135-settings-tabs';tabs.className='v135-settings-tabs';
+  const cfg=[['👤 Mon profil',account],['✨ Ambiance',ambiance],['💾 Sauvegarde',save],['📱 Affichage',display]].filter(x=>x[1]);
+  cfg.forEach(([label,sec],i)=>{sec.classList.toggle('v135-selected',i===0);const b=document.createElement('button');b.textContent=label;b.className=i===0?'active':'';b.onclick=()=>{cfg.forEach(x=>x[1].classList.remove('v135-selected'));sec.classList.add('v135-selected');tabs.querySelectorAll('button').forEach(x=>x.classList.remove('active'));b.classList.add('active')};tabs.appendChild(b)});
+  const palette=panel.querySelector('.settings-theme-palette');(palette||panel.querySelector('.compact-settings-head'))?.after(tabs);
+}
+const __v135UpdateProfile=window.updateProfileUI;
+if(typeof __v135UpdateProfile==='function')window.updateProfileUI=function(){const r=__v135UpdateProfile.apply(this,arguments);setTimeout(()=>{v135RenderRankHub();v135CheckRankUp()},0);return r};
+v135ApplyRankSystems();
+setTimeout(()=>{v135ProfileNav();v135RenderRankHub();v135Settings();v135CheckRankUp()},700);
+document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')setTimeout(()=>{v135RenderRankHub();v135Settings()},100)});
+</script>
+
+
+<div id="v1351-variant-modal" class="modal">
+  <div class="modal-content" style="max-width:390px">
+    <h2>🔁 VARIANTE D’EXERCICE</h2>
+    <p class="subtitle" id="v1351-variant-subtitle">Choisis une variante équivalente</p>
+    <div id="v1351-variant-list" class="v1351-variant-list"></div>
+    <button class="btn-action" onclick="v1351CloseVariant()" style="margin-top:12px">Fermer</button>
+  </div>
+</div>
+
+
+<script>
+/* ==================== V13.5.1 · VARIANTES D'EXERCICES ==================== */
+/* 3 choix maximum : exercice principal + 2 alternatives simples */
+const V1351_VARIANTS={
+ 'Développé Couché':['Développé Couché','Développé Couché Smith','Développé Couché Haltères'],
+ 'Développé Incliné Haltères':['Développé Incliné Haltères','Développé Incliné Smith','Machine Convergente Inclinée'],
+ 'Écarté Poulie':['Écarté Poulie / Vis-à-vis','Butterfly / Pec Deck','Écarté Haltères'],
+ 'Développé Épaules Haltères':['Développé Épaules Haltères','Développé Épaules Smith','Machine Shoulder Press'],
+ 'Élévations Latérales':['Élévations Latérales Haltères','Élévations Latérales Poulie','Machine Élévations Latérales'],
+ 'Tirage Poitrine':['Tirage Poitrine Poulie','Tractions','Machine Tirage Vertical'],
+ 'Rowing Poulie':['Rowing Poulie Basse','Rowing Barre','Machine Rowing Convergente'],
+ 'Rowing Haltère':['Rowing Haltère','Rowing Poulie Unilatéral','Machine Rowing Unilatérale'],
+ 'Curl Biceps EZ':['Curl Barre EZ','Curl Haltères','Curl Poulie'],
+ 'Curl Marteau':['Curl Marteau Haltères','Curl Marteau Corde Poulie','Machine Curl'],
+ 'Extension Triceps':['Extension Triceps Poulie','Barre au Front','Machine Triceps'],
+ 'Squat':['Squat Barre','Squat Smith','Hack Squat'],
+ 'Squat (Volume)':['Squat Barre','Squat Smith','Hack Squat'],
+ 'Presse à Cuisses':['Presse à Cuisses','Hack Squat','Squat Smith'],
+ 'Leg Curl':['Leg Curl Assis','Leg Curl Couché','Leg Curl Debout'],
+ 'Mollets':['Mollets Debout','Mollets Assis','Mollets Presse'],
+ 'Mollets Presse':['Mollets Presse','Mollets Debout','Mollets Assis']
+};
+const V1351_BODYWEIGHT=[
+ 'Dips','Tractions','Gainage','Relevé de jambes','Relevés de jambes',
+ 'Abdos / Core de fin de semaine','Mobilité globale & Récupération','Steps de récupération (Optionnel)'
+];
+function v1351Norm(x){return String(x||'').trim().toLowerCase()}
+function v1351IsBodyweight(name){
+  const n=v1351Norm(name);
+  return V1351_BODYWEIGHT.some(x=>n===v1351Norm(x)) || n.includes('gainage') || n.includes('relevé de jambes') || n.includes('relevés de jambes');
+}
+function v1351VariantsFor(base){return V1351_VARIANTS[base]||[base]}
+function v1351VariantStore(){
+  if(!userData.exerciseVariants)userData.exerciseVariants={};
+  return userData.exerciseVariants;
+}
+function v1351VariantKey(exIndex,base,dIdx=currentDayIndex){
+  return [activeProgramKey,currentBlockIndex,dIdx,exIndex,base].join('|');
+}
+function v1351SelectedExerciseName(exIndex,base,dIdx=currentDayIndex){
+  return v1351VariantStore()[v1351VariantKey(exIndex,base,dIdx)]||v1351VariantsFor(base)[0]||base;
+}
+let v1351VariantContext=null;
+function v1351OpenVariant(exIndex,base){
+  const choices=v1351VariantsFor(base);if(choices.length<2)return;
+  v1351VariantContext={exIndex,base};
+  const current=v1351SelectedExerciseName(exIndex,base);
+  document.getElementById('v1351-variant-subtitle').textContent=`${base} · 3 choix maximum`;
+  document.getElementById('v1351-variant-list').innerHTML=choices.slice(0,3).map((name,i)=>`
+    <button class="v1351-variant-btn ${name===current?'active':''}" onclick="v1351ChooseVariant(${i})">
+      <b>${name===current?'✓ ':''}${typeof v1352ExerciseLabel==='function'?v1352ExerciseLabel(name):name}</b>
+      <small>${i===0?'Exercice prévu':'Alternative équivalente'}</small>
+    </button>`).join('');
+  document.getElementById('v1351-variant-modal').style.display='flex';
+}
+function v1351ChooseVariant(index){
+  if(!v1351VariantContext)return;
+  const {exIndex,base}=v1351VariantContext,choice=v1351VariantsFor(base)[index]||base;
+  v1351VariantStore()[v1351VariantKey(exIndex,base)]=choice;
+  /* Historique de charge séparé : on ne copie pas une charge personnalisée d'une variante à l'autre. */
+  if(!userData.variantSetHistory)userData.variantSetHistory={};
+  saveToLocalStorage();if(typeof scheduleCloudSaveImmediate==='function')scheduleCloudSaveImmediate();
+  v1351CloseVariant();initWorkoutSystem();
+}
+function v1351CloseVariant(){document.getElementById('v1351-variant-modal').style.display='none';v1351VariantContext=null}
+
+/* Les exercices au poids du corps n'affichent aucun champ kg et ne comptent pas dans le tonnage. */
+const __v1351UpdateSetVal=window.updateSetVal;
+window.updateSetVal=function(exIndex,setIndex,field,val){
+  const ex=getPrograms()?.[currentBlockIndex]?.[currentDayIndex]?.exercises?.[exIndex];
+  const name=ex?v1351SelectedExerciseName(exIndex,ex.name):'';
+  if(field==='weight'&&v1351IsBodyweight(name))return;
+  return __v1351UpdateSetVal.apply(this,arguments);
+};
+</script>
+
+
+<div id="v1352-progress-modal" class="modal">
+ <div class="modal-content" style="max-width:420px">
+  <h2 id="v1352-progress-title">📈 PROGRESSION</h2>
+  <p class="subtitle" id="v1352-progress-sub">Tes données</p>
+  <div id="v1352-progress-content"></div>
+  <button class="btn-action" onclick="document.getElementById('v1352-progress-modal').style.display='none'" style="margin-top:12px">Fermer</button>
+ </div>
+</div>
+
+
+<script>
+/* ==================== V13.5.2 ==================== */
+const V1352_VAPID_PUBLIC='BGqj9_iTVNJ7PuV1mASKuOh77NFARda3gbDVAqXFyGtCEJ11f_ii41_6a7benfeUO2fEmBkagI-exnsKVzX9ypA';
+
+function v1352ExerciseLabel(name){
+ const n=String(name||''),l=n.toLowerCase();
+ let icon='🏋️';
+ if(l.includes('poulie')||l.includes('vis-à-vis')||l.includes('câble')||l.includes('cable')) icon='🪢';
+ else if(l.includes('machine')||l.includes('smith')||l.includes('hack')||l.includes('butterfly')||l.includes('pec deck')||l.includes('presse')) icon='⚙️';
+ else if(l.includes('dips')||l.includes('traction')||l.includes('gainage')||l.includes('relevé')||l.includes('abdo')) icon='💪';
+ else if(l.includes('leg ')||l.includes('mollet')) icon='🦵';
+ if(l.includes('développé couché')){
+   if(l.includes('smith')) return '⚙️ Bench Smith';
+   if(l.includes('halt')) return '🏋️ Bench Haltères';
+   return '🏋️ Bench Barre';
+ }
+ return icon+' '+n;
+}
+
+/* Historique SBD à partir de V13.5.2 */
+if(!userData.sbdHistory)userData.sbdHistory=[];
+const __v1352SaveSettings=window.saveSettingsData;
+if(typeof __v1352SaveSettings==='function')window.saveSettingsData=function(){
+ const before=[Number(userData.squat||0),Number(userData.bench||0),Number(userData.deadlift||0)].join('|');
+ const r=__v1352SaveSettings.apply(this,arguments);
+ const after=[Number(userData.squat||0),Number(userData.bench||0),Number(userData.deadlift||0)].join('|');
+ if(before!==after){
+   userData.sbdHistory.push({date:new Date().toISOString(),squat:Number(userData.squat||0),bench:Number(userData.bench||0),deadlift:Number(userData.deadlift||0)});
+   userData.sbdHistory=userData.sbdHistory.slice(-30);saveToLocalStorage();if(typeof scheduleCloudSaveImmediate==='function')scheduleCloudSaveImmediate();
+ }
+ return r;
+};
+
+function v1352SvgSeries(series,labels){
+ const W=330,H=170,P=24,vals=series.flatMap(x=>x.values).filter(Number.isFinite);if(!vals.length)return '<div class="community-empty">Pas encore assez de données.</div>';
+ const mn=Math.min(...vals)*.92,mx=Math.max(...vals)*1.06||1,n=Math.max(...series.map(x=>x.values.length));
+ const x=i=>P+(i/Math.max(1,n-1))*(W-P*2),y=v=>H-P-((v-mn)/Math.max(1,mx-mn))*(H-P*2);
+ const strokes=['#00e676','#ff007f','#00d2ff'];
+ return `<svg class="v1352-chart" viewBox="0 0 ${W} ${H}">${series.map((sr,si)=>`<polyline fill="none" stroke="${strokes[si%3]}" stroke-width="2.5" points="${sr.values.map((v,i)=>`${x(i)},${y(v)}`).join(' ')}"/>`).join('')}</svg>
+ <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:6px;font-size:.55rem">${series.map((sr,i)=>`<span style="color:${strokes[i%3]}">● ${sr.name}</span>`).join('')}</div>`;
+}
+function v1352OpenProgress(type){
+ const m=document.getElementById('v1352-progress-modal'),title=document.getElementById('v1352-progress-title'),sub=document.getElementById('v1352-progress-sub'),box=document.getElementById('v1352-progress-content');
+ if(type==='body'){
+  title.textContent='⚖️ POIDS & BODY FAT';sub.textContent='Évolution physique';
+  box.innerHTML=v1352SvgSeries([{name:'Poids',values:bodyHistory.map(x=>Number(x.weight))},{name:'Body Fat',values:bodyHistory.map(x=>Number(x.bodyFat))}]);
+ } else if(type==='sbd'){
+  title.textContent='🏋️ CHARGES SBD';sub.textContent='Squat · Bench · Deadlift';
+  const h=(userData.sbdHistory||[]).slice();if(!h.length)h.push({squat:+userData.squat||0,bench:+userData.bench||0,deadlift:+userData.deadlift||0});
+  box.innerHTML=v1352SvgSeries([{name:'Squat',values:h.map(x=>+x.squat)},{name:'Bench',values:h.map(x=>+x.bench)},{name:'Deadlift',values:h.map(x=>+x.deadlift)}]);
+ } else if(type==='volume'){
+  title.textContent='📊 VOLUME & SÉANCES';sub.textContent='Résumé de ton activité';
+  box.innerHTML=`<div class="v1352-modal-statgrid"><div class="v1352-modal-stat"><b>${document.getElementById('val-weekly-tonnage')?.textContent||'0 kg'}</b><span>VOLUME BLOC</span></div><div class="v1352-modal-stat"><b>${userData.workoutsCompleted||0}</b><span>SÉANCES</span></div></div>`;
+ } else {
+  title.textContent='🔥 RECORDS PERSONNELS';sub.textContent='Tes références actuelles';
+  box.innerHTML=`<div class="v1352-modal-statgrid"><div class="v1352-modal-stat"><b>${userData.squat||0} kg</b><span>SQUAT</span></div><div class="v1352-modal-stat"><b>${userData.bench||0} kg</b><span>BENCH</span></div><div class="v1352-modal-stat"><b>${userData.deadlift||0} kg</b><span>DEADLIFT</span></div><div class="v1352-modal-stat"><b>${userData.prCount||0}</b><span>PR BATTUS</span></div></div>`;
+ }
+ m.style.display='flex';
+}
+function v1352CleanProfile(){
+ const p=document.getElementById('panel-profile');if(!p||document.getElementById('v1352-progress-hub'))return;
+ const hub=document.createElement('div');hub.id='v1352-progress-hub';hub.className='v1352-progress-hub';
+ hub.innerHTML=`<button class="v1352-progress-btn" onclick="v1352OpenProgress('body')"><b>⚖️ Poids & Body Fat</b><small>Courbes physiques</small></button>
+ <button class="v1352-progress-btn" onclick="v1352OpenProgress('sbd')"><b>🏋️ Charges SBD</b><small>Courbes Squat · Bench · Deadlift</small></button>
+ <button class="v1352-progress-btn" onclick="v1352OpenProgress('volume')"><b>📊 Volume & séances</b><small>Activité d'entraînement</small></button>
+ <button class="v1352-progress-btn" onclick="v1352OpenProgress('pr')"><b>🔥 Records</b><small>PR et références</small></button>`;
+ const rankHub=document.getElementById('v135-rank-hub');(rankHub||p.querySelector('h2'))?.after(hub);
+ /* cache les gros blocs de stats/courbes devenus accessibles par les cartes */
+ ['Évolution Physique','Statistiques du Chasseur','Bilan & Total Hebdo','Records Personnels'].forEach(txt=>{
+   [...p.querySelectorAll('h2')].filter(h=>h.textContent.includes(txt)).forEach(h=>{h.classList.add('v1352-profile-clean-hidden');let n=h.nextElementSibling;if(n)n.classList.add('v1352-profile-clean-hidden')})
+ });
+ const oldNav=document.getElementById('v135-profile-nav');if(oldNav)oldNav.querySelectorAll('button').forEach(b=>{if(b.textContent.includes('Progression'))b.onclick=()=>hub.scrollIntoView({behavior:'smooth',block:'center'})});
+}
+
+/* Notifications */
+function v1352NotifPrefs(){
+ if(!userData.notificationPrefs)userData.notificationPrefs={enabled:false,dm:true,quests:true,workout:true,streak:true};
+ return userData.notificationPrefs;
+}
+function v1352UrlB64ToUint8Array(base64String){
+ const padding='='.repeat((4-base64String.length%4)%4),base64=(base64String+padding).replace(/-/g,'+').replace(/_/g,'/');
+ const raw=atob(base64);return Uint8Array.from([...raw].map(c=>c.charCodeAt(0)));
+}
+async function v1352EnablePush(){
+ const st=document.getElementById('v1352-notif-status');
+ try{
+  if(!('serviceWorker'in navigator)||!('PushManager'in window)||!('Notification'in window))throw new Error('Notifications Push non prises en charge sur ce navigateur.');
+  const perm=await Notification.requestPermission();if(perm!=='granted')throw new Error('Autorisation refusée sur le téléphone.');
+  const reg=await navigator.serviceWorker.ready;
+  let sub=await reg.pushManager.getSubscription();
+  if(!sub)sub=await reg.pushManager.subscribe({userVisibleOnly:true,applicationServerKey:v1352UrlB64ToUint8Array(V1352_VAPID_PUBLIC)});
+  const {data:{session}}=await sb.auth.getSession();if(!session)throw new Error('Connecte-toi à ton compte.');
+  const prefs=v1352NotifPrefs();prefs.enabled=true;
+  const res=await fetch(SUPABASE_URL+'/functions/v1/leveling-push',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+session.access_token},body:JSON.stringify({action:'subscribe',subscription:sub.toJSON(),timezone:Intl.DateTimeFormat().resolvedOptions().timeZone,prefs})});
+  if(!res.ok)throw new Error((await res.text())||'Edge Function indisponible');
+  saveToLocalStorage();scheduleCloudSaveImmediate();if(st)st.textContent='✅ Notifications activées sur cet appareil.';
+ }catch(e){if(st)st.textContent='❌ '+e.message;console.warn(e)}
+}
+async function v1352SaveNotifPrefs(){
+ const p=v1352NotifPrefs();['dm','quests','workout','streak'].forEach(k=>{const el=document.getElementById('v1352-notif-'+k);if(el)p[k]=el.checked});
+ saveToLocalStorage();scheduleCloudSaveImmediate();
+ const {data:{session}}=await sb.auth.getSession();if(session)fetch(SUPABASE_URL+'/functions/v1/leveling-push',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+session.access_token},body:JSON.stringify({action:'preferences',prefs:p,timezone:Intl.DateTimeFormat().resolvedOptions().timeZone})}).catch(()=>{});
+}
+async function v1352DisablePush(){
+ const p=v1352NotifPrefs();p.enabled=false;saveToLocalStorage();scheduleCloudSaveImmediate();
+ try{const reg=await navigator.serviceWorker.ready,sub=await reg.pushManager.getSubscription();if(sub)await sub.unsubscribe();const {data:{session}}=await sb.auth.getSession();if(session)await fetch(SUPABASE_URL+'/functions/v1/leveling-push',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+session.access_token},body:JSON.stringify({action:'unsubscribe'})})}catch(e){}
+ const st=document.getElementById('v1352-notif-status');if(st)st.textContent='🔕 Notifications désactivées sur cet appareil.';
+}
+function v1352AddNotificationSettings(){
+ const panel=document.getElementById('panel-settings');if(!panel||document.getElementById('v1352-notifications'))return;
+ const wrap=document.createElement('div');wrap.id='v1352-notifications';wrap.className='compact-setting-section v135-selected';
+ const p=v1352NotifPrefs();
+ wrap.innerHTML=`<div class="compact-setting-head"><div class="compact-setting-title">🔔 Notifications</div></div><div class="compact-setting-body">
+ <div id="v1352-notif-status" class="v1352-notif-status">Active les notifications pour recevoir les messages et rappels même hors de l'application.</div>
+ <button class="btn-action" onclick="v1352EnablePush()">🔔 Activer sur cet appareil</button>
+ <div class="v1352-toggle"><div><label>💬 Messages privés</label><small>Notification quand un chasseur t'écrit</small></div><input id="v1352-notif-dm" type="checkbox" ${p.dm?'checked':''} onchange="v1352SaveNotifPrefs()"></div>
+ <div class="v1352-toggle"><div><label>⚔️ Quêtes quotidiennes</label><small>Rappel des quêtes restantes</small></div><input id="v1352-notif-quests" type="checkbox" ${p.quests?'checked':''} onchange="v1352SaveNotifPrefs()"></div>
+ <div class="v1352-toggle"><div><label>🏋️ Séance du jour</label><small>Rappel d'entraînement quotidien</small></div><input id="v1352-notif-workout" type="checkbox" ${p.workout?'checked':''} onchange="v1352SaveNotifPrefs()"></div>
+ <div class="v1352-toggle"><div><label>🔥 Streak</label><small>Rappel pour ne pas casser ta série</small></div><input id="v1352-notif-streak" type="checkbox" ${p.streak?'checked':''} onchange="v1352SaveNotifPrefs()"></div>
+ <button class="btn-action" onclick="v1352DisablePush()" style="border-color:#555;color:#aaa">🔕 Désactiver sur cet appareil</button></div>`;
+ const tabs=document.getElementById('v135-settings-tabs');const sections=panel.querySelectorAll('.compact-setting-section');
+ panel.appendChild(wrap);wrap.classList.remove('v135-selected');
+ if(tabs){const b=document.createElement('button');b.textContent='🔔 Notifications';b.onclick=()=>{panel.querySelectorAll('.compact-setting-section').forEach(x=>x.classList.remove('v135-selected'));wrap.classList.add('v135-selected');tabs.querySelectorAll('button').forEach(x=>x.classList.remove('active'));b.classList.add('active')};tabs.appendChild(b)}
+}
+
+/* Après envoi d'un DM, demande au serveur d'envoyer le Push immédiatement. */
+const __v1352SendDM=window.sendDirectMessage;
+if(typeof __v1352SendDM==='function')window.sendDirectMessage=async function(){
+ const target=dmTarget?.userId;const text=document.getElementById('dm-input')?.value?.trim();
+ await __v1352SendDM.apply(this,arguments);
+ if(target&&text){const {data:{session}}=await sb.auth.getSession();if(session)fetch(SUPABASE_URL+'/functions/v1/leveling-push',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+session.access_token},body:JSON.stringify({action:'dm',target_user_id:target,preview:text.slice(0,120)})}).catch(()=>{})}
+};
+
+setTimeout(()=>{v1352CleanProfile();v1352AddNotificationSettings()},1000);
 </script>
 
 </body>

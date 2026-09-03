@@ -1,7 +1,7 @@
 {
   "name": "LEVELING-APP",
   "short_name": "LEVELING",
-  "description": "LEVELING-APP V13.4.2 — galerie de thèmes, accès Fondateur et codes alliés.",
+  "description": "LEVELING-APP V13.5.2 — Ascension, variantes, progression et notifications Push.",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
