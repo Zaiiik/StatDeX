@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>LEVELING-APP — Powerbuilding Tracker V14.1.9</title>
+    <title>LEVELING-APP — Powerbuilding Tracker V14.2.0</title>
     <meta name="theme-color" content="#09090f">
     <meta name="application-name" content="LEVELING-APP">
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -1894,7 +1894,7 @@ header .hud-stat.v140-clickable:hover{
                         <span class="cloud-badge" id="cloud-live-badge">☁️ CLOUD</span>
                     </div>
                     <div id="cloud-sync-detail" style="margin-top:8px;font-size:.62rem;color:#777;text-align:center">Initialisation du cloud…</div>
-                    <div style="margin-top:5px;font-size:.58rem;color:#555;text-align:center">LEVELING-APP V14.1.9 · Social UX</div>
+                    <div style="margin-top:5px;font-size:.58rem;color:#555;text-align:center">LEVELING-APP V14.2.0 · Social UX</div>
                     <button class="btn-action" onclick="logoutLeveling()" style="border-color:#ff5555;color:#ff7777">Se déconnecter</button>
                 </div>
 
@@ -3988,7 +3988,7 @@ const sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_PUBLISHABLE_KEY,{
   auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true,storage:window.localStorage}
 });
 let cloudUser=null,cloudLicensed=false,cloudLoadedOnce=false,cloudSaveTimer=null,suppressCloudSave=false,licenseWatchTimer=null,lastLicenseStatus='UNKNOWN';
-const APP_VERSION='14.1.9';
+const APP_VERSION='14.2.0';
 const ACCOUNT_LOCAL_KEYS=['solo_leveling_user','solo_leveling_smart_refs','solo_leveling_body_hist','solo_leveling_inv','solo_leveling_block','solo_leveling_day','solo_leveling_state','solo_leveling_custom_sets','solo_leveling_history','solo_leveling_active_program','solo_leveling_program_states','solo_leveling_program_custom_sets','solo_leveling_custom_program','leveling_last_local_save','leveling_last_cloud_sync','leveling_v10'];
 function clearLevelingAccountLocalData(){
   try{ACCOUNT_LOCAL_KEYS.forEach(k=>localStorage.removeItem(k));sessionStorage.removeItem('leveling_pending_license')}catch(e){console.warn('Local account cleanup:',e)}
@@ -4104,7 +4104,7 @@ async function retryLicenseCheck(){
 }
 function exportAppData(){
   if(typeof saveActiveProgramState==='function')saveActiveProgramState();
-  return{version:'14.1.9',userData,smartHypertrophyRefs,bodyHistory,inventoryItems,currentBlockIndex,currentDayIndex,activeProgramKey,programWorkoutStates,programCustomSetData,customProgramData,workoutState,customSetData,workoutHistory,v10:(typeof window.__levelingV10Export==='function'?window.__levelingV10Export():null)};
+  return{version:'14.2.0',userData,smartHypertrophyRefs,bodyHistory,inventoryItems,currentBlockIndex,currentDayIndex,activeProgramKey,programWorkoutStates,programCustomSetData,customProgramData,workoutState,customSetData,workoutHistory,v10:(typeof window.__levelingV10Export==='function'?window.__levelingV10Export():null)};
 }
 function importAppData(d){
   if(!d||typeof d!=='object')return;suppressCloudSave=true;
@@ -4605,7 +4605,10 @@ function applyAmbianceTheme(id,save=true){
 }
 window.applyAmbianceTheme=applyAmbianceTheme;
 function renderAmbianceParticles(id){
+ const ua=navigator.userAgent||'', platform=navigator.platform||'';
+ const ios=/iPhone|iPad|iPod/i.test(ua)||(platform==='MacIntel'&&Number(navigator.maxTouchPoints||0)>1);
  let layer=document.getElementById('ambiance-particles');
+ if(ios){ if(layer)layer.replaceChildren(); return; }
  if(!layer){layer=document.createElement('div');layer.id='ambiance-particles';document.body.appendChild(layer)}
  layer.innerHTML='';
  if(id==='default'||window.matchMedia?.('(prefers-reduced-motion: reduce)').matches)return;
@@ -6537,7 +6540,6 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
   });
 
   /* Petit rafraîchissement très léger, sans toucher au DOM si rien n'a changé. */
-  setInterval(syncStableAvatar,3000);
 })();
 </script>
 
@@ -6732,7 +6734,6 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
 
   /* La donnée cloud peut arriver après le rendu initial. On ne touche au DOM
      que si la source a réellement changé. */
-  setInterval(ensureHeaderAvatar,2000);
 })();
 </script>
 
@@ -7162,7 +7163,7 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
     const oldExport=window.exportAppData;
     window.exportAppData=function(){
       const d=oldExport.apply(this,arguments) || {};
-      d.version='14.1.9';
+      d.version='14.2.0';
       try{d.v140Rpg=JSON.parse(localStorage.getItem('leveling_v140_rpg')||'{}')}catch(e){d.v140Rpg={}}
       d.validatedSessions=validatedSnapshot();
       d.cycleResetPending=localStorage.getItem('leveling_cycle_reset_pending')||'';
@@ -8038,6 +8039,81 @@ html.leveling-ios .amb-p{display:none!important;animation:none!important}
     /* restauration rapide : seulement pendant l'initialisation des scripts */
     setTimeout(()=>{window.setInterval=nativeSetInterval},0);
   }
+})();
+</script>
+
+
+<style id="v1420-mobile-ui-final">
+/* V14.2.0 — correction visuelle mobile finale */
+
+/* Android installé : pas de faux bandeau vide au-dessus du header.
+   On garde seulement le safe-area réel si Android en fournit un. */
+html.leveling-android.leveling-standalone header{
+  padding-top:max(8px,env(safe-area-inset-top,0px))!important;
+}
+html.leveling-android.leveling-standalone #app-container{
+  padding-top:0!important;
+  margin-top:0!important;
+}
+
+/* Les sous-pages Réglages deviennent de vraies pages plein écran de l'app,
+   et non plus une petite fenêtre flottante. */
+@media(max-width:760px){
+  #panel-settings .compact-setting-section.v1358-overlay{
+    position:fixed!important;
+    inset:0!important;
+    top:0!important;
+    right:0!important;
+    bottom:0!important;
+    left:0!important;
+    width:100vw!important;
+    height:var(--leveling-vh,100dvh)!important;
+    max-width:none!important;
+    max-height:none!important;
+    margin:0!important;
+    border-radius:0!important;
+    background:#08080d!important;
+    z-index:5400!important;
+    overflow:hidden!important;
+    display:flex!important;
+    flex-direction:column!important;
+  }
+  #panel-settings .compact-setting-section.v1358-overlay > .v1359-pagebar{
+    position:relative!important;
+    top:auto!important;
+    flex:0 0 auto!important;
+    padding-top:calc(10px + env(safe-area-inset-top,0px))!important;
+    min-height:calc(66px + env(safe-area-inset-top,0px))!important;
+  }
+  #panel-settings .compact-setting-section.v1358-overlay > .compact-setting-body{
+    flex:1 1 auto!important;
+    min-height:0!important;
+    overflow-y:auto!important;
+    -webkit-overflow-scrolling:touch!important;
+    padding:14px 14px calc(90px + env(safe-area-inset-bottom,0px))!important;
+  }
+}
+
+/* iOS : aucune animation de panel pendant les changements d'onglet.
+   Safari n'a plus à recomposer tout l'écran à chaque navigation. */
+html.leveling-ios .panel.active{
+  animation:none!important;
+}
+</style>
+
+<script id="v1420-mobile-ui-final-js">
+(function(){
+  function classify(){
+    const ua=navigator.userAgent||'', platform=navigator.platform||'';
+    const ios=/iPhone|iPad|iPod/i.test(ua)||(platform==='MacIntel'&&Number(navigator.maxTouchPoints||0)>1);
+    const android=/Android/i.test(ua);
+    const standalone=(window.matchMedia&&window.matchMedia('(display-mode:standalone)').matches)||navigator.standalone===true;
+    document.documentElement.classList.toggle('leveling-ios',ios);
+    document.documentElement.classList.toggle('leveling-android',android);
+    document.documentElement.classList.toggle('leveling-standalone',standalone);
+  }
+  classify();
+  window.addEventListener('pageshow',classify,{passive:true});
 })();
 </script>
 
