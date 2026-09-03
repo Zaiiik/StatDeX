@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>LEVELING-APP — Admin Mobile V3.1</title>
+<meta name="theme-color" content="#09090e">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="LEVELING ADMIN">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="admin-icon-192.png">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+:root{--bg:#050507;--card:#111118;--text:#eee;--muted:#8e8e9a;--purple:#bd00ff;--green:#00e676;--yellow:#ffea00;--red:#ff365f}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at top,#171020 0,#050507 40%);color:var(--text);font-family:Segoe UI,Arial,sans-serif;min-height:100vh}
+.wrap{max-width:1100px;margin:auto;padding:24px 16px 60px}h1{margin:0;color:var(--purple);text-shadow:0 0 18px rgba(189,0,255,.45);font-size:1.55rem}.sub{color:var(--muted);font-size:.86rem;margin:6px 0 22px}
+.card{background:rgba(17,17,24,.92);border:1px solid #292932;border-radius:16px;padding:16px;box-shadow:0 10px 30px rgba(0,0,0,.28);margin-bottom:14px}.login{max-width:430px;margin:11vh auto}
+label{display:block;font-size:.72rem;color:#bbb;margin:10px 0 5px;text-transform:uppercase;font-weight:800}input{width:100%;background:#09090e;border:1px solid #34343d;color:#fff;border-radius:10px;padding:12px;outline:none}
+button{border:0;border-radius:10px;padding:11px 14px;font-weight:900;cursor:pointer}.primary{background:var(--purple);color:#fff;width:100%;margin-top:14px}.secondary{background:#23232d;color:#fff}.green{background:var(--green);color:#001c0c}.red{background:rgba(255,54,95,.17);border:1px solid rgba(255,54,95,.45);color:#ff718d}.yellow{background:rgba(255,234,0,.12);border:1px solid rgba(255,234,0,.35);color:var(--yellow)}
+.topbar{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:18px}.top-actions{display:flex;gap:8px}.stats{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-bottom:14px}
+.stat{background:#0c0c12;border:1px solid #292932;border-radius:13px;padding:13px}.stat b{display:block;font-size:1.45rem;margin-top:5px}.stat span{font-size:.66rem;color:var(--muted);text-transform:uppercase}
+.generate{display:grid;grid-template-columns:150px 1fr;gap:10px;align-items:end}.table-wrap{overflow:auto;border-radius:12px;border:1px solid #292932}table{width:100%;border-collapse:collapse;min-width:850px;background:#0a0a0f}
+th,td{padding:11px 10px;border-bottom:1px solid #24242d;text-align:left;font-size:.76rem}th{font-size:.62rem;color:#999;text-transform:uppercase;background:#101017}.key{font-family:Consolas,monospace;color:#fff;font-weight:800}
+.badge{display:inline-block;border-radius:999px;padding:4px 8px;font-size:.62rem;font-weight:900}.b-active{color:var(--green);background:rgba(0,230,118,.1)}.b-unused{color:var(--yellow);background:rgba(255,234,0,.1)}.b-disabled{color:#ff718d;background:rgba(255,54,95,.1)}
+.actions{display:flex;gap:6px}.actions button{padding:7px 9px;font-size:.65rem}.msg{font-size:.8rem;margin-top:10px;min-height:18px}.err{color:#ff718d}.ok{color:var(--green)}.hidden{display:none!important}
+.created-box{margin-top:12px;background:#08080c;border:1px dashed #3b3b45;border-radius:10px;padding:10px;max-height:160px;overflow:auto}.created-key{display:flex;justify-content:space-between;gap:10px;align-items:center;padding:7px 0;border-bottom:1px solid #202027;font-family:Consolas,monospace;font-size:.76rem}.small{font-size:.68rem;color:var(--muted)}
+@media(max-width:800px){.stats{grid-template-columns:repeat(2,1fr)}.generate{grid-template-columns:1fr}.topbar{align-items:flex-start;flex-direction:column}}
+
+.client-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.client-card{background:#0b0b11;border:1px solid #292932;border-radius:12px;padding:12px}
+.client-card h3{margin:0 0 5px;font-size:.88rem}.client-meta{font-size:.66rem;color:#8b8b98;line-height:1.5}
+.modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.78);z-index:999;align-items:center;justify-content:center;padding:18px}.modal.show{display:flex}
+.modalbox{width:100%;max-width:620px;background:#101017;border:1px solid #3a3a46;border-radius:16px;padding:18px;box-shadow:0 20px 60px rgba(0,0,0,.55);max-height:86vh;overflow:auto}
+.detail-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}.detail{background:#0a0a0f;border:1px solid #262630;border-radius:10px;padding:10px}.detail span{display:block;color:#777;font-size:.58rem;text-transform:uppercase}.detail b{display:block;margin-top:4px;font-size:.76rem;word-break:break-word}
+.release-grid{display:grid;grid-template-columns:150px 1fr auto;gap:10px;align-items:end}
+@media(max-width:800px){.client-grid,.detail-grid{grid-template-columns:1fr}.release-grid{grid-template-columns:1fr}}
+
+
+/* ===== ADMIN MOBILE V3.1 ===== */
+html,body{width:100%;min-height:100%;min-height:100dvh}
+body{padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);overscroll-behavior:none}
+.wrap{padding:14px 10px calc(24px + env(safe-area-inset-bottom));max-width:980px}
+.admin-mobile-brand{font-size:.58rem;color:#777;letter-spacing:.08em;margin-top:4px}
+.mobile-tabs{display:none}
+.mobile-license-list{display:none}
+.install-admin-btn{display:none}
+button,input{min-height:44px}
+button{touch-action:manipulation}
+input{font-size:16px}
+@media(max-width:700px){
+  body{background:linear-gradient(180deg,#100916 0,#050507 230px)}
+  .wrap{padding:10px 8px calc(20px + env(safe-area-inset-bottom))}
+  .login{margin:8vh auto 0;padding:18px;border-radius:18px}
+  h1{font-size:1.18rem}
+  .sub{font-size:.72rem;margin:5px 0 12px}
+  .topbar{position:sticky;top:0;z-index:30;margin:-10px -8px 10px;padding:calc(10px + env(safe-area-inset-top)) 10px 10px;background:rgba(5,5,7,.94);backdrop-filter:blur(14px);border-bottom:1px solid #23232d}
+  .topbar h1{font-size:1.02rem}
+  .top-actions{width:100%;display:grid;grid-template-columns:1fr 1fr}
+  .top-actions button{width:100%;padding:9px}
+  .stats{grid-template-columns:repeat(3,1fr);gap:6px;overflow:visible}
+  .stat{padding:9px 7px;border-radius:11px;min-width:0}
+  .stat b{font-size:1.1rem}.stat span{font-size:.52rem;white-space:nowrap}
+  .stats .stat:nth-child(4),.stats .stat:nth-child(5){grid-column:span 1}
+  .card{padding:12px;border-radius:14px;margin-bottom:10px}
+  .generate{grid-template-columns:1fr 1fr;gap:7px}
+  .generate label{margin-top:0}
+  .client-grid{grid-template-columns:1fr}
+  .client-card{padding:11px}
+  .release-grid{grid-template-columns:1fr}
+  .release-grid button{width:100%}
+  .detail-grid{grid-template-columns:1fr}
+  .modal{align-items:flex-end;padding:0}
+  .modalbox{max-width:none;border-radius:18px 18px 0 0;padding:14px 12px calc(18px + env(safe-area-inset-bottom));max-height:88dvh}
+  .table-wrap{display:none}
+  .mobile-license-list{display:grid;gap:7px}
+  .m-license{background:#0a0a0f;border:1px solid #292932;border-radius:12px;padding:10px}
+  .m-license-top{display:flex;justify-content:space-between;align-items:center;gap:8px}
+  .m-license-key{font:800 .72rem Consolas,monospace;word-break:break-all}
+  .m-license-meta{font-size:.59rem;color:#8e8e9a;line-height:1.55;margin-top:6px}
+  .m-license-actions{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:8px}
+  .m-license-actions button{width:100%;padding:8px;font-size:.64rem}
+  #search{margin-top:8px}
+  .install-admin-btn{display:inline-block}
+}
+@media(max-width:380px){
+  .stats{grid-template-columns:repeat(2,1fr)}
+  .generate{grid-template-columns:1fr}
+  .top-actions{grid-template-columns:1fr}
+}
+
+</style>
+</head>
+<body>
+<div class="wrap">
+<section id="loginView" class="card login">
+  <h1>⚡ LEVELING ADMIN</h1><p class="sub">Connexion administrateur privée</p>
+  <label>Email</label><input id="email" type="email" autocomplete="username">
+  <label>Mot de passe</label><input id="password" type="password" autocomplete="current-password">
+  <button class="primary" onclick="login()">SE CONNECTER</button><div id="loginMsg" class="msg"></div>
+</section>
+<section id="adminView" class="hidden">
+  <div class="topbar"><div><h1>⚡ LEVELING-APP ADMIN</h1><div class="admin-mobile-brand">MOBILE CONTROL · V3.1</div><div id="adminIdentity" class="sub"></div></div>
+  <div class="top-actions"><button id="installAdminBtn" class="secondary install-admin-btn" onclick="installAdminPWA()">📲 Installer</button><button class="secondary" onclick="refreshAll()">↻ Actualiser</button><button class="red" onclick="logout()">Déconnexion</button></div></div>
+
+  <div class="stats">
+    <div class="stat"><span>Total clés</span><b id="sTotal">—</b></div>
+    <div class="stat"><span>Disponibles</span><b id="sUnused">—</b></div>
+    <div class="stat"><span>Actives</span><b id="sActive">—</b></div>
+    <div class="stat"><span>Désactivées</span><b id="sDisabled">—</b></div>
+    <div class="stat"><span>Profils</span><b id="sProfiles">—</b></div>
+  </div>
+
+  <div class="card">
+    <h2 style="margin:0 0 5px;font-size:1rem;color:var(--yellow)">🔑 Générer des licences Lifetime</h2>
+    <div class="small">1 à 50 clés par génération.</div>
+    <div class="generate"><div><label>Nombre de clés</label><input id="keyCount" type="number" min="1" max="50" value="1"></div>
+    <button class="green" onclick="generateKeys()">➕ GÉNÉRER</button></div>
+    <div id="generateMsg" class="msg"></div><div id="createdKeys" class="created-box hidden"></div>
+  </div>
+
+  <div class="card">
+    <div style="display:flex;gap:10px;justify-content:space-between;align-items:end;flex-wrap:wrap;margin-bottom:10px">
+      <div><h2 style="margin:0;font-size:1rem">Licences</h2><div class="small">Copie une clé et envoie-la au client en MP.</div></div>
+      <div style="min-width:220px"><input id="search" placeholder="Rechercher clé, pseudo, email…" oninput="renderLicenses()"></div>
+    </div>
+    <div class="table-wrap"><table><thead><tr><th>Clé</th><th>Statut</th><th>Client</th><th>Email</th><th>Activation</th><th>Création</th><th>Actions</th></tr></thead><tbody id="licenseRows"></tbody></table></div><div id="mobileLicenseList" class="mobile-license-list"></div>
+    <div id="tableMsg" class="msg"></div>
+  </div>
+
+  <div class="card">
+    <h2 style="margin:0 0 8px;font-size:1rem">👥 Clients</h2>
+    <div class="small">Profils clients en lecture seule : compte, activité, programme, version et licence.</div>
+    <div id="clientGrid" class="client-grid" style="margin-top:10px"></div>
+    <div id="clientMsg" class="msg"></div>
+  </div>
+
+  <div class="card">
+    <h2 style="margin:0 0 6px;font-size:1rem;color:#8feaff">🚀 Mise à jour clients</h2>
+    <div class="small">Le bandeau n'apparaît que lorsque TU publies volontairement une annonce ici. Une version plus ancienne que l'application du client ne sera jamais affichée.</div>
+    <div class="release-grid">
+      <div><label>Nouvelle version</label><input id="releaseVersion" placeholder="12.8"></div>
+      <div><label>Message</label><input id="releaseMessage" placeholder="Nouvelle mise à jour disponible"></div>
+      <button class="green" onclick="saveRelease()">📣 PUBLIER</button>
+    </div>
+    <div style="display:flex;gap:8px;margin-top:10px;align-items:center;flex-wrap:wrap">
+      <span class="badge b-disabled" id="releaseStateBadge">ANNONCE INACTIVE</span>
+      <button class="red" onclick="clearRelease()">RETIRER LE BANDEAU</button>
+    </div>
+    <div id="releaseMsg" class="msg"></div>
+  </div>
+</section>
+</div>
+
+<div id="clientModal" class="modal" onclick="if(event.target===this)closeClientModal()">
+  <div class="modalbox">
+    <div style="display:flex;justify-content:space-between;gap:10px;align-items:center"><h2 style="margin:0">👤 Fiche client</h2><button class="secondary" onclick="closeClientModal()">Fermer</button></div>
+    <div id="clientDetail" class="detail-grid" style="margin-top:12px"></div>
+  </div>
+</div>
+
+<script>
+const SUPABASE_URL = 'https://jmejktyindxzzsqwthsk.supabase.co';
+const SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_2eS6-xR0i4DZ4H4YI4Uj2w_FXSC_yUP';
+const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
+let licenses = [];
+let clients = [];
+function esc(v){return String(v??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]))}
+function fmtDate(v){if(!v)return'—';try{return new Date(v).toLocaleString('fr-FR')}catch{return v}}
+function setMsg(id,text,ok=false){const el=document.getElementById(id);el.textContent=text||'';el.className='msg '+(text?(ok?'ok':'err'):'')}
+async function login(){
+  setMsg('loginMsg','');const email=document.getElementById('email').value.trim();const password=document.getElementById('password').value;
+  if(!email||!password)return setMsg('loginMsg','Entre ton email et ton mot de passe.');
+  const {data,error}=await sb.auth.signInWithPassword({email,password});if(error)return setMsg('loginMsg',error.message);await enterAdmin(data.user);
+}
+async function enterAdmin(user){
+  const {data:isAdmin,error}=await sb.rpc('is_leveling_admin');
+  if(error||!isAdmin){await sb.auth.signOut();document.getElementById('adminView').classList.add('hidden');document.getElementById('loginView').classList.remove('hidden');return setMsg('loginMsg',"Ce compte n'est pas autorisé comme administrateur.");}
+  document.getElementById('loginView').classList.add('hidden');document.getElementById('adminView').classList.remove('hidden');document.getElementById('adminIdentity').textContent='Connecté : '+(user?.email||'');await refreshAll();
+}
+async function logout(){await sb.auth.signOut();location.reload()}
+async function refreshAll(){await Promise.all([loadStats(),loadLicenses(),loadClients(),loadRelease()])}
+async function loadStats(){const {data,error}=await sb.rpc('admin_license_stats');if(error)return;const s=Array.isArray(data)?data[0]:data;if(!s)return;document.getElementById('sTotal').textContent=s.total;document.getElementById('sUnused').textContent=s.unused;document.getElementById('sActive').textContent=s.active;document.getElementById('sDisabled').textContent=s.disabled;document.getElementById('sProfiles').textContent=s.total_profiles}
+async function loadLicenses(){setMsg('tableMsg','');const {data,error}=await sb.rpc('admin_list_licenses');if(error){setMsg('tableMsg',error.message);return}licenses=data||[];renderLicenses()}
+function renderLicenses(){
+  const q=document.getElementById('search').value.toLowerCase().trim();const rows=licenses.filter(x=>!q||[x.license_key,x.username,x.email,x.status].some(v=>String(v||'').toLowerCase().includes(q)));const body=document.getElementById('licenseRows');
+  if(!rows.length){body.innerHTML='<tr><td colspan="7" style="text-align:center;color:#777">Aucune licence</td></tr>';const m=document.getElementById('mobileLicenseList');if(m)m.innerHTML='<div class="small">Aucune licence.</div>';return}
+  body.innerHTML=rows.map(x=>{const cls=x.status==='ACTIVE'?'b-active':x.status==='UNUSED'?'b-unused':'b-disabled';const toggle=x.enabled?`<button class="red" onclick="setEnabled('${x.id}',false)">Désactiver</button>`:`<button class="yellow" onclick="setEnabled('${x.id}',true)">Réactiver</button>`;
+  return `<tr><td><span class="key">${esc(x.license_key)}</span></td><td><span class="badge ${cls}">${esc(x.status)}</span></td><td>${esc(x.username||'—')}</td><td>${esc(x.email||'—')}</td><td>${fmtDate(x.activated_at)}</td><td>${fmtDate(x.created_at)}</td><td><div class="actions"><button class="secondary" onclick="copyKey('${esc(x.license_key)}')">Copier</button>${toggle}</div></td></tr>`}).join('');
+  const mobile=document.getElementById('mobileLicenseList');
+  if(mobile){
+    mobile.innerHTML=rows.map(x=>{const cls=x.status==='ACTIVE'?'b-active':x.status==='UNUSED'?'b-unused':'b-disabled';const toggle=x.enabled?`<button class="red" onclick="setEnabled('${x.id}',false)">Désactiver</button>`:`<button class="yellow" onclick="setEnabled('${x.id}',true)">Réactiver</button>`;
+      return `<div class="m-license"><div class="m-license-top"><span class="m-license-key">${esc(x.license_key)}</span><span class="badge ${cls}">${esc(x.status)}</span></div><div class="m-license-meta">👤 ${esc(x.username||'—')} · ${esc(x.email||'—')}<br>Activation : ${fmtDate(x.activated_at)}<br>Création : ${fmtDate(x.created_at)}</div><div class="m-license-actions"><button class="secondary" onclick="copyKey('${esc(x.license_key)}')">📋 Copier</button>${toggle}</div></div>`;
+    }).join('');
+  }
+}
+async function generateKeys(){
+  setMsg('generateMsg','');const count=Number(document.getElementById('keyCount').value);if(!Number.isInteger(count)||count<1||count>50)return setMsg('generateMsg','Choisis un nombre entre 1 et 50.');
+  const {data,error}=await sb.rpc('admin_generate_lifetime_licenses',{p_count:count});if(error)return setMsg('generateMsg',error.message);
+  const box=document.getElementById('createdKeys');const arr=data||[];box.innerHTML=arr.map(x=>`<div class="created-key"><span>${esc(x.license_key)}</span><button class="secondary" onclick="copyKey('${esc(x.license_key)}')">Copier</button></div>`).join('');box.classList.toggle('hidden',!arr.length);setMsg('generateMsg',`${arr.length} clé(s) générée(s).`,true);await refreshAll()
+}
+async function setEnabled(id,enabled){const action=enabled?'réactiver':'désactiver';if(!confirm(`Tu veux vraiment ${action} cette licence ?`))return;const {error}=await sb.rpc('admin_set_license_enabled',{p_license_id:id,p_enabled:enabled});if(error)return alert(error.message);await refreshAll()}
+
+async function loadClients(){
+  setMsg('clientMsg','');
+  const {data,error}=await sb.rpc('admin_list_clients');
+  if(error){setMsg('clientMsg',error.message);return}
+  clients=data||[];renderClients();
+}
+function renderClients(){
+  const box=document.getElementById('clientGrid');
+  if(!clients.length){box.innerHTML='<div class="small">Aucun client.</div>';return}
+  box.innerHTML=clients.map((x,i)=>`<div class="client-card">
+    <h3>${esc(x.username||'Sans pseudo')}</h3>
+    <div class="client-meta">${esc(x.email||'—')}<br>Programme : <b>${esc(x.active_program||'—')}</b> · Séances : <b>${esc(x.workouts||0)}</b><br>Version : <b>${esc(x.app_version||'—')}</b> · Licence : <b>${esc(x.license_status||'—')}</b></div>
+    <button class="secondary" style="margin-top:9px;width:100%" onclick="viewClient(${i})">Voir profil</button>
+  </div>`).join('');
+}
+function viewClient(i){
+  const x=clients[i];if(!x)return;
+  const fields=[
+    ['Pseudo',x.username],['Email',x.email],['Inscription',fmtDate(x.created_at)],['Dernière connexion',fmtDate(x.last_sign_in_at)],
+    ['Programme actif',x.active_program],['Séances validées',x.workouts],['Version app',x.app_version],['Licence',x.license_status],
+    ['Clé',x.license_key||'—'],['Dernière sauvegarde',fmtDate(x.updated_at)]
+  ];
+  document.getElementById('clientDetail').innerHTML=fields.map(([k,v])=>`<div class="detail"><span>${esc(k)}</span><b>${esc(v??'—')}</b></div>`).join('');
+  document.getElementById('clientModal').classList.add('show');
+}
+function closeClientModal(){document.getElementById('clientModal').classList.remove('show')}
+async function loadRelease(){
+  const {data,error}=await sb.rpc('admin_get_app_release');if(error)return;
+  const r=Array.isArray(data)?data[0]:data;if(!r)return;
+  document.getElementById('releaseVersion').value=r.latest_version||'';
+  document.getElementById('releaseMessage').value=r.message||'';
+  const b=document.getElementById('releaseStateBadge');if(b){b.textContent=r.is_active?'ANNONCE ACTIVE':'ANNONCE INACTIVE';b.className='badge '+(r.is_active?'b-active':'b-disabled')}
+}
+async function saveRelease(){
+  const version=document.getElementById('releaseVersion').value.trim(),message=document.getElementById('releaseMessage').value.trim();
+  if(!version)return setMsg('releaseMsg','Entre un numéro de version.');
+  const {error}=await sb.rpc('admin_set_app_release_v2',{p_version:version,p_message:message,p_active:true});
+  if(error)return setMsg('releaseMsg',error.message);
+  setMsg('releaseMsg','Annonce publiée. Seuls les clients avec une version plus ancienne verront le bandeau.',true);await loadRelease();
+}
+async function clearRelease(){
+  const version=document.getElementById('releaseVersion').value.trim()||'12.7',message=document.getElementById('releaseMessage').value.trim();
+  const {error}=await sb.rpc('admin_set_app_release_v2',{p_version:version,p_message:message,p_active:false});
+  if(error)return setMsg('releaseMsg',error.message);
+  setMsg('releaseMsg','Bandeau retiré chez les clients.',true);await loadRelease();
+}
+
+async function copyKey(key){try{await navigator.clipboard.writeText(key);alert('Clé copiée : '+key)}catch{prompt('Copie la clé :',key)}}
+
+let deferredAdminInstall=null;
+window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();deferredAdminInstall=e;document.getElementById('installAdminBtn')?.classList.add('install-admin-btn')});
+async function installAdminPWA(){
+  if(deferredAdminInstall){deferredAdminInstall.prompt();await deferredAdminInstall.userChoice;deferredAdminInstall=null;return}
+  alert("Sur iPhone/iPad : Partager → Ajouter à l’écran d’accueil. Sur Android : menu du navigateur → Installer l’application / Ajouter à l’écran d’accueil.");
+}
+if('serviceWorker' in navigator){window.addEventListener('load',()=>navigator.serviceWorker.register('./service-worker.js').catch(()=>{}))}
+
+(async function boot(){const {data:{session}}=await sb.auth.getSession();if(session?.user)await enterAdmin(session.user)})();
+</script>
+</body>
+</html>
