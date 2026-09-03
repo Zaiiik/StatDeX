@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>LEVELING-APP — Powerbuilding Tracker V13.5.2</title>
+    <title>LEVELING-APP — Powerbuilding Tracker V14.1.9</title>
     <meta name="theme-color" content="#09090f">
     <meta name="application-name" content="LEVELING-APP">
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -1894,7 +1894,7 @@ header .hud-stat.v140-clickable:hover{
                         <span class="cloud-badge" id="cloud-live-badge">☁️ CLOUD</span>
                     </div>
                     <div id="cloud-sync-detail" style="margin-top:8px;font-size:.62rem;color:#777;text-align:center">Initialisation du cloud…</div>
-                    <div style="margin-top:5px;font-size:.58rem;color:#555;text-align:center">LEVELING-APP V13.2 · Social UX</div>
+                    <div style="margin-top:5px;font-size:.58rem;color:#555;text-align:center">LEVELING-APP V14.1.9 · Social UX</div>
                     <button class="btn-action" onclick="logoutLeveling()" style="border-color:#ff5555;color:#ff7777">Se déconnecter</button>
                 </div>
 
@@ -3988,7 +3988,7 @@ const sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_PUBLISHABLE_KEY,{
   auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true,storage:window.localStorage}
 });
 let cloudUser=null,cloudLicensed=false,cloudLoadedOnce=false,cloudSaveTimer=null,suppressCloudSave=false,licenseWatchTimer=null,lastLicenseStatus='UNKNOWN';
-const APP_VERSION='14.1.7';
+const APP_VERSION='14.1.9';
 const ACCOUNT_LOCAL_KEYS=['solo_leveling_user','solo_leveling_smart_refs','solo_leveling_body_hist','solo_leveling_inv','solo_leveling_block','solo_leveling_day','solo_leveling_state','solo_leveling_custom_sets','solo_leveling_history','solo_leveling_active_program','solo_leveling_program_states','solo_leveling_program_custom_sets','solo_leveling_custom_program','leveling_last_local_save','leveling_last_cloud_sync','leveling_v10'];
 function clearLevelingAccountLocalData(){
   try{ACCOUNT_LOCAL_KEYS.forEach(k=>localStorage.removeItem(k));sessionStorage.removeItem('leveling_pending_license')}catch(e){console.warn('Local account cleanup:',e)}
@@ -4104,7 +4104,7 @@ async function retryLicenseCheck(){
 }
 function exportAppData(){
   if(typeof saveActiveProgramState==='function')saveActiveProgramState();
-  return{version:'14.1.7',userData,smartHypertrophyRefs,bodyHistory,inventoryItems,currentBlockIndex,currentDayIndex,activeProgramKey,programWorkoutStates,programCustomSetData,customProgramData,workoutState,customSetData,workoutHistory,v10:(typeof window.__levelingV10Export==='function'?window.__levelingV10Export():null)};
+  return{version:'14.1.9',userData,smartHypertrophyRefs,bodyHistory,inventoryItems,currentBlockIndex,currentDayIndex,activeProgramKey,programWorkoutStates,programCustomSetData,customProgramData,workoutState,customSetData,workoutHistory,v10:(typeof window.__levelingV10Export==='function'?window.__levelingV10Export():null)};
 }
 function importAppData(d){
   if(!d||typeof d!=='object')return;suppressCloudSave=true;
@@ -7162,7 +7162,7 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
     const oldExport=window.exportAppData;
     window.exportAppData=function(){
       const d=oldExport.apply(this,arguments) || {};
-      d.version='14.1.7';
+      d.version='14.1.9';
       try{d.v140Rpg=JSON.parse(localStorage.getItem('leveling_v140_rpg')||'{}')}catch(e){d.v140Rpg={}}
       d.validatedSessions=validatedSnapshot();
       d.cycleResetPending=localStorage.getItem('leveling_cycle_reset_pending')||'';
@@ -7934,6 +7934,110 @@ html.leveling-ios main{
       setTimeout(setVH,400);
     }
   });
+})();
+</script>
+
+
+<style id="v1418-android-bottom-safe">
+/* V14.1.8 — marge de sécurité Android plein écran */
+html.leveling-android.leveling-standalone{
+  --leveling-android-bottom:18px;
+}
+html.leveling-android.leveling-standalone nav{
+  padding-bottom:calc(10px + env(safe-area-inset-bottom,0px) + var(--leveling-android-bottom,0px))!important;
+  min-height:calc(64px + env(safe-area-inset-bottom,0px) + var(--leveling-android-bottom,0px))!important;
+}
+html.leveling-android.leveling-standalone main{
+  padding-bottom:calc(106px + env(safe-area-inset-bottom,0px) + var(--leveling-android-bottom,0px))!important;
+}
+</style>
+
+<script id="v1418-android-bottom-safe-js">
+(function(){
+  const ua=navigator.userAgent||'';
+  const isAndroid=/Android/i.test(ua);
+  const standalone=
+    (window.matchMedia&&window.matchMedia('(display-mode: standalone)').matches) ||
+    window.navigator.standalone===true;
+
+  if(isAndroid)document.documentElement.classList.add('leveling-android');
+  if(standalone)document.documentElement.classList.add('leveling-standalone');
+})();
+</script>
+
+
+<style id="v1419-final-mobile-stability">
+/* V14.1.9 — stabilisation finale mobile */
+html.leveling-ios main{
+  /* will-change permanent peut augmenter fortement la mémoire sur WebKit */
+  will-change:auto!important;
+  contain:layout!important;
+  transform:none!important;
+}
+html.leveling-ios #ambiance-particles{display:none!important}
+html.leveling-ios .amb-p{display:none!important;animation:none!important}
+
+/* Une seule définition finale du viewport/nav mobile. */
+@media (max-width:760px){
+  html,body,#app-container{
+    height:var(--leveling-vh,100dvh)!important;
+    min-height:var(--leveling-vh,100dvh)!important;
+    max-height:var(--leveling-vh,100dvh)!important;
+  }
+  main{
+    min-height:0!important;
+    overflow-y:auto!important;
+    -webkit-overflow-scrolling:touch!important;
+  }
+}
+</style>
+
+<script id="v1419-final-mobile-stability-js">
+(function(){
+  const ua=navigator.userAgent||'';
+  const platform=navigator.platform||'';
+  const touch=Number(navigator.maxTouchPoints||0);
+  const ios=/iPhone|iPad|iPod/i.test(ua)||(platform==='MacIntel'&&touch>1);
+  const android=/Android/i.test(ua);
+
+  if(ios)document.documentElement.classList.add('leveling-ios');
+  if(android)document.documentElement.classList.add('leveling-android');
+
+  function setVH(){
+    const vv=window.visualViewport;
+    const h=Math.round((vv&&vv.height)||window.innerHeight||document.documentElement.clientHeight||0);
+    if(h>0)document.documentElement.style.setProperty('--leveling-vh',h+'px');
+  }
+  setVH();
+  requestAnimationFrame(setVH);
+  window.addEventListener('resize',setVH,{passive:true});
+  window.addEventListener('orientationchange',()=>setTimeout(setVH,180),{passive:true});
+  window.addEventListener('pageshow',()=>setTimeout(setVH,50),{passive:true});
+  if(window.visualViewport)window.visualViewport.addEventListener('resize',setVH,{passive:true});
+
+  /* iOS: ne crée même plus les particules cachées. */
+  if(ios && typeof window.renderAmbianceParticles==='function'){
+    window.renderAmbianceParticles=function(){
+      const layer=document.getElementById('ambiance-particles');
+      if(layer)layer.replaceChildren();
+    };
+  }
+
+  /* Les anciens correctifs avatar avaient laissé deux pollings permanents.
+     Sur iOS on les neutralise après le chargement; V14.1.4 reste l'affichage autoritaire. */
+  if(ios){
+    const nativeSetInterval=window.setInterval;
+    window.setInterval=function(fn,delay){
+      const name=(fn&&fn.name)||'';
+      if((name==='syncStableAvatar'&&Number(delay)===3000) ||
+         (name==='ensureHeaderAvatar'&&Number(delay)===2000)){
+        return 0;
+      }
+      return nativeSetInterval.apply(this,arguments);
+    };
+    /* restauration rapide : seulement pendant l'initialisation des scripts */
+    setTimeout(()=>{window.setInterval=nativeSetInterval},0);
+  }
 })();
 </script>
 
