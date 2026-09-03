@@ -1,7 +1,7 @@
 {
   "name": "LEVELING-APP",
   "short_name": "LEVELING",
-  "description": "Suivi musculation, powerlifting, programmes, progression et XP.",
+  "description": "LEVELING-APP V12.7 — Profil, objectifs, PR automatiques et progression.",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
