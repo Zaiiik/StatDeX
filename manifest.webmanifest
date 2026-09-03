@@ -1,7 +1,7 @@
 {
   "name": "LEVELING-APP",
   "short_name": "LEVELING",
-  "description": "LEVELING-APP V13.3.1 — MP, notifications, Teams avec Capitaine/Gardien/Soldat et sauvegarde SBD.",
+  "description": "LEVELING-APP V13.4.2 — galerie de thèmes, accès Fondateur et codes alliés.",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",

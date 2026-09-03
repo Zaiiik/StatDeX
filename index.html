@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>LEVELING-APP — Powerbuilding Tracker V13.3.1</title>
+    <title>LEVELING-APP — Powerbuilding Tracker V13.4.2</title>
     <meta name="theme-color" content="#09090f">
     <meta name="application-name" content="LEVELING-APP">
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -612,6 +612,82 @@ nav .nav-item{min-width:0}.nav-text{font-size:.49rem!important}
 .v1331-sbd-status.ok{color:#00e676}.v1331-sbd-status.err{color:#ff687a}.v1331-sbd-status.sync{color:#00d2ff}
 .v1331-error{padding:9px;border:1px solid rgba(255,70,90,.45);background:rgba(255,70,90,.06);border-radius:8px;color:#ff9aa6;font-size:.58rem;line-height:1.45}
 @media(max-width:600px){.v1331-member{grid-template-columns:30px minmax(0,1fr)}.v1331-member .actions{grid-column:1/-1;justify-content:flex-start;padding-left:38px}}
+
+
+/* ===== LEVELING-APP V13.4 — THEME COLLECTION ===== */
+body{--amb-bg1:#050507;--amb-bg2:#09090f;--amb-card:rgba(14,14,22,.96);--amb-particle:#bd00ff}
+body[data-ambiance="halloween"]{--accent-purple:#ff7a00;--accent-rose:#ff2d00;--glow-purple:rgba(255,122,0,.62);--amb-bg1:#070300;--amb-bg2:#150800;--amb-card:rgba(24,9,2,.94);--amb-particle:#ff8a00}
+body[data-ambiance="christmas"]{--accent-purple:#ff2f55;--accent-rose:#00e676;--glow-purple:rgba(255,47,85,.55);--amb-bg1:#060909;--amb-bg2:#07130d;--amb-card:rgba(8,21,15,.94);--amb-particle:#fff}
+body[data-ambiance="sakura"]{--accent-purple:#ff5ca8;--accent-rose:#ffb3d7;--glow-purple:rgba(255,92,168,.58);--amb-bg1:#0c050a;--amb-bg2:#170812;--amb-card:rgba(28,10,21,.94);--amb-particle:#ff9ccc}
+body[data-ambiance="glacial"]{--accent-purple:#65d9ff;--accent-rose:#d8f7ff;--glow-purple:rgba(101,217,255,.58);--amb-bg1:#02080d;--amb-bg2:#071724;--amb-card:rgba(5,22,34,.94);--amb-particle:#bcefff}
+body[data-ambiance="berserker"]{--accent-purple:#ff1744;--accent-rose:#ff9100;--glow-purple:rgba(255,23,68,.6);--amb-bg1:#080101;--amb-bg2:#1b0303;--amb-card:rgba(29,5,5,.94);--amb-particle:#ff3d00}
+body[data-ambiance="thunder"]{--accent-purple:#ffe600;--accent-rose:#8f7cff;--glow-purple:rgba(255,230,0,.55);--amb-bg1:#050504;--amb-bg2:#111006;--amb-card:rgba(24,22,5,.94);--amb-particle:#fff36a}
+body[data-ambiance="elite"]{--accent-purple:#00e5ff;--accent-rose:#8a2be2;--glow-purple:rgba(0,229,255,.58);--amb-bg1:#02080d;--amb-bg2:#09041a;--amb-card:rgba(8,8,28,.94);--amb-particle:#00e5ff}
+body[data-ambiance="monarch"]{--accent-purple:#9c27ff;--accent-rose:#ff007f;--glow-purple:rgba(156,39,255,.75);--amb-bg1:#020006;--amb-bg2:#110021;--amb-card:rgba(17,2,31,.95);--amb-particle:#bd6cff}
+body[data-ambiance="shadow"]{--accent-purple:#6d00ff;--accent-rose:#00d2ff;--glow-purple:rgba(109,0,255,.82);--amb-bg1:#010103;--amb-bg2:#050013;--amb-card:rgba(5,3,18,.97);--amb-particle:#6d00ff}
+
+body[data-ambiance]:not([data-ambiance="default"]){background:
+ radial-gradient(circle at 50% -10%,color-mix(in srgb,var(--accent-purple) 18%,transparent),transparent 42%),
+ linear-gradient(180deg,var(--amb-bg2),var(--amb-bg1) 45%,#020203)!important}
+body[data-ambiance]:not([data-ambiance="default"]) .profile-card,
+body[data-ambiance]:not([data-ambiance="default"]) .v11-card,
+body[data-ambiance]:not([data-ambiance="default"]) .social-card,
+body[data-ambiance]:not([data-ambiance="default"]) .compact-setting-section{
+ background:linear-gradient(145deg,var(--amb-card),rgba(4,4,8,.97))!important
+}
+body[data-ambiance="monarch"] #app-header,
+body[data-ambiance="shadow"] #app-header{box-shadow:0 0 30px color-mix(in srgb,var(--accent-purple) 50%,transparent)}
+body[data-ambiance="halloween"] .main-title:before{content:"🎃 ";font-size:.72em}
+body[data-ambiance="christmas"] .main-title:before{content:"🎄 ";font-size:.72em}
+body[data-ambiance="sakura"] .main-title:before{content:"🌸 ";font-size:.72em}
+body[data-ambiance="glacial"] .main-title:before{content:"❄️ ";font-size:.72em}
+body[data-ambiance="berserker"] .main-title:before{content:"🔥 ";font-size:.72em}
+body[data-ambiance="thunder"] .main-title:before{content:"⚡ ";font-size:.72em}
+body[data-ambiance="monarch"] .main-title:before{content:"👑 ";font-size:.72em}
+body[data-ambiance="shadow"] .main-title:before{content:"🌌 ";font-size:.72em}
+
+.theme-collection{margin:0 0 9px}
+.theme-collection-head{display:flex;justify-content:space-between;align-items:end;gap:8px;margin-bottom:8px}
+.theme-collection-head b{font-size:.74rem}.theme-collection-head span{font-size:.52rem;color:#777}
+.theme-gallery{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}
+.theme-card-v134{position:relative;border:1px solid #30303b;border-radius:11px;padding:9px;min-height:105px;overflow:hidden;background:linear-gradient(145deg,#12121a,#09090e);cursor:pointer}
+.theme-card-v134:before{content:"";position:absolute;inset:0;background:linear-gradient(135deg,var(--tc1),transparent 55%,var(--tc2));opacity:.13;pointer-events:none}
+.theme-card-v134.equipped{border-color:var(--accent-purple);box-shadow:0 0 14px color-mix(in srgb,var(--accent-purple) 30%,transparent)}
+.theme-card-v134.locked{filter:saturate(.45);opacity:.64}
+.theme-card-v134 .tc-top{display:flex;justify-content:space-between;align-items:center;gap:5px;position:relative}
+.theme-card-v134 .tc-icon{font-size:1.35rem}.theme-card-v134 .tc-state{font-size:.47rem;font-weight:1000;padding:3px 6px;border-radius:999px;border:1px solid #3b3b45;color:#aaa}
+.theme-card-v134.equipped .tc-state{color:#fff;border-color:var(--accent-purple);background:color-mix(in srgb,var(--accent-purple) 18%,transparent)}
+.theme-card-v134 .tc-name{font-size:.69rem;font-weight:1000;margin-top:6px;position:relative}
+.theme-card-v134 .tc-desc{font-size:.5rem;color:#8b8b94;line-height:1.35;margin-top:3px;min-height:27px;position:relative}
+.theme-card-v134 .tc-progress{height:5px;background:#1a1a22;border-radius:99px;overflow:hidden;margin-top:7px;position:relative}
+.theme-card-v134 .tc-progress i{display:block;height:100%;background:linear-gradient(90deg,var(--tc1),var(--tc2));width:var(--pct);transition:.3s}
+.theme-card-v134 .tc-condition{font-size:.47rem;color:#777;margin-top:4px;position:relative}
+.theme-card-v134.unlocked:not(.equipped):hover{border-color:#666}
+.theme-season{font-size:.47rem;color:#ffca55;margin-top:4px;position:relative}
+.theme-unlock-modal{position:fixed;inset:0;z-index:12000;background:rgba(0,0,0,.82);display:none;align-items:center;justify-content:center;padding:18px;backdrop-filter:blur(5px)}
+.theme-unlock-modal.show{display:flex}
+.theme-unlock-box{width:min(390px,94vw);border:1px solid var(--accent-purple);border-radius:18px;background:linear-gradient(145deg,#17131d,#060609);padding:22px;text-align:center;box-shadow:0 0 45px var(--glow-purple);animation:themeUnlockPop .34s ease-out}
+.theme-unlock-icon{font-size:3.2rem;filter:drop-shadow(0 0 14px var(--accent-purple))}
+.theme-unlock-box h3{font-size:1rem;margin:9px 0 3px}.theme-unlock-box p{font-size:.62rem;color:#999;line-height:1.5}
+@keyframes themeUnlockPop{from{transform:scale(.76);opacity:0}to{transform:scale(1);opacity:1}}
+#ambiance-particles{position:fixed;inset:0;pointer-events:none;z-index:8;overflow:hidden}
+.amb-p{position:absolute;top:-7vh;opacity:.72;animation:ambFall linear infinite;will-change:transform}
+@keyframes ambFall{to{transform:translate3d(var(--drift),110vh,0) rotate(540deg)}}
+.amb-p.spark{border-radius:50%;background:var(--amb-particle);box-shadow:0 0 10px var(--amb-particle)}
+.amb-p.emoji{font-size:var(--size)}
+@media(max-width:600px){.theme-gallery{grid-template-columns:1fr 1fr}.theme-card-v134{min-height:101px;padding:8px}}
+@media(prefers-reduced-motion:reduce){#ambiance-particles{display:none}.theme-unlock-box{animation:none}}
+
+
+/* ===== V13.4.1 — ALLY THEME UNLOCK ===== */
+.v1341-redeem{margin:9px 0 2px;padding:10px;border:1px dashed rgba(189,0,255,.55);border-radius:10px;background:rgba(189,0,255,.035)}
+.v1341-redeem-head{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:7px}
+.v1341-redeem-head b{font-size:.68rem}.v1341-redeem-head span{font-size:.48rem;color:#777}
+.v1341-redeem-row{display:grid;grid-template-columns:1fr auto;gap:6px}
+.v1341-redeem-row input{min-width:0;background:#08080d;border:1px solid #34343e;color:#fff;border-radius:8px;padding:9px;text-transform:uppercase}
+.v1341-redeem-status{font-size:.51rem;color:#777;margin-top:6px;min-height:12px}
+.v1341-redeem-status.ok{color:#00e676}.v1341-redeem-status.err{color:#ff687a}
+.v1341-founder{display:inline-flex;align-items:center;gap:4px;padding:3px 6px;border-radius:999px;border:1px solid rgba(255,234,0,.5);color:#ffea00;background:rgba(255,234,0,.06);font-size:.47rem;font-weight:1000}
 
 </style>
 
@@ -2829,7 +2905,7 @@ nav .nav-item{min-width:0}.nav-text{font-size:.49rem!important}
   window.handleV11Import=function(input){const file=input.files?.[0];if(!file)return;const r=new FileReader();r.onload=()=>{try{const d=JSON.parse(r.result);if(d.userData)userData=d.userData;if(d.smartHypertrophyRefs)smartHypertrophyRefs=d.smartHypertrophyRefs;if(d.bodyHistory)bodyHistory=d.bodyHistory;if(d.inventoryItems)inventoryItems=d.inventoryItems;if(d.workoutHistory)workoutHistory=d.workoutHistory;if(d.workoutState)workoutState=d.workoutState;if(d.customSetData)customSetData=d.customSetData;if(d.activeProgramKey)activeProgramKey=d.activeProgramKey;if(Number.isInteger(d.currentBlockIndex))currentBlockIndex=d.currentBlockIndex;if(d.v10)v10=Object.assign({},defaults,d.v10);saveToLocalStorage();save();updateProfileUI();renderBodyChart();initWorkoutSystem();renderPowerHome();render();toast('Sauvegarde importée avec succès')}catch(e){alert('Fichier de sauvegarde invalide.')}};r.readAsText(file);input.value=''};
   function recommendation(){const prog=getPrograms()[currentBlockIndex]?.[currentDayIndex];if(!prog)return;let done=0,total=0;prog.exercises.forEach((ex,ei)=>{for(let si=0;si<ex.sets;si++){total++;if(workoutState[currentBlockIndex]?.[currentDayIndex]?.[ei]?.[si])done++}});const pct=total?Math.round(done/total*100):0,msg=pct===100?'🔥 Séance complète. Prochaine fois, vise +2,5 kg sur les isolations si toutes les reps cibles passent.':pct>50?'⚔️ Plus de la moitié validée. Garde 1–2 reps en réserve et termine proprement.':'🎯 Commence par les séries prévues. Le système mémorise tes performances pour ajuster la progression.';const el=document.getElementById('v10-rec-text');if(el)el.textContent=msg+' ('+done+'/'+total+' séries)'}
   const oldFinish=window.finishWorkoutFinal;window.finishWorkoutFinal=function(){const before=userData.workoutsCompleted||0;oldFinish();if((userData.workoutsCompleted||0)>before){const key=today();if(v10.lastWorkout){const diff=Math.round((new Date(key)-new Date(v10.lastWorkout))/86400000);v10.streak=diff===1?(v10.streak||0)+1:diff===0?(v10.streak||0):1}else v10.streak=1;v10.lastWorkout=key;v10.sessions.push({date:key,program:activeProgramKey,day:currentDayIndex,rating:selectedRating,volume:calculateWeeklyTonnage()||0});grantQuest('session',250,'Séance terminée');const ratingBonus=Math.max(0,selectedRating-3)*50;if(ratingBonus)addXP(ratingBonus,'Performance séance');save();render()}};
-  const oldUpdate=window.updateProfileUI;window.updateProfileUI=function(){oldUpdate();setTimeout(render,0)};const oldInit=window.initWorkoutSystem;window.initWorkoutSystem=function(){oldInit();setTimeout(recommendation,0);setTimeout(render,0)};const oldSet=window.toggleSet;window.toggleSet=function(ei,si){oldSet(ei,si);setTimeout(()=>{recommendation();refreshQuests()},20)};
+  const oldUpdate=window.updateProfileUI;window.updateProfileUI=function(){oldUpdate();setTimeout(render,0);setTimeout(()=>{if(typeof renderThemeCollection==='function')renderThemeCollection()},60)};const oldInit=window.initWorkoutSystem;window.initWorkoutSystem=function(){oldInit();setTimeout(recommendation,0);setTimeout(render,0)};const oldSet=window.toggleSet;window.toggleSet=function(ei,si){oldSet(ei,si);setTimeout(()=>{recommendation();refreshQuests()},20)};
   render();
 })();
 </script>
@@ -3064,7 +3140,7 @@ const sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_PUBLISHABLE_KEY,{
   auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true,storage:window.localStorage}
 });
 let cloudUser=null,cloudLicensed=false,cloudLoadedOnce=false,cloudSaveTimer=null,suppressCloudSave=false,licenseWatchTimer=null,lastLicenseStatus='UNKNOWN';
-const APP_VERSION='13.3.1';
+const APP_VERSION='13.4.2';
 const ACCOUNT_LOCAL_KEYS=['solo_leveling_user','solo_leveling_smart_refs','solo_leveling_body_hist','solo_leveling_inv','solo_leveling_block','solo_leveling_day','solo_leveling_state','solo_leveling_custom_sets','solo_leveling_history','solo_leveling_active_program','solo_leveling_program_states','solo_leveling_program_custom_sets','solo_leveling_custom_program','leveling_last_local_save','leveling_last_cloud_sync','leveling_v10'];
 function clearLevelingAccountLocalData(){
   try{ACCOUNT_LOCAL_KEYS.forEach(k=>localStorage.removeItem(k));sessionStorage.removeItem('leveling_pending_license')}catch(e){console.warn('Local account cleanup:',e)}
@@ -3286,7 +3362,7 @@ window.scheduleCloudSave=scheduleCloudSave;
 const __v12LocalSave=window.saveToLocalStorage;
 window.saveToLocalStorage=function(){if(typeof __v12LocalSave==='function')__v12LocalSave();scheduleCloudSave()};
 function refreshV11UIAfterCloud(){
-  try{setTheme(userData.theme);updateProfileUI();renderBodyChart();initWorkoutSystem();renderPowerHome();renderHistoryUI();if(typeof v11RenderIdentity==='function')v11RenderIdentity();if(typeof v11RenderReport==='function')v11RenderReport();if(typeof v11LoadProfileInputs==='function')v11LoadProfileInputs()}catch(e){console.warn('UI refresh:',e)}
+  try{setTheme(userData.theme);if(typeof applyAmbianceTheme==='function')applyAmbianceTheme(userData.ambianceTheme||'default',false);updateProfileUI();renderBodyChart();initWorkoutSystem();renderPowerHome();renderHistoryUI();if(typeof v11RenderIdentity==='function')v11RenderIdentity();if(typeof v11RenderReport==='function')v11RenderReport();if(typeof v11LoadProfileInputs==='function')v11LoadProfileInputs()}catch(e){console.warn('UI refresh:',e)}
 }
 async function unlockLevelingApp(){
   const allowed=await enforceLicenseAccess(false);if(!allowed)return;
@@ -3574,6 +3650,209 @@ async function kickTeamMemberV1331(userId,name){
   if(error)return alert(error.message);await loadCommunityTeam();await loadCommunityTeamSummary()
 }
 
+
+/* ================= LEVELING-APP V13.4 — THEME COLLECTION ================= */
+const V134_THEME_KEY='leveling_theme_collection_v134';
+const V134_THEMES=[
+ {id:'default',icon:'✨',name:'LEVELING Original',desc:'Ton style classique. Couleur principale personnalisable.',c1:'#bd00ff',c2:'#ff007f',cond:'Toujours disponible',goal:0,progress:()=>1},
+ {id:'sakura',icon:'🌸',name:'Sakura',desc:'Rose nocturne avec une pluie légère de pétales.',c1:'#ff5ca8',c2:'#ffb3d7',cond:'Terminer 5 séances',goal:5,progress:()=>Number(userData.workoutsCompleted||0)},
+ {id:'halloween',icon:'🎃',name:'Halloween',desc:'Noir, orange et braises dans l’ombre.',c1:'#ff7a00',c2:'#ff2d00',cond:'Terminer 10 séances',goal:10,progress:()=>Number(userData.workoutsCompleted||0),season:'Bonus saisonnier en octobre'},
+ {id:'christmas',icon:'🎄',name:'Noël',desc:'Ambiance hivernale, rouge/vert et neige.',c1:'#ff2f55',c2:'#00e676',cond:'Terminer 15 séances',goal:15,progress:()=>Number(userData.workoutsCompleted||0),season:'Bonus saisonnier en décembre'},
+ {id:'glacial',icon:'❄️',name:'Glacial',desc:'Bleu polaire, lumière froide et neige fine.',c1:'#65d9ff',c2:'#d8f7ff',cond:'Cumuler 50 000 kg de volume',goal:50000,progress:()=>v134TotalVolume()},
+ {id:'berserker',icon:'🔥',name:'Berserker',desc:'Rouge brutal, braises et énergie de combat.',c1:'#ff1744',c2:'#ff9100',cond:'Détecter 5 PR',goal:5,progress:()=>Number(userData.prCount||0)},
+ {id:'thunder',icon:'⚡',name:'Foudre',desc:'Jaune électrique et éclats d’énergie.',c1:'#ffe600',c2:'#8f7cff',cond:'Atteindre le niveau 20',goal:20,progress:()=>Number(userData.level||1)},
+ {id:'elite',icon:'💎',name:'Élite',desc:'Cyan et violet réservé aux chasseurs avancés.',c1:'#00e5ff',c2:'#8a2be2',cond:'Atteindre le niveau 35',goal:35,progress:()=>Number(userData.level||1)},
+ {id:'monarch',icon:'👑',name:'Monarque',desc:'Aura royale violette. Récompense de rang ultime.',c1:'#9c27ff',c2:'#ff007f',cond:'Atteindre le niveau 67',goal:67,progress:()=>Number(userData.level||1)},
+ {id:'shadow',icon:'🌌',name:'Shadow',desc:'Thème ultra rare : obscurité, violet et énergie spectrale.',c1:'#6d00ff',c2:'#00d2ff',cond:'50 séances + 10 PR',goal:100,progress:()=>Math.min(50,Number(userData.workoutsCompleted||0))+Math.min(50,Number(userData.prCount||0)*5)}
+];
+function v134TotalVolume(){return (workoutHistory||[]).reduce((s,h)=>s+(Number(h.totalTonnage)||0),0)}
+function v134State(){
+ let s={equipped:'default',unlocked:{default:true},seen:{}};
+ try{s=Object.assign(s,JSON.parse(localStorage.getItem(V134_THEME_KEY)||'{}'))}catch(e){}
+ if(userData.ambianceTheme&&!s.equipped)s.equipped=userData.ambianceTheme;
+ s.unlocked=Object.assign({default:true},s.unlocked||{});
+ s.seen=s.seen||{};
+ return s
+}
+
+let v134Themes=v134State();
+
+/* V13.4.1 — Founder + faithful allies unlock */
+const V1341_FOUNDER_EMAIL='dydy180215@gmail.com';
+const V1341_ALLY_CODE='MONARQUE-ALLIES-2026';
+
+function v1341IsFounder(){
+  return String(cloudUser?.email||'').trim().toLowerCase()===V1341_FOUNDER_EMAIL;
+}
+function v1341HasMasterUnlock(){
+  return v1341IsFounder()===true || v134Themes.masterUnlock===true;
+}
+function v1341UnlockEverything(source='code'){
+  v134Themes.masterUnlock=true;
+  V134_THEMES.forEach(t=>{v134Themes.unlocked[t.id]=true;v134Themes.seen[t.id]=true});
+  localStorage.setItem(V134_THEME_KEY,JSON.stringify(v134Themes));
+  userData.ambianceTheme=v134Themes.equipped||'default';
+  saveToLocalStorage();
+  if(typeof scheduleCloudSaveImmediate==='function')scheduleCloudSaveImmediate();
+  if(typeof renderThemeCollection==='function')renderThemeCollection();
+  if(typeof showSocialToast==='function'){
+    showSocialToast(source==='founder'?'👑 Accès Fondateur activé':'🤝 Code Alliés accepté','Tous les thèmes sont débloqués sur ce compte.');
+  }
+}
+function redeemThemeCodeV1341(){
+  const inp=document.getElementById('v1341-theme-code');
+  const st=document.getElementById('v1341-redeem-status');
+  const code=String(inp?.value||'').trim().toUpperCase();
+  if(code===V1341_ALLY_CODE){
+    v1341UnlockEverything('code');
+    if(st){st.className='v1341-redeem-status ok';st.textContent='✅ Tous les thèmes sont maintenant débloqués.'}
+    if(inp)inp.value='';
+    playSound('success');
+  }else{
+    if(st){st.className='v1341-redeem-status err';st.textContent='❌ Code invalide.'}
+    playSound('error');
+  }
+}
+window.redeemThemeCodeV1341=redeemThemeCodeV1341;
+
+function v134IsSeasonUnlocked(t){
+ const m=new Date().getMonth()+1;
+ return (t.id==='halloween'&&m===10)||(t.id==='christmas'&&m===12)
+}
+function v134Unlocked(t){
+ if(v1341HasMasterUnlock())return true;
+ if(t.id==='default')return true;
+ if(v134IsSeasonUnlocked(t))return true;
+ const p=Number(t.progress()||0);
+ return p>=Number(t.goal||0)
+}
+function v134Save(){
+ localStorage.setItem(V134_THEME_KEY,JSON.stringify(v134Themes));
+ userData.ambianceTheme=v134Themes.equipped||'default';
+ saveToLocalStorage();
+ if(typeof scheduleCloudSaveImmediate==='function')scheduleCloudSaveImmediate();
+ else if(typeof scheduleCloudSave==='function')scheduleCloudSave();
+}
+function applyAmbianceTheme(id,save=true){
+ const t=V134_THEMES.find(x=>x.id===id)||V134_THEMES[0];
+ if(!v134Unlocked(t)&&id!=='default')return false;
+ v134Themes.equipped=t.id;userData.ambianceTheme=t.id;
+ document.body.setAttribute('data-ambiance',t.id);
+ renderAmbianceParticles(t.id);
+ if(save)v134Save();
+ renderThemeCollection();
+ return true
+}
+window.applyAmbianceTheme=applyAmbianceTheme;
+function renderAmbianceParticles(id){
+ let layer=document.getElementById('ambiance-particles');
+ if(!layer){layer=document.createElement('div');layer.id='ambiance-particles';document.body.appendChild(layer)}
+ layer.innerHTML='';
+ if(id==='default'||window.matchMedia?.('(prefers-reduced-motion: reduce)').matches)return;
+ const cfg={
+  sakura:['emoji','🌸',15],halloween:['spark','',18],christmas:['emoji','❄',18],
+  glacial:['emoji','❄',16],berserker:['spark','',20],thunder:['spark','',12],
+  elite:['spark','',12],monarch:['spark','',15],shadow:['spark','',17]
+ }[id]||['spark','',10];
+ for(let i=0;i<cfg[2];i++){
+   const p=document.createElement('i');p.className='amb-p '+cfg[0];
+   if(cfg[0]==='emoji')p.textContent=cfg[1];
+   p.style.left=(Math.random()*100)+'vw';p.style.animationDuration=(5+Math.random()*8)+'s';p.style.animationDelay=(-Math.random()*10)+'s';
+   p.style.setProperty('--drift',(-50+Math.random()*100)+'px');p.style.setProperty('--size',(10+Math.random()*11)+'px');
+   if(cfg[0]==='spark'){const z=2+Math.random()*4;p.style.width=z+'px';p.style.height=z+'px'}
+   layer.appendChild(p)
+ }
+}
+function v134ProgressText(t){
+ if(t.id==='shadow')return `${Math.min(50,Number(userData.workoutsCompleted||0))}/50 séances · ${Math.min(10,Number(userData.prCount||0))}/10 PR`;
+ const p=Math.max(0,Number(t.progress()||0)),g=Number(t.goal||0);
+ if(!g)return t.cond;
+ if(t.id==='glacial')return `${Math.round(p).toLocaleString()} / ${g.toLocaleString()} kg`;
+ return `${Math.min(p,g).toLocaleString()} / ${g.toLocaleString()}`;
+}
+function renderThemeCollection(){
+ const box=document.getElementById('v134-theme-gallery');
+ if(!box)return;
+ const newly=[];
+ V134_THEMES.forEach(t=>{
+   const earned=v134Unlocked(t);
+   if(earned&&!v134Themes.unlocked[t.id]){v134Themes.unlocked[t.id]=true;if(!v134Themes.seen[t.id])newly.push(t)}
+ });
+ if(newly.length){v134Save();setTimeout(()=>showThemeUnlock(newly[0]),250)}
+ box.style.display='grid';
+ box.innerHTML=V134_THEMES.map(t=>{
+   const naturallyUnlocked=(t.id==='default')||v134IsSeasonUnlocked(t)||(Number(t.progress()||0)>=Number(t.goal||0));
+   const available=v134Unlocked(t);
+   const eq=v134Themes.equipped===t.id;
+   const p=t.goal?Math.min(100,Math.round(Number(t.progress()||0)/Number(t.goal)*100)):100;
+   const forced=v1341HasMasterUnlock()&&!naturallyUnlocked&&t.id!=='default';
+   const state=eq?'✨ ÉQUIPÉ':available?(forced?'👑 ACCÈS SPÉCIAL':'✅ DÉBLOQUÉ'):'🔒 VERROUILLÉ';
+   const progressText=t.id==='default'?'Toujours disponible':v134ProgressText(t);
+   return `<div class="theme-card-v134 ${available?'unlocked':'locked'} ${eq?'equipped':''}" style="--tc1:${t.c1};--tc2:${t.c2};--pct:${p}%" onclick="selectThemeV134('${t.id}')">
+    <div class="tc-top"><span class="tc-icon">${t.icon}</span><span class="tc-state">${state}</span></div>
+    <div class="tc-name">${t.name}</div>
+    <div class="tc-desc">${t.desc}</div>
+    <div class="tc-progress"><i></i></div>
+    <div class="tc-condition">${progressText}</div>
+    <div class="theme-season">${forced?'👑 Débloqué par Fondateur / Code allié':(t.season?'📅 '+t.season:'')}</div>
+   </div>`
+ }).join('');
+ if(!box.innerHTML.trim()){
+   box.innerHTML='<div class="v1331-error">⚠️ La galerie de thèmes n’a pas pu être chargée.</div>';
+ }
+}
+window.renderThemeCollection=renderThemeCollection;
+function selectThemeV134(id){
+ const t=V134_THEMES.find(x=>x.id===id);if(!t)return;
+ if(!v134Unlocked(t)){playSound('error');if(typeof showSocialToast==='function')showSocialToast('🔒 Thème verrouillé',t.cond);else alert('Thème verrouillé : '+t.cond);return}
+ playSound('success');applyAmbianceTheme(id,true);
+ if(typeof showSocialToast==='function')showSocialToast(`${t.icon} ${t.name} équipé`,'Ambiance appliquée à ton compte.')
+}
+window.selectThemeV134=selectThemeV134;
+function showThemeUnlock(t){
+ if(!t||t.id==='default')return;
+ v134Themes.seen[t.id]=true;v134Save();
+ let m=document.getElementById('theme-unlock-modal');
+ if(!m){m=document.createElement('div');m.id='theme-unlock-modal';m.className='theme-unlock-modal';document.body.appendChild(m)}
+ m.innerHTML=`<div class="theme-unlock-box"><div class="theme-unlock-icon">${t.icon}</div><div style="font-size:.58rem;color:var(--warning);font-weight:1000">🏆 RÉCOMPENSE DÉBLOQUÉE</div><h3>${t.name}</h3><p>${t.desc}<br><b>${t.cond}</b></p><button class="btn-action" onclick="applyAmbianceTheme('${t.id}',true);closeThemeUnlockV134()">✨ ÉQUIPER</button><button class="btn-action" onclick="closeThemeUnlockV134()" style="border-color:#444;color:#aaa">Plus tard</button></div>`;
+ m.classList.add('show');playSound('success')
+}
+window.closeThemeUnlockV134=function(){document.getElementById('theme-unlock-modal')?.classList.remove('show')};
+function mountThemeCollection(parent){
+ if(!parent)return;
+ let c=document.getElementById('v134-theme-collection');
+ if(!c){
+   c=document.createElement('div');
+   c.id='v134-theme-collection';
+   c.className='theme-collection';
+   c.innerHTML=`<div class="theme-collection-head"><b>🏆 Collection de thèmes ${v1341IsFounder()?'<span class="v1341-founder">👑 FONDATEUR</span>':''}</b><span>Quêtes · rangs · événements</span></div>
+   <div style="font-size:.52rem;color:#8b8b94;margin:-2px 0 8px">Même avec un accès Fondateur/Allié, les conditions normales restent visibles pour voir comment chaque thème se débloque.</div>
+   <div id="v134-theme-gallery" class="theme-gallery"></div>
+   <div class="v1341-redeem">
+     <div class="v1341-redeem-head"><b>🔐 Code secret d’allié</b><span>Récompense spéciale</span></div>
+     <div class="v1341-redeem-row"><input id="v1341-theme-code" placeholder="ENTRER UN CODE..." onkeydown="if(event.key==='Enter')redeemThemeCodeV1341()"><button class="btn-action" onclick="redeemThemeCodeV1341()" style="width:auto;margin:0">DÉBLOQUER</button></div>
+     <div id="v1341-redeem-status" class="v1341-redeem-status">${v1341HasMasterUnlock()?'✅ Accès complet actif sur ce compte.':'Entre un code offert par le fondateur.'}</div>
+   </div>`;
+   parent.prepend(c);
+ }
+ renderThemeCollection();
+}
+window.mountThemeCollection=mountThemeCollection;
+(function bootV134(){
+ const id=userData.ambianceTheme||v134Themes.equipped||'default';
+ v134Themes.equipped=v134Unlocked(V134_THEMES.find(t=>t.id===id)||V134_THEMES[0])?id:'default';
+ document.body.setAttribute('data-ambiance',v134Themes.equipped);
+ setTimeout(()=>{if(v1341IsFounder()&&!v134Themes.masterUnlock)v1341UnlockEverything('founder');renderAmbianceParticles(v134Themes.equipped);renderThemeCollection()},30);
+})();
+
+setTimeout(()=>{
+ const amb=[...document.querySelectorAll('.compact-setting-section')].find(x=>x.querySelector('.compact-setting-title')?.textContent.includes('Ambiance'));
+ if(amb){
+   const body=amb.querySelector('.compact-setting-body');
+   if(body)mountThemeCollection(body);
+ }
+},700);
+
 /* Compact settings: transforms the existing settings without deleting features */
 function compactSection(title,summary,open=false){
   const s=document.createElement('div');s.className='compact-setting-section'+(open?' open':'');
@@ -3619,7 +3898,9 @@ function initCompactSettings(){
     const fs=[...visual.querySelectorAll('button')].find(b=>b.textContent.includes('Plein Écran'));
     if(fs){display.querySelector('.compact-setting-body').appendChild(fs)}
     appearance.querySelector('.compact-setting-body').appendChild(visual);
-  }
+    mountThemeCollection(appearance.querySelector('.compact-setting-body'));setTimeout(()=>{mountThemeCollection(appearance.querySelector('.compact-setting-body'));renderThemeCollection()},120);
+  }else{mountThemeCollection(appearance.querySelector('.compact-setting-body'))}
+
   if(backup)save.querySelector('.compact-setting-body').appendChild(backup);
   if(install)display.querySelector('.compact-setting-body').appendChild(install);
   const grid=document.createElement('div');grid.className='compact-settings-grid';
