@@ -1393,7 +1393,7 @@ header .hud-stat.v140-clickable:hover{
 #validate-workout-btn.v1403-validated::before{display:none!important}
 
 #v1402-account-btn{
-  background:#101016!important;
+  background-color:#101016!important;
 }
 #v1402-account-btn .v1405-avatar,
 #v1402-account-btn .v1402-avatar{display:none!important}
@@ -1427,7 +1427,7 @@ header .hud-stat.v140-clickable:hover{
 #v1402-account-btn{
   position:relative!important;
   overflow:hidden!important;
-  background:#0d0d13!important;
+  background-color:#0d0d13!important;
   background-size:cover!important;
   background-position:center!important;
   background-repeat:no-repeat!important;
@@ -3988,7 +3988,7 @@ const sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_PUBLISHABLE_KEY,{
   auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true,storage:window.localStorage}
 });
 let cloudUser=null,cloudLicensed=false,cloudLoadedOnce=false,cloudSaveTimer=null,suppressCloudSave=false,licenseWatchTimer=null,lastLicenseStatus='UNKNOWN';
-const APP_VERSION='14.1.2';
+const APP_VERSION='14.1.3';
 const ACCOUNT_LOCAL_KEYS=['solo_leveling_user','solo_leveling_smart_refs','solo_leveling_body_hist','solo_leveling_inv','solo_leveling_block','solo_leveling_day','solo_leveling_state','solo_leveling_custom_sets','solo_leveling_history','solo_leveling_active_program','solo_leveling_program_states','solo_leveling_program_custom_sets','solo_leveling_custom_program','leveling_last_local_save','leveling_last_cloud_sync','leveling_v10'];
 function clearLevelingAccountLocalData(){
   try{ACCOUNT_LOCAL_KEYS.forEach(k=>localStorage.removeItem(k));sessionStorage.removeItem('leveling_pending_license')}catch(e){console.warn('Local account cleanup:',e)}
@@ -4104,7 +4104,7 @@ async function retryLicenseCheck(){
 }
 function exportAppData(){
   if(typeof saveActiveProgramState==='function')saveActiveProgramState();
-  return{version:'14.1.2',userData,smartHypertrophyRefs,bodyHistory,inventoryItems,currentBlockIndex,currentDayIndex,activeProgramKey,programWorkoutStates,programCustomSetData,customProgramData,workoutState,customSetData,workoutHistory,v10:(typeof window.__levelingV10Export==='function'?window.__levelingV10Export():null)};
+  return{version:'14.1.3',userData,smartHypertrophyRefs,bodyHistory,inventoryItems,currentBlockIndex,currentDayIndex,activeProgramKey,programWorkoutStates,programCustomSetData,customProgramData,workoutState,customSetData,workoutHistory,v10:(typeof window.__levelingV10Export==='function'?window.__levelingV10Export():null)};
 }
 function importAppData(d){
   if(!d||typeof d!=='object')return;suppressCloudSave=true;
@@ -7162,7 +7162,7 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
     const oldExport=window.exportAppData;
     window.exportAppData=function(){
       const d=oldExport.apply(this,arguments) || {};
-      d.version='14.1.2';
+      d.version='14.1.3';
       try{d.v140Rpg=JSON.parse(localStorage.getItem('leveling_v140_rpg')||'{}')}catch(e){d.v140Rpg={}}
       d.validatedSessions=validatedSnapshot();
       d.cycleResetPending=localStorage.getItem('leveling_cycle_reset_pending')||'';
@@ -7400,6 +7400,80 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',()=>setTimeout(boot,2800));
   else setTimeout(boot,2800);
   document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')setTimeout(boot,120)});
+})();
+</script>
+
+
+<style id="v1413-avatar-real-fix">
+/* V14.1.3 — une seule source d'affichage pour l'avatar du header */
+#v1402-account-btn{
+  background-color:#0d0d13!important;
+  background-image:var(--v1413-avatar-image,none)!important;
+  background-size:cover!important;
+  background-position:center!important;
+  background-repeat:no-repeat!important;
+}
+#v1402-account-btn.v1413-avatar-ready::before{display:none!important}
+#v1402-account-btn.v1413-avatar-ready > *{display:none!important}
+</style>
+
+<script id="v1413-avatar-real-fix-js">
+(function(){
+  let last='__init__';
+
+  function sync(){
+    const btn=document.getElementById('v1402-account-btn');
+    if(!btn)return;
+    const src=String(window.userData?.playerAvatarImage||'').trim();
+
+    if(src){
+      if(src!==last){
+        btn.style.setProperty('--v1413-avatar-image',`url("${src.replace(/"/g,'%22')}")`);
+        last=src;
+      }
+      btn.classList.add('v1413-avatar-ready');
+      btn.classList.add('v1408-photo');
+    }else{
+      btn.style.setProperty('--v1413-avatar-image','none');
+      btn.classList.remove('v1413-avatar-ready');
+      last='';
+    }
+  }
+
+  window.v1413SyncHeaderAvatar=sync;
+
+  /* La donnée peut arriver après le chargement cloud. */
+  let tries=0;
+  const timer=setInterval(()=>{
+    sync();
+    tries++;
+    if(tries>40 && String(window.userData?.playerAvatarImage||'').trim())clearInterval(timer);
+  },350);
+
+  if(typeof window.renderProfileV2==='function'&&!window.renderProfileV2.v1413){
+    const old=window.renderProfileV2;
+    window.renderProfileV2=function(){
+      const r=old.apply(this,arguments);
+      setTimeout(sync,0);
+      return r;
+    };
+    window.renderProfileV2.v1413=1;
+  }
+
+  if(typeof window.handleProfileAvatar==='function'&&!window.handleProfileAvatar.v1413){
+    const old=window.handleProfileAvatar;
+    window.handleProfileAvatar=async function(){
+      const r=await old.apply(this,arguments);
+      last='__refresh__';
+      setTimeout(sync,30);
+      return r;
+    };
+    window.handleProfileAvatar.v1413=1;
+  }
+
+  document.addEventListener('visibilitychange',()=>{
+    if(document.visibilityState==='visible')setTimeout(sync,80);
+  });
 })();
 </script>
 
