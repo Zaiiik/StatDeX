@@ -3,7 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>LEVELING-APP — Powerbuilding Tracker V12.5.1</title>
+    <title>LEVELING-APP — Powerbuilding Tracker V12.6</title>
+    <meta name="theme-color" content="#09090f">
+    <meta name="application-name" content="LEVELING-APP">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="LEVELING-APP">
+    <meta name="mobile-web-app-capable" content="yes">
+    <link rel="manifest" href="./manifest.webmanifest">
+    <link rel="apple-touch-icon" href="./icon-192.png">
+
     <style>
         :root {
             --bg-color: #050507;
@@ -417,6 +426,27 @@
 #update-banner button{border:1px solid #00d2ff;background:rgba(0,210,255,.12);color:#b8f3ff;border-radius:8px;padding:7px 9px;font-weight:900;cursor:pointer;white-space:nowrap}
 @media(max-width:600px){.custom-ex-row{grid-template-columns:minmax(0,1fr) 50px 50px 58px 32px}.custom-ex-row input{font-size:.61rem;padding:6px}}
 
+
+/* ==================== V12.6 PWA / MOBILE / PROFILE ==================== */
+:root{--safe-bottom:env(safe-area-inset-bottom,0px);--safe-top:env(safe-area-inset-top,0px)}
+body{padding-top:var(--safe-top)}
+.bottom-nav{padding-bottom:var(--safe-bottom);height:calc(54px + var(--safe-bottom))}
+main{padding-bottom:calc(76px + var(--safe-bottom))}
+.v11-avatar{position:relative;cursor:pointer}.v11-avatar img{width:100%;height:100%;object-fit:cover;border-radius:inherit}
+.avatar-preview-box{display:flex;align-items:center;gap:12px;padding:10px;border:1px solid rgba(189,0,255,.25);border-radius:12px;background:rgba(0,0,0,.22)}
+.avatar-preview{width:74px;height:74px;border-radius:16px;display:grid;place-items:center;overflow:hidden;background:radial-gradient(circle at 35% 25%,#fff,#bd00ff 25%,#17001f 72%);font-size:1.7rem;font-weight:1000;flex:none}
+.avatar-preview img{width:100%;height:100%;object-fit:cover}.avatar-actions{display:flex;flex-direction:column;gap:7px;flex:1}.avatar-actions button{margin:0}
+.sync-online{color:#00e676!important;border-color:rgba(0,230,118,.35)!important}.sync-working{color:#8feaff!important;border-color:rgba(0,210,255,.35)!important}
+.sync-offline{color:#ffb74d!important;border-color:rgba(255,183,77,.35)!important}.sync-error{color:#ff5b6e!important;border-color:rgba(255,91,110,.35)!important}
+.install-card{border-color:rgba(0,210,255,.4)!important;box-shadow:0 0 14px rgba(0,210,255,.08)}
+.install-status{font-size:.64rem;color:#888;margin-top:7px;line-height:1.45}
+.resume-pill{display:none;margin:8px 12px;padding:9px 11px;border:1px solid rgba(0,230,118,.38);border-radius:10px;background:rgba(0,230,118,.07);color:#baffd2;font-size:.67rem;align-items:center;justify-content:space-between;gap:8px}
+.resume-pill.show{display:flex}.resume-pill button{border:1px solid rgba(0,230,118,.45);background:rgba(0,230,118,.12);color:#d4ffe2;border-radius:7px;padding:6px 8px;font-weight:900;font-size:.62rem}
+#ios-install-modal{display:none;position:fixed;inset:0;z-index:7000;background:rgba(0,0,0,.78);align-items:center;justify-content:center;padding:20px}
+#ios-install-modal.show{display:flex}.ios-install-box{max-width:390px;width:100%;background:#111118;border:1px solid #393943;border-radius:16px;padding:18px;box-shadow:0 0 30px rgba(189,0,255,.22)}
+.ios-step{padding:8px 0;border-bottom:1px solid #25252d;font-size:.76rem;color:#ddd}.ios-step:last-child{border-bottom:0}
+@media(max-width:600px){header{padding-left:10px;padding-right:10px}.profile-card,.v11-card,.v10-card{border-radius:12px}button,.btn-action,.v11-btn{min-height:42px}.nav-item{min-height:48px}}
+
 </style>
 
 <style id="v10-style">
@@ -490,9 +520,13 @@
         </header>
         <div id="update-banner">
             <div><b id="update-version-label">Nouvelle version disponible</b><div id="update-message" style="color:#aaa;margin-top:2px"></div></div>
-            <button onclick="location.reload()">ACTUALISER</button>
+            <button onclick="forceAppUpdate()">METTRE À JOUR</button>
         </div>
 
+        <div id="resume-workout-banner" class="resume-pill">
+            <span id="resume-workout-text">🏋️ Séance en cours sauvegardée</span>
+            <button onclick="resumeSavedWorkout()">REPRENDRE</button>
+        </div>
         <main>
             <div id="panel-profile" class="panel active">
                 <h2>Rang & Niveau de Powerlifting</h2>
@@ -641,11 +675,20 @@
                             <input id="v11-name-input" type="text" maxlength="24" placeholder="Ton pseudo"
                                 style="width:100%;margin-top:4px;padding:10px;border-radius:8px;border:1px solid rgba(189,0,255,.35);background:#111;color:#fff">
                         </label>
-                        <label style="font-size:.68rem;color:#aaa">Avatar (emoji)
+                        <div class="avatar-preview-box">
+                            <div class="avatar-preview" id="profile-avatar-preview">⚔️</div>
+                            <div class="avatar-actions">
+                                <button class="btn-action" type="button" onclick="playSound('click'); document.getElementById('profile-avatar-file').click()">📷 Choisir une photo</button>
+                                <button class="btn-action" type="button" onclick="playSound('click'); removeProfileAvatar()" style="border-color:#555;color:#aaa">Retirer la photo</button>
+                                <div style="font-size:.6rem;color:#777">Photo compressée automatiquement pour rester légère dans le cloud.</div>
+                            </div>
+                        </div>
+                        <input id="profile-avatar-file" type="file" accept="image/*" style="display:none" onchange="handleProfileAvatar(this)">
+                        <label style="font-size:.68rem;color:#aaa">Avatar de secours (emoji)
                             <input id="v11-avatar-input" type="text" maxlength="4" placeholder="⚔️"
                                 style="width:100%;margin-top:4px;padding:10px;border-radius:8px;border:1px solid rgba(189,0,255,.35);background:#111;color:#fff">
                         </label>
-                        <button class="v11-btn" onclick="v11SaveProfile()">💾 Sauvegarder mon profil</button>
+                        <button class="v11-btn" onclick="playSound('success'); v11SaveProfile()">💾 Sauvegarder mon profil</button>
                     </div>
                 </div>
 
@@ -658,10 +701,19 @@
                     <p style="font-size:.68rem;color:#aaa">Compte LEVELING-APP synchronisé avec Supabase et protégé par licence Lifetime.</p>
                     <div style="display:flex;justify-content:space-between;align-items:center;gap:8px">
                         <span id="cloud-account-email" style="font-size:.7rem;color:#fff;word-break:break-all">Non connecté</span>
-                        <span class="cloud-badge">☁️ CLOUD</span>
+                        <span class="cloud-badge" id="cloud-live-badge">☁️ CLOUD</span>
                     </div>
-                    <div style="margin-top:8px;font-size:.6rem;color:#777;text-align:center">LEVELING-APP V12.5.1 · Base V11 conservée</div>
+                    <div id="cloud-sync-detail" style="margin-top:8px;font-size:.62rem;color:#777;text-align:center">Initialisation du cloud…</div>
+                    <div style="margin-top:5px;font-size:.58rem;color:#555;text-align:center">LEVELING-APP V12.6 · PWA Mobile</div>
                     <button class="btn-action" onclick="logoutLeveling()" style="border-color:#ff5555;color:#ff7777">Se déconnecter</button>
+                </div>
+
+
+                <div class="profile-card install-card">
+                    <h3>📲 Installer LEVELING-APP</h3>
+                    <p style="font-size:.68rem;color:#aaa">Installe l'app sur l'écran d'accueil pour un lancement plein écran, plus rapide et adapté à l'iPhone/Android.</p>
+                    <button class="btn-action" id="install-app-btn" onclick="playSound('click'); installLevelingApp()" style="background:rgba(0,210,255,.13);border-color:#00d2ff;color:#b8f3ff">📲 Ajouter à l'écran d'accueil</button>
+                    <div class="install-status" id="install-app-status">Détection de ton appareil…</div>
                 </div>
 
                 <div class="profile-card"><h3>💾 Sauvegarde V11</h3><p style="font-size:.68rem;color:#aaa">Sauvegarde complète de ta progression, XP, quêtes, succès et réglages.</p><div class="v10-export"><button class="btn-action" onclick="exportV11Data()">⬇️ Exporter</button><button class="btn-action" onclick="importV11Data()">⬆️ Importer</button></div><input id="v10-import-file" type="file" accept="application/json" style="display:none" onchange="handleV11Import(this)"></div>
@@ -1464,7 +1516,7 @@
             currentBlockIndex = 0;
             currentDayIndex = 0;
             loadActiveProgramState();
-            saveToLocalStorage();
+            saveToLocalStorage();scheduleCloudSaveImmediate();updateResumeWorkoutBanner();
             initWorkoutSystem();
             const workoutBtn = document.querySelector('button.nav-item[onclick*="switchTab(\'workout\'"]');
             switchTab('workout', workoutBtn);
@@ -1493,6 +1545,9 @@
 
                 const savedBlock = localStorage.getItem('solo_leveling_block');
                 if (savedBlock !== null) currentBlockIndex = parseInt(savedBlock);
+
+                const savedDay = localStorage.getItem('solo_leveling_day');
+                if (savedDay !== null) currentDayIndex = parseInt(savedDay);
 
                 const savedActiveProgram = localStorage.getItem('solo_leveling_active_program');
                 if (savedActiveProgram) activeProgramKey = savedActiveProgram;
@@ -1530,6 +1585,7 @@
                 localStorage.setItem('solo_leveling_body_hist', JSON.stringify(bodyHistory));
                 localStorage.setItem('solo_leveling_inv', JSON.stringify(inventoryItems));
                 localStorage.setItem('solo_leveling_block', currentBlockIndex);
+                localStorage.setItem('solo_leveling_day', currentDayIndex);
                 localStorage.setItem('solo_leveling_state', JSON.stringify(workoutState));
                 localStorage.setItem('solo_leveling_custom_sets', JSON.stringify(customSetData));
                 localStorage.setItem('solo_leveling_history', JSON.stringify(workoutHistory));
@@ -1541,6 +1597,11 @@
         }
 
         function initAutoDateAndBlock() {
+            const savedDay = localStorage.getItem('solo_leveling_day');
+            if (savedDay !== null && !Number.isNaN(parseInt(savedDay))) {
+                currentDayIndex = parseInt(savedDay);
+                return;
+            }
             const jsDay = new Date().getDay();
             currentDayIndex = (jsDay === 0) ? 6 : jsDay - 1;
         }
@@ -1686,7 +1747,7 @@
             userData.bench = parseFloat(document.getElementById('set-bench').value) || userData.bench;
             userData.deadlift = parseFloat(document.getElementById('set-deadlift').value) || userData.deadlift;
            
-            saveToLocalStorage();
+            saveToLocalStorage();scheduleCloudSaveImmediate();updateResumeWorkoutBanner();
             updateProfileUI();
             renderBodyChart();
             initWorkoutSystem();
@@ -1913,7 +1974,7 @@
                 };
             }
             customSetData[currentBlockIndex][currentDayIndex][exIndex][setIndex][field] = parseFloat(val) || 0;
-            saveToLocalStorage();
+            saveToLocalStorage();scheduleCloudSave();updateResumeWorkoutBanner();
             calculateWeeklyTonnage();
         }
 
@@ -2589,30 +2650,49 @@ function v11ExportReport(){
     a.click(); URL.revokeObjectURL(a.href);
 }
 
+function renderAvatarInto(el){
+    if(!el)return;el.innerHTML='';
+    if(userData.playerAvatarImage){
+        const img=document.createElement('img');img.src=userData.playerAvatarImage;img.alt='Avatar';el.appendChild(img);
+    }else el.textContent=userData.playerAvatar||((userData.playerName||'L').trim()[0]||'L').toUpperCase();
+}
 function v11LoadProfileInputs(){
-    const n=document.getElementById('v11-name-input');
-    const a=document.getElementById('v11-avatar-input');
-    if(n) n.value=userData.playerName || userData.name || '';
-    if(a) a.value=userData.playerAvatar || '⚔️';
+    const n=document.getElementById('v11-name-input'),a=document.getElementById('v11-avatar-input');
+    if(n)n.value=userData.playerName||userData.name||'';if(a)a.value=userData.playerAvatar||'⚔️';
+    renderAvatarInto(document.getElementById('profile-avatar-preview'));
 }
+async function handleProfileAvatar(input){
+    const file=input?.files?.[0];if(!file)return;
+    if(!file.type.startsWith('image/')){alert('Choisis une image valide.');return}
+    try{
+        userData.playerAvatarImage=await compressAvatarImage(file,192,.76);
+        saveToLocalStorage();renderAvatarInto(document.getElementById('profile-avatar-preview'));v11RenderIdentity();scheduleCloudSaveImmediate();playSound('success');
+    }catch(e){console.error(e);alert("Impossible de traiter cette image.")}finally{input.value=''}
+}
+function compressAvatarImage(file,maxSize=192,quality=.76){
+    return new Promise((resolve,reject)=>{
+        const img=new Image(),url=URL.createObjectURL(file);
+        img.onload=()=>{
+            try{
+                const side=Math.min(img.naturalWidth,img.naturalHeight),sx=(img.naturalWidth-side)/2,sy=(img.naturalHeight-side)/2;
+                const canvas=document.createElement('canvas');canvas.width=maxSize;canvas.height=maxSize;
+                canvas.getContext('2d').drawImage(img,sx,sy,side,side,0,0,maxSize,maxSize);
+                URL.revokeObjectURL(url);resolve(canvas.toDataURL('image/jpeg',quality));
+            }catch(e){URL.revokeObjectURL(url);reject(e)}
+        };
+        img.onerror=()=>{URL.revokeObjectURL(url);reject(new Error('image'))};img.src=url;
+    });
+}
+function removeProfileAvatar(){delete userData.playerAvatarImage;saveToLocalStorage();v11LoadProfileInputs();v11RenderIdentity();scheduleCloudSaveImmediate()}
 function v11SaveProfile(){
-    const n=document.getElementById('v11-name-input');
-    const a=document.getElementById('v11-avatar-input');
-    userData.playerName=(n?.value||'Joueur').trim().slice(0,24) || 'Joueur';
-    userData.playerAvatar=(a?.value||'⚔️').trim().slice(0,4) || '⚔️';
-    saveToLocalStorage();
-    v11RenderIdentity();
-    alert('Profil sauvegardé !');
+    const n=document.getElementById('v11-name-input'),a=document.getElementById('v11-avatar-input');
+    userData.playerName=(n?.value||'Joueur').trim().slice(0,24)||'Joueur';userData.playerAvatar=(a?.value||'⚔️').trim().slice(0,4)||'⚔️';
+    saveToLocalStorage();v11RenderIdentity();scheduleCloudSaveImmediate();alert('Profil sauvegardé et synchronisé !');
 }
-
 function v11RenderIdentity(){
-    const name = userData.playerName || userData.name || 'Joueur';
-    const nameEl=document.getElementById('v11-player-name');
-    const avatar=document.getElementById('v11-avatar');
-    const id=document.getElementById('v11-player-id');
-    if(nameEl) nameEl.textContent=name;
-    if(avatar) avatar.textContent=userData.playerAvatar || (name.trim()[0]||'L').toUpperCase();
-    if(id) id.textContent=userData.accountId ? 'ID '+userData.accountId : 'Profil local • prêt pour synchronisation cloud';
+    const name=userData.playerName||userData.name||'Joueur',nameEl=document.getElementById('v11-player-name'),avatar=document.getElementById('v11-avatar'),id=document.getElementById('v11-player-id');
+    if(nameEl)nameEl.textContent=name;renderAvatarInto(avatar);
+    if(id)id.textContent=(typeof cloudUser!=='undefined'&&cloudUser)?(cloudUser.email||'Compte LEVELING-APP'):'Profil local';
 }
 const v11OriginalSwitchTab = window.switchTab;
 window.switchTab = function(tabName,btn){
@@ -2652,9 +2732,11 @@ setTimeout(()=>{v11RenderIdentity();v11RenderReport();},50);
 <script>
 const SUPABASE_URL='https://jmejktyindxzzsqwthsk.supabase.co';
 const SUPABASE_PUBLISHABLE_KEY='sb_publishable_2eS6-xR0i4DZ4H4YI4Uj2w_FXSC_yUP';
-const sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_PUBLISHABLE_KEY);
+const sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_PUBLISHABLE_KEY,{
+  auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true,storage:window.localStorage}
+});
 let cloudUser=null,cloudLicensed=false,cloudLoadedOnce=false,cloudSaveTimer=null,suppressCloudSave=false,licenseWatchTimer=null,lastLicenseStatus='UNKNOWN';
-const APP_VERSION='12.5.1';
+const APP_VERSION='12.6';
 
 function showAuthScreen(name){
   document.querySelectorAll('.auth-screen').forEach(el=>el.classList.remove('active'));
@@ -2760,7 +2842,7 @@ async function retryLicenseCheck(){
 }
 function exportAppData(){
   if(typeof saveActiveProgramState==='function')saveActiveProgramState();
-  return{version:'12.5.1',userData,smartHypertrophyRefs,bodyHistory,inventoryItems,currentBlockIndex,currentDayIndex,activeProgramKey,programWorkoutStates,programCustomSetData,customProgramData,workoutState,customSetData,workoutHistory,v10:(typeof window.__levelingV10Export==='function'?window.__levelingV10Export():null)};
+  return{version:'12.6',userData,smartHypertrophyRefs,bodyHistory,inventoryItems,currentBlockIndex,currentDayIndex,activeProgramKey,programWorkoutStates,programCustomSetData,customProgramData,workoutState,customSetData,workoutHistory,v10:(typeof window.__levelingV10Export==='function'?window.__levelingV10Export():null)};
 }
 function importAppData(d){
   if(!d||typeof d!=='object')return;suppressCloudSave=true;
@@ -2773,15 +2855,95 @@ function importAppData(d){
   }finally{suppressCloudSave=false}
 }
 async function loadCloudData(){
-  if(!cloudUser||!cloudLicensed)return;const {data,error}=await sb.from('profiles').select('app_data,username').eq('id',cloudUser.id).single();
+  if(!cloudUser||!cloudLicensed)return;
+  lastCloudSyncAt=parseInt(localStorage.getItem('leveling_last_cloud_sync')||'0')||0;setCloudStatus(navigator.onLine?'syncing':'offline');
+  const {data,error}=await sb.from('profiles').select('app_data,username').eq('id',cloudUser.id).single();
   if(!error&&data){if(data.username&&!userData.playerName)userData.playerName=data.username;if(data.app_data&&Object.keys(data.app_data).length)importAppData(data.app_data);else await saveCloudData()}
   else if(error)console.warn('Cloud load:',error.message);cloudLoadedOnce=true;
 }
-async function saveCloudData(){
-  if(!cloudUser||!cloudLicensed||suppressCloudSave)return;const updates={app_data:exportAppData(),updated_at:new Date().toISOString()};if(userData.playerName)updates.username=userData.playerName;
-  const {error}=await sb.from('profiles').update(updates).eq('id',cloudUser.id);if(error)console.warn('Cloud save:',error.message);
+
+let lastCloudSyncAt=0;
+function formatSyncAge(ts){
+  if(!ts)return 'Jamais synchronisé';
+  const s=Math.max(0,Math.floor((Date.now()-ts)/1000));if(s<5)return 'Synchronisé à l’instant';if(s<60)return `Synchronisé il y a ${s} s`;
+  const m=Math.floor(s/60);if(m<60)return `Synchronisé il y a ${m} min`;return `Synchronisé il y a ${Math.floor(m/60)} h`;
 }
-function scheduleCloudSave(){if(!cloudUser||!cloudLicensed||suppressCloudSave)return;clearTimeout(cloudSaveTimer);cloudSaveTimer=setTimeout(saveCloudData,700)}
+function setCloudStatus(state,text){
+  const pill=document.getElementById('v11-sync-pill'),badge=document.getElementById('cloud-live-badge'),detail=document.getElementById('cloud-sync-detail');
+  const map={synced:['sync-online','● ☁ '+(text||formatSyncAge(lastCloudSyncAt))],syncing:['sync-working','● ☁ Synchronisation…'],offline:['sync-offline','● Hors ligne'],error:['sync-error','● Erreur cloud'],local:['','● Sauvegarde locale']};
+  const [cls,label]=map[state]||map.local;
+  [pill,badge].forEach(el=>{if(!el)return;el.classList.remove('sync-online','sync-working','sync-offline','sync-error');if(cls)el.classList.add(cls)});
+  if(pill)pill.textContent=label;
+  if(badge)badge.textContent=state==='synced'?'☁️ SYNCHRONISÉ':state==='syncing'?'☁️ SYNC…':state==='offline'?'📴 HORS LIGNE':'☁️ CLOUD';
+  if(detail)detail.textContent=state==='offline'?'Changements enregistrés sur cet appareil. Synchronisation à la reconnexion.':(text||formatSyncAge(lastCloudSyncAt));
+}
+setInterval(()=>{if(lastCloudSyncAt&&cloudUser&&cloudLicensed&&navigator.onLine)setCloudStatus('synced')},5000);
+function scheduleCloudSaveImmediate(){if(!cloudUser||!cloudLicensed||suppressCloudSave)return;clearTimeout(cloudSaveTimer);saveCloudData()}
+window.scheduleCloudSaveImmediate=scheduleCloudSaveImmediate;
+
+function hasWorkoutProgress(){
+  try{return Object.values(workoutState||{}).some(block=>block&&Object.values(block).some(day=>day&&Object.values(day).some(ex=>ex&&Object.values(ex).some(Boolean))))}catch(e){return false}
+}
+function updateResumeWorkoutBanner(){
+  const b=document.getElementById('resume-workout-banner'),t=document.getElementById('resume-workout-text');if(!b)return;
+  if(hasWorkoutProgress()){const meta=getProgramMeta(activeProgramKey);if(t)t.textContent=`🏋️ Séance en cours · ${meta?.title||activeProgramKey} · Jour ${currentDayIndex+1}`;b.classList.add('show')}else b.classList.remove('show');
+}
+function resumeSavedWorkout(){
+  playSound('click');initWorkoutSystem();
+  const workoutBtn=document.querySelector("button.nav-item[onclick*=\"switchTab('workout'\"]");
+  switchTab('workout',workoutBtn);document.getElementById('resume-workout-banner')?.classList.remove('show');
+}
+
+let deferredInstallPrompt=null;
+const isIOS=/iphone|ipad|ipod/i.test(navigator.userAgent);
+const isStandalone=window.matchMedia('(display-mode: standalone)').matches||window.navigator.standalone===true;
+window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();deferredInstallPrompt=e;updateInstallUI()});
+window.addEventListener('appinstalled',()=>{deferredInstallPrompt=null;updateInstallUI()});
+function updateInstallUI(){
+  const status=document.getElementById('install-app-status'),btn=document.getElementById('install-app-btn');if(!status||!btn)return;
+  if(isStandalone){status.textContent='✅ LEVELING-APP est déjà installée sur cet appareil.';btn.disabled=true;btn.textContent='✅ Application installée';return}
+  if(isIOS){status.textContent='Sur iPhone : Safari → Partager → Ajouter à l’écran d’accueil.';btn.disabled=false;return}
+  if(deferredInstallPrompt){status.textContent='Ton navigateur permet l’installation directe.';btn.disabled=false;return}
+  status.textContent='Menu du navigateur → Installer / Ajouter à l’écran d’accueil.';
+}
+async function installLevelingApp(){
+  if(isStandalone)return;
+  if(isIOS){document.getElementById('ios-install-modal')?.classList.add('show');return}
+  if(deferredInstallPrompt){deferredInstallPrompt.prompt();await deferredInstallPrompt.userChoice;deferredInstallPrompt=null;updateInstallUI();return}
+  alert("Utilise le menu du navigateur puis « Installer l'application » ou « Ajouter à l'écran d'accueil ».");
+}
+function closeIOSInstallHelp(){document.getElementById('ios-install-modal')?.classList.remove('show')}
+
+let swRegistration=null;
+async function registerLevelingSW(){
+  if(!('serviceWorker' in navigator))return;
+  try{
+    swRegistration=await navigator.serviceWorker.register('./service-worker.js');
+    swRegistration.addEventListener('updatefound',()=>{const w=swRegistration.installing;if(!w)return;w.addEventListener('statechange',()=>{if(w.state==='installed'&&navigator.serviceWorker.controller)checkAppRelease()})});
+  }catch(e){console.warn('SW:',e)}
+}
+async function forceAppUpdate(){
+  playSound('click');
+  try{
+    if(swRegistration)await swRegistration.update();
+    if(swRegistration?.waiting)swRegistration.waiting.postMessage({type:'SKIP_WAITING'});
+    const keys=await caches.keys();await Promise.all(keys.filter(k=>k.startsWith('leveling-app-')).map(k=>caches.delete(k)));
+  }catch(e){console.warn(e)}
+  location.replace(location.pathname+'?updated='+Date.now());
+}
+
+async function saveCloudData(){
+  if(!cloudUser||!cloudLicensed||suppressCloudSave)return;
+  if(!navigator.onLine){setCloudStatus('offline');return}
+  setCloudStatus('syncing');
+  const updates={app_data:exportAppData(),updated_at:new Date().toISOString()};if(userData.playerName)updates.username=userData.playerName;
+  const {error}=await sb.from('profiles').update(updates).eq('id',cloudUser.id);
+  if(error){console.warn('Cloud save:',error.message);setCloudStatus('error');return}
+  lastCloudSyncAt=Date.now();localStorage.setItem('leveling_last_cloud_sync',String(lastCloudSyncAt));setCloudStatus('synced');
+}
+function scheduleCloudSave(){
+  if(!cloudUser||!cloudLicensed||suppressCloudSave)return;clearTimeout(cloudSaveTimer);setCloudStatus(navigator.onLine?'syncing':'offline');cloudSaveTimer=setTimeout(saveCloudData,350)
+}
 window.scheduleCloudSave=scheduleCloudSave;
 const __v12LocalSave=window.saveToLocalStorage;
 window.saveToLocalStorage=function(){if(typeof __v12LocalSave==='function')__v12LocalSave();scheduleCloudSave()};
@@ -2792,7 +2954,8 @@ async function unlockLevelingApp(){
   const allowed=await enforceLicenseAccess(false);if(!allowed)return;if(!cloudLoadedOnce)await loadCloudData();
   document.getElementById('auth-gate').classList.add('hidden');document.getElementById('app-container').classList.remove('auth-locked');
   const emailEl=document.getElementById('cloud-account-email');if(emailEl&&cloudUser)emailEl.textContent=cloudUser.email||'Compte connecté';
-  refreshV11UIAfterCloud();startLicenseWatch();checkAppRelease();scheduleCloudSave();
+  refreshV11UIAfterCloud();updateResumeWorkoutBanner();updateInstallUI();
+  startLicenseWatch();checkAppRelease();if(navigator.onLine)scheduleCloudSave();else setCloudStatus('offline');
 }
 async function logoutLeveling(){
   stopLicenseWatch();await saveCloudData();await sb.auth.signOut();cloudUser=null;cloudLicensed=false;cloudLoadedOnce=false;
@@ -2833,10 +2996,28 @@ async function initSupabaseGate(){
   showAuthScreen('activate');
 }
 window.addEventListener('focus',()=>{if(cloudUser)enforceLicenseAccess(false)});
-document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible'&&cloudUser)enforceLicenseAccess(false)});
-window.addEventListener('online',()=>{if(cloudUser)enforceLicenseAccess(false)});
-initSupabaseGate();
+document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible'&&cloudUser){enforceLicenseAccess(false);if(navigator.onLine)scheduleCloudSave()}});
+window.addEventListener('online',()=>{setCloudStatus('syncing');if(cloudUser){enforceLicenseAccess(false);scheduleCloudSaveImmediate()}});
+window.addEventListener('offline',()=>setCloudStatus('offline'));
+sb.auth.onAuthStateChange((event,session)=>{if(session?.user)cloudUser=session.user;else if(event==='SIGNED_OUT'){cloudUser=null;cloudLicensed=false}});
+document.addEventListener('pointerup',e=>{
+  const target=e.target.closest('button,.nav-item,.day-tab,.power-program-card,.theme-dot');if(!target)return;
+  if(target.getAttribute('onclick')?.includes("playSound("))return;playSound('click');
+},{passive:true});
+registerLevelingSW();updateInstallUI();initSupabaseGate();
 </script>
+
+
+    <div id="ios-install-modal" onclick="if(event.target===this)closeIOSInstallHelp()">
+        <div class="ios-install-box">
+            <h3 style="margin-top:0;color:#d66cff">📱 Installer sur iPhone / iPad</h3>
+            <div class="ios-step">1. Ouvre LEVELING-APP dans <b>Safari</b>.</div>
+            <div class="ios-step">2. Appuie sur le bouton <b>Partager</b> ⬆️.</div>
+            <div class="ios-step">3. Choisis <b>Ajouter à l'écran d'accueil</b>.</div>
+            <div class="ios-step">4. Ouvre ensuite LEVELING-APP depuis son icône : elle se lancera comme une vraie app.</div>
+            <button class="btn-action" onclick="closeIOSInstallHelp()" style="margin-top:12px">Compris</button>
+        </div>
+    </div>
 
 </body>
 </html>
