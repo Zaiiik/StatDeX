@@ -1421,6 +1421,121 @@ header .hud-stat.v140-clickable:hover{
 }
 </style>
 
+
+<style id="v1408-header-avatar-hardfix">
+/* V14.0.8 — correctif définitif avatar header */
+#v1402-account-btn{
+  position:relative!important;
+  overflow:hidden!important;
+  background:#0d0d13!important;
+  background-size:cover!important;
+  background-position:center!important;
+  background-repeat:no-repeat!important;
+}
+#v1402-account-btn::after{
+  content:"";
+  position:absolute;
+  inset:0;
+  border-radius:inherit;
+  pointer-events:none;
+}
+#v1402-account-btn.v1408-photo{
+  border-color:var(--accent-rose)!important;
+}
+#v1402-account-btn.v1408-photo > *{
+  display:none!important;
+}
+#v1402-account-btn:not(.v1408-photo)::before{
+  content:"👤";
+  position:absolute;
+  inset:0;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:1rem;
+}
+</style>
+
+
+<style id="v1409-month-calendar-css">
+/* V14.0.9 — calendrier mensuel Solo Leveling */
+#v140-streak-modal .v140-modalbox{
+  width:min(560px,96vw)!important;
+  max-height:88dvh!important;
+  overflow:auto!important;
+  padding:16px!important;
+  text-align:left!important;
+  background:
+    radial-gradient(circle at 50% -15%,rgba(189,0,255,.25),transparent 38%),
+    linear-gradient(180deg,#101018,#08080d)!important;
+  border:1px solid color-mix(in srgb,var(--accent-purple) 70%,#3a3045)!important;
+  box-shadow:0 0 35px rgba(189,0,255,.20)!important;
+}
+.v1409-cal-head{
+  display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:12px
+}
+.v1409-cal-title{
+  flex:1;text-align:center;font-size:1rem;font-weight:1000;color:#fff;
+  text-transform:uppercase;letter-spacing:.06em;text-shadow:0 0 12px var(--accent-purple)
+}
+.v1409-nav{
+  width:38px;height:38px;border-radius:10px;border:1px solid #353541;background:#111119;
+  color:#fff;font-size:1.2rem;font-weight:1000;cursor:pointer
+}
+.v1409-weekdays,.v1409-grid{
+  display:grid;grid-template-columns:repeat(7,1fr);gap:6px
+}
+.v1409-weekdays{margin-bottom:6px}
+.v1409-weekdays div{
+  text-align:center;font-size:.57rem;color:#7f7f8d;font-weight:900
+}
+.v1409-day{
+  min-height:58px;border-radius:10px;border:1px solid #282832;background:#101017;
+  padding:6px;position:relative;display:flex;flex-direction:column;justify-content:space-between;
+  transition:.15s
+}
+.v1409-day.other{opacity:.24}
+.v1409-day.today{
+  border-color:var(--accent-purple);
+  box-shadow:0 0 12px rgba(189,0,255,.22)
+}
+.v1409-day.validated{
+  border-color:#00e676;
+  background:linear-gradient(145deg,rgba(0,230,118,.13),#0d1512);
+  box-shadow:inset 0 0 14px rgba(0,230,118,.05)
+}
+.v1409-num{font-size:.68rem;font-weight:900;color:#ddd}
+.v1409-day.validated .v1409-num{color:#a8ffc8}
+.v1409-check{font-size:.82rem;align-self:flex-end}
+.v1409-session-label{
+  font-size:.47rem;line-height:1.15;color:#8dffba;white-space:nowrap;overflow:hidden;text-overflow:ellipsis
+}
+.v1409-stats{
+  display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin:12px 0
+}
+.v1409-stat{
+  background:#101017;border:1px solid #292933;border-radius:10px;padding:9px;text-align:center
+}
+.v1409-stat span{display:block;font-size:.5rem;color:#777;text-transform:uppercase}
+.v1409-stat b{display:block;margin-top:4px;font-size:.9rem;color:#fff}
+.v1409-legend{
+  display:flex;gap:12px;flex-wrap:wrap;font-size:.55rem;color:#8c8c98;margin:8px 0
+}
+.v1409-dot{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:4px;vertical-align:-1px}
+.v1409-dot.done{background:#00e676;box-shadow:0 0 5px rgba(0,230,118,.6)}
+.v1409-dot.today{background:var(--accent-purple)}
+#v140-streak-modal .v140-week{display:none!important}
+#v140-streak-modal .stats{display:none!important}
+@media(max-width:480px){
+  #v140-streak-modal{padding:8px!important}
+  #v140-streak-modal .v140-modalbox{padding:12px!important}
+  .v1409-day{min-height:48px;padding:4px}
+  .v1409-grid,.v1409-weekdays{gap:4px}
+  .v1409-session-label{display:none}
+  .v1409-stats{gap:5px}
+}
+</style>
+
 </head>
 <body data-theme="purple">
 
@@ -6688,6 +6803,324 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
   document.addEventListener('visibilitychange',()=>{
     if(document.visibilityState==='visible')setTimeout(syncHeaderAvatarDirect,120);
   });
+})();
+</script>
+
+
+<script id="v1408-header-avatar-hardfix-js">
+(function(){
+  let lastApplied='';
+
+  function findAvatarSrc(){
+    const direct=String(window.userData?.playerAvatarImage||'').trim();
+    if(direct) return direct;
+
+    /* Le profil du chasseur sait déjà afficher la bonne photo :
+       on lui fait juste remplir son contenu en arrière-plan, sans ouvrir la fenêtre. */
+    try{
+      if(typeof window.renderProfileV2==='function') window.renderProfileV2();
+    }catch(e){}
+
+    const modalImg=document.querySelector('#profile-v2-avatar img');
+    if(modalImg?.src) return modalImg.src;
+
+    const previewImg=document.querySelector('#profile-avatar-preview img');
+    if(previewImg?.src) return previewImg.src;
+
+    const legacyImg=document.querySelector('#v11-avatar img');
+    if(legacyImg?.src) return legacyImg.src;
+
+    return '';
+  }
+
+  function applyAvatar(){
+    const btn=document.getElementById('v1402-account-btn');
+    if(!btn)return;
+
+    const src=findAvatarSrc();
+
+    if(src){
+      if(src!==lastApplied){
+        lastApplied=src;
+        btn.style.backgroundImage=`url("${src.replace(/"/g,'%22')}")`;
+      }
+      btn.classList.add('v1408-photo');
+      btn.setAttribute('aria-label','Ouvrir mon profil');
+    }else{
+      btn.style.backgroundImage='';
+      btn.classList.remove('v1408-photo');
+    }
+  }
+
+  /* Au chargement, puis après la synchro cloud qui peut arriver plus tard. */
+  function start(){
+    applyAvatar();
+    let tries=0;
+    const timer=setInterval(()=>{
+      applyAvatar();
+      tries++;
+      if(tries>=30 && document.getElementById('v1402-account-btn')?.classList.contains('v1408-photo')){
+        clearInterval(timer);
+      }
+    },500);
+  }
+
+  /* Quand on sauvegarde/change la photo, mise à jour immédiate. */
+  if(typeof window.handleProfileAvatar==='function'&&!window.handleProfileAvatar.v1408){
+    const old=window.handleProfileAvatar;
+    window.handleProfileAvatar=async function(){
+      const r=await old.apply(this,arguments);
+      lastApplied='';
+      setTimeout(applyAvatar,50);
+      return r;
+    };
+    window.handleProfileAvatar.v1408=1;
+  }
+
+  if(typeof window.removeProfileAvatar==='function'&&!window.removeProfileAvatar.v1408){
+    const old=window.removeProfileAvatar;
+    window.removeProfileAvatar=function(){
+      const r=old.apply(this,arguments);
+      lastApplied='';
+      setTimeout(applyAvatar,50);
+      return r;
+    };
+    window.removeProfileAvatar.v1408=1;
+  }
+
+  if(typeof window.v11RenderIdentity==='function'&&!window.v11RenderIdentity.v1408){
+    const old=window.v11RenderIdentity;
+    window.v11RenderIdentity=function(){
+      const r=old.apply(this,arguments);
+      setTimeout(applyAvatar,30);
+      return r;
+    };
+    window.v11RenderIdentity.v1408=1;
+  }
+
+  if(document.readyState==='loading'){
+    document.addEventListener('DOMContentLoaded',()=>setTimeout(start,1800));
+  }else{
+    setTimeout(start,1800);
+  }
+
+  document.addEventListener('visibilitychange',()=>{
+    if(document.visibilityState==='visible'){
+      lastApplied='';
+      setTimeout(applyAvatar,100);
+    }
+  });
+})();
+</script>
+
+
+<script id="v1409-month-calendar-js">
+(function(){
+  let viewDate=new Date();
+  viewDate.setDate(1);
+
+  function localDateKey(d){
+    const y=d.getFullYear(),m=String(d.getMonth()+1).padStart(2,'0'),day=String(d.getDate()).padStart(2,'0');
+    return `${y}-${m}-${day}`;
+  }
+
+  function allValidatedSessions(){
+    const map={};
+
+    /* Nouveau système V14 */
+    try{
+      const s=JSON.parse(localStorage.getItem('leveling_v140_rpg')||'{}');
+      (s.trainingDays||[]).forEach(k=>{if(k)map[k]=map[k]||'Séance validée'});
+    }catch(e){}
+
+    /* Ancien système V10 : contient les vraies séances et leur programme. */
+    try{
+      const v=JSON.parse(localStorage.getItem('leveling_v10')||'{}');
+      (v.sessions||[]).forEach(x=>{
+        if(!x?.date)return;
+        const k=String(x.date).slice(0,10);
+        map[k]=x.program?String(x.program).replace(/^./,c=>c.toUpperCase()):'Séance validée';
+      });
+    }catch(e){}
+
+    /* Marqueurs anti-farm récents : si la séance du jour est validée,
+       on l'ajoute même si l'ancien système n'a pas encore écrit trainingDays. */
+    try{
+      const today=localDateKey(new Date());
+      const prefix='leveling_validated_';
+      for(let i=0;i<localStorage.length;i++){
+        const key=localStorage.key(i);
+        if(key?.startsWith(prefix)&&localStorage.getItem(key)==='1'){
+          map[today]=map[today]||'Séance validée';
+        }
+      }
+    }catch(e){}
+
+    return map;
+  }
+
+  function currentStreak(keys){
+    const set=new Set(keys),d=new Date();let n=0,started=false;
+    for(let i=0;i<366;i++){
+      const k=localDateKey(d);
+      if(set.has(k)){n++;started=true}
+      else if(started)break;
+      d.setDate(d.getDate()-1);
+    }
+    return n;
+  }
+
+  function bestStreak(keys){
+    const arr=[...new Set(keys)].sort();
+    let best=0,cur=0,prev=null;
+    arr.forEach(k=>{
+      const d=new Date(k+'T12:00:00');
+      if(prev){
+        const diff=Math.round((d-prev)/86400000);
+        cur=diff===1?cur+1:1;
+      }else cur=1;
+      best=Math.max(best,cur);prev=d;
+    });
+    return best;
+  }
+
+  function ensureShell(){
+    const modal=document.getElementById('v140-streak-modal');
+    const box=modal?.querySelector('.v140-modalbox');
+    if(!modal||!box)return null;
+    let root=box.querySelector('#v1409-calendar-root');
+    if(!root){
+      root=document.createElement('div');
+      root.id='v1409-calendar-root';
+      const oldTitle=box.querySelector('.v140-title');
+      oldTitle?.after(root);
+    }
+    return {modal,box,root};
+  }
+
+  function renderCalendar(){
+    const shell=ensureShell();if(!shell)return;
+    const {modal,root}=shell, sessions=allValidatedSessions(),keys=Object.keys(sessions);
+
+    const y=viewDate.getFullYear(),m=viewDate.getMonth();
+    const first=new Date(y,m,1);
+    const start=new Date(first);
+    start.setDate(1-((first.getDay()+6)%7)); // lundi
+    const monthName=new Intl.DateTimeFormat('fr-FR',{month:'long',year:'numeric'}).format(first);
+
+    let cells='';
+    for(let i=0;i<42;i++){
+      const d=new Date(start);d.setDate(start.getDate()+i);
+      const k=localDateKey(d),same=d.getMonth()===m,done=!!sessions[k],isToday=k===localDateKey(new Date());
+      cells+=`<div class="v1409-day ${same?'':'other'} ${done?'validated':''} ${isToday?'today':''}">
+        <span class="v1409-num">${d.getDate()}</span>
+        ${done?`<span class="v1409-session-label">${sessions[k]}</span><span class="v1409-check">✔️</span>`:''}
+      </div>`;
+    }
+
+    const monthPrefix=`${y}-${String(m+1).padStart(2,'0')}`;
+    const monthCount=keys.filter(k=>k.startsWith(monthPrefix)).length;
+
+    root.innerHTML=`
+      <div class="v1409-cal-head">
+        <button class="v1409-nav" id="v1409-prev">‹</button>
+        <div class="v1409-cal-title">⚔️ ${monthName}</div>
+        <button class="v1409-nav" id="v1409-next">›</button>
+      </div>
+      <div class="v1409-weekdays"><div>LUN</div><div>MAR</div><div>MER</div><div>JEU</div><div>VEN</div><div>SAM</div><div>DIM</div></div>
+      <div class="v1409-grid">${cells}</div>
+      <div class="v1409-stats">
+        <div class="v1409-stat"><span>Ce mois</span><b>${monthCount}</b></div>
+        <div class="v1409-stat"><span>Série actuelle</span><b>${currentStreak(keys)} 🔥</b></div>
+        <div class="v1409-stat"><span>Meilleure série</span><b>${bestStreak(keys)} j</b></div>
+      </div>
+      <div class="v1409-legend">
+        <span><i class="v1409-dot done"></i>Séance validée</span>
+        <span><i class="v1409-dot today"></i>Aujourd'hui</span>
+      </div>`;
+
+    root.querySelector('#v1409-prev').onclick=()=>{viewDate.setMonth(viewDate.getMonth()-1);renderCalendar()};
+    root.querySelector('#v1409-next').onclick=()=>{viewDate.setMonth(viewDate.getMonth()+1);renderCalendar()};
+    modal.style.display='flex';
+  }
+
+  window.v1409OpenCalendar=function(){
+    viewDate=new Date();viewDate.setDate(1);
+    renderCalendar();
+  };
+
+  function bindFlame(){
+    const flame=document.querySelector('header #hud-days')?.closest('.hud-stat');
+    if(!flame||flame.dataset.v1409==='1')return;
+    flame.dataset.v1409='1';
+    flame.style.cursor='pointer';
+    flame.addEventListener('click',e=>{
+      e.preventDefault();
+      e.stopImmediatePropagation();
+      v1409OpenCalendar();
+    },true);
+  }
+
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',()=>setTimeout(bindFlame,2200));
+  else setTimeout(bindFlame,2200);
+
+  document.addEventListener('visibilitychange',()=>{
+    if(document.visibilityState==='visible')setTimeout(bindFlame,100);
+  });
+})();
+</script>
+
+
+<style id="v1410-calendar-icon-css">
+/* V14.1.0 — le calendrier remplace la flamme du streak */
+.v1410-calendar-icon{
+  font-size:15px!important;
+  line-height:1!important;
+  filter:drop-shadow(0 0 4px rgba(189,0,255,.55));
+}
+</style>
+<script id="v1410-calendar-icon-js">
+(function(){
+  function replaceFlame(){
+    const days=document.getElementById('hud-days');
+    const stat=days?.closest('.hud-stat');
+    if(!stat)return;
+
+    /* On ne touche qu'au pictogramme du bouton streak, pas au compteur de jours. */
+    const walker=document.createTreeWalker(stat,NodeFilter.SHOW_TEXT);
+    const nodes=[];
+    while(walker.nextNode()) nodes.push(walker.currentNode);
+    nodes.forEach(n=>{
+      if(n.nodeValue && n.nodeValue.includes('🔥')) n.nodeValue=n.nodeValue.replace(/🔥/g,'');
+    });
+
+    const emojiEls=[...stat.querySelectorAll('span,i,b,strong')].filter(el=>
+      el!==days && el.textContent.trim()==='🔥'
+    );
+    emojiEls.forEach(el=>{
+      el.textContent='📅';
+      el.classList.add('v1410-calendar-icon');
+    });
+
+    /* Si l'icône était créée par ::before / fond CSS et non dans le HTML. */
+    if(!stat.querySelector('.v1410-calendar-icon')){
+      const icon=document.createElement('span');
+      icon.className='v1410-calendar-icon';
+      icon.textContent='📅';
+      stat.insertBefore(icon,stat.firstChild);
+    }
+
+    stat.title="Ouvrir le calendrier d'entraînement";
+    stat.setAttribute('aria-label',"Ouvrir le calendrier d'entraînement");
+  }
+
+  function init(){
+    replaceFlame();
+    setTimeout(replaceFlame,500);
+    setTimeout(replaceFlame,1800);
+  }
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);
+  else init();
 })();
 </script>
 
