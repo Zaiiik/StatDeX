@@ -3739,7 +3739,7 @@ header .hud-stat.v140-clickable:hover{
   function addXP(xp,label){v10.totalXp+=xp;v10.xp=v10.totalXp;toast('+'+xp+' XP · '+label);save()}
   function grantQuest(id,xp,label){ensureDay();if(v10.quests[id])return false;v10.quests[id]=true;addXP(xp,label);return true}
   const ACH=[['first','⚔️ Éveil','Terminer ta première séance',()=>userData.workoutsCompleted>=1],['five','🗡️ Chasseur','5 séances terminées',()=>userData.workoutsCompleted>=5],['ten','💀 Exterminateur','10 séances terminées',()=>userData.workoutsCompleted>=10],['volume10k','🔥 10K','Accumuler 10 000 kg de volume',()=>totalVolume()>=10000],['volume50k','👑 50K','Accumuler 50 000 kg de volume',()=>totalVolume()>=50000],['pr5','💎 Briseur de records','5 PR détectés',()=>userData.prCount>=5],['elite','⚡ Élite','Atteindre le rang Élite',()=>levelInfo().lvl>=35],['monarch','🌌 Monarque','Atteindre le niveau 67',()=>levelInfo().lvl>=67]];
-  function refreshQuests(){ensureDay();const vol=calculateWeeklyTonnage()||0,sets=completedSetsToday(),steps=Number(v10.steps||0);const q=[['session','⚔️ Terminer la séance',250,()=>false],['volume','🏋️ Atteindre 5 000 kg de volume',150,()=>vol>=5000],['sets','🎯 Valider 12 séries',100,()=>sets>=12],['steps','🚶 8 000 pas',100,()=>steps>=8000]];for(const [id,label,xp,fn] of q){if(!v10.quests[id]&&fn())grantQuest(id,xp,label.replace(/^\S+\s/,''))}const all=q.every(([id])=>!!v10.quests[id]);if(all&&!v10.dailyBonus){v10.dailyBonus=true;addXP(500,'Bonus quotidien complet')}document.getElementById('v10-quests').innerHTML=q.map(([id,label,xp])=>{const done=!!v10.quests[id],progress=id==='steps'?`<div class="v10-muted" style="margin-top:3px">${steps.toLocaleString()} / 8 000 · <button onclick="setDailySteps()" style="border:0;background:none;color:#00d2ff;cursor:pointer;padding:0">modifier</button></div>`:'';return `<div class="v10-quest ${done?'done':''}"><span>${label}${progress}</span><b style="color:var(--warning)">+${xp} XP ${done?'✓':''}</b></div>`}).join('')+`<div class="v10-quest ${v10.dailyBonus?'done':''}" style="border-color:${v10.dailyBonus?'var(--success)':'#444'}"><span>🎁 Bonus quotidien · 4/4 quêtes</span><b style="color:var(--warning)">+500 XP ${v10.dailyBonus?'✓':''}</b></div>`}
+  function refreshQuests(){ensureDay();}
   window.setDailySteps=function(){ensureDay();const x=prompt('Nombre de pas aujourd’hui :',String(v10.steps||0));if(x===null)return;const n=Math.max(0,Math.floor(Number(String(x).replace(/\s/g,''))||0));v10.steps=n;save();render()};
   window.levelingGrantPRXP=function(pr){ensureDay();const k=[pr.exercise,pr.weight,pr.reps,pr.date].join('|');if(v10.prXpKeys[k])return;v10.prXpKeys[k]=1;addXP(150,'PR '+pr.exercise);render()};
   function refreshAchievements(){let unlocked=0,el=document.getElementById('v10-achievements');el.innerHTML=ACH.map(a=>{const[id,name,desc,fn]=a;let ok=false;try{ok=!!fn()}catch(e){}if(ok){unlocked++;if(!v10.achievements[id]){v10.achievements[id]=true;userData.trophies=(userData.trophies||0)+1;saveToLocalStorage()}}return `<div class="v10-ach ${ok?'':'locked'}"><span style="font-size:1rem">${ok?'🏆':'🔒'}</span><div><b>${name}</b><div class="v10-muted">${desc}</div></div></div>`}).join('');document.getElementById('v10-ach-count').textContent=unlocked+'/'+ACH.length}
@@ -3750,7 +3750,7 @@ header .hud-stat.v140-clickable:hover{
   window.importV11Data=()=>document.getElementById('v10-import-file').click();
   window.handleV11Import=function(input){const file=input.files?.[0];if(!file)return;const r=new FileReader();r.onload=()=>{try{const d=JSON.parse(r.result);if(d.userData)userData=d.userData;if(d.smartHypertrophyRefs)smartHypertrophyRefs=d.smartHypertrophyRefs;if(d.bodyHistory)bodyHistory=d.bodyHistory;if(d.inventoryItems)inventoryItems=d.inventoryItems;if(d.workoutHistory)workoutHistory=d.workoutHistory;if(d.workoutState)workoutState=d.workoutState;if(d.customSetData)customSetData=d.customSetData;if(d.activeProgramKey)activeProgramKey=d.activeProgramKey;if(Number.isInteger(d.currentBlockIndex))currentBlockIndex=d.currentBlockIndex;if(d.v10)v10=Object.assign({},defaults,d.v10);saveToLocalStorage();save();updateProfileUI();renderBodyChart();initWorkoutSystem();renderPowerHome();render();toast('Sauvegarde importée avec succès')}catch(e){alert('Fichier de sauvegarde invalide.')}};r.readAsText(file);input.value=''};
   function recommendation(){const prog=getPrograms()[currentBlockIndex]?.[currentDayIndex];if(!prog)return;let done=0,total=0;prog.exercises.forEach((ex,ei)=>{for(let si=0;si<ex.sets;si++){total++;if(workoutState[currentBlockIndex]?.[currentDayIndex]?.[ei]?.[si])done++}});const pct=total?Math.round(done/total*100):0,msg=pct===100?'🔥 Séance complète. Prochaine fois, vise +2,5 kg sur les isolations si toutes les reps cibles passent.':pct>50?'⚔️ Plus de la moitié validée. Garde 1–2 reps en réserve et termine proprement.':'🎯 Commence par les séries prévues. Le système mémorise tes performances pour ajuster la progression.';const el=document.getElementById('v10-rec-text');if(el)el.textContent=msg+' ('+done+'/'+total+' séries)'}
-  const oldFinish=window.finishWorkoutFinal;window.finishWorkoutFinal=function(){const before=userData.workoutsCompleted||0;oldFinish();if((userData.workoutsCompleted||0)>before){const key=today();if(v10.lastWorkout){const diff=Math.round((new Date(key)-new Date(v10.lastWorkout))/86400000);v10.streak=diff===1?(v10.streak||0)+1:diff===0?(v10.streak||0):1}else v10.streak=1;v10.lastWorkout=key;v10.sessions.push({date:key,program:activeProgramKey,day:currentDayIndex,rating:selectedRating,volume:calculateWeeklyTonnage()||0});grantQuest('session',250,'Séance terminée');const ratingBonus=Math.max(0,selectedRating-3)*50;if(ratingBonus)addXP(ratingBonus,'Performance séance');save();render()}};
+  const oldFinish=window.finishWorkoutFinal;window.finishWorkoutFinal=function(){const before=userData.workoutsCompleted||0;oldFinish();if((userData.workoutsCompleted||0)>before){const key=today();if(v10.lastWorkout){const diff=Math.round((new Date(key)-new Date(v10.lastWorkout))/86400000);v10.streak=diff===1?(v10.streak||0)+1:diff===0?(v10.streak||0):1}else v10.streak=1;v10.lastWorkout=key;v10.sessions.push({date:key,program:activeProgramKey,day:currentDayIndex,rating:selectedRating,volume:calculateWeeklyTonnage()||0});const ratingBonus=Math.max(0,selectedRating-3)*50;if(ratingBonus)addXP(ratingBonus,'Performance séance');save();render()}};
   const oldUpdate=window.updateProfileUI;window.updateProfileUI=function(){oldUpdate();setTimeout(render,0);setTimeout(()=>{if(typeof renderThemeCollection==='function')renderThemeCollection()},60)};const oldInit=window.initWorkoutSystem;window.initWorkoutSystem=function(){oldInit();setTimeout(recommendation,0);setTimeout(render,0)};const oldSet=window.toggleSet;window.toggleSet=function(ei,si){oldSet(ei,si);setTimeout(()=>{recommendation();refreshQuests()},20)};
   render();
 })();
@@ -3988,7 +3988,7 @@ const sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_PUBLISHABLE_KEY,{
   auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true,storage:window.localStorage}
 });
 let cloudUser=null,cloudLicensed=false,cloudLoadedOnce=false,cloudSaveTimer=null,suppressCloudSave=false,licenseWatchTimer=null,lastLicenseStatus='UNKNOWN';
-const APP_VERSION='13.5.2';
+const APP_VERSION='14.1.2';
 const ACCOUNT_LOCAL_KEYS=['solo_leveling_user','solo_leveling_smart_refs','solo_leveling_body_hist','solo_leveling_inv','solo_leveling_block','solo_leveling_day','solo_leveling_state','solo_leveling_custom_sets','solo_leveling_history','solo_leveling_active_program','solo_leveling_program_states','solo_leveling_program_custom_sets','solo_leveling_custom_program','leveling_last_local_save','leveling_last_cloud_sync','leveling_v10'];
 function clearLevelingAccountLocalData(){
   try{ACCOUNT_LOCAL_KEYS.forEach(k=>localStorage.removeItem(k));sessionStorage.removeItem('leveling_pending_license')}catch(e){console.warn('Local account cleanup:',e)}
@@ -4104,7 +4104,7 @@ async function retryLicenseCheck(){
 }
 function exportAppData(){
   if(typeof saveActiveProgramState==='function')saveActiveProgramState();
-  return{version:'13.2',userData,smartHypertrophyRefs,bodyHistory,inventoryItems,currentBlockIndex,currentDayIndex,activeProgramKey,programWorkoutStates,programCustomSetData,customProgramData,workoutState,customSetData,workoutHistory,v10:(typeof window.__levelingV10Export==='function'?window.__levelingV10Export():null)};
+  return{version:'14.1.2',userData,smartHypertrophyRefs,bodyHistory,inventoryItems,currentBlockIndex,currentDayIndex,activeProgramKey,programWorkoutStates,programCustomSetData,customProgramData,workoutState,customSetData,workoutHistory,v10:(typeof window.__levelingV10Export==='function'?window.__levelingV10Export():null)};
 }
 function importAppData(d){
   if(!d||typeof d!=='object')return;suppressCloudSave=true;
@@ -7121,6 +7121,285 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
   }
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);
   else init();
+})();
+</script>
+
+
+<script id="v1411-stability-audit-fixes">
+/* V14.1.1 — correctifs stabilité issus de l'audit complet */
+(function(){
+  const V1411='14.1.1';
+
+  function validatedSnapshot(){
+    const out={};
+    try{
+      for(let i=0;i<localStorage.length;i++){
+        const k=localStorage.key(i);
+        if(k && k.startsWith('leveling_validated_')) out[k]=localStorage.getItem(k);
+      }
+    }catch(e){}
+    return out;
+  }
+
+  function restoreValidatedSnapshot(obj){
+    try{
+      const rm=[];
+      for(let i=0;i<localStorage.length;i++){
+        const k=localStorage.key(i);
+        if(k && k.startsWith('leveling_validated_')) rm.push(k);
+      }
+      rm.forEach(k=>localStorage.removeItem(k));
+      if(obj && typeof obj==='object'){
+        Object.entries(obj).forEach(([k,v])=>{
+          if(k.startsWith('leveling_validated_') && v==='1') localStorage.setItem(k,'1');
+        });
+      }
+    }catch(e){}
+  }
+
+  /* Cloud : les données ajoutées en V14 doivent suivre le compte sur tous les appareils. */
+  if(typeof window.exportAppData==='function' && !window.exportAppData.v1411){
+    const oldExport=window.exportAppData;
+    window.exportAppData=function(){
+      const d=oldExport.apply(this,arguments) || {};
+      d.version='14.1.2';
+      try{d.v140Rpg=JSON.parse(localStorage.getItem('leveling_v140_rpg')||'{}')}catch(e){d.v140Rpg={}}
+      d.validatedSessions=validatedSnapshot();
+      d.cycleResetPending=localStorage.getItem('leveling_cycle_reset_pending')||'';
+      d.cycleCompletedDate=localStorage.getItem('leveling_cycle_completed_date')||'';
+      return d;
+    };
+    window.exportAppData.v1411=1;
+  }
+
+  if(typeof window.importAppData==='function' && !window.importAppData.v1411){
+    const oldImport=window.importAppData;
+    window.importAppData=function(d){
+      const r=oldImport.apply(this,arguments);
+      try{
+        if(d?.v140Rpg && typeof d.v140Rpg==='object'){
+          localStorage.setItem('leveling_v140_rpg',JSON.stringify(d.v140Rpg));
+        }
+        if(d?.validatedSessions) restoreValidatedSnapshot(d.validatedSessions);
+        if(d?.cycleResetPending) localStorage.setItem('leveling_cycle_reset_pending',d.cycleResetPending);
+        else localStorage.removeItem('leveling_cycle_reset_pending');
+        if(d?.cycleCompletedDate) localStorage.setItem('leveling_cycle_completed_date',d.cycleCompletedDate);
+        else localStorage.removeItem('leveling_cycle_completed_date');
+      }catch(e){console.warn('V14.1.1 import RPG:',e)}
+      return r;
+    };
+    window.importAppData.v1411=1;
+  }
+
+  /* Isolation des comptes : pas d'XP/calendrier V14 qui reste lors d'une déconnexion. */
+  if(typeof window.clearLevelingAccountLocalData==='function' && !window.clearLevelingAccountLocalData.v1411){
+    const oldClear=window.clearLevelingAccountLocalData;
+    window.clearLevelingAccountLocalData=function(){
+      oldClear.apply(this,arguments);
+      try{
+        ['leveling_v140_rpg','leveling_cycle_reset_pending','leveling_cycle_completed_date']
+          .forEach(k=>localStorage.removeItem(k));
+        const rm=[];
+        for(let i=0;i<localStorage.length;i++){
+          const k=localStorage.key(i);
+          if(k && k.startsWith('leveling_validated_')) rm.push(k);
+        }
+        rm.forEach(k=>localStorage.removeItem(k));
+      }catch(e){}
+    };
+    window.clearLevelingAccountLocalData.v1411=1;
+  }
+
+  function parseDay(s){
+    if(!/^\d{4}-\d{2}-\d{2}$/.test(String(s||''))) return null;
+    const [y,m,d]=s.split('-').map(Number);
+    return new Date(y,m-1,d,12,0,0,0);
+  }
+  function dayKey(d){
+    return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+  }
+
+  /* Le cycle doit repartir le lundi, même si l'utilisateur ne rouvre l'app que mardi/mercredi. */
+  window.v1411CycleResetIfDue=function(){
+    try{
+      if(localStorage.getItem('leveling_cycle_reset_pending')!=='1') return false;
+      const completed=parseDay(localStorage.getItem('leveling_cycle_completed_date'));
+      if(!completed) return false;
+
+      const nextMonday=new Date(completed);
+      const add=(8-nextMonday.getDay())%7 || 7;
+      nextMonday.setDate(nextMonday.getDate()+add);
+
+      const now=new Date(); now.setHours(12,0,0,0);
+      if(now < nextMonday) return false;
+
+      workoutState={};
+      customSetData={};
+      programWorkoutStates={};
+      programCustomSetData={};
+      currentBlockIndex=0;
+      currentDayIndex=0;
+
+      restoreValidatedSnapshot({});
+      localStorage.removeItem('leveling_cycle_reset_pending');
+      localStorage.removeItem('leveling_cycle_completed_date');
+
+      if(typeof saveToLocalStorage==='function') saveToLocalStorage();
+      if(typeof scheduleCloudSaveImmediate==='function') scheduleCloudSaveImmediate();
+      if(typeof initWorkoutSystem==='function') setTimeout(initWorkoutSystem,30);
+      if(typeof updateProfileUI==='function') setTimeout(updateProfileUI,40);
+      if(typeof updateResumeWorkoutBanner==='function') setTimeout(updateResumeWorkoutBanner,50);
+      return true;
+    }catch(e){
+      console.warn('V14.1.1 reset cycle:',e);
+      return false;
+    }
+  };
+
+  function boot(){
+    v1411CycleResetIfDue();
+  }
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',()=>setTimeout(boot,2500));
+  else setTimeout(boot,2500);
+
+  document.addEventListener('visibilitychange',()=>{
+    if(document.visibilityState==='visible') setTimeout(v1411CycleResetIfDue,100);
+  });
+})();
+</script>
+
+
+<script id="v1412-unified-xp-quests">
+/* V14.1.2 — un seul moteur XP visible + quêtes intelligentes réelles */
+(function(){
+  const dayKey=()=>{
+    const d=new Date();
+    return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+  };
+
+  function v10data(){
+    try{return typeof window.__levelingV10Export==='function'?window.__levelingV10Export():null}catch(e){return null}
+  }
+  function saveV10(v){
+    if(v&&typeof window.__levelingV10Import==='function')window.__levelingV10Import(v);
+  }
+
+  function currentCompletedSets(){
+    try{
+      const p=getPrograms()?.[currentBlockIndex]?.[currentDayIndex];
+      if(!p)return 0;
+      let n=0;
+      p.exercises.forEach((ex,ei)=>{
+        for(let si=0;si<ex.sets;si++) if(workoutState?.[currentBlockIndex]?.[currentDayIndex]?.[ei]?.[si]) n++;
+      });
+      return n;
+    }catch(e){return 0}
+  }
+
+  function referenceMatched(){
+    try{
+      const p=getPrograms()?.[currentBlockIndex]?.[currentDayIndex];
+      if(!p)return false;
+      return p.exercises.some((ex,ei)=>{
+        const ref=Number(
+          smartHypertrophyRefs?.[ex.name]?.weight ||
+          userData?.prRecords?.[ex.name]?.weight ||
+          0
+        );
+        if(ref<=0)return false;
+        for(let si=0;si<ex.sets;si++){
+          if(!workoutState?.[currentBlockIndex]?.[currentDayIndex]?.[ei]?.[si])continue;
+          const current=Number(customSetData?.[currentBlockIndex]?.[currentDayIndex]?.[ei]?.[si]?.weight ?? ex.defaultWeight ?? 0);
+          if(current>=ref)return true;
+        }
+        return false;
+      });
+    }catch(e){return false}
+  }
+
+  function sessionValidated(){
+    const k=`leveling_validated_${activeProgramKey}_${currentBlockIndex}_${currentDayIndex}`;
+    return localStorage.getItem(k)==='1';
+  }
+
+  function grantSmartQuest(id,xp){
+    const v=v10data();if(!v)return false;
+    v.smartQuestClaims=v.smartQuestClaims||{};
+    const key=`${dayKey()}_${id}`;
+    if(v.smartQuestClaims[key])return false;
+    v.smartQuestClaims[key]=true;
+    v.totalXp=Number(v.totalXp||0)+xp;
+    v.xp=v.totalXp;
+    saveV10(v);
+    return true;
+  }
+
+  function addTrainingDay(){
+    try{
+      const s=JSON.parse(localStorage.getItem('leveling_v140_rpg')||'{}');
+      s.trainingDays=Array.isArray(s.trainingDays)?s.trainingDays:[];
+      const k=dayKey();
+      if(!s.trainingDays.includes(k))s.trainingDays.push(k);
+      localStorage.setItem('leveling_v140_rpg',JSON.stringify(s));
+    }catch(e){}
+  }
+
+  window.v1412RenderSmartQuests=function(){
+    const box=document.getElementById('v140-quests');if(!box)return;
+    const sets=currentCompletedSets();
+    const q=[
+      {id:'session',icon:'⚔️',title:'Terminer la séance du jour',sub:'Validation finale avec les étoiles',xp:120,done:sessionValidated()},
+      {id:'sets15',icon:'🎯',title:'Valider 15 séries',sub:`${sets}/15 séries validées`,xp:60,done:sets>=15},
+      {id:'reference',icon:'📈',title:'Égale ou dépasse une référence',sub:'Au moins une charge au niveau de ta référence précédente',xp:80,done:referenceMatched()}
+    ];
+
+    q.forEach(x=>{if(x.done)grantSmartQuest(x.id,x.xp)});
+
+    const v=v10data()||{},claims=v.smartQuestClaims||{};
+    box.innerHTML='<div class="v140-title">🎯 Quêtes du jour</div>'+q.map(x=>{
+      const claimed=!!claims[`${dayKey()}_${x.id}`];
+      return `<div class="v140-quest ${claimed?'done':''}">
+        <span>${x.icon}</span>
+        <div class="v140-quest-main"><b>${x.title}</b><small>${x.sub}</small></div>
+        <span class="v140-xp">${claimed?'✔️ ':''}+${x.xp} XP</span>
+      </div>`;
+    }).join('');
+
+    if(typeof v135RenderRankHub==='function')v135RenderRankHub();
+  };
+
+  /* Une validation réussie alimente calendrier + quête séance une seule fois. */
+  if(typeof window.finishWorkoutFinal==='function'&&!window.finishWorkoutFinal.v1412){
+    const old=window.finishWorkoutFinal;
+    window.finishWorkoutFinal=function(){
+      const before=Number(userData?.workoutsCompleted||0);
+      const r=old.apply(this,arguments);
+      if(Number(userData?.workoutsCompleted||0)>before){
+        addTrainingDay();
+        setTimeout(v1412RenderSmartQuests,80);
+        if(typeof scheduleCloudSaveImmediate==='function')setTimeout(scheduleCloudSaveImmediate,120);
+      }
+      return r;
+    };
+    window.finishWorkoutFinal.v1412=1;
+  }
+
+  if(typeof window.toggleSet==='function'&&!window.toggleSet.v1412){
+    const old=window.toggleSet;
+    window.toggleSet=function(){
+      const r=old.apply(this,arguments);
+      setTimeout(v1412RenderSmartQuests,80);
+      return r;
+    };
+    window.toggleSet.v1412=1;
+  }
+
+  function boot(){
+    v1412RenderSmartQuests();
+  }
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',()=>setTimeout(boot,2800));
+  else setTimeout(boot,2800);
+  document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')setTimeout(boot,120)});
 })();
 </script>
 
