@@ -771,6 +771,397 @@ body[data-ambiance="sakura"] .ambiance-particle-layer,body[data-ambiance="sakura
 /* ===== STATDEX V11 UPGRADE ===== */
 .v10-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin:10px 0}.v10-card{background:linear-gradient(145deg,rgba(25,25,35,.96),rgba(10,10,15,.96));border:1px solid #343443;border-radius:12px;padding:12px;box-shadow:0 8px 24px rgba(0,0,0,.25)}.v10-card h3{margin:0 0 8px;font-size:.8rem}.v10-xp{height:9px;background:#17171e;border-radius:99px;overflow:hidden;border:1px solid #333}.v10-xp>i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--accent-purple),var(--accent-rose));box-shadow:0 0 12px var(--accent-purple);transition:width .4s}.v10-big{font-size:1.35rem;font-weight:900}.v10-muted{font-size:.65rem;color:#888}.v10-quest{display:flex;justify-content:space-between;gap:8px;align-items:center;padding:8px;border:1px solid #292933;border-radius:8px;margin:5px 0;background:rgba(255,255,255,.02)}.v10-quest.done{border-color:var(--success);opacity:.75}.v10-ach{display:flex;align-items:center;gap:8px;padding:7px;border-bottom:1px solid #222;font-size:.7rem}.v10-ach:last-child{border-bottom:0}.v10-ach.locked{opacity:.35}.v10-statrow{display:grid;grid-template-columns:repeat(3,1fr);gap:7px}.v10-stat{background:rgba(0,0,0,.28);border-radius:8px;padding:8px;text-align:center}.v10-stat b{display:block;font-size:.95rem}.v10-chip{display:inline-flex;padding:4px 7px;border-radius:99px;border:1px solid #3b3b49;font-size:.58rem;color:#bbb;margin:2px}.v10-rec{border:1px solid var(--accent-purple);background:linear-gradient(90deg,rgba(189,0,255,.11),rgba(0,0,0,.15));border-radius:10px;padding:10px;margin:8px 0;font-size:.7rem}.v10-actions{display:flex;gap:6px;flex-wrap:wrap}.v10-actions button{flex:1;min-width:100px}.v10-preset{border:1px solid #444;background:#17171e;color:#ddd;border-radius:7px;padding:5px 8px;font-size:.6rem;cursor:pointer}.v10-preset.active{border-color:var(--accent-purple);box-shadow:0 0 8px rgba(189,0,255,.25)}.v10-toast{position:fixed;left:50%;bottom:78px;transform:translateX(-50%) translateY(20px);opacity:0;pointer-events:none;background:#111;border:1px solid var(--accent-purple);padding:10px 14px;border-radius:10px;z-index:9999;font-size:.72rem;box-shadow:0 0 20px rgba(189,0,255,.3);transition:.25s}.v10-toast.show{opacity:1;transform:translateX(-50%) translateY(0)}.v10-list{max-height:190px;overflow:auto}.v10-e1rm{font-family:monospace;font-size:.75rem}.v10-timerbar{height:4px;background:#222;border-radius:99px;margin-top:7px;overflow:hidden}.v10-timerbar i{display:block;height:100%;width:100%;background:var(--success);transition:width 1s linear}.v10-export{display:flex;gap:7px;margin-top:8px}.v10-export button{flex:1}.v10-empty{font-size:.68rem;color:#777;text-align:center;padding:10px}.v10-section-title{display:flex;justify-content:space-between;align-items:center;margin:14px 0 7px}.v10-section-title span{font-size:.6rem;color:#777}@media(max-width:600px){.v10-grid{grid-template-columns:1fr}.v10-statrow{grid-template-columns:repeat(3,1fr)}.v10-actions button{min-width:90px}}
 </style>
+
+<!-- ==================== V13.5.3 · CLEAN RANKS & SETTINGS ==================== -->
+<style id="v1353-clean-ui">
+#v135-profile-nav{gap:7px!important;padding:2px 0 10px!important}
+#v135-profile-nav button{
+  appearance:none!important;background:linear-gradient(145deg,#111119,#09090e)!important;
+  color:#b8b8c2!important;border:1px solid #30303a!important;border-radius:11px!important;
+  box-shadow:none!important;min-height:38px!important;font-weight:900!important
+}
+#v135-profile-nav button:active{transform:scale(.97);border-color:var(--accent-rose)!important;color:#fff!important}
+
+.v1353-legacy-xp{position:relative;padding-top:38px!important}
+.v1353-legacy-xp:before{
+  content:"⚡ ACTIVITÉ DU CHASSEUR";position:absolute;top:12px;left:12px;color:#f2f2f5;
+  font-size:.72rem;font-weight:1000;letter-spacing:.02em
+}
+.v1353-legacy-xp>div:first-child,
+.v1353-legacy-xp>div:nth-child(2),
+.v1353-legacy-xp>.v10-xp{display:none!important}
+.v1353-legacy-xp .v10-statrow{margin-top:0!important}
+
+.rank-card{
+  border-color:var(--accent-rose)!important;
+  background:radial-gradient(circle at 50% 0,color-mix(in srgb,var(--accent-purple) 18%,transparent),transparent 55%),#09090e!important
+}
+.rank-card .rank-title{color:#aaa!important;letter-spacing:.09em!important}
+
+#panel-settings.compact-ready .settings-theme-top{margin:8px 0 10px!important}
+#v135-settings-tabs{
+  display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;
+  gap:7px!important;margin:0 0 10px!important
+}
+#v135-settings-tabs button{
+  appearance:none!important;background:linear-gradient(145deg,#111119,#09090e)!important;
+  color:#b7b7c0!important;border:1px solid #30303a!important;border-radius:11px!important;
+  min-height:44px!important;padding:9px 8px!important;font-size:.59rem!important;
+  font-weight:900!important;box-shadow:none!important
+}
+#v135-settings-tabs button.active{
+  color:#fff!important;border-color:var(--accent-rose)!important;
+  background:linear-gradient(145deg,color-mix(in srgb,var(--accent-rose) 13%,#111119),#09090e)!important;
+  box-shadow:0 0 12px color-mix(in srgb,var(--accent-rose) 20%,transparent)!important
+}
+#panel-settings .compact-setting-section{
+  background:linear-gradient(145deg,#101016,#09090e)!important;border-color:#30303a!important
+}
+#panel-settings .compact-setting-header,
+#panel-settings .compact-setting-head{background:transparent!important;color:#fff!important}
+#panel-settings .compact-setting-body{background:transparent!important}
+
+.settings-theme-top{
+  background:linear-gradient(135deg,color-mix(in srgb,var(--accent-purple) 10%,#0c0c12),#0a0a0f)!important;
+  border-color:color-mix(in srgb,var(--accent-purple) 45%,#30303a)!important
+}
+.settings-theme-choice{height:34px!important;border-radius:10px!important}
+
+@media(max-width:380px){
+  #v135-settings-tabs{gap:6px!important}
+  #v135-settings-tabs button{font-size:.54rem!important;padding:8px 5px!important}
+}
+</style>
+
+
+<style id="v1354-hero-ranks">
+#v135-rank-hub{display:block!important;margin:12px 0 12px!important}
+#v135-rank-hub .v135-rank-card.power{display:none!important}
+#v135-rank-hub .v135-rank-card.xp{
+  min-height:155px!important;padding:17px 18px!important;border-radius:17px!important;
+  position:relative!important;overflow:hidden!important;
+  background:radial-gradient(circle at 78% 30%,color-mix(in srgb,var(--accent-purple) 26%,transparent),transparent 42%),linear-gradient(145deg,#11091a,#09090e 62%,#07070b)!important;
+  border:1px solid color-mix(in srgb,var(--accent-purple) 78%,#3a3045)!important;
+  box-shadow:0 0 22px color-mix(in srgb,var(--accent-purple) 17%,transparent)!important
+}
+#v135-rank-hub .v135-rank-card.xp:after{
+  content:"⚔";position:absolute;right:18px;bottom:0;font-size:7rem;line-height:.9;
+  opacity:.055;transform:rotate(-10deg);pointer-events:none
+}
+#v135-rank-hub .v135-rank-card.xp .v135-rank-kicker{font-size:.72rem!important;letter-spacing:.07em!important;margin-bottom:13px!important}
+#v135-rank-hub .v135-rank-card.xp .v135-rank-name{
+  font-size:2rem!important;text-align:center!important;margin:5px 0 8px!important;
+  text-shadow:0 0 16px color-mix(in srgb,var(--accent-purple) 60%,transparent)!important
+}
+#v135-rank-hub .v135-rank-card.xp .v135-rank-meta{font-size:.78rem!important;text-align:center!important;color:#ddd!important;margin-bottom:13px!important}
+#v135-rank-hub .v135-rank-card.xp .v135-progress{height:9px!important;border-radius:999px!important;background:#24242d!important}
+#v135-rank-hub .v135-rank-card.xp .v135-progress i{
+  background:linear-gradient(90deg,var(--accent-purple),var(--accent-rose))!important;
+  box-shadow:0 0 12px color-mix(in srgb,var(--accent-purple) 45%,transparent)!important
+}
+
+.rank-card.v1354-power-hero{
+  min-height:168px!important;padding:18px!important;margin:12px 0!important;border-radius:17px!important;
+  position:relative!important;overflow:hidden!important;
+  background:radial-gradient(circle at 80% 35%,color-mix(in srgb,var(--accent-rose) 22%,transparent),transparent 42%),linear-gradient(145deg,#19090e,#09090e 62%,#07070b)!important;
+  border:1px solid color-mix(in srgb,var(--accent-rose) 80%,#4a3038)!important;
+  box-shadow:0 0 22px color-mix(in srgb,var(--accent-rose) 16%,transparent)!important
+}
+.rank-card.v1354-power-hero:after{
+  content:"⚔";position:absolute;right:18px;bottom:0;font-size:7rem;line-height:.9;
+  opacity:.055;transform:rotate(9deg);pointer-events:none
+}
+.rank-card.v1354-power-hero .rank-title{font-size:.72rem!important;letter-spacing:.08em!important;color:#ddd!important;text-align:left!important}
+.rank-card.v1354-power-hero .rank-badge{
+  font-size:1.9rem!important;margin:13px 0 8px!important;color:var(--accent-rose)!important;
+  text-shadow:0 0 16px color-mix(in srgb,var(--accent-rose) 55%,transparent)!important
+}
+.rank-card.v1354-power-hero .sbd-total-display{font-size:.82rem!important;margin-bottom:12px!important}
+.rank-card.v1354-power-hero .rank-hint{margin-top:12px!important;opacity:.8!important}
+
+.v1354-power-progress{height:9px;background:#24242d;border-radius:999px;overflow:hidden;margin:10px 0 4px}
+.v1354-power-progress i{
+  display:block;height:100%;border-radius:inherit;
+  background:linear-gradient(90deg,var(--accent-rose),var(--accent-purple));
+  box-shadow:0 0 12px color-mix(in srgb,var(--accent-rose) 45%,transparent)
+}
+#v1352-progress-hub{margin-top:10px!important}
+
+@media(max-width:480px){
+  #v135-rank-hub .v135-rank-card.xp{min-height:145px!important;padding:15px!important}
+  #v135-rank-hub .v135-rank-card.xp .v135-rank-name{font-size:1.65rem!important}
+  .rank-card.v1354-power-hero{min-height:155px!important;padding:15px!important}
+  .rank-card.v1354-power-hero .rank-badge{font-size:1.6rem!important}
+}
+</style>
+
+
+<style id="v1355-settings-direct">
+/* V13.5.5 — Réglages directs : un clic = contenu ouvert */
+#panel-settings.compact-ready .compact-setting-section.v135-selected{
+  display:block!important;
+  border:1px solid #30303a!important;
+  border-radius:14px!important;
+  background:linear-gradient(145deg,#101016,#09090e)!important;
+  overflow:hidden!important;
+}
+#panel-settings.compact-ready .compact-setting-section.v135-selected > .compact-setting-body{
+  display:block!important;
+  padding:12px!important;
+}
+#panel-settings.compact-ready .compact-setting-section.v135-selected > .compact-setting-header{
+  display:none!important;
+}
+#panel-settings.compact-ready #v1352-notifications.v135-selected > .compact-setting-head{
+  padding:12px 12px 0!important;
+  background:transparent!important;
+}
+#panel-settings.compact-ready #v1352-notifications.v135-selected > .compact-setting-body{
+  display:block!important;
+}
+#v135-settings-tabs{
+  grid-template-columns:repeat(2,minmax(0,1fr))!important;
+}
+#v135-settings-tabs button{
+  min-height:46px!important;
+  cursor:pointer!important;
+}
+.v1355-backup-note{
+  margin:14px 0 8px;
+  padding-top:12px;
+  border-top:1px solid #2d2d36;
+  font-size:.68rem;
+  color:#aaa;
+}
+.v1355-backup-note b{color:#fff}
+</style>
+
+
+<style id="v1356-settings-clean-list">
+/* Réglages : exactement 4 cartes visibles sous la palette */
+#v135-settings-tabs{
+  display:flex!important;
+  flex-direction:column!important;
+  gap:8px!important;
+  margin-top:12px!important;
+}
+#v135-settings-tabs button{
+  width:100%!important;
+  min-height:58px!important;
+  text-align:left!important;
+  padding:11px 14px!important;
+  border-radius:12px!important;
+  font-size:.76rem!important;
+  position:relative!important;
+}
+#v135-settings-tabs button:after{
+  content:"›";
+  position:absolute;
+  right:14px;
+  top:50%;
+  transform:translateY(-50%);
+  font-size:1.5rem;
+  color:#aaa;
+}
+#panel-settings .compact-setting-section{
+  display:none!important;
+}
+</style>
+
+
+<style id="v1357-settings-toggle">
+/* Quand aucun réglage n'est ouvert, seules les 4 cartes restent visibles */
+#panel-settings.v1357-all-closed .compact-setting-section{
+  display:none!important;
+}
+#v135-settings-tabs button.active{
+  border-color:var(--accent-rose)!important;
+}
+</style>
+
+
+<style id="v1358-settings-overlay">
+/* V13.5.8 — chaque réglage s'ouvre comme une vraie grande page */
+#panel-settings .compact-setting-section.v1358-overlay{
+  display:block!important;
+  position:fixed!important;
+  z-index:9990!important;
+  top:0!important;
+  left:0!important;
+  right:0!important;
+  bottom:0!important;
+  width:100%!important;
+  height:100dvh!important;
+  margin:0!important;
+  padding:0!important;
+  border:0!important;
+  border-radius:0!important;
+  background:#07070b!important;
+  overflow-y:auto!important;
+  overscroll-behavior:contain!important;
+}
+#panel-settings .compact-setting-section.v1358-overlay > .compact-setting-header,
+#panel-settings .compact-setting-section.v1358-overlay > .compact-setting-head{
+  display:flex!important;
+  position:sticky!important;
+  top:0!important;
+  z-index:3!important;
+  min-height:62px!important;
+  align-items:center!important;
+  padding:12px 16px!important;
+  background:rgba(7,7,11,.96)!important;
+  backdrop-filter:blur(12px)!important;
+  border-bottom:1px solid color-mix(in srgb,var(--accent-rose) 65%,#282832)!important;
+}
+#panel-settings .compact-setting-section.v1358-overlay > .compact-setting-body{
+  display:block!important;
+  padding:16px 16px 110px!important;
+  max-width:900px!important;
+  margin:0 auto!important;
+}
+.v1358-close{
+  position:sticky;
+  top:10px;
+  float:right;
+  z-index:10;
+  width:42px;
+  height:42px;
+  margin:10px 12px -52px 0;
+  border:1px solid #3a3a45;
+  border-radius:12px;
+  background:#111119;
+  color:#fff;
+  font-size:1.45rem;
+  font-weight:900;
+  cursor:pointer;
+  box-shadow:0 0 14px rgba(0,0,0,.4);
+}
+.v1358-close:active{transform:scale(.95)}
+body.v1358-settings-open{overflow:hidden!important}
+
+/* Sur téléphone, la page part sous la barre système proprement */
+@media(max-width:600px){
+  #panel-settings .compact-setting-section.v1358-overlay > .compact-setting-body{
+    padding:14px 12px 100px!important;
+  }
+}
+</style>
+
+
+<style id="v1359-settings-subpage">
+/* V13.5.9 — vraie sous-page intégrée à l'app, pas un mini site au milieu */
+#panel-settings .compact-setting-section.v1358-overlay{
+  top:58px!important;
+  bottom:54px!important;
+  height:auto!important;
+  left:0!important;
+  right:0!important;
+  width:auto!important;
+  padding:0!important;
+  background:
+    radial-gradient(circle at 50% 0,color-mix(in srgb,var(--accent-purple) 8%,transparent),transparent 35%),
+    #07070b!important;
+}
+
+#panel-settings .compact-setting-section.v1358-overlay > .compact-setting-body{
+  width:100%!important;
+  max-width:none!important;
+  margin:0!important;
+  padding:16px 18px 90px!important;
+  box-sizing:border-box!important;
+}
+
+/* On remplace l'ancienne flèche flottante bizarre */
+#panel-settings .compact-setting-section.v1358-overlay > .v1358-close{
+  display:none!important;
+}
+
+.v1359-pagebar{
+  position:sticky;
+  top:0;
+  z-index:50;
+  display:flex;
+  align-items:center;
+  gap:12px;
+  min-height:58px;
+  padding:10px 16px;
+  background:rgba(8,8,13,.96);
+  backdrop-filter:blur(14px);
+  border-bottom:1px solid color-mix(in srgb,var(--accent-rose) 60%,#282832);
+  box-shadow:0 10px 25px rgba(0,0,0,.25);
+}
+.v1359-pageback{
+  width:40px;
+  height:40px;
+  flex:0 0 40px;
+  border-radius:11px;
+  border:1px solid #353540;
+  background:#111119;
+  color:#fff;
+  font-size:1.25rem;
+  font-weight:900;
+}
+.v1359-pagetitle{
+  min-width:0;
+}
+.v1359-pagetitle b{
+  display:block;
+  font-size:.9rem;
+  color:#fff;
+}
+.v1359-pagetitle small{
+  display:block;
+  margin-top:2px;
+  font-size:.58rem;
+  color:#8d8d98;
+}
+
+/* Les anciens en-têtes internes ne servent plus de deuxième titre */
+#panel-settings .compact-setting-section.v1358-overlay > .compact-setting-header,
+#panel-settings .compact-setting-section.v1358-overlay > .compact-setting-head{
+  display:none!important;
+}
+
+/* Contenu vraiment large et lisible sur PC/tablette */
+#panel-settings .compact-setting-section.v1358-overlay .profile-card,
+#panel-settings .compact-setting-section.v1358-overlay .v11-card,
+#panel-settings .compact-setting-section.v1358-overlay .v1352-toggle,
+#panel-settings .compact-setting-section.v1358-overlay .theme-collection,
+#panel-settings .compact-setting-section.v1358-overlay .ambiance-card{
+  width:100%!important;
+  max-width:none!important;
+  box-sizing:border-box!important;
+}
+
+/* Collections de thèmes : plus de mini bande étroite */
+#panel-settings .compact-setting-section.v1358-overlay #v134-theme-gallery{
+  display:grid!important;
+  grid-template-columns:repeat(auto-fit,minmax(220px,1fr))!important;
+  overflow:visible!important;
+  gap:10px!important;
+}
+#panel-settings .compact-setting-section.v1358-overlay #v134-theme-gallery > *{
+  min-width:0!important;
+  width:auto!important;
+  flex:none!important;
+}
+
+/* Mobile : sous-page plein écran entre header et nav */
+@media(max-width:600px){
+  #panel-settings .compact-setting-section.v1358-overlay{
+    top:58px!important;
+    bottom:calc(54px + env(safe-area-inset-bottom,0px))!important;
+  }
+  #panel-settings .compact-setting-section.v1358-overlay > .compact-setting-body{
+    padding:12px 12px 80px!important;
+  }
+  .v1359-pagebar{
+    padding:8px 12px;
+    min-height:54px;
+  }
+}
+</style>
+
 </head>
 <body data-theme="purple">
 
@@ -876,7 +1267,7 @@ body[data-ambiance="sakura"] .ambiance-particle-layer,body[data-ambiance="sakura
     <button class="btn-action today-action" id="today-action-btn" onclick="playSound('click'); startOrResumeToday()">⚔️ COMMENCER LA SÉANCE</button>
   </div>
 
-  <div class="v10-card" style="grid-column:1/-1">
+  <div class="v10-card v1353-legacy-xp" style="grid-column:1/-1">
     <div style="display:flex;justify-content:space-between;align-items:center"><div><div class="v10-muted">PLAYER STATUS</div><div class="v10-big">NIVEAU <span id="v10-level">1</span> · <span id="v10-rank">NOVICE</span></div></div><div style="text-align:right"><div class="v10-muted">XP TOTAL</div><b id="v10-total-xp">0</b></div></div>
     <div style="display:flex;justify-content:space-between;margin:8px 0 4px;font-size:.62rem"><span id="v10-xp-label">0 / 1000 XP</span><span id="v10-next-xp">Prochain niveau</span></div><div class="v10-xp"><i id="v10-xp-bar"></i></div>
     <div class="v10-statrow" style="margin-top:9px"><div class="v10-stat"><span class="v10-muted">SÉANCES</span><b id="v10-workouts">0</b></div><div class="v10-stat"><span class="v10-muted">SÉRIE</span><b id="v10-streak">0 🔥</b></div><div class="v10-stat"><span class="v10-muted">VOLUME</span><b id="v10-volume">0 kg</b></div></div>
@@ -894,7 +1285,7 @@ body[data-ambiance="sakura"] .ambiance-particle-layer,body[data-ambiance="sakura
                 </div>
 
                 <div class="rank-card" onclick="playSound('click'); openRankShowcaseModal()">
-                    <div class="rank-title">Rang Powerlifting (SBD / Poids Corporel)</div>
+                    <div class="rank-title">RANG POWER · SBD / POIDS CORPOREL</div>
                     <div class="rank-badge" id="rank-name">NOVICE</div>
                     <div class="sbd-total-display">Total : <strong id="val-sbd-total" style="color:var(--success);">150 kg</strong> (<span id="val-sbd-ratio" style="color:var(--accent-purple); font-weight:bold;">1.76x</span> PDC)</div>
                     <div class="rank-hint">🔍 Cliquer pour voir la vitrine des rangs & objectifs</div>
@@ -2978,7 +3369,7 @@ body[data-ambiance="sakura"] .ambiance-particle-layer,body[data-ambiance="sakura
   window.setDailySteps=function(){ensureDay();const x=prompt('Nombre de pas aujourd’hui :',String(v10.steps||0));if(x===null)return;const n=Math.max(0,Math.floor(Number(String(x).replace(/\s/g,''))||0));v10.steps=n;save();render()};
   window.levelingGrantPRXP=function(pr){ensureDay();const k=[pr.exercise,pr.weight,pr.reps,pr.date].join('|');if(v10.prXpKeys[k])return;v10.prXpKeys[k]=1;addXP(150,'PR '+pr.exercise);render()};
   function refreshAchievements(){let unlocked=0,el=document.getElementById('v10-achievements');el.innerHTML=ACH.map(a=>{const[id,name,desc,fn]=a;let ok=false;try{ok=!!fn()}catch(e){}if(ok){unlocked++;if(!v10.achievements[id]){v10.achievements[id]=true;userData.trophies=(userData.trophies||0)+1;saveToLocalStorage()}}return `<div class="v10-ach ${ok?'':'locked'}"><span style="font-size:1rem">${ok?'🏆':'🔒'}</span><div><b>${name}</b><div class="v10-muted">${desc}</div></div></div>`}).join('');document.getElementById('v10-ach-count').textContent=unlocked+'/'+ACH.length}
-  function render(){ensureDay();const li=levelInfo();userData.level=li.lvl;const total=userData.squat+userData.bench+userData.deadlift,bw=userData.weight||85,ratio=total/bw,sbdRank=getSBDRank(total,bw),rank=hunterRank(li.lvl);document.getElementById('v10-level').textContent=li.lvl;document.getElementById('v10-rank').textContent=rank;document.getElementById('v10-total-xp').textContent=v10.totalXp.toLocaleString();document.getElementById('v10-xp-label').textContent=li.into+' / 1000 XP';document.getElementById('v10-xp-bar').style.width=li.pct+'%';document.getElementById('v10-next-xp').textContent=(li.next-v10.totalXp)+' XP restants';document.getElementById('v10-workouts').textContent=userData.workoutsCompleted||0;document.getElementById('v10-streak').textContent=(v10.streak||0)+' 🔥';document.getElementById('v10-volume').textContent=Math.round(totalVolume()).toLocaleString()+' kg';document.getElementById('v10-e1rm-squat').textContent=(userData.squat||0)+' kg';document.getElementById('v10-e1rm-bench').textContent=(userData.bench||0)+' kg';document.getElementById('v10-e1rm-dead').textContent=(userData.deadlift||0)+' kg';document.getElementById('v10-sbd-analysis').innerHTML=`<span class="v10-chip">Rang chasseur ${rank}</span><span class="v10-chip">SBD ${sbdRank.name} · ${ratio.toFixed(2)}x</span><span class="v10-chip">Objectif +5% : ${Math.round(total*1.05)} kg</span>`;refreshQuests();refreshAchievements();updateSaveLabel()}
+  function render(){ensureDay();const li=levelInfo();userData.level=li.lvl;const total=userData.squat+userData.bench+userData.deadlift,bw=userData.weight||85,ratio=total/bw,sbdRank=getSBDRank(total,bw),rank=hunterRank(li.lvl);document.getElementById('v10-level').textContent=li.lvl;document.getElementById('v10-rank').textContent=rank;document.getElementById('v10-total-xp').textContent=v10.totalXp.toLocaleString();document.getElementById('v10-xp-label').textContent=li.into+' / 1000 XP';document.getElementById('v10-xp-bar').style.width=li.pct+'%';document.getElementById('v10-next-xp').textContent=(li.next-v10.totalXp)+' XP restants';document.getElementById('v10-workouts').textContent=userData.workoutsCompleted||0;document.getElementById('v10-streak').textContent=(v10.streak||0)+' 🔥';document.getElementById('v10-volume').textContent=Math.round(totalVolume()).toLocaleString()+' kg';document.getElementById('v10-e1rm-squat').textContent=(userData.squat||0)+' kg';document.getElementById('v10-e1rm-bench').textContent=(userData.bench||0)+' kg';document.getElementById('v10-e1rm-dead').textContent=(userData.deadlift||0)+' kg';document.getElementById('v10-sbd-analysis').innerHTML=`<span class="v10-chip">Rang XP ${rank}</span><span class="v10-chip">Rang Power ${sbdRank.name} · ${ratio.toFixed(2)}x</span><span class="v10-chip">Objectif +5% : ${Math.round(total*1.05)} kg</span>`;refreshQuests();refreshAchievements();updateSaveLabel()}
   function toast(msg){let t=document.getElementById('v10-toast');if(!t){t=document.createElement('div');t.id='v10-toast';t.className='v10-toast';document.body.appendChild(t)}t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2200)}
   window.setV11Timer=function(sec){timerSecondsLeft=sec;clearInterval(timerInterval);isTimerRunning=false;updateTimerDisplay();v10.timer=sec;save();document.querySelectorAll('.v10-preset').forEach(b=>b.classList.remove('active'));toast('Repos réglé sur '+sec+' secondes')};
   window.exportV11Data=function(){const data={version:'V12.8',exportedAt:new Date().toISOString(),userData,smartHypertrophyRefs,bodyHistory,inventoryItems,workoutHistory,workoutState,customSetData,activeProgramKey,currentBlockIndex,v10};const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'}),a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='leveling-app-v13.0-backup-'+today()+'.json';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),500);toast('Sauvegarde exportée')};
@@ -4188,7 +4579,7 @@ setTimeout(()=>{initCompactSettings();if(cloudUser&&cloudLicensed)syncSocialProf
 </div>
 <div id="v135-power-modal" class="modal">
   <div class="modal-content" style="max-width:390px">
-    <h2>🏋️ VITRINE POWERBUILDING</h2>
+    <h2>🏋️ VITRINE RANG POWER</h2>
     <p class="subtitle">Rang basé sur ton total Squat + Bench + Deadlift</p>
     <div id="v135-power-showcase" class="v135-showcase"></div>
     <button class="btn-action" onclick="v135Close('v135-power-modal')" style="margin-top:12px">Fermer</button>
@@ -4253,7 +4644,7 @@ function v135RenderRankHub(){
   const xpPct=nx?Math.max(0,Math.min(100,(lvl-xp.min)/(nx.min-xp.min)*100)):100;
   const pwPct=np?Math.max(0,Math.min(100,(total-pw.min)/(np.min-pw.min)*100)):100;
   hub.innerHTML=`<div class="v135-rank-card xp" onclick="playSound('click');v135OpenXp()"><div class="v135-rank-kicker">🎮 RANG XP</div><div class="v135-rank-name">${xp.icon} ${xp.name}</div><div class="v135-rank-meta">Niveau ${lvl}${nx?' · prochain : '+nx.name:' · MAX'}</div><div class="v135-progress"><i style="width:${xpPct}%"></i></div></div>
-  <div class="v135-rank-card power" onclick="playSound('click');v135OpenPower()"><div class="v135-rank-kicker">🏋️ RANG POWERBUILDING</div><div class="v135-rank-name">${pw.icon} ${pw.name}</div><div class="v135-rank-meta">${total} kg SBD${np?' · '+np.min+' kg pour '+np.name:' · MAX'}</div><div class="v135-progress"><i style="width:${pwPct}%"></i></div></div>`;
+  <div class="v135-rank-card power" onclick="playSound('click');v135OpenPower()"><div class="v135-rank-kicker">🏋️ RANG POWER</div><div class="v135-rank-name">${pw.icon} ${pw.name}</div><div class="v135-rank-meta">${total} kg SBD${np?' · '+np.min+' kg pour '+np.name:' · MAX'}</div><div class="v135-progress"><i style="width:${pwPct}%"></i></div></div>`;
 }
 function v135CheckRankUp(){
   const lvl=Number(userData.level||1),r=v135XpRank(lvl),key='leveling_v135_last_xp_rank',old=localStorage.getItem(key);
@@ -4539,6 +4930,578 @@ if(typeof __v1352SendDM==='function')window.sendDirectMessage=async function(){
 };
 
 setTimeout(()=>{v1352CleanProfile();v1352AddNotificationSettings()},1000);
+</script>
+
+
+<script id="v1353-clean-ranks-script">
+(function(){
+  function v1353Power(){
+    const total=Number(userData?.squat||0)+Number(userData?.bench||0)+Number(userData?.deadlift||0);
+    const rank=(typeof v135PowerRank==='function')?v135PowerRank(total):null;
+    return {total,rank};
+  }
+
+  window.v1353SyncPowerRank=function(){
+    try{
+      const {total,rank}=v1353Power();
+      if(!rank)return;
+
+      const badge=document.getElementById('rank-name');
+      if(badge){
+        badge.textContent=`${rank.icon} ${rank.name}`;
+        badge.style.color='var(--accent-rose)';
+      }
+
+      const title=document.querySelector('.rank-card .rank-title');
+      if(title)title.textContent='RANG POWER · SBD / POIDS CORPOREL';
+
+      const powerCard=document.querySelector('#v135-rank-hub .v135-rank-card.power');
+      if(powerCard){
+        const kicker=powerCard.querySelector('.v135-rank-kicker');
+        const name=powerCard.querySelector('.v135-rank-name');
+        if(kicker)kicker.textContent='🏋️ RANG POWER';
+        if(name)name.textContent=`${rank.icon} ${rank.name}`;
+      }
+
+      const modal=document.querySelector('#v135-power-modal h2');
+      if(modal)modal.textContent='🏋️ VITRINE RANG POWER';
+    }catch(e){console.warn('V13.5.3 Rang Power sync:',e)}
+  };
+
+  window.v1353CleanSettings=function(){
+    const panel=document.getElementById('panel-settings');
+    if(!panel)return;
+
+    try{
+      if(typeof initCompactSettings==='function')initCompactSettings();
+      if(typeof v135Settings==='function')v135Settings();
+      if(typeof v1352AddNotificationSettings==='function')v1352AddNotificationSettings();
+    }catch(e){}
+
+    const head=panel.querySelector('.compact-settings-head');
+    const palette=panel.querySelector('.settings-theme-top');
+    const tabs=document.getElementById('v135-settings-tabs');
+
+    if(head&&palette&&head.nextElementSibling!==palette)head.after(palette);
+    if(palette&&tabs&&palette.nextElementSibling!==tabs)palette.after(tabs);
+  };
+
+  window.v1353CleanProfile=function(){
+    const legacy=document.querySelector('.v1353-legacy-xp');
+    if(legacy){
+      const status=legacy.querySelector('.v10-muted');
+      if(status&&status.textContent.trim()==='PLAYER STATUS')status.textContent='ACTIVITÉ';
+    }
+    v1353SyncPowerRank();
+  };
+
+  if(typeof window.updateProfileUI==='function'){
+    const prev=window.updateProfileUI;
+    window.updateProfileUI=function(){
+      const r=prev.apply(this,arguments);
+      setTimeout(()=>{v1353CleanProfile();v1353SyncPowerRank()},0);
+      return r;
+    };
+  }
+
+  if(typeof window.switchTab==='function'){
+    const prevSwitch=window.switchTab;
+    window.switchTab=function(tab,btn){
+      const r=prevSwitch.apply(this,arguments);
+      if(tab==='settings')setTimeout(v1353CleanSettings,30);
+      if(tab==='profile')setTimeout(v1353CleanProfile,30);
+      return r;
+    };
+  }
+
+  function boot(){
+    v1353CleanProfile();
+    v1353CleanSettings();
+    v1353SyncPowerRank();
+    setTimeout(()=>{v1353CleanProfile();v1353CleanSettings();v1353SyncPowerRank()},850);
+    setTimeout(()=>{v1353CleanSettings();v1353SyncPowerRank()},1500);
+  }
+
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot);
+  else boot();
+
+  document.addEventListener('visibilitychange',()=>{
+    if(document.visibilityState==='visible'){
+      setTimeout(()=>{v1353CleanProfile();v1353CleanSettings();v1353SyncPowerRank()},120);
+    }
+  });
+})();
+</script>
+
+
+<script id="v1354-hero-ranks-script">
+(function(){
+  function powerPct(){
+    try{
+      const total=Number(userData?.squat||0)+Number(userData?.bench||0)+Number(userData?.deadlift||0);
+      const cur=typeof v135PowerRank==='function'?v135PowerRank(total):null;
+      const next=cur&&typeof v135Next==='function'?v135Next(V135_POWER_RANKS,cur):null;
+      if(!cur)return 0;
+      if(!next)return 100;
+      return Math.max(0,Math.min(100,((total-cur.min)/(next.min-cur.min))*100));
+    }catch(e){return 0}
+  }
+
+  window.v1354ArrangeProfile=function(){
+    const panel=document.getElementById('panel-profile');
+    if(!panel)return;
+
+    const rankHub=document.getElementById('v135-rank-hub');
+    const nav=document.getElementById('v135-profile-nav');
+    if(rankHub&&nav&&nav.nextElementSibling!==rankHub)nav.after(rankHub);
+
+    const powerHero=panel.querySelector('.rank-card');
+    const goals=panel.querySelector('.goal-card');
+    if(powerHero&&goals){
+      powerHero.classList.add('v1354-power-hero');
+      if(goals.previousElementSibling!==powerHero)goals.before(powerHero);
+
+      let bar=powerHero.querySelector('.v1354-power-progress');
+      if(!bar){
+        bar=document.createElement('div');
+        bar.className='v1354-power-progress';
+        bar.innerHTML='<i></i>';
+        const total=powerHero.querySelector('.sbd-total-display');
+        if(total)total.after(bar);
+      }
+      const fill=bar.querySelector('i');
+      if(fill)fill.style.width=powerPct()+'%';
+    }
+
+    const progressHub=document.getElementById('v1352-progress-hub');
+    if(progressHub&&goals&&goals.nextElementSibling!==progressHub)goals.after(progressHub);
+
+    const dash=document.getElementById('v10-profile-dashboard');
+    if(rankHub&&dash&&rankHub.nextElementSibling!==dash)rankHub.after(dash);
+  };
+
+  function run(){
+    try{
+      if(typeof v135RenderRankHub==='function')v135RenderRankHub();
+      if(typeof v1353SyncPowerRank==='function')v1353SyncPowerRank();
+      v1354ArrangeProfile();
+    }catch(e){console.warn('V13.5.4 layout',e)}
+  }
+
+  if(typeof window.updateProfileUI==='function'){
+    const prev=window.updateProfileUI;
+    window.updateProfileUI=function(){
+      const r=prev.apply(this,arguments);
+      setTimeout(run,0);
+      setTimeout(run,250);
+      return r;
+    };
+  }
+
+  if(typeof window.switchTab==='function'){
+    const prevSwitch=window.switchTab;
+    window.switchTab=function(tab,btn){
+      const r=prevSwitch.apply(this,arguments);
+      if(tab==='profile')setTimeout(run,40);
+      return r;
+    };
+  }
+
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',()=>{setTimeout(run,80);setTimeout(run,800)});
+  else {setTimeout(run,80);setTimeout(run,800)}
+
+  document.addEventListener('visibilitychange',()=>{
+    if(document.visibilityState==='visible')setTimeout(run,100);
+  });
+})();
+</script>
+
+
+<script id="v1355-settings-direct-script">
+(function(){
+  function labelOf(sec){
+    return sec?.querySelector('.compact-setting-title')?.textContent?.trim() || '';
+  }
+
+  function selectSection(sec, btn){
+    const panel=document.getElementById('panel-settings');
+    if(!panel||!sec)return;
+    panel.querySelectorAll('.compact-setting-section').forEach(x=>{
+      x.classList.remove('v135-selected','open');
+    });
+    sec.classList.add('v135-selected','open');
+
+    const tabs=document.getElementById('v135-settings-tabs');
+    tabs?.querySelectorAll('button').forEach(x=>x.classList.remove('active'));
+    btn?.classList.add('active');
+    sec.scrollIntoView({behavior:'smooth',block:'nearest'});
+  }
+
+  function moveBackupIntoProfile(panel, account, save){
+    if(!account||!save||account.dataset.v1355BackupMoved==='1')return;
+    const accountBody=account.querySelector('.compact-setting-body');
+    const saveBody=save.querySelector('.compact-setting-body');
+    if(!accountBody||!saveBody)return;
+
+    const note=document.createElement('div');
+    note.className='v1355-backup-note';
+    note.innerHTML='<b>💾 Sécurité des données</b><br>Ta progression est déjà sauvegardée automatiquement. L\'export/import reste disponible ici uniquement comme copie de secours.';
+    accountBody.appendChild(note);
+
+    while(saveBody.firstChild) accountBody.appendChild(saveBody.firstChild);
+    account.dataset.v1355BackupMoved='1';
+    save.remove();
+  }
+
+  window.v1355FixSettings=function(){
+    const panel=document.getElementById('panel-settings');
+    if(!panel)return;
+
+    try{
+      if(typeof initCompactSettings==='function')initCompactSettings();
+      if(typeof v135Settings==='function')v135Settings();
+      if(typeof v1352AddNotificationSettings==='function')v1352AddNotificationSettings();
+    }catch(e){console.warn('settings init',e)}
+
+    let sections=[...panel.querySelectorAll('.compact-setting-section')];
+    const account=sections.find(x=>labelOf(x).includes('Mon profil')||labelOf(x).includes('Compte & profil'));
+    const ambiance=sections.find(x=>labelOf(x).includes('Ambiance'));
+    const save=sections.find(x=>labelOf(x).includes('Sauvegarde'));
+    const display=sections.find(x=>labelOf(x).includes('Affichage'));
+    const notif=document.getElementById('v1352-notifications');
+
+    moveBackupIntoProfile(panel,account,save);
+
+    let tabs=document.getElementById('v135-settings-tabs');
+    if(!tabs){
+      tabs=document.createElement('div');
+      tabs.id='v135-settings-tabs';
+      tabs.className='v135-settings-tabs';
+      const palette=panel.querySelector('.settings-theme-top');
+      (palette||panel.querySelector('.compact-settings-head'))?.after(tabs);
+    }
+
+    tabs.innerHTML='';
+    const cfg=[
+      ['👤 Mon profil',account],
+      ['✨ Ambiance',ambiance],
+      ['📱 Affichage',display],
+      ['🔔 Notifications',notif]
+    ].filter(x=>x[1]);
+
+    cfg.forEach(([label,sec],i)=>{
+      const b=document.createElement('button');
+      b.textContent=label;
+      b.onclick=()=>{playSound('click');selectSection(sec,b)};
+      tabs.appendChild(b);
+      if(i===0){
+        b.classList.add('active');
+        selectSection(sec,b);
+      }
+    });
+
+    /* La palette reste toujours au-dessus des onglets */
+    const head=panel.querySelector('.compact-settings-head');
+    const palette=panel.querySelector('.settings-theme-top');
+    if(head&&palette&&head.nextElementSibling!==palette)head.after(palette);
+    if(palette&&tabs&&palette.nextElementSibling!==tabs)palette.after(tabs);
+  };
+
+  const oldSwitch=window.switchTab;
+  if(typeof oldSwitch==='function'){
+    window.switchTab=function(tab,btn){
+      const r=oldSwitch.apply(this,arguments);
+      if(tab==='settings'){
+        setTimeout(v1355FixSettings,60);
+        setTimeout(v1355FixSettings,500);
+      }
+      return r;
+    };
+  }
+
+  if(document.readyState==='loading'){
+    document.addEventListener('DOMContentLoaded',()=>setTimeout(v1355FixSettings,1200));
+  }else{
+    setTimeout(v1355FixSettings,1200);
+  }
+
+  document.addEventListener('visibilitychange',()=>{
+    if(document.visibilityState==='visible')setTimeout(v1355FixSettings,150);
+  });
+})();
+</script>
+
+
+<script id="v1356-settings-clean-list-script">
+(function(){
+  function setup(){
+    const panel=document.getElementById('panel-settings');
+    const tabs=document.getElementById('v135-settings-tabs');
+    if(!panel||!tabs)return;
+
+    /* Sauvegarde reste uniquement dans Mon profil : aucun bouton séparé. */
+    [...tabs.querySelectorAll('button')].forEach(b=>{
+      if(/sauvegarde/i.test(b.textContent)) b.remove();
+    });
+
+    const wanted=[
+      ['Mon profil','Informations personnelles et compte'],
+      ['Ambiance','Thème, effets et animations'],
+      ['Affichage','Interface, taille du texte et affichage'],
+      ['Notifications','Gérer les notifications et rappels']
+    ];
+
+    [...tabs.querySelectorAll('button')].forEach(btn=>{
+      const hit=wanted.find(x=>btn.textContent.includes(x[0]));
+      if(hit){
+        const icon=btn.textContent.trim().split(' ')[0];
+        btn.innerHTML=`<span style="display:block;font-weight:900;color:#f2f2f5">${icon} ${hit[0]}</span><small style="display:block;margin-top:3px;color:#8e8e99;font-size:.61rem;font-weight:600">${hit[1]}</small>`;
+      }
+    });
+  }
+
+  if(typeof window.v1355FixSettings==='function'){
+    const prev=window.v1355FixSettings;
+    window.v1355FixSettings=function(){
+      const r=prev.apply(this,arguments);
+      setTimeout(setup,0);
+      return r;
+    };
+  }
+
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',()=>setTimeout(setup,1400));
+  else setTimeout(setup,1400);
+
+  document.addEventListener('click',e=>{
+    if(e.target.closest('#v135-settings-tabs'))setTimeout(setup,100);
+  });
+})();
+</script>
+
+
+<script id="v1357-settings-toggle-script">
+(function(){
+  let currentKey = null;
+
+  function keyOf(btn){
+    const t=(btn?.textContent||'').toLowerCase();
+    if(t.includes('profil')) return 'profile';
+    if(t.includes('ambiance')) return 'ambiance';
+    if(t.includes('affichage')) return 'display';
+    if(t.includes('notification')) return 'notifications';
+    return t.trim();
+  }
+
+  function closeAll(){
+    const panel=document.getElementById('panel-settings');
+    const tabs=document.getElementById('v135-settings-tabs');
+    if(!panel||!tabs)return;
+
+    panel.classList.add('v1357-all-closed');
+    panel.querySelectorAll('.compact-setting-section').forEach(sec=>{
+      sec.classList.remove('v135-selected','open');
+      sec.style.display='none';
+    });
+    tabs.querySelectorAll('button').forEach(b=>b.classList.remove('active'));
+    currentKey=null;
+  }
+
+  function bind(){
+    const panel=document.getElementById('panel-settings');
+    const tabs=document.getElementById('v135-settings-tabs');
+    if(!panel||!tabs)return;
+
+    tabs.querySelectorAll('button').forEach(btn=>{
+      if(btn.dataset.v1357Bound==='1')return;
+      btn.dataset.v1357Bound='1';
+
+      btn.addEventListener('click',function(e){
+        const key=keyOf(btn);
+
+        /* Si on reclique sur la page déjà ouverte => on la referme */
+        if(currentKey===key){
+          e.preventDefault();
+          e.stopImmediatePropagation();
+          closeAll();
+          return false;
+        }
+
+        currentKey=key;
+        panel.classList.remove('v1357-all-closed');
+
+        /* laisse l'ancien moteur ouvrir la bonne section */
+        setTimeout(()=>{
+          tabs.querySelectorAll('button').forEach(b=>{
+            b.classList.toggle('active',b===btn);
+          });
+        },30);
+      },true);
+    });
+  }
+
+  /* On ne force plus Mon profil à rester ouvert au démarrage. */
+  function boot(){
+    bind();
+    closeAll();
+  }
+
+  if(typeof window.v1355FixSettings==='function'){
+    const prev=window.v1355FixSettings;
+    window.v1355FixSettings=function(){
+      const r=prev.apply(this,arguments);
+      setTimeout(()=>{
+        bind();
+        /* ne réouvre pas automatiquement Mon profil */
+        if(currentKey===null)closeAll();
+      },20);
+      return r;
+    };
+  }
+
+  if(document.readyState==='loading'){
+    document.addEventListener('DOMContentLoaded',()=>setTimeout(boot,1550));
+  }else{
+    setTimeout(boot,1550);
+  }
+
+  document.addEventListener('visibilitychange',()=>{
+    if(document.visibilityState==='visible')setTimeout(bind,120);
+  });
+})();
+</script>
+
+
+<script id="v1358-settings-overlay-script">
+(function(){
+  let opened=null;
+
+  function closeOverlay(){
+    if(!opened)return;
+    opened.classList.remove('v1358-overlay','v135-selected','open');
+    opened.style.display='none';
+    opened.querySelector('.v1358-close')?.remove();
+    document.body.classList.remove('v1358-settings-open');
+    document.querySelectorAll('#v135-settings-tabs button').forEach(b=>b.classList.remove('active'));
+    opened=null;
+  }
+
+  function findSection(btn){
+    const t=(btn.textContent||'').toLowerCase();
+    const sections=[...document.querySelectorAll('#panel-settings .compact-setting-section')];
+    if(t.includes('profil')) return sections.find(s=>(s.textContent||'').includes('Mon profil'));
+    if(t.includes('ambiance')) return sections.find(s=>(s.textContent||'').includes('Ambiance'));
+    if(t.includes('affichage')) return sections.find(s=>(s.textContent||'').includes('Affichage'));
+    if(t.includes('notification')) return document.getElementById('v1352-notifications') || sections.find(s=>(s.textContent||'').includes('Notifications'));
+    return null;
+  }
+
+  function openOverlay(sec,btn){
+    if(!sec)return;
+    if(opened===sec){closeOverlay();return}
+    closeOverlay();
+
+    opened=sec;
+    sec.style.display='block';
+    sec.classList.add('v1358-overlay','v135-selected','open');
+    document.body.classList.add('v1358-settings-open');
+    btn?.classList.add('active');
+
+    const close=document.createElement('button');
+    close.className='v1358-close';
+    close.type='button';
+    close.setAttribute('aria-label','Fermer');
+    close.innerHTML='←';
+    close.onclick=(e)=>{e.preventDefault();e.stopPropagation();closeOverlay()};
+    sec.prepend(close);
+
+    sec.scrollTop=0;
+  }
+
+  function bind(){
+    const tabs=document.getElementById('v135-settings-tabs');
+    if(!tabs)return;
+    tabs.querySelectorAll('button').forEach(btn=>{
+      if(btn.dataset.v1358Bound==='1')return;
+      btn.dataset.v1358Bound='1';
+      btn.addEventListener('click',function(e){
+        e.preventDefault();
+        e.stopImmediatePropagation();
+        const sec=findSection(btn);
+        openOverlay(sec,btn);
+      },true);
+    });
+  }
+
+  window.v1358CloseSettingsPage=closeOverlay;
+
+  if(typeof window.v1355FixSettings==='function'){
+    const prev=window.v1355FixSettings;
+    window.v1355FixSettings=function(){
+      const r=prev.apply(this,arguments);
+      setTimeout(bind,30);
+      return r;
+    };
+  }
+
+  if(typeof window.switchTab==='function'){
+    const prevSwitch=window.switchTab;
+    window.switchTab=function(tab,btn){
+      if(tab!=='settings')closeOverlay();
+      const r=prevSwitch.apply(this,arguments);
+      if(tab==='settings')setTimeout(bind,80);
+      return r;
+    };
+  }
+
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',()=>setTimeout(bind,1700));
+  else setTimeout(bind,1700);
+
+  document.addEventListener('keydown',e=>{
+    if(e.key==='Escape')closeOverlay();
+  });
+})();
+</script>
+
+
+<script id="v1359-settings-subpage-script">
+(function(){
+  function metaFor(sec){
+    const txt=(sec?.textContent||'').toLowerCase();
+    if(txt.includes('mon profil')) return ['👤 Mon profil','Compte, identité et sauvegarde de secours'];
+    if(txt.includes('collection de thèmes')||txt.includes('ambiance')) return ['✨ Ambiance','Thèmes, effets et animations'];
+    if(txt.includes('plein écran')||txt.includes('affichage')) return ['📱 Affichage','Interface, installation et affichage'];
+    if(txt.includes('notification')) return ['🔔 Notifications','Rappels et préférences'];
+    return ['⚙️ Réglage','Configuration'];
+  }
+
+  function decorate(sec){
+    if(!sec||sec.querySelector(':scope > .v1359-pagebar'))return;
+    const [title,sub]=metaFor(sec);
+    const bar=document.createElement('div');
+    bar.className='v1359-pagebar';
+    bar.innerHTML=`
+      <button class="v1359-pageback" type="button" aria-label="Retour">←</button>
+      <div class="v1359-pagetitle"><b>${title}</b><small>${sub}</small></div>
+    `;
+    bar.querySelector('button').onclick=(e)=>{
+      e.preventDefault();
+      e.stopPropagation();
+      if(typeof window.v1358CloseSettingsPage==='function')window.v1358CloseSettingsPage();
+    };
+    sec.prepend(bar);
+  }
+
+  const observer=new MutationObserver(()=>{
+    document.querySelectorAll('#panel-settings .compact-setting-section.v1358-overlay').forEach(decorate);
+  });
+  observer.observe(document.documentElement,{subtree:true,attributes:true,attributeFilter:['class'],childList:true});
+
+  document.addEventListener('click',()=>{
+    setTimeout(()=>{
+      document.querySelectorAll('#panel-settings .compact-setting-section.v1358-overlay').forEach(decorate);
+    },40);
+  },true);
+})();
 </script>
 
 </body>
