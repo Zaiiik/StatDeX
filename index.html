@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
 <!-- ============================================================
-     LEVELING-APP V16.0.1 — STABLE PATCH
+     LEVELING-APP V16.0.2 — STABLE PATCH
      Base figée après validation réelle PC + Samsung + iPhone/PWA.
 
      Release V16 :
@@ -20,7 +20,7 @@
 
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>LEVELING-APP — Powerbuilding Tracker V16.0.1 STABLE</title>
+    <title>LEVELING-APP — Powerbuilding Tracker V16.0.2 STABLE</title>
     <meta name="theme-color" content="#09090f">
     <meta name="application-name" content="LEVELING-APP">
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -1146,12 +1146,17 @@ header .hud-stat.v140-clickable:hover{
   }
 
   html.leveling-ios.leveling-standalone #app-container{
+    /* V16.0.2 — iPhone PWA bottom-gap fix.
+       En standalone, `position:fixed; inset:0` donne déjà les 4 bords exacts
+       du viewport. L'ancien `height:100dvh` sur-contraignait le conteneur sur
+       certains iPhone/iOS et pouvait laisser une bande noire SOUS la nav.
+       On laisse donc top+bottom définir la hauteur réelle. */
     position:fixed!important;
     inset:0!important;
-    width:100%!important;
-    height:100dvh!important;
-    min-height:100dvh!important;
-    max-height:100dvh!important;
+    width:auto!important;
+    height:auto!important;
+    min-height:0!important;
+    max-height:none!important;
     margin:0!important;
     padding:0!important;
   }
@@ -1161,7 +1166,10 @@ header .hud-stat.v140-clickable:hover{
   }
 
   html.leveling-ios.leveling-standalone nav{
+    left:0!important;
+    right:0!important;
     bottom:0!important;
+    width:auto!important;
     min-height:calc(58px + env(safe-area-inset-bottom,0px))!important;
     padding:6px 0 max(6px,env(safe-area-inset-bottom,0px))!important;
     background:linear-gradient(to top,#08080d 0%,#0b0b11 62%,rgba(5,5,7,.97) 100%)!important;
@@ -3427,7 +3435,7 @@ const sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_PUBLISHABLE_KEY,{
   auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true,storage:window.localStorage}
 });
 let cloudUser=null,cloudLicensed=false,cloudLoadedOnce=false,cloudSaveTimer=null,suppressCloudSave=false,licenseWatchTimer=null,lastLicenseStatus='UNKNOWN';
-const APP_VERSION='16.0.1';
+const APP_VERSION='16.0.2';
 const ACCOUNT_LOCAL_KEYS=['solo_leveling_user','solo_leveling_smart_refs','solo_leveling_body_hist','solo_leveling_inv','solo_leveling_block','solo_leveling_day','solo_leveling_state','solo_leveling_custom_sets','solo_leveling_history','solo_leveling_active_program','solo_leveling_program_states','solo_leveling_program_custom_sets','solo_leveling_custom_program','leveling_last_local_save','leveling_last_cloud_sync','leveling_v10'];
 function clearLevelingAccountLocalData(){
   try{ACCOUNT_LOCAL_KEYS.forEach(k=>localStorage.removeItem(k));sessionStorage.removeItem('leveling_pending_license')}catch(e){console.warn('Local account cleanup:',e)}
@@ -5923,7 +5931,7 @@ body.v1358-settings-open{overflow:hidden!important}
    Aucun hook finishWorkoutFinal / updateProfileUI / switchTab.
    ============================================================ */
 
-const VERSION='16.0.1';
+const VERSION='16.0.2';
 const RPG_KEY='leveling_v140_rpg';
 
 function loadRpg(){try{return JSON.parse(localStorage.getItem(RPG_KEY)||'{}')||{}}catch(e){return {}}}
