@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>LEVELING-APP — Powerbuilding Tracker V14.5.4</title>
+    <title>LEVELING-APP — Powerbuilding Tracker V15.0.0 CLEAN CORE</title>
     <meta name="theme-color" content="#09090f">
     <meta name="application-name" content="LEVELING-APP">
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -781,311 +781,6 @@ body[data-ambiance="sakura"] .ambiance-particle-layer,body[data-ambiance="sakura
 </style>
 
 <!-- ==================== V13.5.3 · CLEAN RANKS & SETTINGS ==================== -->
-<style id="v1353-clean-ui">
-#v135-profile-nav{gap:7px!important;padding:2px 0 10px!important}
-#v135-profile-nav button{
-  appearance:none!important;background:linear-gradient(145deg,#111119,#09090e)!important;
-  color:#b8b8c2!important;border:1px solid #30303a!important;border-radius:11px!important;
-  box-shadow:none!important;min-height:38px!important;font-weight:900!important
-}
-#v135-profile-nav button:active{transform:scale(.97);border-color:var(--accent-rose)!important;color:#fff!important}
-
-.v1353-legacy-xp{position:relative;padding-top:38px!important}
-.v1353-legacy-xp:before{
-  content:"⚡ ACTIVITÉ DU CHASSEUR";position:absolute;top:12px;left:12px;color:#f2f2f5;
-  font-size:.72rem;font-weight:1000;letter-spacing:.02em
-}
-.v1353-legacy-xp>div:first-child,
-.v1353-legacy-xp>div:nth-child(2),
-.v1353-legacy-xp>.v10-xp{display:none!important}
-.v1353-legacy-xp .v10-statrow{margin-top:0!important}
-
-.rank-card{
-  border-color:var(--accent-rose)!important;
-  background:radial-gradient(circle at 50% 0,color-mix(in srgb,var(--accent-purple) 18%,transparent),transparent 55%),#09090e!important
-}
-.rank-card .rank-title{color:#aaa!important;letter-spacing:.09em!important}
-
-#panel-settings.compact-ready .settings-theme-top{margin:8px 0 10px!important}
-#v135-settings-tabs{
-  display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;
-  gap:7px!important;margin:0 0 10px!important
-}
-#v135-settings-tabs button{
-  appearance:none!important;background:linear-gradient(145deg,#111119,#09090e)!important;
-  color:#b7b7c0!important;border:1px solid #30303a!important;border-radius:11px!important;
-  min-height:44px!important;padding:9px 8px!important;font-size:.59rem!important;
-  font-weight:900!important;box-shadow:none!important
-}
-#v135-settings-tabs button.active{
-  color:#fff!important;border-color:var(--accent-rose)!important;
-  background:linear-gradient(145deg,color-mix(in srgb,var(--accent-rose) 13%,#111119),#09090e)!important;
-  box-shadow:0 0 12px color-mix(in srgb,var(--accent-rose) 20%,transparent)!important
-}
-#panel-settings .compact-setting-section{
-  background:linear-gradient(145deg,#101016,#09090e)!important;border-color:#30303a!important
-}
-#panel-settings .compact-setting-header,
-#panel-settings .compact-setting-head{background:transparent!important;color:#fff!important}
-#panel-settings .compact-setting-body{background:transparent!important}
-
-.settings-theme-top{
-  background:linear-gradient(135deg,color-mix(in srgb,var(--accent-purple) 10%,#0c0c12),#0a0a0f)!important;
-  border-color:color-mix(in srgb,var(--accent-purple) 45%,#30303a)!important
-}
-.settings-theme-choice{height:34px!important;border-radius:10px!important}
-
-@media(max-width:380px){
-  #v135-settings-tabs{gap:6px!important}
-  #v135-settings-tabs button{font-size:.54rem!important;padding:8px 5px!important}
-}
-</style>
-
-
-<style id="v1354-hero-ranks">
-#v135-rank-hub{display:block!important;margin:12px 0 12px!important}
-#v135-rank-hub .v135-rank-card.power{display:none!important}
-#v135-rank-hub .v135-rank-card.xp{
-  min-height:155px!important;padding:17px 18px!important;border-radius:17px!important;
-  position:relative!important;overflow:hidden!important;
-  background:radial-gradient(circle at 78% 30%,color-mix(in srgb,var(--accent-purple) 26%,transparent),transparent 42%),linear-gradient(145deg,#11091a,#09090e 62%,#07070b)!important;
-  border:1px solid color-mix(in srgb,var(--accent-purple) 78%,#3a3045)!important;
-  box-shadow:0 0 22px color-mix(in srgb,var(--accent-purple) 17%,transparent)!important
-}
-#v135-rank-hub .v135-rank-card.xp:after{
-  content:"⚔";position:absolute;right:18px;bottom:0;font-size:7rem;line-height:.9;
-  opacity:.055;transform:rotate(-10deg);pointer-events:none
-}
-#v135-rank-hub .v135-rank-card.xp .v135-rank-kicker{font-size:.72rem!important;letter-spacing:.07em!important;margin-bottom:13px!important}
-#v135-rank-hub .v135-rank-card.xp .v135-rank-name{
-  font-size:2rem!important;text-align:center!important;margin:5px 0 8px!important;
-  text-shadow:0 0 16px color-mix(in srgb,var(--accent-purple) 60%,transparent)!important
-}
-#v135-rank-hub .v135-rank-card.xp .v135-rank-meta{font-size:.78rem!important;text-align:center!important;color:#ddd!important;margin-bottom:13px!important}
-#v135-rank-hub .v135-rank-card.xp .v135-progress{height:9px!important;border-radius:999px!important;background:#24242d!important}
-#v135-rank-hub .v135-rank-card.xp .v135-progress i{
-  background:linear-gradient(90deg,var(--accent-purple),var(--accent-rose))!important;
-  box-shadow:0 0 12px color-mix(in srgb,var(--accent-purple) 45%,transparent)!important
-}
-
-.rank-card.v1354-power-hero{
-  min-height:168px!important;padding:18px!important;margin:12px 0!important;border-radius:17px!important;
-  position:relative!important;overflow:hidden!important;
-  background:radial-gradient(circle at 80% 35%,color-mix(in srgb,var(--accent-rose) 22%,transparent),transparent 42%),linear-gradient(145deg,#19090e,#09090e 62%,#07070b)!important;
-  border:1px solid color-mix(in srgb,var(--accent-rose) 80%,#4a3038)!important;
-  box-shadow:0 0 22px color-mix(in srgb,var(--accent-rose) 16%,transparent)!important
-}
-.rank-card.v1354-power-hero:after{
-  content:"⚔";position:absolute;right:18px;bottom:0;font-size:7rem;line-height:.9;
-  opacity:.055;transform:rotate(9deg);pointer-events:none
-}
-.rank-card.v1354-power-hero .rank-title{font-size:.72rem!important;letter-spacing:.08em!important;color:#ddd!important;text-align:left!important}
-.rank-card.v1354-power-hero .rank-badge{
-  font-size:1.9rem!important;margin:13px 0 8px!important;color:var(--accent-rose)!important;
-  text-shadow:0 0 16px color-mix(in srgb,var(--accent-rose) 55%,transparent)!important
-}
-.rank-card.v1354-power-hero .sbd-total-display{font-size:.82rem!important;margin-bottom:12px!important}
-.rank-card.v1354-power-hero .rank-hint{margin-top:12px!important;opacity:.8!important}
-
-.v1354-power-progress{height:9px;background:#24242d;border-radius:999px;overflow:hidden;margin:10px 0 4px}
-.v1354-power-progress i{
-  display:block;height:100%;border-radius:inherit;
-  background:linear-gradient(90deg,var(--accent-rose),var(--accent-purple));
-  box-shadow:0 0 12px color-mix(in srgb,var(--accent-rose) 45%,transparent)
-}
-#v1352-progress-hub{margin-top:10px!important}
-
-@media(max-width:480px){
-  #v135-rank-hub .v135-rank-card.xp{min-height:145px!important;padding:15px!important}
-  #v135-rank-hub .v135-rank-card.xp .v135-rank-name{font-size:1.65rem!important}
-  .rank-card.v1354-power-hero{min-height:155px!important;padding:15px!important}
-  .rank-card.v1354-power-hero .rank-badge{font-size:1.6rem!important}
-}
-</style>
-
-
-<style id="v1355-settings-direct">
-/* V13.5.5 — Réglages directs : un clic = contenu ouvert */
-#panel-settings.compact-ready .compact-setting-section.v135-selected{
-  display:block!important;
-  border:1px solid #30303a!important;
-  border-radius:14px!important;
-  background:linear-gradient(145deg,#101016,#09090e)!important;
-  overflow:hidden!important;
-}
-#panel-settings.compact-ready .compact-setting-section.v135-selected > .compact-setting-body{
-  display:block!important;
-  padding:12px!important;
-}
-#panel-settings.compact-ready .compact-setting-section.v135-selected > .compact-setting-header{
-  display:none!important;
-}
-#panel-settings.compact-ready #v1352-notifications.v135-selected > .compact-setting-head{
-  padding:12px 12px 0!important;
-  background:transparent!important;
-}
-#panel-settings.compact-ready #v1352-notifications.v135-selected > .compact-setting-body{
-  display:block!important;
-}
-#v135-settings-tabs{
-  grid-template-columns:repeat(2,minmax(0,1fr))!important;
-}
-#v135-settings-tabs button{
-  min-height:46px!important;
-  cursor:pointer!important;
-}
-.v1355-backup-note{
-  margin:14px 0 8px;
-  padding-top:12px;
-  border-top:1px solid #2d2d36;
-  font-size:.68rem;
-  color:#aaa;
-}
-.v1355-backup-note b{color:#fff}
-</style>
-
-
-<style id="v1356-settings-clean-list">
-/* Réglages : exactement 4 cartes visibles sous la palette */
-#v135-settings-tabs{
-  display:flex!important;
-  flex-direction:column!important;
-  gap:8px!important;
-  margin-top:12px!important;
-}
-#v135-settings-tabs button{
-  width:100%!important;
-  min-height:58px!important;
-  text-align:left!important;
-  padding:11px 14px!important;
-  border-radius:12px!important;
-  font-size:.76rem!important;
-  position:relative!important;
-}
-#v135-settings-tabs button:after{
-  content:"›";
-  position:absolute;
-  right:14px;
-  top:50%;
-  transform:translateY(-50%);
-  font-size:1.5rem;
-  color:#aaa;
-}
-#panel-settings .compact-setting-section{
-  display:none!important;
-}
-</style>
-
-
-<style id="v1357-settings-toggle">
-/* Quand aucun réglage n'est ouvert, seules les 4 cartes restent visibles */
-#panel-settings.v1357-all-closed .compact-setting-section{
-  display:none!important;
-}
-#v135-settings-tabs button.active{
-  border-color:var(--accent-rose)!important;
-}
-</style>
-
-
-<style id="v1423-settings-subpage-clean">
-/* V14.2.3 — Fusion propre des anciens blocs v1358 + v1359, qui définissaient
-   des top/bottom/height contradictoires pour la sous-page Réglages et ne se
-   "départageaient" que grâce à leur ordre d'apparition dans le fichier.
-   Il n'y a plus ici qu'une seule définition par écran :
-   - ci-dessous : l'affichage par défaut (PC/tablette large, > 760px)
-   - plus bas dans le fichier, @media(max-width:760px) : le plein écran mobile,
-     seule et unique règle qui gère iPhone/Android. */
-#panel-settings .compact-setting-section.v1358-overlay{
-  display:block!important;
-  position:fixed!important;
-  z-index:9990!important;
-  top:58px!important;
-  left:0!important;
-  right:0!important;
-  bottom:54px!important;
-  width:auto!important;
-  height:auto!important;
-  margin:0!important;
-  padding:0!important;
-  border:0!important;
-  border-radius:0!important;
-  background:
-    radial-gradient(circle at 50% 0,color-mix(in srgb,var(--accent-purple) 8%,transparent),transparent 35%),
-    #07070b!important;
-  overflow-y:auto!important;
-  overscroll-behavior:contain!important;
-}
-/* L'ancien en-tête interne ne sert plus de titre : remplacé par .v1359-pagebar. */
-#panel-settings .compact-setting-section.v1358-overlay > .compact-setting-header,
-#panel-settings .compact-setting-section.v1358-overlay > .compact-setting-head{
-  display:none!important;
-}
-#panel-settings .compact-setting-section.v1358-overlay > .compact-setting-body{
-  display:block!important;
-  width:100%!important;
-  max-width:900px!important;
-  margin:0 auto!important;
-  padding:16px 18px 110px!important;
-  box-sizing:border-box!important;
-}
-/* L'ancienne flèche flottante ne sert plus, remplacée par .v1359-pageback */
-.v1358-close{display:none!important}
-body.v1358-settings-open{overflow:hidden!important}
-
-.v1359-pagebar{
-  position:sticky;
-  top:0;
-  z-index:50;
-  display:flex;
-  align-items:center;
-  gap:12px;
-  min-height:58px;
-  padding:10px 16px;
-  background:rgba(8,8,13,.96);
-  backdrop-filter:blur(14px);
-  border-bottom:1px solid color-mix(in srgb,var(--accent-rose) 60%,#282832);
-  box-shadow:0 10px 25px rgba(0,0,0,.25);
-}
-.v1359-pageback{
-  width:40px;
-  height:40px;
-  flex:0 0 40px;
-  border-radius:11px;
-  border:1px solid #353540;
-  background:#111119;
-  color:#fff;
-  font-size:1.25rem;
-  font-weight:900;
-}
-.v1359-pagetitle{min-width:0}
-.v1359-pagetitle b{display:block;font-size:.9rem;color:#fff}
-.v1359-pagetitle small{display:block;margin-top:2px;font-size:.58rem;color:#8d8d98}
-
-/* Contenu large et lisible sur PC/tablette */
-#panel-settings .compact-setting-section.v1358-overlay .profile-card,
-#panel-settings .compact-setting-section.v1358-overlay .v11-card,
-#panel-settings .compact-setting-section.v1358-overlay .v1352-toggle,
-#panel-settings .compact-setting-section.v1358-overlay .theme-collection,
-#panel-settings .compact-setting-section.v1358-overlay .ambiance-card{
-  width:100%!important;
-  max-width:none!important;
-  box-sizing:border-box!important;
-}
-#panel-settings .compact-setting-section.v1358-overlay #v134-theme-gallery{
-  display:grid!important;
-  grid-template-columns:repeat(auto-fit,minmax(220px,1fr))!important;
-  overflow:visible!important;
-  gap:10px!important;
-}
-#panel-settings .compact-setting-section.v1358-overlay #v134-theme-gallery > *{
-  min-width:0!important;
-  width:auto!important;
-  flex:none!important;
-}
-</style>
-
-
 <style id="v140-rpg-upgrade-css">
 /* ===== V14.0 RPG / POWER PROGRESSION ===== */
 #v140-hud{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin:12px 0}
@@ -1817,7 +1512,7 @@ header .hud-stat.v140-clickable:hover{
                         <span class="cloud-badge" id="cloud-live-badge">☁️ CLOUD</span>
                     </div>
                     <div id="cloud-sync-detail" style="margin-top:8px;font-size:.62rem;color:#777;text-align:center">Initialisation du cloud…</div>
-                    <div style="margin-top:5px;font-size:.58rem;color:#555;text-align:center">LEVELING-APP V14.5.4 · Stable</div>
+                    <div style="margin-top:5px;font-size:.58rem;color:#555;text-align:center">LEVELING-APP V15.0.0 · Stable</div>
                     <button class="btn-action" onclick="logoutLeveling()" style="border-color:#ff5555;color:#ff7777">Se déconnecter</button>
                 </div>
 
@@ -2092,7 +1787,7 @@ header .hud-stat.v140-clickable:hover{
             autoProgression: true
         };
 
-        /* V14.5.4 — CANONICAL USER STATE BRIDGE
+        /* V15.0.0 — CANONICAL USER STATE BRIDGE
            `userData` est déclaré avec `let`, donc il n'est pas automatiquement disponible
            via `window.userData`. Plusieurs anciens modules lisaient pourtant window.userData,
            ce qui produisait 0 kg / RECRUE malgré des données correctes.
@@ -5306,560 +5001,6 @@ if(typeof __v1352SendDM==='function')window.sendDirectMessage=async function(){
 
 setTimeout(()=>{v1352CleanProfile();v1352AddNotificationSettings()},1000);
 </script>
-
-
-<script id="v1353-clean-ranks-script">
-(function(){
-  function v1353Power(){
-    const total=Number(userData?.squat||0)+Number(userData?.bench||0)+Number(userData?.deadlift||0);
-    const rank=(typeof v135PowerRank==='function')?v135PowerRank(total):null;
-    return {total,rank};
-  }
-
-  window.v1353SyncPowerRank=function(){
-    try{
-      if(typeof window.renderPowerRankLive==='function')window.renderPowerRankLive();
-    }catch(e){console.warn('V13.5.3 Rang Power sync:',e)}
-  };
-
-  window.v1353CleanSettings=function(){
-    const panel=document.getElementById('panel-settings');
-    if(!panel)return;
-
-    try{
-      if(typeof initCompactSettings==='function')initCompactSettings();
-      if(typeof v135Settings==='function')v135Settings();
-      if(typeof v1352AddNotificationSettings==='function')v1352AddNotificationSettings();
-    }catch(e){}
-
-    const head=panel.querySelector('.compact-settings-head');
-    const palette=panel.querySelector('.settings-theme-top');
-    const tabs=document.getElementById('v135-settings-tabs');
-
-    if(head&&palette&&head.nextElementSibling!==palette)head.after(palette);
-    if(palette&&tabs&&palette.nextElementSibling!==tabs)palette.after(tabs);
-  };
-
-  window.v1353CleanProfile=function(){
-    const legacy=document.querySelector('.v1353-legacy-xp');
-    if(legacy){
-      const status=legacy.querySelector('.v10-muted');
-      if(status&&status.textContent.trim()==='PLAYER STATUS')status.textContent='ACTIVITÉ';
-    }
-    v1353SyncPowerRank();
-  };
-
-  if(typeof window.updateProfileUI==='function'){
-    const prev=window.updateProfileUI;
-    window.updateProfileUI=function(){
-      const r=prev.apply(this,arguments);
-      setTimeout(()=>{v1353CleanProfile();v1353SyncPowerRank()},0);
-      return r;
-    };
-  }
-
-  if(typeof window.switchTab==='function'){
-    const prevSwitch=window.switchTab;
-    window.switchTab=function(tab,btn){
-      const r=prevSwitch.apply(this,arguments);
-      if(tab==='settings')setTimeout(v1353CleanSettings,30);
-      if(tab==='profile')setTimeout(v1353CleanProfile,30);
-      return r;
-    };
-  }
-
-  function boot(){
-    v1353CleanProfile();
-    v1353CleanSettings();
-    v1353SyncPowerRank();
-    setTimeout(()=>{v1353CleanProfile();v1353CleanSettings();v1353SyncPowerRank()},850);
-    setTimeout(()=>{v1353CleanSettings();v1353SyncPowerRank()},1500);
-  }
-
-  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot);
-  else boot();
-
-  document.addEventListener('visibilitychange',()=>{
-    if(document.visibilityState==='visible'){
-      setTimeout(()=>{v1353CleanProfile();v1353CleanSettings();v1353SyncPowerRank()},120);
-    }
-  });
-})();
-</script>
-
-
-<script id="v1354-hero-ranks-script">
-(function(){
-  function powerPct(){
-    try{
-      const total=Number(userData?.squat||0)+Number(userData?.bench||0)+Number(userData?.deadlift||0);
-      const cur=typeof v135PowerRank==='function'?v135PowerRank(total):null;
-      const next=cur&&typeof v135Next==='function'?v135Next(V135_POWER_RANKS,cur):null;
-      if(!cur)return 0;
-      if(!next)return 100;
-      return Math.max(0,Math.min(100,((total-cur.min)/(next.min-cur.min))*100));
-    }catch(e){return 0}
-  }
-
-  window.v1354ArrangeProfile=function(){
-    const panel=document.getElementById('panel-profile');
-    if(!panel)return;
-
-    const rankHub=document.getElementById('v135-rank-hub');
-    const nav=document.getElementById('v135-profile-nav');
-    if(rankHub&&nav&&nav.nextElementSibling!==rankHub)nav.after(rankHub);
-
-    const powerHero=panel.querySelector('.rank-card');
-    const goals=panel.querySelector('.goal-card');
-    if(powerHero&&goals){
-      powerHero.classList.add('v1354-power-hero');
-      if(goals.previousElementSibling!==powerHero)goals.before(powerHero);
-
-      let bar=powerHero.querySelector('.v1354-power-progress');
-      if(!bar){
-        bar=document.createElement('div');
-        bar.className='v1354-power-progress';
-        bar.innerHTML='<i></i>';
-        const total=powerHero.querySelector('.sbd-total-display');
-        if(total)total.after(bar);
-      }
-      const fill=bar.querySelector('i');
-      if(fill)fill.style.width=powerPct()+'%';
-    }
-
-    const progressHub=document.getElementById('v1352-progress-hub');
-    if(progressHub&&goals&&goals.nextElementSibling!==progressHub)goals.after(progressHub);
-
-    const dash=document.getElementById('v10-profile-dashboard');
-    if(rankHub&&dash&&rankHub.nextElementSibling!==dash)rankHub.after(dash);
-  };
-
-  function run(){
-    try{
-      if(typeof v135RenderRankHub==='function')v135RenderRankHub();
-      if(typeof v1353SyncPowerRank==='function')v1353SyncPowerRank();
-      v1354ArrangeProfile();
-    }catch(e){console.warn('V13.5.4 layout',e)}
-  }
-
-  if(typeof window.updateProfileUI==='function'){
-    const prev=window.updateProfileUI;
-    window.updateProfileUI=function(){
-      const r=prev.apply(this,arguments);
-      setTimeout(run,0);
-      setTimeout(run,250);
-      return r;
-    };
-  }
-
-  if(typeof window.switchTab==='function'){
-    const prevSwitch=window.switchTab;
-    window.switchTab=function(tab,btn){
-      const r=prevSwitch.apply(this,arguments);
-      if(tab==='profile')setTimeout(run,40);
-      return r;
-    };
-  }
-
-  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',()=>{setTimeout(run,80);setTimeout(run,800)});
-  else {setTimeout(run,80);setTimeout(run,800)}
-
-  document.addEventListener('visibilitychange',()=>{
-    if(document.visibilityState==='visible')setTimeout(run,100);
-  });
-})();
-</script>
-
-
-<script id="v1355-settings-direct-script">
-(function(){
-  function labelOf(sec){
-    return sec?.querySelector('.compact-setting-title')?.textContent?.trim() || '';
-  }
-
-  function selectSection(sec, btn){
-    const panel=document.getElementById('panel-settings');
-    if(!panel||!sec)return;
-    panel.querySelectorAll('.compact-setting-section').forEach(x=>{
-      x.classList.remove('v135-selected','open');
-    });
-    sec.classList.add('v135-selected','open');
-
-    const tabs=document.getElementById('v135-settings-tabs');
-    tabs?.querySelectorAll('button').forEach(x=>x.classList.remove('active'));
-    btn?.classList.add('active');
-    sec.scrollIntoView({behavior:'smooth',block:'nearest'});
-  }
-
-  function moveBackupIntoProfile(panel, account, save){
-    if(!account||!save||account.dataset.v1355BackupMoved==='1')return;
-    const accountBody=account.querySelector('.compact-setting-body');
-    const saveBody=save.querySelector('.compact-setting-body');
-    if(!accountBody||!saveBody)return;
-
-    const note=document.createElement('div');
-    note.className='v1355-backup-note';
-    note.innerHTML='<b>💾 Sécurité des données</b><br>Ta progression est déjà sauvegardée automatiquement. L\'export/import reste disponible ici uniquement comme copie de secours.';
-    accountBody.appendChild(note);
-
-    while(saveBody.firstChild) accountBody.appendChild(saveBody.firstChild);
-    account.dataset.v1355BackupMoved='1';
-    save.remove();
-  }
-
-  window.v1355FixSettings=function(){
-    const panel=document.getElementById('panel-settings');
-    if(!panel)return;
-
-    try{
-      if(typeof initCompactSettings==='function')initCompactSettings();
-      if(typeof v135Settings==='function')v135Settings();
-      if(typeof v1352AddNotificationSettings==='function')v1352AddNotificationSettings();
-    }catch(e){console.warn('settings init',e)}
-
-    let sections=[...panel.querySelectorAll('.compact-setting-section')];
-    const account=sections.find(x=>labelOf(x).includes('Mon profil')||labelOf(x).includes('Compte & profil'));
-    const ambiance=sections.find(x=>labelOf(x).includes('Ambiance'));
-    const save=sections.find(x=>labelOf(x).includes('Sauvegarde'));
-    const display=sections.find(x=>labelOf(x).includes('Affichage'));
-    const notif=document.getElementById('v1352-notifications');
-
-    moveBackupIntoProfile(panel,account,save);
-
-    let tabs=document.getElementById('v135-settings-tabs');
-    if(!tabs){
-      tabs=document.createElement('div');
-      tabs.id='v135-settings-tabs';
-      tabs.className='v135-settings-tabs';
-      const palette=panel.querySelector('.settings-theme-top');
-      (palette||panel.querySelector('.compact-settings-head'))?.after(tabs);
-    }
-
-    tabs.innerHTML='';
-    const cfg=[
-      ['👤 Mon profil',account],
-      ['✨ Ambiance',ambiance],
-      ['📱 Affichage',display],
-      ['🔔 Notifications',notif]
-    ].filter(x=>x[1]);
-
-    cfg.forEach(([label,sec],i)=>{
-      const b=document.createElement('button');
-      b.textContent=label;
-      b.onclick=()=>{playSound('click');selectSection(sec,b)};
-      tabs.appendChild(b);
-      if(i===0){
-        b.classList.add('active');
-        selectSection(sec,b);
-      }
-    });
-
-    /* La palette reste toujours au-dessus des onglets */
-    const head=panel.querySelector('.compact-settings-head');
-    const palette=panel.querySelector('.settings-theme-top');
-    if(head&&palette&&head.nextElementSibling!==palette)head.after(palette);
-    if(palette&&tabs&&palette.nextElementSibling!==tabs)palette.after(tabs);
-  };
-
-  const oldSwitch=window.switchTab;
-  if(typeof oldSwitch==='function'){
-    window.switchTab=function(tab,btn){
-      const r=oldSwitch.apply(this,arguments);
-      if(tab==='settings'){
-        setTimeout(v1355FixSettings,60);
-        setTimeout(v1355FixSettings,500);
-      }
-      return r;
-    };
-  }
-
-  if(document.readyState==='loading'){
-    document.addEventListener('DOMContentLoaded',()=>setTimeout(v1355FixSettings,1200));
-  }else{
-    setTimeout(v1355FixSettings,1200);
-  }
-
-  document.addEventListener('visibilitychange',()=>{
-    if(document.visibilityState==='visible')setTimeout(v1355FixSettings,150);
-  });
-})();
-</script>
-
-
-<script id="v1356-settings-clean-list-script">
-(function(){
-  function setup(){
-    const panel=document.getElementById('panel-settings');
-    const tabs=document.getElementById('v135-settings-tabs');
-    if(!panel||!tabs)return;
-
-    /* Sauvegarde reste uniquement dans Mon profil : aucun bouton séparé. */
-    [...tabs.querySelectorAll('button')].forEach(b=>{
-      if(/sauvegarde/i.test(b.textContent)) b.remove();
-    });
-
-    const wanted=[
-      ['Mon profil','Informations personnelles et compte'],
-      ['Ambiance','Thème, effets et animations'],
-      ['Affichage','Interface, taille du texte et affichage'],
-      ['Notifications','Gérer les notifications et rappels']
-    ];
-
-    [...tabs.querySelectorAll('button')].forEach(btn=>{
-      const hit=wanted.find(x=>btn.textContent.includes(x[0]));
-      if(hit){
-        const icon=btn.textContent.trim().split(' ')[0];
-        btn.innerHTML=`<span style="display:block;font-weight:900;color:#f2f2f5">${icon} ${hit[0]}</span><small style="display:block;margin-top:3px;color:#8e8e99;font-size:.61rem;font-weight:600">${hit[1]}</small>`;
-      }
-    });
-  }
-
-  if(typeof window.v1355FixSettings==='function'){
-    const prev=window.v1355FixSettings;
-    window.v1355FixSettings=function(){
-      const r=prev.apply(this,arguments);
-      setTimeout(setup,0);
-      return r;
-    };
-  }
-
-  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',()=>setTimeout(setup,1400));
-  else setTimeout(setup,1400);
-
-  document.addEventListener('click',e=>{
-    if(e.target.closest('#v135-settings-tabs'))setTimeout(setup,100);
-  });
-})();
-</script>
-
-
-<script id="v1357-settings-toggle-script">
-(function(){
-  let currentKey = null;
-
-  function keyOf(btn){
-    const t=(btn?.textContent||'').toLowerCase();
-    if(t.includes('profil')) return 'profile';
-    if(t.includes('ambiance')) return 'ambiance';
-    if(t.includes('affichage')) return 'display';
-    if(t.includes('notification')) return 'notifications';
-    return t.trim();
-  }
-
-  function closeAll(){
-    const panel=document.getElementById('panel-settings');
-    const tabs=document.getElementById('v135-settings-tabs');
-    if(!panel||!tabs)return;
-
-    panel.classList.add('v1357-all-closed');
-    panel.querySelectorAll('.compact-setting-section').forEach(sec=>{
-      sec.classList.remove('v135-selected','open');
-      sec.style.display='none';
-    });
-    tabs.querySelectorAll('button').forEach(b=>b.classList.remove('active'));
-    currentKey=null;
-  }
-
-  function bind(){
-    const panel=document.getElementById('panel-settings');
-    const tabs=document.getElementById('v135-settings-tabs');
-    if(!panel||!tabs)return;
-
-    tabs.querySelectorAll('button').forEach(btn=>{
-      if(btn.dataset.v1357Bound==='1')return;
-      btn.dataset.v1357Bound='1';
-
-      btn.addEventListener('click',function(e){
-        const key=keyOf(btn);
-
-        /* Si on reclique sur la page déjà ouverte => on la referme */
-        if(currentKey===key){
-          e.preventDefault();
-          e.stopImmediatePropagation();
-          closeAll();
-          return false;
-        }
-
-        currentKey=key;
-        panel.classList.remove('v1357-all-closed');
-
-        /* laisse l'ancien moteur ouvrir la bonne section */
-        setTimeout(()=>{
-          tabs.querySelectorAll('button').forEach(b=>{
-            b.classList.toggle('active',b===btn);
-          });
-        },30);
-      },true);
-    });
-  }
-
-  /* On ne force plus Mon profil à rester ouvert au démarrage. */
-  function boot(){
-    bind();
-    closeAll();
-  }
-
-  if(typeof window.v1355FixSettings==='function'){
-    const prev=window.v1355FixSettings;
-    window.v1355FixSettings=function(){
-      const r=prev.apply(this,arguments);
-      setTimeout(()=>{
-        bind();
-        /* ne réouvre pas automatiquement Mon profil */
-        if(currentKey===null)closeAll();
-      },20);
-      return r;
-    };
-  }
-
-  if(document.readyState==='loading'){
-    document.addEventListener('DOMContentLoaded',()=>setTimeout(boot,1550));
-  }else{
-    setTimeout(boot,1550);
-  }
-
-  document.addEventListener('visibilitychange',()=>{
-    if(document.visibilityState==='visible')setTimeout(bind,120);
-  });
-})();
-</script>
-
-
-<script id="v1358-settings-overlay-script">
-(function(){
-  let opened=null;
-
-  function closeOverlay(){
-    if(!opened)return;
-    opened.classList.remove('v1358-overlay','v135-selected','open');
-    opened.style.display='none';
-    opened.querySelector('.v1358-close')?.remove();
-    document.body.classList.remove('v1358-settings-open');
-    document.querySelectorAll('#v135-settings-tabs button').forEach(b=>b.classList.remove('active'));
-    opened=null;
-  }
-
-  function findSection(btn){
-    const t=(btn.textContent||'').toLowerCase();
-    const sections=[...document.querySelectorAll('#panel-settings .compact-setting-section')];
-    if(t.includes('profil')) return sections.find(s=>(s.textContent||'').includes('Mon profil'));
-    if(t.includes('ambiance')) return sections.find(s=>(s.textContent||'').includes('Ambiance'));
-    if(t.includes('affichage')) return sections.find(s=>(s.textContent||'').includes('Affichage'));
-    if(t.includes('notification')) return document.getElementById('v1352-notifications') || sections.find(s=>(s.textContent||'').includes('Notifications'));
-    return null;
-  }
-
-  function openOverlay(sec,btn){
-    if(!sec)return;
-    if(opened===sec){closeOverlay();return}
-    closeOverlay();
-
-    opened=sec;
-    sec.style.display='block';
-    sec.classList.add('v1358-overlay','v135-selected','open');
-    document.body.classList.add('v1358-settings-open');
-    btn?.classList.add('active');
-
-    const close=document.createElement('button');
-    close.className='v1358-close';
-    close.type='button';
-    close.setAttribute('aria-label','Fermer');
-    close.innerHTML='←';
-    close.onclick=(e)=>{e.preventDefault();e.stopPropagation();closeOverlay()};
-    sec.prepend(close);
-
-    sec.scrollTop=0;
-  }
-
-  function bind(){
-    const tabs=document.getElementById('v135-settings-tabs');
-    if(!tabs)return;
-    tabs.querySelectorAll('button').forEach(btn=>{
-      if(btn.dataset.v1358Bound==='1')return;
-      btn.dataset.v1358Bound='1';
-      btn.addEventListener('click',function(e){
-        e.preventDefault();
-        e.stopImmediatePropagation();
-        const sec=findSection(btn);
-        openOverlay(sec,btn);
-      },true);
-    });
-  }
-
-  window.v1358CloseSettingsPage=closeOverlay;
-
-  if(typeof window.v1355FixSettings==='function'){
-    const prev=window.v1355FixSettings;
-    window.v1355FixSettings=function(){
-      const r=prev.apply(this,arguments);
-      setTimeout(bind,30);
-      return r;
-    };
-  }
-
-  if(typeof window.switchTab==='function'){
-    const prevSwitch=window.switchTab;
-    window.switchTab=function(tab,btn){
-      if(tab!=='settings')closeOverlay();
-      const r=prevSwitch.apply(this,arguments);
-      if(tab==='settings')setTimeout(bind,80);
-      return r;
-    };
-  }
-
-  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',()=>setTimeout(bind,1700));
-  else setTimeout(bind,1700);
-
-  document.addEventListener('keydown',e=>{
-    if(e.key==='Escape')closeOverlay();
-  });
-})();
-</script>
-
-
-<script id="v1359-settings-subpage-script">
-(function(){
-  function metaFor(sec){
-    const txt=(sec?.textContent||'').toLowerCase();
-    if(txt.includes('mon profil')) return ['👤 Mon profil','Compte, identité et sauvegarde de secours'];
-    if(txt.includes('collection de thèmes')||txt.includes('ambiance')) return ['✨ Ambiance','Thèmes, effets et animations'];
-    if(txt.includes('plein écran')||txt.includes('affichage')) return ['📱 Affichage','Interface, installation et affichage'];
-    if(txt.includes('notification')) return ['🔔 Notifications','Rappels et préférences'];
-    return ['⚙️ Réglage','Configuration'];
-  }
-
-  function decorate(sec){
-    if(!sec||sec.querySelector(':scope > .v1359-pagebar'))return;
-    const [title,sub]=metaFor(sec);
-    const bar=document.createElement('div');
-    bar.className='v1359-pagebar';
-    bar.innerHTML=`
-      <button class="v1359-pageback" type="button" aria-label="Retour">←</button>
-      <div class="v1359-pagetitle"><b>${title}</b><small>${sub}</small></div>
-    `;
-    bar.querySelector('button').onclick=(e)=>{
-      e.preventDefault();
-      e.stopPropagation();
-      if(typeof window.v1358CloseSettingsPage==='function')window.v1358CloseSettingsPage();
-    };
-    sec.prepend(bar);
-  }
-
-  const observer=new MutationObserver(()=>{
-    document.querySelectorAll('#panel-settings .compact-setting-section.v1358-overlay').forEach(decorate);
-  });
-  const v1359Root=document.getElementById('panel-settings')||document.documentElement;
-  observer.observe(v1359Root,{subtree:true,attributes:true,attributeFilter:['class'],childList:true});
-
-  document.addEventListener('click',()=>{
-    setTimeout(()=>{
-      document.querySelectorAll('#panel-settings .compact-setting-section.v1358-overlay').forEach(decorate);
-    },40);
-  },true);
-})();
-</script>
-
-
 <script id="v140-rpg-upgrade-js">
 (function(){
 const KEY='leveling_v140_rpg';
@@ -7938,7 +7079,7 @@ html.leveling-ios nav{-webkit-backdrop-filter:none!important;backdrop-filter:non
 
 
 <style id="v1430-stable-ui-css">
-/* ================= V14.5.4 — STABLE SETTINGS / PROGRESSION =================
+/* ================= V15.0.0 — STABLE SETTINGS / PROGRESSION =================
    Réglages: plus aucune sous-page fixed/overlay. Toutes les rubriques restent
    dans le scroll principal de l'app, donc plus de page coupée ni ouverture en bas. */
 #panel-settings{position:relative!important;overflow:visible!important;min-height:0!important}
@@ -7993,7 +7134,7 @@ body.v1358-settings-open{overflow:hidden!important}
 
 <script id="v1430-stable-core-js">
 (function(){
-  const VERSION='14.5.4';
+  const VERSION='15.0.0';
   const q=s=>document.querySelector(s);
   const qa=s=>[...document.querySelectorAll(s)];
   const localDay=(d=new Date())=>`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
@@ -8019,62 +7160,6 @@ body.v1358-settings-open{overflow:hidden!important}
     try{q('#modal-rank-showcase')?.style.setProperty('display','none')}catch(e){}
     if(typeof window.v135OpenPower==='function')return window.v135OpenPower();
     if(typeof v135OpenPower==='function')return v135OpenPower();
-  };
-
-  /* ---------- 2. RÉGLAGES : PAS D'OVERLAY, PAS DE SCROLL ALÉATOIRE ---------- */
-  function sectionLabel(sec){return (sec?.querySelector('.compact-setting-title')?.textContent||sec?.textContent||'').toLowerCase()}
-  function findSettingSection(label){
-    const sections=qa('#panel-settings .compact-setting-section');
-    const s=String(label||'').toLowerCase();
-    if(s.includes('profil'))return sections.find(x=>/mon profil|compte & profil/i.test(sectionLabel(x)));
-    if(s.includes('ambiance'))return sections.find(x=>/ambiance/i.test(sectionLabel(x)));
-    if(s.includes('affichage'))return sections.find(x=>/affichage/i.test(sectionLabel(x)));
-    if(s.includes('notification'))return q('#v1352-notifications')||sections.find(x=>/notification/i.test(sectionLabel(x)));
-    return null;
-  }
-  function selectSetting(sec,btn){
-    const panel=q('#panel-settings'),main=q('#app-container > main');if(!panel||!sec)return;
-    qa('#panel-settings .compact-setting-section').forEach(x=>{
-      x.classList.remove('v1358-overlay','open','v135-selected');
-      x.style.removeProperty('display');x.style.removeProperty('top');x.style.removeProperty('bottom');x.style.removeProperty('height');
-      x.querySelector(':scope > .v1358-close')?.remove();
-    });
-    document.body.classList.remove('v1358-settings-open');
-    sec.classList.add('v135-selected');
-    qa('#v135-settings-tabs button').forEach(x=>x.classList.toggle('active',x===btn));
-    if(main){try{main.scrollTo({top:0,left:0,behavior:'auto'})}catch(e){main.scrollTop=0}}
-    sec.scrollTop=0;const body=sec.querySelector(':scope > .compact-setting-body');if(body)body.scrollTop=0;
-  }
-  function stabilizeSettings(){
-    const panel=q('#panel-settings');if(!panel)return;
-    try{if(typeof window.v1358CloseSettingsPage==='function')window.v1358CloseSettingsPage()}catch(e){}
-    document.body.classList.remove('v1358-settings-open');
-    qa('#panel-settings .compact-setting-section').forEach(x=>{
-      x.classList.remove('v1358-overlay','open');x.querySelector(':scope > .v1358-close')?.remove();
-    });
-    const tabs=q('#v135-settings-tabs');if(!tabs)return;
-    const old=[...tabs.querySelectorAll('button')];
-    if(!old.length)return;
-    old.forEach((btn,i)=>{
-      if(btn.dataset.v1430==='1')return;
-      const clone=btn.cloneNode(true);clone.dataset.v1430='1';clone.removeAttribute('onclick');
-      clone.onclick=(e)=>{
-        e.preventDefault();e.stopPropagation();
-        try{if(typeof playSound==='function')playSound('click')}catch(_){}
-        const sec=findSettingSection(clone.textContent);
-        selectSetting(sec,clone);
-      };
-      btn.replaceWith(clone);
-    });
-    const buttons=[...tabs.querySelectorAll('button')];
-    let selected=q('#panel-settings .compact-setting-section.v135-selected');
-    if(!selected){selected=findSettingSection(buttons[0]?.textContent);if(selected)selected.classList.add('v135-selected')}
-    buttons.forEach(b=>b.classList.toggle('active',findSettingSection(b.textContent)===selected));
-  }
-  window.v1430StabilizeSettings=stabilizeSettings;
-  window.v1358CloseSettingsPage=function(){
-    qa('#panel-settings .compact-setting-section').forEach(x=>{x.classList.remove('v1358-overlay','open');x.querySelector(':scope > .v1358-close')?.remove()});
-    document.body.classList.remove('v1358-settings-open');
   };
 
   /* ---------- 3. STREAK + QUÊTES : SYNCHRO ET MIGRATION ---------- */
@@ -8196,45 +7281,63 @@ body.v1358-settings-open{overflow:hidden!important}
         if(typeof renderProfileV2==='function'&&document.getElementById('profile-v2-modal')?.classList.contains('show'))renderProfileV2();
         if(typeof window.renderPowerRankLive==='function')window.renderPowerRankLive();
         if(typeof render==='function')render();
-      }catch(e){console.warn('V14.5.4 SBD UI refresh',e)}
+      }catch(e){console.warn('V15.0.0 SBD UI refresh',e)}
       syncProgressionState();refreshRanks();
     },0);
     return r;
   };
   try{window.importAppData=window.v1430ImportAppData}catch(e){}
-
-  /* ---------- 5. HOOKS ---------- */
+  /* ---------- 5. HOOKS CORE — progression uniquement ---------- */
   const prevSwitch=window.switchTab;
-  if(typeof prevSwitch==='function'&&!prevSwitch.v1430){
+  if(typeof prevSwitch==='function'&&!prevSwitch.v150core){
     window.switchTab=function(tab,btn){
       const r=prevSwitch.apply(this,arguments);
-      if(tab==='settings')setTimeout(()=>{stabilizeSettings();const m=q('#app-container > main');if(m)m.scrollTop=0},90);
-      if(tab==='profile')setTimeout(()=>{refreshRanks();syncProgressionState()},60);
+      if(tab==='profile')setTimeout(()=>{refreshRanks();syncProgressionState()},40);
       return r;
-    };window.switchTab.v1430=1;
-  }
-  const prevUpdate=window.updateProfileUI;
-  if(typeof prevUpdate==='function'&&!prevUpdate.v1430){
-    window.updateProfileUI=function(){const r=prevUpdate.apply(this,arguments);setTimeout(()=>{refreshRanks();syncProgressionState()},20);return r};window.updateProfileUI.v1430=1;
-  }
-  const prevFinish=window.finishWorkoutFinal;
-  if(typeof prevFinish==='function'&&!prevFinish.v1430){
-    window.finishWorkoutFinal=function(){const r=prevFinish.apply(this,arguments);setTimeout(()=>{syncProgressionState();refreshRanks();if(typeof window.scheduleCloudSaveImmediate==='function')window.scheduleCloudSaveImmediate()},160);return r};window.finishWorkoutFinal.v1430=1;
+    };
+    window.switchTab.v150core=1;
   }
 
-  function boot(){stabilizeSettings();refreshRanks();syncProgressionState()}
-  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',()=>{setTimeout(boot,2400);setTimeout(boot,3400)});
-  else {setTimeout(boot,700);setTimeout(boot,1800)}
-  const obs=new MutationObserver(()=>{clearTimeout(obs.t);obs.t=setTimeout(()=>{const tabs=q('#v135-settings-tabs');if(tabs&&[...tabs.querySelectorAll('button')].some(b=>b.dataset.v1430!=='1'))stabilizeSettings()},40)});
-  const root=q('#panel-settings');if(root)obs.observe(root,{subtree:true,childList:true});
-  document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')setTimeout(boot,120)});
+  const prevUpdate=window.updateProfileUI;
+  if(typeof prevUpdate==='function'&&!prevUpdate.v150core){
+    window.updateProfileUI=function(){
+      const r=prevUpdate.apply(this,arguments);
+      setTimeout(()=>{refreshRanks();syncProgressionState()},15);
+      return r;
+    };
+    window.updateProfileUI.v150core=1;
+  }
+
+  const prevFinish=window.finishWorkoutFinal;
+  if(typeof prevFinish==='function'&&!prevFinish.v150core){
+    window.finishWorkoutFinal=function(){
+      const r=prevFinish.apply(this,arguments);
+      setTimeout(()=>{
+        syncProgressionState();
+        refreshRanks();
+        if(typeof window.scheduleCloudSaveImmediate==='function')window.scheduleCloudSaveImmediate();
+      },120);
+      return r;
+    };
+    window.finishWorkoutFinal.v150core=1;
+  }
+
+  function bootCore(){refreshRanks();syncProgressionState()}
+  if(document.readyState==='loading'){
+    document.addEventListener('DOMContentLoaded',()=>setTimeout(bootCore,350),{once:true});
+  }else{
+    setTimeout(bootCore,80);
+  }
+  document.addEventListener('visibilitychange',()=>{
+    if(document.visibilityState==='visible')setTimeout(bootCore,80);
+  });
 })();
 </script>
 
 
 
 <style id="v1440-power-rank-clean-css">
-/* V14.5.4 — RANG POWER PROPRE
+/* V15.0.0 — RANG POWER PROPRE
    Une seule logique: total Squat + Bench + Deadlift en KG.
    Une identité visuelle distincte par rang. */
 
@@ -8441,7 +7544,7 @@ body.v1358-settings-open{overflow:hidden!important}
 
 
 <style id="v1451-power-live-neon-css">
-/* V14.5.4 — les cartes visibles utilisent la même identité néon que la vitrine */
+/* V15.0.0 — les cartes visibles utilisent la même identité néon que la vitrine */
 .rank-card.v1451-live-rank{
   --rank:#ff2d55;
   --rank-rgb:255,45,85;
@@ -8591,7 +7694,7 @@ body.v1358-settings-open{overflow:hidden!important}
         mini.classList.add('v1451-live-rank-mini');
         cssVars(mini,r);
       }
-    }catch(e){console.warn('V14.5.4 live rank render',e)}
+    }catch(e){console.warn('V15.0.0 live rank render',e)}
   };
 
   /* Après toute vraie mise à jour de données/UI */
@@ -8652,7 +7755,7 @@ body.v1358-settings-open{overflow:hidden!important}
     try{
       if(typeof window.renderPowerRankLive==='function')window.renderPowerRankLive();
       if(typeof window.v135RenderRankHub==='function')window.v135RenderRankHub();
-    }catch(e){console.warn('V14.5.4 power refresh',e)}
+    }catch(e){console.warn('V15.0.0 power refresh',e)}
   }
 
   const oldLoad=window.loadFromLocalStorage;
@@ -8690,7 +7793,7 @@ body.v1358-settings-open{overflow:hidden!important}
 
 
 <style id="v1454-xp-neon-css">
-/* V14.5.4 — Rang XP : même qualité visuelle néon que le Rang Power */
+/* V15.0.0 — Rang XP : même qualité visuelle néon que le Rang Power */
 #v135-xp-modal .modal-content{
   width:min(620px,96vw)!important;
   max-width:620px!important;
@@ -8815,7 +7918,7 @@ body.v1358-settings-open{overflow:hidden!important}
           bar.style.width=pct+'%';
         }
       }
-    }catch(e){console.warn('V14.5.4 XP live',e)}
+    }catch(e){console.warn('V15.0.0 XP live',e)}
   };
 
   const oldHub=window.v135RenderRankHub;
@@ -8837,6 +7940,274 @@ body.v1358-settings-open{overflow:hidden!important}
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot,{once:true});
   else boot();
   window.addEventListener('pageshow',()=>setTimeout(window.renderXpRankLive,30));
+})();
+</script>
+
+
+<style id="v150-clean-core-css">
+/* ============================================================
+   LEVELING-APP V15.0 — CLEAN CORE
+   Un seul contrôleur Réglages. Pas d'overlay, pas de sous-page
+   fixed, pas de MutationObserver pour repositionner la page.
+   ============================================================ */
+
+#panel-settings.v15-settings-ready{
+  padding-bottom:calc(96px + env(safe-area-inset-bottom,0px))!important;
+}
+#panel-settings.v15-settings-ready .compact-settings-head{
+  margin-bottom:10px!important;
+}
+#v15-settings-tabs{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:8px;
+  margin:10px 0 12px;
+}
+.v15-settings-tab{
+  min-height:58px;
+  border:1px solid #30303b;
+  border-radius:12px;
+  padding:9px 10px;
+  background:linear-gradient(145deg,#101017,#0a0a0f);
+  color:#aaa;
+  text-align:left;
+  cursor:pointer;
+  overflow:hidden;
+}
+.v15-settings-tab b{display:block;font-size:.72rem;color:#f4f4f7}
+.v15-settings-tab small{display:block;font-size:.53rem;color:#777;margin-top:3px;line-height:1.25}
+.v15-settings-tab.active{
+  border-color:var(--accent-purple);
+  background:linear-gradient(145deg,color-mix(in srgb,var(--accent-purple) 13%,#101017),#09090e);
+  box-shadow:0 0 15px color-mix(in srgb,var(--accent-purple) 20%,transparent);
+}
+#panel-settings.v15-settings-ready .compact-setting-section{
+  display:none!important;
+  position:static!important;
+  inset:auto!important;
+  width:auto!important;
+  height:auto!important;
+  min-height:0!important;
+  max-height:none!important;
+  margin:0 0 10px!important;
+  overflow:visible!important;
+  border-radius:12px!important;
+}
+#panel-settings.v15-settings-ready .compact-setting-section.v15-active-setting{
+  display:block!important;
+}
+#panel-settings.v15-settings-ready .compact-setting-header{
+  display:none!important;
+}
+#panel-settings.v15-settings-ready .compact-setting-body{
+  display:block!important;
+  padding:10px!important;
+}
+#panel-settings.v15-settings-ready .v1358-close,
+#panel-settings.v15-settings-ready .v1359-pagebar{
+  display:none!important;
+}
+body.v1358-settings-open{overflow:inherit!important}
+
+/* Profile layout orchestrated once by V15 */
+#panel-profile .v1354-power-progress{
+  height:6px;border-radius:99px;overflow:hidden;background:#191923;margin:9px 0 2px
+}
+#panel-profile .v1354-power-progress i{
+  display:block;height:100%;width:0;border-radius:inherit;
+  background:linear-gradient(90deg,var(--accent-rose),#fff,var(--accent-purple));
+  box-shadow:0 0 10px var(--accent-purple)
+}
+
+@media(max-width:520px){
+  #v15-settings-tabs{grid-template-columns:1fr}
+  .v15-settings-tab{min-height:54px}
+}
+</style>
+
+
+<script id="v150-clean-core-runtime">
+(function(){
+  'use strict';
+
+  const q=(s,r=document)=>r.querySelector(s);
+  const qa=(s,r=document)=>[...r.querySelectorAll(s)];
+
+  /* -------------------- SETTINGS: ONE CONTROLLER -------------------- */
+  const SETTINGS=[
+    {key:'profile',icon:'👤',title:'Mon profil',sub:'Compte, identité et sauvegarde',
+      test:s=>/mon profil|compte & profil/i.test(label(s))},
+    {key:'ambiance',icon:'✨',title:'Ambiance',sub:'Thèmes, effets et animations',
+      test:s=>/ambiance/i.test(label(s))},
+    {key:'display',icon:'📱',title:'Affichage',sub:'Interface, installation et écran',
+      test:s=>/affichage/i.test(label(s))},
+    {key:'notifications',icon:'🔔',title:'Notifications',sub:'Rappels et préférences',
+      test:s=>s.id==='v1352-notifications'||/notification/i.test(label(s))}
+  ];
+
+  function label(sec){
+    return sec?.querySelector('.compact-setting-title')?.textContent || sec?.textContent || '';
+  }
+
+  function ensureSettingsSource(){
+    try{if(typeof initCompactSettings==='function')initCompactSettings()}catch(e){}
+    try{if(typeof v135Settings==='function')v135Settings()}catch(e){}
+    try{if(typeof v1352AddNotificationSettings==='function')v1352AddNotificationSettings()}catch(e){}
+  }
+
+  function findSection(cfg,panel){
+    return qa('.compact-setting-section',panel).find(cfg.test)||null;
+  }
+
+  function moveBackupIntoProfile(panel){
+    const sections=qa('.compact-setting-section',panel);
+    const account=sections.find(s=>/mon profil|compte & profil/i.test(label(s)));
+    const backup=sections.find(s=>/sauvegarde/i.test(label(s)));
+    if(!account||!backup||account===backup||account.dataset.v15BackupMerged==='1')return;
+    const a=account.querySelector('.compact-setting-body');
+    const b=backup.querySelector('.compact-setting-body');
+    if(!a||!b)return;
+    while(b.firstChild)a.appendChild(b.firstChild);
+    backup.remove();
+    account.dataset.v15BackupMerged='1';
+  }
+
+  function selectSetting(key,scroll=true){
+    const panel=q('#panel-settings');if(!panel)return;
+    const cfg=SETTINGS.find(x=>x.key===key)||SETTINGS[0];
+    const sec=findSection(cfg,panel);if(!sec)return;
+    qa('.compact-setting-section',panel).forEach(s=>s.classList.toggle('v15-active-setting',s===sec));
+    qa('#v15-settings-tabs .v15-settings-tab').forEach(b=>b.classList.toggle('active',b.dataset.key===cfg.key));
+    panel.dataset.v15Setting=cfg.key;
+    if(scroll){
+      const main=q('#app-container > main');
+      if(main){try{main.scrollTo({top:0,left:0,behavior:'auto'})}catch(e){main.scrollTop=0}}
+    }
+  }
+
+  function buildSettings(){
+    const panel=q('#panel-settings');if(!panel)return;
+    ensureSettingsSource();
+    moveBackupIntoProfile(panel);
+
+    /* retire les vestiges de l'ancien système sans observer/rejouer en boucle */
+    q('#v135-settings-tabs')?.remove();
+    qa('.v1358-close,.v1359-pagebar',panel).forEach(x=>x.remove());
+    qa('.compact-setting-section',panel).forEach(s=>{
+      s.classList.remove('v1358-overlay','v135-selected','open','v15-active-setting');
+      s.style.removeProperty('display');
+      s.style.removeProperty('top');s.style.removeProperty('bottom');s.style.removeProperty('height');
+    });
+    document.body.classList.remove('v1358-settings-open');
+
+    let tabs=q('#v15-settings-tabs');
+    if(!tabs){
+      tabs=document.createElement('div');
+      tabs.id='v15-settings-tabs';
+      const palette=q('.settings-theme-top',panel);
+      const head=q('.compact-settings-head',panel);
+      (palette||head)?.after(tabs);
+    }
+
+    const available=SETTINGS.filter(c=>findSection(c,panel));
+    tabs.innerHTML=available.map(c=>`
+      <button type="button" class="v15-settings-tab" data-key="${c.key}">
+        <b>${c.icon} ${c.title}</b><small>${c.sub}</small>
+      </button>`).join('');
+
+    qa('.v15-settings-tab',tabs).forEach(btn=>{
+      btn.onclick=()=>{
+        try{if(typeof playSound==='function')playSound('click')}catch(e){}
+        selectSetting(btn.dataset.key,true);
+      };
+    });
+
+    panel.classList.add('v15-settings-ready');
+    const wanted=panel.dataset.v15Setting||available[0]?.key||'profile';
+    selectSetting(wanted,false);
+  }
+
+  window.v15BuildSettings=buildSettings;
+  window.v15SelectSetting=selectSetting;
+
+  /* -------------------- PROFILE: ONE ORCHESTRATOR -------------------- */
+  function powerProgressPct(){
+    try{
+      const total=Number(userData?.squat||0)+Number(userData?.bench||0)+Number(userData?.deadlift||0);
+      const bw=Number(userData?.weight||0);
+      const cur=getSBDRank(total,bw),next=getNextSBDRank(cur);
+      if(!next)return 100;
+      const ratio=bw>0?total/bw:0;
+      const kgSpan=Math.max(1,next.minKg-cur.minKg);
+      const ratioSpan=Math.max(.01,next.minRatio-cur.minRatio);
+      const kg=Math.max(0,Math.min(100,(total-cur.minKg)/kgSpan*100));
+      const rel=Math.max(0,Math.min(100,(ratio-cur.minRatio)/ratioSpan*100));
+      return Math.min(kg,rel);
+    }catch(e){return 0}
+  }
+
+  function arrangeProfile(){
+    const panel=q('#panel-profile');if(!panel)return;
+    try{window.renderPowerRankLive?.()}catch(e){}
+    try{window.renderXpRankLive?.()}catch(e){}
+    try{window.v135RenderRankHub?.()}catch(e){}
+
+    const rankHub=q('#v135-rank-hub'),nav=q('#v135-profile-nav');
+    if(rankHub&&nav&&nav.nextElementSibling!==rankHub)nav.after(rankHub);
+
+    const powerHero=q('.rank-card',panel),goals=q('.goal-card',panel);
+    if(powerHero&&goals){
+      powerHero.classList.add('v1354-power-hero');
+      if(goals.previousElementSibling!==powerHero)goals.before(powerHero);
+      let bar=q('.v1354-power-progress',powerHero);
+      if(!bar){
+        bar=document.createElement('div');
+        bar.className='v1354-power-progress';
+        bar.innerHTML='<i></i>';
+        const total=q('.sbd-total-display',powerHero);
+        (total||powerHero).appendChild(bar);
+      }
+      const fill=q('i',bar);if(fill)fill.style.width=powerProgressPct()+'%';
+    }
+
+    const progressHub=q('#v1352-progress-hub');
+    if(progressHub&&goals&&goals.nextElementSibling!==progressHub)goals.after(progressHub);
+  }
+  window.v15ArrangeProfile=arrangeProfile;
+
+  /* -------------------- SINGLE TAB HOOK -------------------- */
+  const baseSwitch=window.switchTab;
+  if(typeof baseSwitch==='function'&&!baseSwitch.v150ui){
+    window.switchTab=function(tab,btn){
+      const r=baseSwitch.apply(this,arguments);
+      const main=q('#app-container > main');
+      if(main){try{main.scrollTo({top:0,left:0,behavior:'auto'})}catch(e){main.scrollTop=0}}
+      if(tab==='settings')setTimeout(buildSettings,25);
+      if(tab==='profile')setTimeout(arrangeProfile,20);
+      return r;
+    };
+    window.switchTab.v150ui=1;
+  }
+
+  const baseUpdate=window.updateProfileUI;
+  if(typeof baseUpdate==='function'&&!baseUpdate.v150ui){
+    window.updateProfileUI=function(){
+      const r=baseUpdate.apply(this,arguments);
+      queueMicrotask(arrangeProfile);
+      return r;
+    };
+    window.updateProfileUI.v150ui=1;
+  }
+
+  function boot(){
+    buildSettings();
+    arrangeProfile();
+  }
+  if(document.readyState==='loading'){
+    document.addEventListener('DOMContentLoaded',()=>setTimeout(boot,120),{once:true});
+  }else setTimeout(boot,30);
+
+  window.addEventListener('pageshow',()=>setTimeout(boot,40));
 })();
 </script>
 
