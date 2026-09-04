@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>LEVELING-APP — Powerbuilding Tracker V15.1.0 SETTINGS REBUILD</title>
+    <title>LEVELING-APP — Powerbuilding Tracker V15.2.0 XP QUEST STREAK CLEAN</title>
     <meta name="theme-color" content="#09090f">
     <meta name="application-name" content="LEVELING-APP">
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -1512,7 +1512,7 @@ header .hud-stat.v140-clickable:hover{
                         <span class="cloud-badge" id="cloud-live-badge">☁️ CLOUD</span>
                     </div>
                     <div id="cloud-sync-detail" style="margin-top:8px;font-size:.62rem;color:#777;text-align:center">Initialisation du cloud…</div>
-                    <div style="margin-top:5px;font-size:.58rem;color:#555;text-align:center">LEVELING-APP V15.1.0 · Stable</div>
+                    <div style="margin-top:5px;font-size:.58rem;color:#555;text-align:center">LEVELING-APP V15.2.0 · Stable</div>
                     <button class="btn-action" onclick="logoutLeveling()" style="border-color:#ff5555;color:#ff7777">Se déconnecter</button>
                 </div>
 
@@ -1787,7 +1787,7 @@ header .hud-stat.v140-clickable:hover{
             autoProgression: true
         };
 
-        /* V15.1.0 — CANONICAL USER STATE BRIDGE
+        /* V15.2.0 — CANONICAL USER STATE BRIDGE
            `userData` est déclaré avec `let`, donc il n'est pas automatiquement disponible
            via `window.userData`. Plusieurs anciens modules lisaient pourtant window.userData,
            ce qui produisait 0 kg / RECRUE malgré des données correctes.
@@ -3385,7 +3385,30 @@ header .hud-stat.v140-clickable:hover{
   window.importV11Data=()=>document.getElementById('v10-import-file').click();
   window.handleV11Import=function(input){const file=input.files?.[0];if(!file)return;const r=new FileReader();r.onload=()=>{try{const d=JSON.parse(r.result);if(d.userData)userData=d.userData;if(d.smartHypertrophyRefs)smartHypertrophyRefs=d.smartHypertrophyRefs;if(d.bodyHistory)bodyHistory=d.bodyHistory;if(d.inventoryItems)inventoryItems=d.inventoryItems;if(d.workoutHistory)workoutHistory=d.workoutHistory;if(d.workoutState)workoutState=d.workoutState;if(d.customSetData)customSetData=d.customSetData;if(d.activeProgramKey)activeProgramKey=d.activeProgramKey;if(Number.isInteger(d.currentBlockIndex))currentBlockIndex=d.currentBlockIndex;if(d.v10)v10=Object.assign({},defaults,d.v10);saveToLocalStorage();save();updateProfileUI();renderBodyChart();initWorkoutSystem();renderPowerHome();render();toast('Sauvegarde importée avec succès')}catch(e){alert('Fichier de sauvegarde invalide.')}};r.readAsText(file);input.value=''};
   function recommendation(){const prog=getPrograms()[currentBlockIndex]?.[currentDayIndex];if(!prog)return;let done=0,total=0;prog.exercises.forEach((ex,ei)=>{for(let si=0;si<ex.sets;si++){total++;if(workoutState[currentBlockIndex]?.[currentDayIndex]?.[ei]?.[si])done++}});const pct=total?Math.round(done/total*100):0,msg=pct===100?'🔥 Séance complète. Prochaine fois, vise +2,5 kg sur les isolations si toutes les reps cibles passent.':pct>50?'⚔️ Plus de la moitié validée. Garde 1–2 reps en réserve et termine proprement.':'🎯 Commence par les séries prévues. Le système mémorise tes performances pour ajuster la progression.';const el=document.getElementById('v10-rec-text');if(el)el.textContent=msg+' ('+done+'/'+total+' séries)'}
-  const oldFinish=window.finishWorkoutFinal;window.finishWorkoutFinal=function(){const before=userData.workoutsCompleted||0;oldFinish();if((userData.workoutsCompleted||0)>before){const key=today();if(v10.lastWorkout){const diff=Math.round((new Date(key)-new Date(v10.lastWorkout))/86400000);v10.streak=diff===1?(v10.streak||0)+1:diff===0?(v10.streak||0):1}else v10.streak=1;v10.lastWorkout=key;v10.sessions.push({date:key,program:activeProgramKey,day:currentDayIndex,rating:selectedRating,volume:calculateWeeklyTonnage()||0});const ratingBonus=Math.max(0,selectedRating-3)*50;if(ratingBonus)addXP(ratingBonus,'Performance séance');save();render()}};
+  const oldFinish=window.finishWorkoutFinal;window.finishWorkoutFinal=function(){
+    const before=userData.workoutsCompleted||0;
+    const result=oldFinish.apply(this,arguments);
+    if((userData.workoutsCompleted||0)>before){
+      const key=today();
+      v10.lastWorkout=key;
+      v10.sessions=Array.isArray(v10.sessions)?v10.sessions:[];
+      const sessionKey=[key,activeProgramKey,currentBlockIndex,currentDayIndex].join('|');
+      if(!v10.sessions.some(x=>x&&x.sessionKey===sessionKey)){
+        v10.sessions.push({
+          sessionKey,
+          date:key,
+          program:activeProgramKey,
+          block:currentBlockIndex,
+          day:currentDayIndex,
+          rating:selectedRating,
+          volume:calculateWeeklyTonnage()||0
+        });
+      }
+      save();
+      render();
+    }
+    return result;
+  };
   const oldUpdate=window.updateProfileUI;window.updateProfileUI=function(){oldUpdate();setTimeout(render,0);setTimeout(()=>{if(typeof renderThemeCollection==='function')renderThemeCollection()},60)};const oldInit=window.initWorkoutSystem;window.initWorkoutSystem=function(){oldInit();setTimeout(recommendation,0);setTimeout(render,0)};const oldSet=window.toggleSet;window.toggleSet=function(ei,si){oldSet(ei,si);setTimeout(()=>{recommendation();refreshQuests()},20)};
   render();
 })();
@@ -5020,10 +5043,10 @@ function xpRank(l){
  return [r.icon,r.name]
 }
 function addXP(n,reason){
- let s=state(), old=s.level; s.xp+=n;
- while(s.xp>=xpNeed(s.level)){s.xp-=xpNeed(s.level);s.level++}
- save(s); render();
- if(s.level>old)showLevel(s.level,reason);
+ if(typeof window.LevelingProgressionV15==='object'&&typeof window.LevelingProgressionV15.addXP==='function'){
+   return window.LevelingProgressionV15.addXP(Number(n||0),reason||'Progression','legacy-v140:'+String(reason||'xp'));
+ }
+ return false;
 }
 function showLevel(l,reason){
  let m=document.getElementById('v140-levelup'); if(!m)return;
@@ -5112,9 +5135,14 @@ function showStreak(){
  m.querySelector('.v140-week').innerHTML=days.join('');m.querySelector('.stats').textContent=`Série actuelle : ${streak()} j · ${month} séances ce mois`;m.style.display='flex'
 }
 function recordTraining(){
- let s=state(),k=today();if(!s.trainingDays.includes(k)){s.trainingDays.push(k);save(s);addXP(150,'Séance terminée')}
+ let s=state(),k=today();
+ if(!s.trainingDays.includes(k)){s.trainingDays.push(k);save(s)}
 }
-function recordPR(){let s=state();s.prCount++;save(s);addXP(100,'Nouveau PR')}
+function recordPR(){
+ let s=state();
+ s.prCount=Math.max(Number(s.prCount||0),Number(userData?.prCount||0));
+ save(s);
+}
 function logLift(kind,weight,reps,rpe,failed){
  let s=state(); if(!s.lifts[kind])s.lifts[kind]=[];
  s.lifts[kind].push({date:today(),weight:Number(weight),value:Number(weight),reps:Number(reps||1),rpe:Number(rpe||8),failed:Number(failed||0)});save(s);render()
@@ -6406,143 +6434,6 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
   });
 })();
 </script>
-
-
-<script id="v1412-unified-xp-quests">
-/* V14.1.2 — un seul moteur XP visible + quêtes intelligentes réelles */
-(function(){
-  const dayKey=()=>{
-    const d=new Date();
-    return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
-  };
-
-  function v10data(){
-    try{return typeof window.__levelingV10Export==='function'?window.__levelingV10Export():null}catch(e){return null}
-  }
-  function saveV10(v){
-    if(v&&typeof window.__levelingV10Import==='function')window.__levelingV10Import(v);
-  }
-
-  function currentCompletedSets(){
-    try{
-      const p=getPrograms()?.[currentBlockIndex]?.[currentDayIndex];
-      if(!p)return 0;
-      let n=0;
-      p.exercises.forEach((ex,ei)=>{
-        for(let si=0;si<ex.sets;si++) if(workoutState?.[currentBlockIndex]?.[currentDayIndex]?.[ei]?.[si]) n++;
-      });
-      return n;
-    }catch(e){return 0}
-  }
-
-  function referenceMatched(){
-    try{
-      const p=getPrograms()?.[currentBlockIndex]?.[currentDayIndex];
-      if(!p)return false;
-      return p.exercises.some((ex,ei)=>{
-        const ref=Number(
-          smartHypertrophyRefs?.[ex.name]?.weight ||
-          userData?.prRecords?.[ex.name]?.weight ||
-          0
-        );
-        if(ref<=0)return false;
-        for(let si=0;si<ex.sets;si++){
-          if(!workoutState?.[currentBlockIndex]?.[currentDayIndex]?.[ei]?.[si])continue;
-          const current=Number(customSetData?.[currentBlockIndex]?.[currentDayIndex]?.[ei]?.[si]?.weight ?? ex.defaultWeight ?? 0);
-          if(current>=ref)return true;
-        }
-        return false;
-      });
-    }catch(e){return false}
-  }
-
-  function sessionValidated(){
-    const k=`leveling_validated_${activeProgramKey}_${currentBlockIndex}_${currentDayIndex}`;
-    return localStorage.getItem(k)==='1';
-  }
-
-  function grantSmartQuest(id,xp){
-    const v=v10data();if(!v)return false;
-    v.smartQuestClaims=v.smartQuestClaims||{};
-    const key=`${dayKey()}_${id}`;
-    if(v.smartQuestClaims[key])return false;
-    v.smartQuestClaims[key]=true;
-    v.totalXp=Number(v.totalXp||0)+xp;
-    v.xp=v.totalXp;
-    saveV10(v);
-    return true;
-  }
-
-  function addTrainingDay(){
-    try{
-      const s=JSON.parse(localStorage.getItem('leveling_v140_rpg')||'{}');
-      s.trainingDays=Array.isArray(s.trainingDays)?s.trainingDays:[];
-      const k=dayKey();
-      if(!s.trainingDays.includes(k))s.trainingDays.push(k);
-      localStorage.setItem('leveling_v140_rpg',JSON.stringify(s));
-    }catch(e){}
-  }
-
-  window.v1412RenderSmartQuests=function(){
-    const box=document.getElementById('v140-quests');if(!box)return;
-    const sets=currentCompletedSets();
-    const q=[
-      {id:'session',icon:'⚔️',title:'Terminer la séance du jour',sub:'Validation finale avec les étoiles',xp:120,done:sessionValidated()},
-      {id:'sets15',icon:'🎯',title:'Valider 15 séries',sub:`${sets}/15 séries validées`,xp:60,done:sets>=15},
-      {id:'reference',icon:'📈',title:'Égale ou dépasse une référence',sub:'Au moins une charge au niveau de ta référence précédente',xp:80,done:referenceMatched()}
-    ];
-
-    q.forEach(x=>{if(x.done)grantSmartQuest(x.id,x.xp)});
-
-    const v=v10data()||{},claims=v.smartQuestClaims||{};
-    box.innerHTML='<div class="v140-title">🎯 Quêtes du jour</div>'+q.map(x=>{
-      const claimed=!!claims[`${dayKey()}_${x.id}`];
-      return `<div class="v140-quest ${claimed?'done':''}">
-        <span>${x.icon}</span>
-        <div class="v140-quest-main"><b>${x.title}</b><small>${x.sub}</small></div>
-        <span class="v140-xp">${claimed?'✔️ ':''}+${x.xp} XP</span>
-      </div>`;
-    }).join('');
-
-    if(typeof v135RenderRankHub==='function')v135RenderRankHub();
-  };
-
-  /* Une validation réussie alimente calendrier + quête séance une seule fois. */
-  if(typeof window.finishWorkoutFinal==='function'&&!window.finishWorkoutFinal.v1412){
-    const old=window.finishWorkoutFinal;
-    window.finishWorkoutFinal=function(){
-      const before=Number(userData?.workoutsCompleted||0);
-      const r=old.apply(this,arguments);
-      if(Number(userData?.workoutsCompleted||0)>before){
-        addTrainingDay();
-        setTimeout(v1412RenderSmartQuests,80);
-        if(typeof scheduleCloudSaveImmediate==='function')setTimeout(scheduleCloudSaveImmediate,120);
-      }
-      return r;
-    };
-    window.finishWorkoutFinal.v1412=1;
-  }
-
-  if(typeof window.toggleSet==='function'&&!window.toggleSet.v1412){
-    const old=window.toggleSet;
-    window.toggleSet=function(){
-      const r=old.apply(this,arguments);
-      setTimeout(v1412RenderSmartQuests,80);
-      return r;
-    };
-    window.toggleSet.v1412=1;
-  }
-
-  function boot(){
-    v1412RenderSmartQuests();
-  }
-  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',()=>setTimeout(boot,2800));
-  else setTimeout(boot,2800);
-  document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')setTimeout(boot,120)});
-})();
-</script>
-
-
 <style id="v1413-avatar-real-fix">
 /* V14.1.3 — une seule source d'affichage pour l'avatar du header */
 #v1402-account-btn{
@@ -7079,7 +6970,7 @@ html.leveling-ios nav{-webkit-backdrop-filter:none!important;backdrop-filter:non
 
 
 <style id="v1430-stable-ui-css">
-/* ================= V15.1.0 — STABLE SETTINGS / PROGRESSION =================
+/* ================= V15.2.0 — STABLE SETTINGS / PROGRESSION =================
    Réglages: plus aucune sous-page fixed/overlay. Toutes les rubriques restent
    dans le scroll principal de l'app, donc plus de page coupée ni ouverture en bas. */
 #panel-settings{position:relative!important;overflow:visible!important;min-height:0!important}
@@ -7134,7 +7025,7 @@ body.v1358-settings-open{overflow:hidden!important}
 
 <script id="v1430-stable-core-js">
 (function(){
-  const VERSION='15.1.0';
+  const VERSION='15.2.0';
   const q=s=>document.querySelector(s);
   const qa=s=>[...document.querySelectorAll(s)];
   const localDay=(d=new Date())=>`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
@@ -7188,7 +7079,7 @@ body.v1358-settings-open{overflow:hidden!important}
     }catch(e){}
     try{(window.workoutHistory||workoutHistory||[]).forEach(x=>{const d=normalizeDate(x?.date);if(d)merged.add(d)})}catch(e){}
     s.trainingDays=[...merged].sort();saveRpg(s);
-    try{if(typeof window.v1412RenderSmartQuests==='function')window.v1412RenderSmartQuests()}catch(e){}
+    try{if(typeof window.v152RenderProgression==='function')window.v152RenderProgression()}catch(e){}
     return currentStreak(s.trainingDays);
   }
   window.v1430SyncProgressionState=syncProgressionState;
@@ -7281,7 +7172,7 @@ body.v1358-settings-open{overflow:hidden!important}
         if(typeof renderProfileV2==='function'&&document.getElementById('profile-v2-modal')?.classList.contains('show'))renderProfileV2();
         if(typeof window.renderPowerRankLive==='function')window.renderPowerRankLive();
         if(typeof render==='function')render();
-      }catch(e){console.warn('V15.1.0 SBD UI refresh',e)}
+      }catch(e){console.warn('V15.2.0 SBD UI refresh',e)}
       syncProgressionState();refreshRanks();
     },0);
     return r;
@@ -7337,7 +7228,7 @@ body.v1358-settings-open{overflow:hidden!important}
 
 
 <style id="v1440-power-rank-clean-css">
-/* V15.1.0 — RANG POWER PROPRE
+/* V15.2.0 — RANG POWER PROPRE
    Une seule logique: total Squat + Bench + Deadlift en KG.
    Une identité visuelle distincte par rang. */
 
@@ -7544,7 +7435,7 @@ body.v1358-settings-open{overflow:hidden!important}
 
 
 <style id="v1451-power-live-neon-css">
-/* V15.1.0 — les cartes visibles utilisent la même identité néon que la vitrine */
+/* V15.2.0 — les cartes visibles utilisent la même identité néon que la vitrine */
 .rank-card.v1451-live-rank{
   --rank:#ff2d55;
   --rank-rgb:255,45,85;
@@ -7694,7 +7585,7 @@ body.v1358-settings-open{overflow:hidden!important}
         mini.classList.add('v1451-live-rank-mini');
         cssVars(mini,r);
       }
-    }catch(e){console.warn('V15.1.0 live rank render',e)}
+    }catch(e){console.warn('V15.2.0 live rank render',e)}
   };
 
   /* Après toute vraie mise à jour de données/UI */
@@ -7755,7 +7646,7 @@ body.v1358-settings-open{overflow:hidden!important}
     try{
       if(typeof window.renderPowerRankLive==='function')window.renderPowerRankLive();
       if(typeof window.v135RenderRankHub==='function')window.v135RenderRankHub();
-    }catch(e){console.warn('V15.1.0 power refresh',e)}
+    }catch(e){console.warn('V15.2.0 power refresh',e)}
   }
 
   const oldLoad=window.loadFromLocalStorage;
@@ -7793,7 +7684,7 @@ body.v1358-settings-open{overflow:hidden!important}
 
 
 <style id="v1454-xp-neon-css">
-/* V15.1.0 — Rang XP : même qualité visuelle néon que le Rang Power */
+/* V15.2.0 — Rang XP : même qualité visuelle néon que le Rang Power */
 #v135-xp-modal .modal-content{
   width:min(620px,96vw)!important;
   max-width:620px!important;
@@ -7918,7 +7809,7 @@ body.v1358-settings-open{overflow:hidden!important}
           bar.style.width=pct+'%';
         }
       }
-    }catch(e){console.warn('V15.1.0 XP live',e)}
+    }catch(e){console.warn('V15.2.0 XP live',e)}
   };
 
   const oldHub=window.v135RenderRankHub;
@@ -8361,7 +8252,7 @@ body.v1358-settings-open{overflow:hidden!important}
 
 
 <style id="v1501-vitrines-fix-css">
-/* V15.1.0 — restaure la présentation propre des vitrines sans réactiver les vieux contrôleurs */
+/* V15.2.0 — restaure la présentation propre des vitrines sans réactiver les vieux contrôleurs */
 
 /* Ancienne carte PLAYER STATUS = doublon historique V10, désormais masquée. */
 #v10-profile-dashboard{display:none!important}
@@ -8452,7 +8343,7 @@ body.v1358-settings-open{overflow:hidden!important}
       /* Rafraîchit seulement les données/visuels, sans recréer d'anciens modules. */
       try{window.renderXpRankLive?.()}catch(e){}
       try{window.renderPowerRankLive?.()}catch(e){}
-    }catch(e){console.warn('V15.1.0 vitrines',e)}
+    }catch(e){console.warn('V15.2.0 vitrines',e)}
   }
 
   window.v1501FixVitrines=fixVitrines;
@@ -8474,5 +8365,391 @@ body.v1358-settings-open{overflow:hidden!important}
   window.addEventListener('pageshow',()=>setTimeout(fixVitrines,50));
 })();
 </script>
+
+<script id="v1520-progression-core">
+/* ============================================================
+   LEVELING-APP V15.2 — PROGRESSION CORE
+   UNE source XP : v10.totalXp
+   UNE source quêtes : v10.rewardClaims
+   UNE source streak : leveling_v140_rpg.trainingDays
+   ============================================================ */
+(function(){
+  'use strict';
+
+  const localDay=(d=new Date()) =>
+    `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+
+  function readV10(){
+    try{
+      const v=typeof window.__levelingV10Export==='function'
+        ? window.__levelingV10Export()
+        : {};
+      v.totalXp=Number(v.totalXp||0);
+      v.xp=v.totalXp;
+      v.rewardClaims=(v.rewardClaims&&typeof v.rewardClaims==='object')?v.rewardClaims:{};
+      v.smartQuestClaims=(v.smartQuestClaims&&typeof v.smartQuestClaims==='object')?v.smartQuestClaims:{};
+      v.prXpKeys=(v.prXpKeys&&typeof v.prXpKeys==='object')?v.prXpKeys:{};
+      v.sessions=Array.isArray(v.sessions)?v.sessions:[];
+      return v;
+    }catch(e){return null}
+  }
+
+  function writeV10(v){
+    if(!v)return;
+    v.totalXp=Math.max(0,Number(v.totalXp||0));
+    v.xp=v.totalXp;
+    if(typeof window.__levelingV10Import==='function'){
+      window.__levelingV10Import(v);
+    }
+    const lvl=1+Math.floor(v.totalXp/1000);
+    if(Number(userData?.level||1)!==lvl){
+      userData.level=lvl;
+      try{saveToLocalStorage()}catch(e){}
+    }
+  }
+
+  function toastXp(amount,label){
+    try{
+      let t=document.getElementById('v10-toast');
+      if(!t){
+        t=document.createElement('div');
+        t.id='v10-toast';
+        t.className='v10-toast';
+        document.body.appendChild(t);
+      }
+      t.textContent=`+${amount} XP · ${label}`;
+      t.classList.add('show');
+      setTimeout(()=>t.classList.remove('show'),2200);
+    }catch(e){}
+  }
+
+  function addXP(amount,label,claimKey){
+    amount=Math.max(0,Math.round(Number(amount||0)));
+    if(!amount)return false;
+    const v=readV10();if(!v)return false;
+
+    if(claimKey){
+      if(v.rewardClaims[claimKey])return false;
+      v.rewardClaims[claimKey]=Date.now();
+    }
+
+    const before=1+Math.floor(v.totalXp/1000);
+    v.totalXp+=amount;
+    v.xp=v.totalXp;
+    const after=1+Math.floor(v.totalXp/1000);
+    writeV10(v);
+    toastXp(amount,label);
+
+    if(after>before){
+      try{
+        const modal=document.getElementById('v140-levelup');
+        if(modal){
+          modal.querySelector('.v140-levelbig').textContent='NIVEAU '+after;
+          modal.querySelector('.why').textContent=label||'Progression validée';
+          modal.style.display='flex';
+          if(typeof playSound==='function')playSound('level');
+        }
+      }catch(e){}
+    }
+
+    setTimeout(()=>{
+      try{window.renderXpRankLive?.()}catch(e){}
+      try{window.v135RenderRankHub?.()}catch(e){}
+    },0);
+    return true;
+  }
+
+  /* -------------------- STREAK -------------------- */
+  function readRpg(){
+    try{
+      const s=JSON.parse(localStorage.getItem('leveling_v140_rpg')||'{}')||{};
+      s.trainingDays=Array.isArray(s.trainingDays)?s.trainingDays:[];
+      return s;
+    }catch(e){return {trainingDays:[]}}
+  }
+  function writeRpg(s){
+    try{localStorage.setItem('leveling_v140_rpg',JSON.stringify(s))}catch(e){}
+  }
+  function normalizeDate(v){
+    if(!v)return null;
+    const m=String(v).match(/(20\d{2})[-\/]([01]\d)[-\/]([0-3]\d)/);
+    if(m)return `${m[1]}-${m[2]}-${m[3]}`;
+    const d=new Date(v);
+    return Number.isNaN(d.getTime())?null:localDay(d);
+  }
+  function streakFrom(days){
+    const set=new Set(days);
+    if(!set.size)return 0;
+    let d=new Date(),started=false,n=0;
+    /* Un jour sans séance aujourd'hui ne casse pas encore la série :
+       on peut avoir entraîné hier et être toujours à 2 jours de streak. */
+    for(let i=0;i<366;i++){
+      const k=localDay(d);
+      if(set.has(k)){n++;started=true}
+      else if(started)break;
+      d.setDate(d.getDate()-1);
+    }
+    return n;
+  }
+
+  function syncTrainingDays(){
+    const rpg=readRpg();
+    const merged=new Set(rpg.trainingDays.map(normalizeDate).filter(Boolean));
+    const v=readV10();
+
+    (v?.sessions||[]).forEach(x=>{
+      const d=normalizeDate(x?.date);
+      if(d)merged.add(d);
+    });
+
+    try{
+      (workoutHistory||[]).forEach(x=>{
+        const d=normalizeDate(x?.date);
+        if(d)merged.add(d);
+      });
+    }catch(e){}
+
+    /* Les anciennes validations déjà présentes restent reconnues. */
+    try{
+      for(let i=0;i<localStorage.length;i++){
+        const k=localStorage.key(i);
+        if(!k?.startsWith('leveling_validated_')||localStorage.getItem(k)!=='1')continue;
+        /* Une validation courante vaut aujourd'hui. Les autres jours sont déjà dans history/sessions. */
+        const current=`leveling_validated_${activeProgramKey}_${currentBlockIndex}_${currentDayIndex}`;
+        if(k===current)merged.add(localDay());
+      }
+    }catch(e){}
+
+    rpg.trainingDays=[...merged].sort();
+    writeRpg(rpg);
+
+    const streak=streakFrom(rpg.trainingDays);
+    if(v){
+      v.streak=streak;
+      writeV10(v);
+    }
+    const e=document.getElementById('v10-streak');
+    if(e)e.textContent=`${streak} 🔥`;
+    const dash=document.getElementById('today-streak');
+    if(dash)dash.textContent=`${streak} 🔥`;
+    return streak;
+  }
+
+  function addTrainingToday(){
+    const rpg=readRpg();
+    const k=localDay();
+    if(!rpg.trainingDays.includes(k)){
+      rpg.trainingDays.push(k);
+      rpg.trainingDays.sort();
+      writeRpg(rpg);
+    }
+    return syncTrainingDays();
+  }
+
+  /* -------------------- QUÊTES -------------------- */
+  function completedSets(){
+    try{
+      const p=getPrograms()?.[currentBlockIndex]?.[currentDayIndex];
+      if(!p)return 0;
+      let n=0;
+      p.exercises.forEach((ex,ei)=>{
+        for(let si=0;si<ex.sets;si++){
+          if(workoutState?.[currentBlockIndex]?.[currentDayIndex]?.[ei]?.[si])n++;
+        }
+      });
+      return n;
+    }catch(e){return 0}
+  }
+
+  function referenceMatched(){
+    try{
+      const p=getPrograms()?.[currentBlockIndex]?.[currentDayIndex];
+      if(!p)return false;
+      return p.exercises.some((ex,ei)=>{
+        const ref=Number(
+          smartHypertrophyRefs?.[ex.name]?.weight ||
+          userData?.prRecords?.[ex.name]?.weight ||
+          0
+        );
+        if(ref<=0)return false;
+        for(let si=0;si<ex.sets;si++){
+          if(!workoutState?.[currentBlockIndex]?.[currentDayIndex]?.[ei]?.[si])continue;
+          const cur=Number(
+            customSetData?.[currentBlockIndex]?.[currentDayIndex]?.[ei]?.[si]?.weight ??
+            ex.defaultWeight ?? 0
+          );
+          if(cur>=ref)return true;
+        }
+        return false;
+      });
+    }catch(e){return false}
+  }
+
+  function sessionValidated(){
+    try{
+      const k=`leveling_validated_${activeProgramKey}_${currentBlockIndex}_${currentDayIndex}`;
+      return localStorage.getItem(k)==='1';
+    }catch(e){return false}
+  }
+
+  function quests(){
+    const sets=completedSets();
+    return [
+      {
+        id:'session',icon:'⚔️',title:'Terminer la séance du jour',
+        sub:'Validation finale avec les étoiles',xp:120,done:sessionValidated()
+      },
+      {
+        id:'sets15',icon:'🎯',title:'Valider 15 séries',
+        sub:`${sets}/15 séries validées`,xp:60,done:sets>=15
+      },
+      {
+        id:'reference',icon:'📈',title:'Égale ou dépasse une référence',
+        sub:'Au moins une charge au niveau de ta référence précédente',xp:80,done:referenceMatched()
+      }
+    ];
+  }
+
+  function migrateOldClaims(v){
+    const day=localDay();
+    /* Les claims V14.1.2 déjà obtenus restent obtenus après migration. */
+    Object.keys(v.smartQuestClaims||{}).forEach(k=>{
+      if(v.smartQuestClaims[k]){
+        v.rewardClaims[`quest:${k}`]=v.rewardClaims[`quest:${k}`]||'migrated';
+      }
+    });
+    /* Compatibilité avec l'ancien v10.quests du jour. */
+    Object.keys(v.quests||{}).forEach(id=>{
+      if(v.quests[id])v.rewardClaims[`quest:${day}_${id}`]=v.rewardClaims[`quest:${day}_${id}`]||'migrated';
+    });
+  }
+
+  function renderQuests(){
+    const box=document.getElementById('v140-quests');
+    const v=readV10();if(!v)return;
+    migrateOldClaims(v);
+    writeV10(v);
+
+    const day=localDay();
+    const list=quests();
+
+    list.forEach(q=>{
+      if(q.done){
+        addXP(q.xp,q.title,`quest:${day}_${q.id}`);
+      }
+    });
+
+    const fresh=readV10()||v;
+    if(box){
+      box.innerHTML='<div class="v140-title">🎯 Quêtes du jour</div>'+
+        list.map(q=>{
+          const claimed=!!fresh.rewardClaims?.[`quest:${day}_${q.id}`];
+          return `<div class="v140-quest ${claimed?'done':''}">
+            <span>${q.icon}</span>
+            <div class="v140-quest-main">
+              <b>${q.title}</b>
+              <small>${q.sub}</small>
+            </div>
+            <span class="v140-xp">${claimed?'✔️ ':''}+${q.xp} XP</span>
+          </div>`;
+        }).join('');
+    }
+
+    try{window.renderXpRankLive?.()}catch(e){}
+  }
+
+  /* -------------------- PR -------------------- */
+  window.levelingGrantPRXP=function(pr){
+    if(!pr)return false;
+    const k=[pr.exercise,pr.weight,pr.reps,pr.date].join('|');
+    const v=readV10();if(!v)return false;
+
+    /* Si l'ancien moteur l'avait déjà attribué, on le migre sans repayer. */
+    if(v.prXpKeys?.[k]){
+      v.rewardClaims[`pr:${k}`]=v.rewardClaims[`pr:${k}`]||'migrated';
+      writeV10(v);
+      return false;
+    }
+
+    const ok=addXP(150,'PR '+String(pr.exercise||''),`pr:${k}`);
+    if(ok){
+      const fresh=readV10();
+      if(fresh){
+        fresh.prXpKeys[k]=1;
+        writeV10(fresh);
+      }
+    }
+    return ok;
+  };
+
+  /* -------------------- FIN DE SÉANCE -------------------- */
+  const previousFinish=window.finishWorkoutFinal;
+  if(typeof previousFinish==='function'&&!previousFinish.v1520){
+    window.finishWorkoutFinal=function(){
+      const before=Number(userData?.workoutsCompleted||0);
+      const result=previousFinish.apply(this,arguments);
+
+      if(Number(userData?.workoutsCompleted||0)>before){
+        addTrainingToday();
+
+        const day=localDay();
+        const sessionId=[day,activeProgramKey,currentBlockIndex,currentDayIndex].join('|');
+
+        /* Le bonus d'évaluation V10 est conservé, mais maintenant réclamable UNE fois. */
+        const bonus=Math.max(0,Number(selectedRating||0)-3)*50;
+        if(bonus){
+          addXP(bonus,'Performance séance',`rating:${sessionId}`);
+        }
+
+        setTimeout(()=>{
+          renderQuests();
+          syncTrainingDays();
+          try{window.v1430SyncProgressionState?.()}catch(e){}
+          try{window.scheduleCloudSaveImmediate?.()}catch(e){}
+        },80);
+      }
+      return result;
+    };
+    window.finishWorkoutFinal.v1520=1;
+  }
+
+  const previousToggle=window.toggleSet;
+  if(typeof previousToggle==='function'&&!previousToggle.v1520){
+    window.toggleSet=function(){
+      const r=previousToggle.apply(this,arguments);
+      setTimeout(renderQuests,40);
+      return r;
+    };
+    window.toggleSet.v1520=1;
+  }
+
+  window.v152RenderProgression=function(){
+    const streak=syncTrainingDays();
+    renderQuests();
+    return streak;
+  };
+
+  window.LevelingProgressionV15={
+    addXP,
+    render:window.v152RenderProgression,
+    syncStreak:syncTrainingDays,
+    getStreak:()=>syncTrainingDays(),
+    getXp:()=>Number(readV10()?.totalXp||0)
+  };
+
+  function boot(){
+    window.v152RenderProgression();
+  }
+  if(document.readyState==='loading'){
+    document.addEventListener('DOMContentLoaded',()=>setTimeout(boot,420),{once:true});
+  }else{
+    setTimeout(boot,100);
+  }
+  document.addEventListener('visibilitychange',()=>{
+    if(document.visibilityState==='visible')setTimeout(boot,80);
+  });
+})();
+</script>
+
 </body>
 </html>
