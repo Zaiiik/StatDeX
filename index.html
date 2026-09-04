@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>LEVELING-APP — Powerbuilding Tracker V14.5.2</title>
+    <title>LEVELING-APP — Powerbuilding Tracker V14.5.3</title>
     <meta name="theme-color" content="#09090f">
     <meta name="application-name" content="LEVELING-APP">
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -1817,7 +1817,7 @@ header .hud-stat.v140-clickable:hover{
                         <span class="cloud-badge" id="cloud-live-badge">☁️ CLOUD</span>
                     </div>
                     <div id="cloud-sync-detail" style="margin-top:8px;font-size:.62rem;color:#777;text-align:center">Initialisation du cloud…</div>
-                    <div style="margin-top:5px;font-size:.58rem;color:#555;text-align:center">LEVELING-APP V14.5.2 · Stable</div>
+                    <div style="margin-top:5px;font-size:.58rem;color:#555;text-align:center">LEVELING-APP V14.5.3 · Stable</div>
                     <button class="btn-action" onclick="logoutLeveling()" style="border-color:#ff5555;color:#ff7777">Se déconnecter</button>
                 </div>
 
@@ -2091,6 +2091,22 @@ header .hud-stat.v140-clickable:hover{
             prCount: 0, workoutsCompleted: 0, trophies: 0, level: 1, theme: 'purple',
             autoProgression: true
         };
+
+        /* V14.5.3 — CANONICAL USER STATE BRIDGE
+           `userData` est déclaré avec `let`, donc il n'est pas automatiquement disponible
+           via `window.userData`. Plusieurs anciens modules lisaient pourtant window.userData,
+           ce qui produisait 0 kg / RECRUE malgré des données correctes.
+           Ce pont ne duplique aucune donnée : il expose exactement la variable canonique. */
+        try {
+            Object.defineProperty(window, 'userData', {
+                configurable: true,
+                enumerable: false,
+                get() { return userData; },
+                set(v) { if (v && typeof v === 'object') userData = v; }
+            });
+        } catch (e) {
+            console.warn('userData bridge:', e);
+        }
 
         // Stockage des performances de référence pour les exercices non-SBD (hypertrophie/isolation)
         let smartHypertrophyRefs = {};
@@ -3912,7 +3928,7 @@ const sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_PUBLISHABLE_KEY,{
   auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true,storage:window.localStorage}
 });
 let cloudUser=null,cloudLicensed=false,cloudLoadedOnce=false,cloudSaveTimer=null,suppressCloudSave=false,licenseWatchTimer=null,lastLicenseStatus='UNKNOWN';
-const APP_VERSION='14.5.2';
+const APP_VERSION='14.5.3';
 const ACCOUNT_LOCAL_KEYS=['solo_leveling_user','solo_leveling_smart_refs','solo_leveling_body_hist','solo_leveling_inv','solo_leveling_block','solo_leveling_day','solo_leveling_state','solo_leveling_custom_sets','solo_leveling_history','solo_leveling_active_program','solo_leveling_program_states','solo_leveling_program_custom_sets','solo_leveling_custom_program','leveling_last_local_save','leveling_last_cloud_sync','leveling_v10'];
 function clearLevelingAccountLocalData(){
   try{ACCOUNT_LOCAL_KEYS.forEach(k=>localStorage.removeItem(k));sessionStorage.removeItem('leveling_pending_license')}catch(e){console.warn('Local account cleanup:',e)}
@@ -7892,7 +7908,7 @@ html.leveling-ios nav{-webkit-backdrop-filter:none!important;backdrop-filter:non
 
 
 <style id="v1430-stable-ui-css">
-/* ================= V14.5.2 — STABLE SETTINGS / PROGRESSION =================
+/* ================= V14.5.3 — STABLE SETTINGS / PROGRESSION =================
    Réglages: plus aucune sous-page fixed/overlay. Toutes les rubriques restent
    dans le scroll principal de l'app, donc plus de page coupée ni ouverture en bas. */
 #panel-settings{position:relative!important;overflow:visible!important;min-height:0!important}
@@ -7947,7 +7963,7 @@ body.v1358-settings-open{overflow:hidden!important}
 
 <script id="v1430-stable-core-js">
 (function(){
-  const VERSION='14.5.2';
+  const VERSION='14.5.3';
   const q=s=>document.querySelector(s);
   const qa=s=>[...document.querySelectorAll(s)];
   const localDay=(d=new Date())=>`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
@@ -7958,8 +7974,8 @@ body.v1358-settings-open{overflow:hidden!important}
       window.renderPowerRankLive();
       return;
     }
-    const total=Number(window.userData?.squat||0)+Number(window.userData?.bench||0)+Number(window.userData?.deadlift||0);
-    const bw=Number(window.userData?.weight||0);
+    const total=Number(userData?.squat||0)+Number(userData?.bench||0)+Number(userData?.deadlift||0);
+    const bw=Number(userData?.weight||0);
     const r=getSBDRank(total,bw);
     const legacy=q('#rank-name');
     if(legacy){
@@ -8098,7 +8114,7 @@ body.v1358-settings-open{overflow:hidden!important}
     try{localStorage.setItem(sbdSafeKey(),JSON.stringify({...s,savedAt:Date.now()}))}catch(e){}
   }
   window.v1452SaveSbdSafe=function(){
-    const s=sbdSnapshot(window.userData||userData);
+    const s=sbdSnapshot(userData);
     if(validSbd(s))saveSbdSafe(s);
   };
   function applySbd(u,s){
@@ -8109,7 +8125,7 @@ body.v1358-settings-open{overflow:hidden!important}
   }
 
   window.v1430ImportAppData=function(d){
-    const localBefore=sbdSnapshot(window.userData||userData);
+    const localBefore=sbdSnapshot(userData);
     if(validSbd(localBefore))saveSbdSafe(localBefore);
     const safeBefore=loadSbdSafe();
     const incoming=sbdSnapshot(d?.userData||{});
@@ -8136,8 +8152,8 @@ body.v1358-settings-open{overflow:hidden!important}
     const r=baseImport?baseImport(payload):undefined;
 
     if(winner){
-      applySbd(window.userData||userData,winner);
-      saveSbdSafe(sbdSnapshot(window.userData||userData));
+      applySbd(userData,winner);
+      saveSbdSafe(sbdSnapshot(userData));
       try{saveToLocalStorage()}catch(e){}
     }
     if(payload?.v140Rpg)saveRpg(payload.v140Rpg);
@@ -8150,7 +8166,7 @@ body.v1358-settings-open{overflow:hidden!important}
         if(typeof renderProfileV2==='function'&&document.getElementById('profile-v2-modal')?.classList.contains('show'))renderProfileV2();
         if(typeof window.renderPowerRankLive==='function')window.renderPowerRankLive();
         if(typeof render==='function')render();
-      }catch(e){console.warn('V14.5.2 SBD UI refresh',e)}
+      }catch(e){console.warn('V14.5.3 SBD UI refresh',e)}
       syncProgressionState();refreshRanks();
     },0);
     return r;
@@ -8188,7 +8204,7 @@ body.v1358-settings-open{overflow:hidden!important}
 
 
 <style id="v1440-power-rank-clean-css">
-/* V14.5.2 — RANG POWER PROPRE
+/* V14.5.3 — RANG POWER PROPRE
    Une seule logique: total Squat + Bench + Deadlift en KG.
    Une identité visuelle distincte par rang. */
 
@@ -8395,7 +8411,7 @@ body.v1358-settings-open{overflow:hidden!important}
 
 
 <style id="v1451-power-live-neon-css">
-/* V14.5.2 — les cartes visibles utilisent la même identité néon que la vitrine */
+/* V14.5.3 — les cartes visibles utilisent la même identité néon que la vitrine */
 .rank-card.v1451-live-rank{
   --rank:#ff2d55;
   --rank-rgb:255,45,85;
@@ -8483,7 +8499,7 @@ body.v1358-settings-open{overflow:hidden!important}
 <script id="v1451-power-live-renderer">
 (function(){
   function totals(){
-    const u=window.userData||{};
+    const u=userData||{};
     const total=Number(u.squat||0)+Number(u.bench||0)+Number(u.deadlift||0);
     const bw=Number(u.weight||0);
     const ratio=bw>0?total/bw:0;
@@ -8545,7 +8561,7 @@ body.v1358-settings-open{overflow:hidden!important}
         mini.classList.add('v1451-live-rank-mini');
         cssVars(mini,r);
       }
-    }catch(e){console.warn('V14.5.2 live rank render',e)}
+    }catch(e){console.warn('V14.5.3 live rank render',e)}
   };
 
   /* Après toute vraie mise à jour de données/UI */
@@ -8600,33 +8616,45 @@ body.v1358-settings-open{overflow:hidden!important}
 })();
 </script>
 
-
-<script id="v1452-sbd-recovery-boot">
+<script id="v1453-power-state-refresh">
 (function(){
-  function positive(v){return Number(v)>0}
-  function recover(){
+  function refresh(){
     try{
-      const u=window.userData;
-      if(!u)return;
-      if(positive(u.squat)&&positive(u.bench)&&positive(u.deadlift)){
-        if(typeof window.v1452SaveSbdSafe==='function')window.v1452SaveSbdSafe();
-        return;
-      }
-      const hist=Array.isArray(u.sbdHistory)?u.sbdHistory:[];
-      let best=null,bestTotal=0;
-      hist.forEach(x=>{
-        const s=Number(x?.squat||0),b=Number(x?.bench||0),d=Number(x?.deadlift||0),t=s+b+d;
-        if(s>0&&b>0&&d>0&&t>bestTotal){best={squat:s,bench:b,deadlift:d,weight:Number(u.weight||0),updatedAt:0};bestTotal=t}
-      });
-      if(best){
-        u.squat=best.squat;u.bench=best.bench;u.deadlift=best.deadlift;u.sbdUpdatedAt=Date.now();
-        try{saveToLocalStorage()}catch(e){}
-        try{updateProfileUI();renderGoals();window.renderPowerRankLive?.()}catch(e){}
-      }
-    }catch(e){console.warn('V14.5.2 recovery',e)}
+      if(typeof window.renderPowerRankLive==='function')window.renderPowerRankLive();
+      if(typeof window.v135RenderRankHub==='function')window.v135RenderRankHub();
+    }catch(e){console.warn('V14.5.3 power refresh',e)}
   }
-  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',()=>setTimeout(recover,80),{once:true});
-  else setTimeout(recover,20);
+
+  const oldLoad=window.loadFromLocalStorage;
+  if(typeof oldLoad==='function'&&!oldLoad.v1453){
+    window.loadFromLocalStorage=function(){
+      const r=oldLoad.apply(this,arguments);
+      queueMicrotask(refresh);
+      return r;
+    };
+    window.loadFromLocalStorage.v1453=1;
+  }
+
+  const oldSave=window.saveToLocalStorage;
+  if(typeof oldSave==='function'&&!oldSave.v1453){
+    window.saveToLocalStorage=function(){
+      const r=oldSave.apply(this,arguments);
+      queueMicrotask(refresh);
+      return r;
+    };
+    window.saveToLocalStorage.v1453=1;
+  }
+
+  window.addEventListener('pageshow',()=>setTimeout(refresh,30));
+  document.addEventListener('visibilitychange',()=>{
+    if(document.visibilityState==='visible')setTimeout(refresh,30);
+  });
+
+  if(document.readyState==='loading'){
+    document.addEventListener('DOMContentLoaded',()=>setTimeout(refresh,50),{once:true});
+  }else{
+    setTimeout(refresh,20);
+  }
 })();
 </script>
 
