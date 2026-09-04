@@ -1,20 +1,26 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-<!-- V15.19.1 — Release Metadata & Security Clean
-     - Numéros de version (title / APP_VERSION / VERSION) resynchronisés avec la version réelle du fichier.
-     - Faille XSS corrigée : pseudo utilisateur injecté dans des attributs onclick= (4 sites :
-       liste d'amis ×2, exclusion de membre d'équipe ×2) via une double couche d'échappement cassée.
-       Remplacée par jsAttr() (JSON.stringify + échappement HTML), sûre pour insérer du texte
-       utilisateur comme argument JS dans un attribut inline.
-     - Moteur Power/Rang fusionné (v1451+v1453 → v1600), setTimeout de boot dédupliqués.
-     - Fallback mort v1430Export/ImportAppData retiré (jamais défini, ne s'exécutait jamais).
-     - Référence cassée getUnifiedPowerRank() (inexistante) corrigée dans syncProfileRank(). -->
+<!-- ============================================================
+     LEVELING-APP V16.0.0 — STABLE
+     Base figée après validation réelle PC + Samsung + iPhone/PWA.
+
+     Release V16 :
+     - title / APP_VERSION / VERSION synchronisés en 16.0.0.
+     - Aucun changement de logique métier par rapport à la RC V15.19.3.
+     - Ordre Profil déterministe conservé : XP → Quêtes → Rang Power
+       → Progression SBD → Coach → Objectifs.
+     - Correctifs sécurité/XSS, Supabase/RPC, mobile/PWA et validation
+       de séance conservés.
+     - Les références V11 / V12 / V13 / V14 / V15 présentes plus bas
+       restent volontairement inchangées lorsqu'elles identifient
+       l'origine ou la version historique d'un module.
+     ============================================================ -->
 
 
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>LEVELING-APP — Powerbuilding Tracker V15.19.3</title>
+    <title>LEVELING-APP — Powerbuilding Tracker V16.0.0 STABLE</title>
     <meta name="theme-color" content="#09090f">
     <meta name="application-name" content="LEVELING-APP">
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -3421,7 +3427,7 @@ const sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_PUBLISHABLE_KEY,{
   auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true,storage:window.localStorage}
 });
 let cloudUser=null,cloudLicensed=false,cloudLoadedOnce=false,cloudSaveTimer=null,suppressCloudSave=false,licenseWatchTimer=null,lastLicenseStatus='UNKNOWN';
-const APP_VERSION='15.19.3';
+const APP_VERSION='16.0.0';
 const ACCOUNT_LOCAL_KEYS=['solo_leveling_user','solo_leveling_smart_refs','solo_leveling_body_hist','solo_leveling_inv','solo_leveling_block','solo_leveling_day','solo_leveling_state','solo_leveling_custom_sets','solo_leveling_history','solo_leveling_active_program','solo_leveling_program_states','solo_leveling_program_custom_sets','solo_leveling_custom_program','leveling_last_local_save','leveling_last_cloud_sync','leveling_v10'];
 function clearLevelingAccountLocalData(){
   try{ACCOUNT_LOCAL_KEYS.forEach(k=>localStorage.removeItem(k));sessionStorage.removeItem('leveling_pending_license')}catch(e){console.warn('Local account cleanup:',e)}
@@ -5896,7 +5902,7 @@ body.v1358-settings-open{overflow:hidden!important}
    Aucun hook finishWorkoutFinal / updateProfileUI / switchTab.
    ============================================================ */
 
-const VERSION='15.19.3';
+const VERSION='16.0.0';
 const RPG_KEY='leveling_v140_rpg';
 
 function loadRpg(){try{return JSON.parse(localStorage.getItem(RPG_KEY)||'{}')||{}}catch(e){return {}}}
