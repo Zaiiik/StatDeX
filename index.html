@@ -14,7 +14,7 @@
 
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>LEVELING-APP — Powerbuilding Tracker V15.19.2</title>
+    <title>LEVELING-APP — Powerbuilding Tracker V15.19.3</title>
     <meta name="theme-color" content="#09090f">
     <meta name="application-name" content="LEVELING-APP">
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -3421,7 +3421,7 @@ const sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_PUBLISHABLE_KEY,{
   auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true,storage:window.localStorage}
 });
 let cloudUser=null,cloudLicensed=false,cloudLoadedOnce=false,cloudSaveTimer=null,suppressCloudSave=false,licenseWatchTimer=null,lastLicenseStatus='UNKNOWN';
-const APP_VERSION='15.19.2';
+const APP_VERSION='15.19.3';
 const ACCOUNT_LOCAL_KEYS=['solo_leveling_user','solo_leveling_smart_refs','solo_leveling_body_hist','solo_leveling_inv','solo_leveling_block','solo_leveling_day','solo_leveling_state','solo_leveling_custom_sets','solo_leveling_history','solo_leveling_active_program','solo_leveling_program_states','solo_leveling_program_custom_sets','solo_leveling_custom_program','leveling_last_local_save','leveling_last_cloud_sync','leveling_v10'];
 function clearLevelingAccountLocalData(){
   try{ACCOUNT_LOCAL_KEYS.forEach(k=>localStorage.removeItem(k));sessionStorage.removeItem('leveling_pending_license')}catch(e){console.warn('Local account cleanup:',e)}
@@ -4647,7 +4647,7 @@ function v135Settings(){
 const __v135UpdateProfile=window.updateProfileUI;
 if(typeof __v135UpdateProfile==='function')window.updateProfileUI=function(){const r=__v135UpdateProfile.apply(this,arguments);setTimeout(()=>{v135RenderRankHub();v135CheckRankUp()},0);return r};
 v135ApplyRankSystems();
-setTimeout(()=>{v135ProfileNav();v135RenderRankHub();v135Settings();v135CheckRankUp()},700);
+v135ProfileNav();v135RenderRankHub();v135Settings();v135CheckRankUp();
 document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')setTimeout(()=>{v135RenderRankHub();v135Settings()},100)});
 </script>
 
@@ -4943,13 +4943,43 @@ function ensureDom(){
   let sbd=document.getElementById('v140-sbd');
   let coach=document.getElementById('v140-coach');
   let quests=document.getElementById('v140-quests');
-  if(!quests||!sbd||!coach){
-    const wrap=document.createElement('div');
-    wrap.id='v1580-progression-wrap';
-    wrap.innerHTML=`<div id="v140-quests"></div><div id="v140-sbd"></div><div id="v140-coach"></div>`;
-    const rank=document.getElementById('v135-rank-hub');
-    if(rank&&rank.parentNode===panel)rank.after(wrap);
-    else panel.prepend(wrap);
+
+  /* V15.19.3 — création directement à l'emplacement final.
+     Avant, les 3 blocs naissaient dans un wrapper temporaire puis plusieurs
+     modules les déplaçaient à 300 ms / 700 ms / 1900 ms, ce qui provoquait
+     le "saut" visible après F5 et au réveil PWA. */
+  const rankHub=document.getElementById('v135-rank-hub');
+  const powerHero=panel.querySelector('.rank-card.v1354-power-hero') || panel.querySelector('.rank-card');
+  const goals=panel.querySelector('.goal-card');
+
+  if(!quests){
+    quests=document.createElement('div');
+    quests.id='v140-quests';
+  }
+  if(!sbd){
+    sbd=document.createElement('div');
+    sbd.id='v140-sbd';
+  }
+  if(!coach){
+    coach=document.createElement('div');
+    coach.id='v140-coach';
+  }
+
+  /* Ordre canonique : XP -> Quêtes -> Power -> SBD -> Coach -> Objectifs. */
+  if(rankHub && rankHub.parentNode===panel){
+    rankHub.after(quests);
+  }else if(powerHero){
+    panel.insertBefore(quests,powerHero);
+  }else{
+    panel.prepend(quests);
+  }
+
+  if(goals){
+    panel.insertBefore(sbd,goals);
+    panel.insertBefore(coach,goals);
+  }else if(powerHero){
+    powerHero.after(sbd);
+    sbd.after(coach);
   }
 
   if(!document.getElementById('v140-levelup')){
@@ -5035,8 +5065,8 @@ function boot(){
   renderSbdCoach();
   try{window.v152RenderProgression?.()}catch(e){}
 }
-if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',()=>setTimeout(boot,300),{once:true});
-else setTimeout(boot,80);
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot,{once:true});
+else boot();
 
 document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')setTimeout(boot,80)});
 })();
@@ -5160,8 +5190,8 @@ document.addEventListener('visibilitychange',()=>{if(document.visibilityState===
     bindHeader();
   }
 
-  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',()=>setTimeout(run,1900));
-  else setTimeout(run,1900);
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',run,{once:true});
+  else run();
 
   document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')setTimeout(run,80)});
 })();
@@ -5866,7 +5896,7 @@ body.v1358-settings-open{overflow:hidden!important}
    Aucun hook finishWorkoutFinal / updateProfileUI / switchTab.
    ============================================================ */
 
-const VERSION='15.19.2';
+const VERSION='15.19.3';
 const RPG_KEY='leveling_v140_rpg';
 
 function loadRpg(){try{return JSON.parse(localStorage.getItem(RPG_KEY)||'{}')||{}}catch(e){return {}}}
@@ -6996,7 +7026,7 @@ else setTimeout(boot,60);
     if(powerHero&&goals){
       powerHero.classList.add('v1354-power-hero');
 
-      /* V15.19.2 — ordre Profil déterministe.
+      /* V15.19.3 — ordre Profil déterministe.
          Un refresh/updateProfileUI replaçait auparavant Power juste avant Objectifs,
          ce qui pouvait laisser SBD/Coach AU-DESSUS de Power jusqu'au prochain
          visibilitychange/reload. On fixe ici l'ordre canonique à chaque rendu :
@@ -7052,8 +7082,8 @@ else setTimeout(boot,60);
     arrangeProfile();
   }
   if(document.readyState==='loading'){
-    document.addEventListener('DOMContentLoaded',()=>setTimeout(boot,120),{once:true});
-  }else setTimeout(boot,30);
+    document.addEventListener('DOMContentLoaded',boot,{once:true});
+  }else boot();
 
   window.addEventListener('pageshow',()=>setTimeout(boot,40));
 })();
@@ -7160,8 +7190,8 @@ else setTimeout(boot,60);
   }
 
   if(document.readyState==='loading'){
-    document.addEventListener('DOMContentLoaded',()=>setTimeout(fixVitrines,160),{once:true});
-  }else setTimeout(fixVitrines,40);
+    document.addEventListener('DOMContentLoaded',fixVitrines,{once:true});
+  }else fixVitrines();
 
   window.addEventListener('pageshow',()=>setTimeout(fixVitrines,50));
 })();
