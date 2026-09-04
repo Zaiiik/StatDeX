@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>LEVELING-APP — Powerbuilding Tracker V14.5.3</title>
+    <title>LEVELING-APP — Powerbuilding Tracker V14.5.4</title>
     <meta name="theme-color" content="#09090f">
     <meta name="application-name" content="LEVELING-APP">
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -1817,7 +1817,7 @@ header .hud-stat.v140-clickable:hover{
                         <span class="cloud-badge" id="cloud-live-badge">☁️ CLOUD</span>
                     </div>
                     <div id="cloud-sync-detail" style="margin-top:8px;font-size:.62rem;color:#777;text-align:center">Initialisation du cloud…</div>
-                    <div style="margin-top:5px;font-size:.58rem;color:#555;text-align:center">LEVELING-APP V14.5.3 · Stable</div>
+                    <div style="margin-top:5px;font-size:.58rem;color:#555;text-align:center">LEVELING-APP V14.5.4 · Stable</div>
                     <button class="btn-action" onclick="logoutLeveling()" style="border-color:#ff5555;color:#ff7777">Se déconnecter</button>
                 </div>
 
@@ -2092,7 +2092,7 @@ header .hud-stat.v140-clickable:hover{
             autoProgression: true
         };
 
-        /* V14.5.3 — CANONICAL USER STATE BRIDGE
+        /* V14.5.4 — CANONICAL USER STATE BRIDGE
            `userData` est déclaré avec `let`, donc il n'est pas automatiquement disponible
            via `window.userData`. Plusieurs anciens modules lisaient pourtant window.userData,
            ce qui produisait 0 kg / RECRUE malgré des données correctes.
@@ -3928,7 +3928,7 @@ const sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_PUBLISHABLE_KEY,{
   auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true,storage:window.localStorage}
 });
 let cloudUser=null,cloudLicensed=false,cloudLoadedOnce=false,cloudSaveTimer=null,suppressCloudSave=false,licenseWatchTimer=null,lastLicenseStatus='UNKNOWN';
-const APP_VERSION='14.5.3';
+const APP_VERSION='14.5.4';
 const ACCOUNT_LOCAL_KEYS=['solo_leveling_user','solo_leveling_smart_refs','solo_leveling_body_hist','solo_leveling_inv','solo_leveling_block','solo_leveling_day','solo_leveling_state','solo_leveling_custom_sets','solo_leveling_history','solo_leveling_active_program','solo_leveling_program_states','solo_leveling_program_custom_sets','solo_leveling_custom_program','leveling_last_local_save','leveling_last_cloud_sync','leveling_v10'];
 function clearLevelingAccountLocalData(){
   try{ACCOUNT_LOCAL_KEYS.forEach(k=>localStorage.removeItem(k));sessionStorage.removeItem('leveling_pending_license')}catch(e){console.warn('Local account cleanup:',e)}
@@ -4919,13 +4919,13 @@ setTimeout(()=>{initCompactSettings();if(cloudUser&&cloudLicensed)syncSocialProf
 <script>
 /* ==================== V13.5 · ASCENSION ==================== */
 const V135_XP_RANKS=[
-  {name:'ÉVEILLÉ',icon:'🌱',min:1},
-  {name:'CHASSEUR',icon:'⚔️',min:10},
-  {name:'SPARTAN',icon:'🛡️',min:20},
-  {name:'SENTINELLE',icon:'🔷',min:30},
-  {name:'SHADOW',icon:'🌑',min:40},
-  {name:'ASCENDANT',icon:'✨',min:50},
-  {name:'EMPEREUR',icon:'👑',min:67}
+  {name:'ÉVEILLÉ',   icon:'🌱',min:1, color:'#39ff88',glow:'57,255,136', motif:'✦'},
+  {name:'CHASSEUR',  icon:'⚔️',min:10,color:'#ff8a00',glow:'255,138,0',  motif:'⚔'},
+  {name:'SPARTAN',   icon:'🛡️',min:20,color:'#00e5ff',glow:'0,229,255', motif:'◆'},
+  {name:'SENTINELLE',icon:'🔷',min:30,color:'#a855ff',glow:'168,85,255', motif:'◇'},
+  {name:'SHADOW',    icon:'🌑',min:40,color:'#7c3cff',glow:'124,60,255', motif:'☾'},
+  {name:'ASCENDANT', icon:'✨',min:50,color:'#ff1744',glow:'255,23,68',  motif:'✹'},
+  {name:'EMPEREUR',  icon:'👑',min:67,color:'#ff35f2',glow:'255,53,242', motif:'♛'}
 ];
 const V135_POWER_RANKS=POWER_RANKS;
 function v135XpRank(level){let r=V135_XP_RANKS[0];for(const x of V135_XP_RANKS)if(level>=x.min)r=x;return r}
@@ -4933,11 +4933,38 @@ function v135PowerRank(total){return getSBDRank(total,Number(userData?.weight||0
 function v135Next(arr,current){const i=arr.indexOf(current);return i>=0&&i<arr.length-1?arr[i+1]:null}
 function v135Close(id){document.getElementById(id).style.display='none'}
 function v135OpenXp(){
-  const lvl=Number(userData.level||1),cur=v135XpRank(lvl),next=v135Next(V135_XP_RANKS,cur),totalXp=(typeof v10!=='undefined'?Number(v10.totalXp||0):Math.max(0,(lvl-1)*1000));
-  document.getElementById('v135-xp-showcase').innerHTML=V135_XP_RANKS.map(r=>{
+  const lvl=Number(userData.level||1);
+  const cur=v135XpRank(lvl);
+  const next=v135Next(V135_XP_RANKS,cur);
+  const totalXp=(typeof v10!=='undefined'?Number(v10.totalXp||0):Math.max(0,(lvl-1)*1000));
+  const box=document.getElementById('v135-xp-showcase');
+  if(!box)return;
+
+  box.innerHTML=V135_XP_RANKS.map(r=>{
     const current=r===cur,done=lvl>=r.min;
-    return `<div class="v135-rank-row ${current?'current':done?'done':'locked'}"><div class="v135-rank-icon">${done?r.icon:'🔒'}</div><div><b>${r.name}${current?' · TON RANG':''}</b><small>Niveau ${r.min}+ · ${(Math.max(0,r.min-1)*1000).toLocaleString()} XP total</small></div><div class="v135-rank-state">${current?'ACTUEL':done?'✓':'🔒'}</div></div>`
-  }).join('')+(next?`<div class="v10-muted" style="text-align:center;margin-top:7px">${totalXp.toLocaleString()} / ${((next.min-1)*1000).toLocaleString()} XP avant ${next.name}</div>`:`<div class="v10-muted" style="text-align:center;margin-top:7px">👑 Rang maximum atteint</div>`);
+    const nextR=v135Next(V135_XP_RANKS,r);
+    let pct=done?100:0;
+    if(current&&nextR){
+      pct=Math.max(0,Math.min(100,(lvl-r.min)/(nextR.min-r.min)*100));
+    }
+    return `<div class="xp-rank-tier ${current?'current':done?'done':'locked'}"
+      style="--xp-rank:${r.color};--xp-rgb:${r.glow}">
+      <div class="xp-rank-pattern">${r.motif}</div>
+      <div class="xp-rank-icon">${done?r.icon:'🔒'}</div>
+      <div class="xp-rank-copy">
+        <b>${r.name}${current?' <em>TON RANG</em>':''}</b>
+        <small>Niveau ${r.min}+ · ${Math.max(0,r.min-1)*1000} XP total</small>
+        ${current?`<div class="xp-rank-mini"><i style="width:${pct}%"></i></div>`:''}
+      </div>
+      <div class="xp-rank-state">${current?'ACTUEL':done?'VALIDÉ':'VERROUILLÉ'}</div>
+    </div>`;
+  }).join('')+
+  `<div class="xp-rank-summary" style="--xp-rank:${cur.color};--xp-rgb:${cur.glow}">
+     <b>${cur.icon} ${cur.name}</b>
+     <span>Niveau ${lvl} · ${totalXp.toLocaleString()} XP total</span>
+     ${next?`<small>Prochain : ${next.name} au niveau ${next.min}</small>`:'<small>Rang maximum</small>'}
+   </div>`;
+
   document.getElementById('v135-xp-modal').style.display='flex';
 }
 function v135OpenPower(){
@@ -5847,7 +5874,10 @@ function state(){
  return s;
 }
 function xpNeed(l){return Math.round(100+Math.pow(l,1.55)*38)}
-function xpRank(l){if(l>=50)return['👑','MONARQUE'];if(l>=30)return['💎','ÉLITE'];if(l>=18)return['⚔️','CHASSEUR'];if(l>=8)return['🌿','ÉVEILLÉ'];return['🕯️','NOVICE']}
+function xpRank(l){
+ const r=v135XpRank(Number(l||1));
+ return [r.icon,r.name]
+}
 function addXP(n,reason){
  let s=state(), old=s.level; s.xp+=n;
  while(s.xp>=xpNeed(s.level)){s.xp-=xpNeed(s.level);s.level++}
@@ -7908,7 +7938,7 @@ html.leveling-ios nav{-webkit-backdrop-filter:none!important;backdrop-filter:non
 
 
 <style id="v1430-stable-ui-css">
-/* ================= V14.5.3 — STABLE SETTINGS / PROGRESSION =================
+/* ================= V14.5.4 — STABLE SETTINGS / PROGRESSION =================
    Réglages: plus aucune sous-page fixed/overlay. Toutes les rubriques restent
    dans le scroll principal de l'app, donc plus de page coupée ni ouverture en bas. */
 #panel-settings{position:relative!important;overflow:visible!important;min-height:0!important}
@@ -7963,7 +7993,7 @@ body.v1358-settings-open{overflow:hidden!important}
 
 <script id="v1430-stable-core-js">
 (function(){
-  const VERSION='14.5.3';
+  const VERSION='14.5.4';
   const q=s=>document.querySelector(s);
   const qa=s=>[...document.querySelectorAll(s)];
   const localDay=(d=new Date())=>`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
@@ -8166,7 +8196,7 @@ body.v1358-settings-open{overflow:hidden!important}
         if(typeof renderProfileV2==='function'&&document.getElementById('profile-v2-modal')?.classList.contains('show'))renderProfileV2();
         if(typeof window.renderPowerRankLive==='function')window.renderPowerRankLive();
         if(typeof render==='function')render();
-      }catch(e){console.warn('V14.5.3 SBD UI refresh',e)}
+      }catch(e){console.warn('V14.5.4 SBD UI refresh',e)}
       syncProgressionState();refreshRanks();
     },0);
     return r;
@@ -8204,7 +8234,7 @@ body.v1358-settings-open{overflow:hidden!important}
 
 
 <style id="v1440-power-rank-clean-css">
-/* V14.5.3 — RANG POWER PROPRE
+/* V14.5.4 — RANG POWER PROPRE
    Une seule logique: total Squat + Bench + Deadlift en KG.
    Une identité visuelle distincte par rang. */
 
@@ -8411,7 +8441,7 @@ body.v1358-settings-open{overflow:hidden!important}
 
 
 <style id="v1451-power-live-neon-css">
-/* V14.5.3 — les cartes visibles utilisent la même identité néon que la vitrine */
+/* V14.5.4 — les cartes visibles utilisent la même identité néon que la vitrine */
 .rank-card.v1451-live-rank{
   --rank:#ff2d55;
   --rank-rgb:255,45,85;
@@ -8561,7 +8591,7 @@ body.v1358-settings-open{overflow:hidden!important}
         mini.classList.add('v1451-live-rank-mini');
         cssVars(mini,r);
       }
-    }catch(e){console.warn('V14.5.3 live rank render',e)}
+    }catch(e){console.warn('V14.5.4 live rank render',e)}
   };
 
   /* Après toute vraie mise à jour de données/UI */
@@ -8622,7 +8652,7 @@ body.v1358-settings-open{overflow:hidden!important}
     try{
       if(typeof window.renderPowerRankLive==='function')window.renderPowerRankLive();
       if(typeof window.v135RenderRankHub==='function')window.v135RenderRankHub();
-    }catch(e){console.warn('V14.5.3 power refresh',e)}
+    }catch(e){console.warn('V14.5.4 power refresh',e)}
   }
 
   const oldLoad=window.loadFromLocalStorage;
@@ -8655,6 +8685,158 @@ body.v1358-settings-open{overflow:hidden!important}
   }else{
     setTimeout(refresh,20);
   }
+})();
+</script>
+
+
+<style id="v1454-xp-neon-css">
+/* V14.5.4 — Rang XP : même qualité visuelle néon que le Rang Power */
+#v135-xp-modal .modal-content{
+  width:min(620px,96vw)!important;
+  max-width:620px!important;
+  border:1px solid rgba(255,255,255,.12)!important;
+  background:
+    radial-gradient(circle at 50% -12%,rgba(168,85,255,.22),transparent 38%),
+    linear-gradient(180deg,#0b0710,#07070c)!important;
+  box-shadow:0 0 34px rgba(168,85,255,.18),0 0 80px rgba(255,53,242,.07)!important;
+}
+#v135-xp-modal h2{
+  color:#fff!important;
+  text-shadow:0 0 9px #fff,0 0 22px var(--accent-purple)!important;
+  letter-spacing:.08em!important;
+}
+#v135-xp-showcase{display:flex!important;flex-direction:column!important;gap:9px!important;margin-top:12px!important}
+
+.xp-rank-tier{
+  --xp-rank:#39ff88;--xp-rgb:57,255,136;
+  position:relative;min-height:76px;
+  display:grid;grid-template-columns:48px minmax(0,1fr) auto;
+  align-items:center;gap:11px;padding:12px 13px;overflow:hidden;
+  border-radius:13px;border:1px solid rgba(var(--xp-rgb),.38);
+  background:
+    linear-gradient(105deg,rgba(var(--xp-rgb),.13),rgba(10,10,16,.96) 48%,rgba(var(--xp-rgb),.06));
+  box-shadow:inset 0 0 22px rgba(var(--xp-rgb),.045),0 0 10px rgba(var(--xp-rgb),.08);
+}
+.xp-rank-tier::before{
+  content:"";position:absolute;inset:-1px;pointer-events:none;
+  background:
+    linear-gradient(115deg,transparent 0 30%,rgba(var(--xp-rgb),.11) 30.5% 31.5%,transparent 32% 64%,rgba(var(--xp-rgb),.07) 64.5% 65.5%,transparent 66%),
+    radial-gradient(circle at 88% 25%,rgba(var(--xp-rgb),.16),transparent 31%);
+}
+.xp-rank-pattern{
+  position:absolute;right:12%;top:50%;transform:translateY(-50%) rotate(-13deg);
+  font-size:5rem;line-height:1;font-weight:1000;color:var(--xp-rank);opacity:.07;
+  filter:drop-shadow(0 0 12px rgba(var(--xp-rgb),.7));pointer-events:none
+}
+.xp-rank-icon{
+  position:relative;z-index:1;width:44px;height:44px;display:grid;place-items:center;border-radius:12px;
+  font-size:1.35rem;background:rgba(var(--xp-rgb),.10);border:1px solid rgba(var(--xp-rgb),.42);
+  box-shadow:inset 0 0 14px rgba(var(--xp-rgb),.16)
+}
+.xp-rank-copy{position:relative;z-index:1;min-width:0}
+.xp-rank-copy b{display:flex;align-items:center;gap:8px;flex-wrap:wrap;color:var(--xp-rank);font-size:.84rem;letter-spacing:.055em;text-shadow:0 0 9px rgba(var(--xp-rgb),.72)}
+.xp-rank-copy b em{font-style:normal;font-size:.48rem;color:#fff;padding:3px 6px;border-radius:99px;background:rgba(var(--xp-rgb),.24);border:1px solid rgba(var(--xp-rgb),.65);box-shadow:0 0 10px rgba(var(--xp-rgb),.30)}
+.xp-rank-copy small{display:block;color:#9292a2;font-size:.56rem;margin-top:4px}
+.xp-rank-state{position:relative;z-index:1;font-size:.49rem;font-weight:1000;letter-spacing:.08em;color:rgba(255,255,255,.45)}
+.xp-rank-tier.done{border-color:rgba(var(--xp-rgb),.62)}
+.xp-rank-tier.done .xp-rank-state{color:rgba(var(--xp-rgb),.88)}
+.xp-rank-tier.current{
+  transform:scale(1.012);border-color:var(--xp-rank);
+  background:linear-gradient(105deg,rgba(var(--xp-rgb),.27),rgba(9,8,15,.97) 47%,rgba(var(--xp-rgb),.16));
+  box-shadow:0 0 10px rgba(var(--xp-rgb),.65),0 0 27px rgba(var(--xp-rgb),.34),inset 0 0 28px rgba(var(--xp-rgb),.12)
+}
+.xp-rank-tier.current .xp-rank-icon{background:rgba(var(--xp-rgb),.20);border-color:var(--xp-rank);box-shadow:0 0 16px rgba(var(--xp-rgb),.48),inset 0 0 15px rgba(var(--xp-rgb),.20)}
+.xp-rank-tier.current .xp-rank-state{color:#fff;text-shadow:0 0 8px var(--xp-rank),0 0 16px var(--xp-rank)}
+.xp-rank-tier.locked{opacity:.48;filter:saturate(.45)}
+.xp-rank-mini{width:100%;height:4px;margin-top:7px;border-radius:99px;overflow:hidden;background:rgba(255,255,255,.07)}
+.xp-rank-mini i{display:block;height:100%;border-radius:inherit;background:linear-gradient(90deg,var(--xp-rank),#fff,var(--xp-rank));box-shadow:0 0 9px var(--xp-rank)}
+.xp-rank-summary{--xp-rank:#fff;--xp-rgb:255,255,255;margin-top:3px;padding:10px 12px;border-radius:11px;text-align:center;border:1px solid rgba(var(--xp-rgb),.52);background:rgba(var(--xp-rgb),.08);box-shadow:0 0 18px rgba(var(--xp-rgb),.12)}
+.xp-rank-summary b{display:block;color:var(--xp-rank);text-shadow:0 0 10px rgba(var(--xp-rgb),.7);font-size:.8rem}
+.xp-rank-summary span,.xp-rank-summary small{display:block;margin-top:4px;font-size:.56rem;color:#aaa}
+
+/* Carte XP visible sur le profil */
+#v135-rank-hub .v135-rank-card.xp.v1454-xp-live{
+  --xp-rank:#39ff88;--xp-rgb:57,255,136;--xp-motif:"✦";
+  position:relative!important;overflow:hidden!important;
+  border-color:var(--xp-rank)!important;
+  background:
+    radial-gradient(circle at 86% 26%,rgba(var(--xp-rgb),.25),transparent 35%),
+    linear-gradient(115deg,rgba(var(--xp-rgb),.17),#0b0910 48%,rgba(var(--xp-rgb),.08))!important;
+  box-shadow:0 0 10px rgba(var(--xp-rgb),.56),0 0 26px rgba(var(--xp-rgb),.24),inset 0 0 22px rgba(var(--xp-rgb),.08)!important
+}
+#v135-rank-hub .v135-rank-card.xp.v1454-xp-live::before{
+  content:"";position:absolute;inset:0;pointer-events:none;
+  background:repeating-linear-gradient(135deg,transparent 0 35px,rgba(var(--xp-rgb),.04) 36px 37px)
+}
+#v135-rank-hub .v135-rank-card.xp.v1454-xp-live::after{
+  content:var(--xp-motif);position:absolute;right:5%;top:50%;transform:translateY(-50%) rotate(-12deg);
+  color:var(--xp-rank);font-size:6.5rem;font-weight:1000;opacity:.08;filter:drop-shadow(0 0 16px rgba(var(--xp-rgb),.7));pointer-events:none
+}
+#v135-rank-hub .v135-rank-card.xp.v1454-xp-live>*{position:relative;z-index:1}
+#v135-rank-hub .v135-rank-card.xp.v1454-xp-live .v135-rank-name{
+  color:var(--xp-rank)!important;text-shadow:0 0 8px var(--xp-rank),0 0 22px rgba(var(--xp-rgb),.5)!important
+}
+#v135-rank-hub .v135-rank-card.xp.v1454-xp-live .v135-progress i{
+  background:linear-gradient(90deg,var(--xp-rank),#fff,var(--xp-rank))!important;
+  box-shadow:0 0 10px var(--xp-rank)!important
+}
+
+@media(max-width:520px){
+  .xp-rank-tier{grid-template-columns:42px minmax(0,1fr);padding:10px;min-height:72px}
+  .xp-rank-state{grid-column:2;font-size:.45rem;margin-top:-4px}
+  .xp-rank-icon{width:38px;height:38px;font-size:1.15rem}
+  .xp-rank-pattern{font-size:4.2rem;right:7%}
+}
+</style>
+
+<script id="v1454-xp-live-renderer">
+(function(){
+  function cssVars(el,r){
+    if(!el||!r)return;
+    el.style.setProperty('--xp-rank',r.color);
+    el.style.setProperty('--xp-rgb',r.glow);
+    el.style.setProperty('--xp-motif',`"${r.motif||'✦'}"`);
+  }
+  window.renderXpRankLive=function(){
+    try{
+      const lvl=Number(userData?.level||1);
+      const r=v135XpRank(lvl),next=v135Next(V135_XP_RANKS,r);
+      const card=document.querySelector('#v135-rank-hub .v135-rank-card.xp');
+      if(card){
+        card.classList.add('v1454-xp-live');
+        cssVars(card,r);
+        const name=card.querySelector('.v135-rank-name');
+        if(name)name.textContent=`${r.icon} ${r.name}`;
+        const meta=card.querySelector('.v135-rank-meta');
+        if(meta)meta.textContent=`Niveau ${lvl}${next?' · prochain : '+next.name+' niv. '+next.min:' · MAX'}`;
+        const bar=card.querySelector('.v135-progress i');
+        if(bar){
+          const pct=next?Math.max(0,Math.min(100,(lvl-r.min)/(next.min-r.min)*100)):100;
+          bar.style.width=pct+'%';
+        }
+      }
+    }catch(e){console.warn('V14.5.4 XP live',e)}
+  };
+
+  const oldHub=window.v135RenderRankHub;
+  if(typeof oldHub==='function'&&!oldHub.v1454){
+    window.v135RenderRankHub=function(){
+      const ret=oldHub.apply(this,arguments);
+      queueMicrotask(()=>window.renderXpRankLive());
+      return ret;
+    };
+    window.v135RenderRankHub.v1454=1;
+  }
+
+  function boot(){
+    try{window.v135RenderRankHub?.()}catch(e){}
+    window.renderXpRankLive();
+    setTimeout(window.renderXpRankLive,120);
+    setTimeout(window.renderXpRankLive,600);
+  }
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot,{once:true});
+  else boot();
+  window.addEventListener('pageshow',()=>setTimeout(window.renderXpRankLive,30));
 })();
 </script>
 
