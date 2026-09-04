@@ -432,7 +432,7 @@
 
 /* ==================== V12.6 PWA / MOBILE / PROFILE ==================== */
 :root{--safe-bottom:env(safe-area-inset-bottom,0px);--safe-top:env(safe-area-inset-top,0px)}
-body{padding-top:var(--safe-top)}
+body{padding-top:0}
 .bottom-nav{padding-bottom:var(--safe-bottom);height:calc(54px + var(--safe-bottom))}
 main{padding-bottom:calc(76px + var(--safe-bottom))}
 .v11-avatar{position:relative;cursor:pointer}.v11-avatar img{width:100%;height:100%;object-fit:cover;border-radius:inherit}
@@ -781,10 +781,19 @@ header{padding-top:max(8px,env(safe-area-inset-top,0px))}
 .v140-quest-main{flex:1}.v140-quest-main b{display:block;font-size:.72rem}.v140-quest-main small{font-size:.58rem;color:#999}
 .v140-xp{font-size:.65rem;font-weight:900;color:#ffd54f}
 .v140-sbd-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
-.v140-lift{padding:10px;background:#111119;border:1px solid #292933;border-radius:11px}
-.v140-lift b{font-size:.72rem}.v140-lift .big{font-size:1.1rem;font-weight:1000;margin:6px 0}.v140-lift small{font-size:.56rem;color:#999}
-.v140-spark{width:100%;height:44px;margin-top:6px}
-.v140-spark polyline{fill:none;stroke:var(--accent-rose);stroke-width:2}
+.v140-lift{position:relative;min-width:0;padding:10px;background:linear-gradient(145deg,#111119,#0b0b12);border:1px solid #292933;border-radius:12px;overflow:hidden}
+.v140-lift-head{display:flex;align-items:center;gap:6px;min-width:0}
+.v140-lift-icon{font-size:1rem;line-height:1;filter:drop-shadow(0 0 6px currentColor)}
+.v140-lift b{font-size:.68rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.v140-lift .big{font-size:1.08rem;font-weight:1000;margin:6px 0 5px;color:#fff;white-space:nowrap}
+.v140-lift-deltas{display:grid;gap:1px;font-size:.52rem;color:#9a9aa5;line-height:1.25}
+.v140-lift-deltas span{display:flex;justify-content:space-between;gap:5px}
+.v140-lift-deltas em{font-style:normal;color:#c6c6cf}
+.v140-spark{width:100%;height:26px;margin-top:5px;opacity:.95}
+.v140-spark polyline{fill:none;stroke:currentColor;stroke-width:2.2;vector-effect:non-scaling-stroke}
+.v140-lift.squat{border-color:color-mix(in srgb,#ff2f92 72%,#292933);color:#ff2f92;background:linear-gradient(145deg,rgba(255,47,146,.08),#0b0b12)}
+.v140-lift.bench{border-color:color-mix(in srgb,#5b8cff 72%,#292933);color:#5b8cff;background:linear-gradient(145deg,rgba(91,140,255,.08),#0b0b12)}
+.v140-lift.deadlift{border-color:color-mix(in srgb,#ff325d 72%,#292933);color:#ff325d;background:linear-gradient(145deg,rgba(255,50,93,.08),#0b0b12)}
 #v140-streak-modal,#v140-levelup,#v140-rankup{position:fixed;inset:0;z-index:12000;background:rgba(0,0,0,.88);display:none;align-items:center;justify-content:center;padding:18px}
 .v140-modalbox{width:min(520px,94vw);background:radial-gradient(circle at 50% 0,color-mix(in srgb,var(--accent-purple) 30%,transparent),transparent 45%),#0b0b11;border:1px solid var(--accent-rose);border-radius:18px;padding:20px;box-shadow:0 0 35px color-mix(in srgb,var(--accent-purple) 25%,transparent);text-align:center}
 .v140-levelbig{font-size:2rem;font-weight:1000;color:#fff;text-shadow:0 0 18px var(--accent-purple)}
@@ -793,7 +802,24 @@ header{padding-top:max(8px,env(safe-area-inset-top,0px))}
 #v140-streak-trigger{cursor:pointer}
 .v140-coach-row{padding:10px;background:#111119;border:1px solid #292933;border-radius:11px;margin:7px 0;font-size:.68rem}
 .v140-secret{filter:blur(4px);user-select:none}
-@media(max-width:600px){.v140-sbd-grid{grid-template-columns:1fr}}
+@media(max-width:600px){
+  .v140-sbd-grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:7px}
+  .v140-lift{padding:8px 7px}
+  .v140-lift-head{gap:4px}
+  .v140-lift-icon{font-size:.9rem}
+  .v140-lift b{font-size:.61rem}
+  .v140-lift .big{font-size:.95rem;margin:5px 0 4px}
+  .v140-lift-deltas{font-size:.46rem}
+  .v140-spark{height:22px;margin-top:4px}
+}
+@media(max-width:380px){
+  .v140-sbd-grid{gap:5px}
+  .v140-lift{padding:7px 6px;border-radius:10px}
+  .v140-lift-icon{display:none}
+  .v140-lift b{font-size:.58rem}
+  .v140-lift .big{font-size:.86rem}
+  .v140-lift-deltas{font-size:.42rem}
+}
 </style>
 
 
@@ -817,8 +843,6 @@ header{padding-top:max(8px,env(safe-area-inset-top,0px))}
 }
 #v140-quests .v140-quest{padding:8px!important;margin:5px 0!important}
 #v140-coach .v140-coach-row{padding:8px!important;margin:5px 0!important}
-#v140-sbd .v140-lift{padding:8px!important}
-#v140-sbd .v140-spark{height:34px!important}
 
 /* Visuellement : bloc XP puis quêtes, bloc Power puis SBD/coach */
 #v140-quests{
@@ -1089,34 +1113,63 @@ header .hud-stat.v140-clickable:hover{
 </style>
 
 
-<style id="v15180-ios-bottom-ambiance-polish">
-/* V15.18 — iPhone bottom safe-area + ambiance light.
-   CSS uniquement côté layout ; aucune logique métier modifiée. */
-html.leveling-ios{
-  --ios-nav-content-h:58px;
-}
+<style id="v15181-iphone-pwa-viewport-fix">
+/* V15.18.1 — iPhone PWA viewport propre.
+   Une seule règle de responsabilité :
+   - #app-container remplit le viewport
+   - header absorbe la safe-area du haut
+   - nav absorbe la safe-area du bas
+   - body ne réserve aucune safe-area supplémentaire. */
 
 @media (max-width:760px){
-  html.leveling-ios nav{
-    min-height:calc(var(--ios-nav-content-h) + env(safe-area-inset-bottom,0px))!important;
+  html.leveling-ios.leveling-standalone,
+  html.leveling-ios.leveling-standalone body{
+    width:100%!important;
+    height:100%!important;
+    min-height:100%!important;
+    margin:0!important;
+    padding:0!important;
+    overflow:hidden!important;
+  }
+
+  html.leveling-ios.leveling-standalone #app-container{
+    position:fixed!important;
+    inset:0!important;
+    width:100%!important;
+    height:100dvh!important;
+    min-height:100dvh!important;
+    max-height:100dvh!important;
+    margin:0!important;
+    padding:0!important;
+  }
+
+  html.leveling-ios.leveling-standalone header{
+    padding-top:max(8px,env(safe-area-inset-top,0px))!important;
+  }
+
+  html.leveling-ios.leveling-standalone nav{
+    bottom:0!important;
+    min-height:calc(58px + env(safe-area-inset-bottom,0px))!important;
     padding:6px 0 max(6px,env(safe-area-inset-bottom,0px))!important;
     background:linear-gradient(to top,#08080d 0%,#0b0b11 62%,rgba(5,5,7,.97) 100%)!important;
     box-shadow:0 -6px 20px rgba(0,0,0,.42)!important;
   }
-  html.leveling-ios main{
-    padding-bottom:calc(var(--ios-nav-content-h) + 24px + env(safe-area-inset-bottom,0px))!important;
-    scroll-padding-bottom:calc(var(--ios-nav-content-h) + 24px + env(safe-area-inset-bottom,0px))!important;
+
+  html.leveling-ios.leveling-standalone main{
+    padding-bottom:calc(82px + env(safe-area-inset-bottom,0px))!important;
+    scroll-padding-bottom:calc(82px + env(safe-area-inset-bottom,0px))!important;
   }
-  html.leveling-ios nav .nav-item{
+
+  html.leveling-ios.leveling-standalone nav .nav-item{
     min-height:46px!important;
     padding:3px 3px 4px!important;
     justify-content:center!important;
   }
-  html.leveling-ios nav .nav-icon{line-height:1!important}
-  html.leveling-ios nav .nav-text{margin-top:3px!important}
+  html.leveling-ios.leveling-standalone nav .nav-icon{line-height:1!important}
+  html.leveling-ios.leveling-standalone nav .nav-text{margin-top:3px!important}
 }
 
-/* Les particules iOS sont volontairement plus légères que sur Android. */
+/* Ambiance iOS light conservée telle quelle. */
 html.leveling-ios #ambiance-particles{z-index:8!important;opacity:.72!important}
 html.leveling-ios .amb-p{
   opacity:.48!important;
@@ -4908,7 +4961,9 @@ function renderSbdCoach(){
         const base=key==='deadlift'?t.deadlift:t[key];
         const best=Math.max(Number(base||0),...arr.map(x=>Number(x.value??x.weight??0)),0);
         const d30=delta(arr,30),d90=delta(arr,90);
-        return `<div class="v140-lift"><b>${name}</b><div class="big">${best} kg</div><small>30j ${d30>=0?'+':''}${d30.toFixed(1)} kg · 90j ${d90>=0?'+':''}${d90.toFixed(1)} kg</small>${spark(arr)}</div>`;
+        const icon={squat:'🏋️',bench:'🛏️',deadlift:'🏋️‍♂️'}[key]||'🏋️';
+        const f=v=>`${v>=0?'+':''}${v.toFixed(1)} kg`;
+        return `<div class="v140-lift ${key}"><div class="v140-lift-head"><span class="v140-lift-icon">${icon}</span><b>${name}</b></div><div class="big">${best} kg</div><div class="v140-lift-deltas"><span>30j <em>${f(d30)}</em></span><span>90j <em>${f(d90)}</em></span></div>${spark(arr)}</div>`;
       }).join('')+'</div>';
   }
 
