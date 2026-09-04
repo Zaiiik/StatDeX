@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
 <!-- ============================================================
-     LEVELING-APP V16.0.0 — STABLE
+     LEVELING-APP V16.0.1 — STABLE PATCH
      Base figée après validation réelle PC + Samsung + iPhone/PWA.
 
      Release V16 :
@@ -20,7 +20,7 @@
 
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>LEVELING-APP — Powerbuilding Tracker V16.0.0 STABLE</title>
+    <title>LEVELING-APP — Powerbuilding Tracker V16.0.1 STABLE</title>
     <meta name="theme-color" content="#09090f">
     <meta name="application-name" content="LEVELING-APP">
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -3427,7 +3427,7 @@ const sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_PUBLISHABLE_KEY,{
   auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true,storage:window.localStorage}
 });
 let cloudUser=null,cloudLicensed=false,cloudLoadedOnce=false,cloudSaveTimer=null,suppressCloudSave=false,licenseWatchTimer=null,lastLicenseStatus='UNKNOWN';
-const APP_VERSION='16.0.0';
+const APP_VERSION='16.0.1';
 const ACCOUNT_LOCAL_KEYS=['solo_leveling_user','solo_leveling_smart_refs','solo_leveling_body_hist','solo_leveling_inv','solo_leveling_block','solo_leveling_day','solo_leveling_state','solo_leveling_custom_sets','solo_leveling_history','solo_leveling_active_program','solo_leveling_program_states','solo_leveling_program_custom_sets','solo_leveling_custom_program','leveling_last_local_save','leveling_last_cloud_sync','leveling_v10'];
 function clearLevelingAccountLocalData(){
   try{ACCOUNT_LOCAL_KEYS.forEach(k=>localStorage.removeItem(k));sessionStorage.removeItem('leveling_pending_license')}catch(e){console.warn('Local account cleanup:',e)}
@@ -4821,7 +4821,17 @@ function v1352CleanProfile(){
  <button class="v1352-progress-btn" onclick="v1352OpenProgress('sbd')"><b>🏋️ Charges SBD</b><small>Courbes Squat · Bench · Deadlift</small></button>
  <button class="v1352-progress-btn" onclick="v1352OpenProgress('volume')"><b>📊 Volume & séances</b><small>Activité d'entraînement</small></button>
  <button class="v1352-progress-btn" onclick="v1352OpenProgress('pr')"><b>🔥 Records</b><small>PR et références</small></button>`;
- const rankHub=document.getElementById('v135-rank-hub');(rankHub||p.querySelector('h2'))?.after(hub);
+ /* V16.0.1 — emplacement canonique dès la création.
+    Ces 4 cartes étaient auparavant créées après le hub XP, puis déplacées
+    sous Objectifs seulement lors d'un rendu Profil ultérieur. Résultat :
+    elles apparaissaient en haut après F5 puis en bas après un changement
+    d'onglet. Elles naissent maintenant directement à leur place finale. */
+ const goals=p.querySelector('.goal-card');
+ if(goals) goals.after(hub);
+ else {
+   const rankHub=document.getElementById('v135-rank-hub');
+   (rankHub||p.querySelector('h2'))?.after(hub);
+ }
  /* cache les gros blocs de stats/courbes devenus accessibles par les cartes */
  ['Statistiques du Chasseur','Bilan & Total Hebdo','Records Personnels'].forEach(txt=>{
    [...p.querySelectorAll('h2')].filter(h=>h.textContent.includes(txt)).forEach(h=>{h.classList.add('v1352-profile-clean-hidden');let n=h.nextElementSibling;if(n)n.classList.add('v1352-profile-clean-hidden')})
@@ -4888,7 +4898,18 @@ if(typeof __v1352SendDM==='function')window.sendDirectMessage=async function(){
  if(target&&text){const {data:{session}}=await sb.auth.getSession();if(session)fetch(SUPABASE_URL+'/functions/v1/leveling-push',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+session.access_token},body:JSON.stringify({action:'dm',target_user_id:target,preview:text.slice(0,120)})}).catch(()=>{})}
 };
 
-setTimeout(()=>{v1352CleanProfile();v1352AddNotificationSettings()},1000);
+function v1601BootProfileTools(){
+  v1352CleanProfile();
+  v1352AddNotificationSettings();
+  /* Si les Objectifs ont été créés juste après, l'orchestrateur canonique
+     remet immédiatement le hub à sa position finale, sans attendre un switch. */
+  window.v15ArrangeProfile?.();
+}
+if(document.readyState==='loading'){
+  document.addEventListener('DOMContentLoaded',v1601BootProfileTools,{once:true});
+}else{
+  v1601BootProfileTools();
+}
 </script>
 
 <script id="v1580-progression-ui-clean">
@@ -5902,7 +5923,7 @@ body.v1358-settings-open{overflow:hidden!important}
    Aucun hook finishWorkoutFinal / updateProfileUI / switchTab.
    ============================================================ */
 
-const VERSION='16.0.0';
+const VERSION='16.0.1';
 const RPG_KEY='leveling_v140_rpg';
 
 function loadRpg(){try{return JSON.parse(localStorage.getItem(RPG_KEY)||'{}')||{}}catch(e){return {}}}
