@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>LEVELING-APP — Powerbuilding Tracker V15.6.0 RENDERER LEGACY CLEAN</title>
+    <title>LEVELING-APP — Powerbuilding Tracker V15.6.1 XP HERO FIRST PAINT FIX</title>
     <meta name="theme-color" content="#09090f">
     <meta name="application-name" content="LEVELING-APP">
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -300,12 +300,6 @@
         .slider:before { position: absolute; content: ""; height: 16px; width: 16px; left: 3px; bottom: 3px; background-color: white; transition: .3s; border-radius: 50%; }
         input:checked + .slider { background-color: var(--success); border-color: var(--success); }
         input:checked + .slider:before { transform: translateX(22px); }
-
-        .chart-container { position: relative; width: 100%; height: 180px; margin-top: 10px; background: rgba(0,0,0,0.3); border-radius: 8px; border: 1px solid #333; padding: 10px; }
-        .chart-svg { width: 100%; height: 100%; overflow: visible; }
-        .chart-legend { display: flex; justify-content: center; gap: 15px; font-size: 0.7rem; margin-top: 6px; color: #aaa; }
-        .legend-item { display: flex; align-items: center; gap: 4px; }
-        .legend-dot { width: 8px; height: 8px; border-radius: 50%; }
 
         .modal {
             display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; height: 100dvh;
@@ -1243,18 +1237,6 @@ header .hud-stat.v140-clickable:hover{
                     <div class="rank-hint">🔍 Cliquer pour voir la vitrine des rangs & objectifs</div>
                 </div>
 
-                <h2>Évolution Physique (Suivi Avancé)</h2>
-                <div class="profile-card">
-                    <div style="font-size:0.75rem; color:#aaa; margin-bottom:5px;">Poids (kg) & Masse Grasse (%) au fil des semaines</div>
-                    <div class="chart-container">
-                        <svg class="chart-svg" id="body-evolution-chart" viewBox="0 0 300 130"></svg>
-                    </div>
-                    <div class="chart-legend">
-                        <div class="legend-item"><div class="legend-dot" style="background:var(--success);"></div>Poids (kg)</div>
-                        <div class="legend-item"><div class="legend-dot" style="background:var(--accent-rose);"></div>Body Fat (%)</div>
-                    </div>
-                </div>
-
                 <h2>Statistiques du Chasseur</h2>
                 <div class="profile-card">
                     <div class="stats-grid">
@@ -1472,7 +1454,7 @@ header .hud-stat.v140-clickable:hover{
                         <span class="cloud-badge" id="cloud-live-badge">☁️ CLOUD</span>
                     </div>
                     <div id="cloud-sync-detail" style="margin-top:8px;font-size:.62rem;color:#777;text-align:center">Initialisation du cloud…</div>
-                    <div style="margin-top:5px;font-size:.58rem;color:#555;text-align:center">LEVELING-APP V15.6.0 · Stable</div>
+                    <div style="margin-top:5px;font-size:.58rem;color:#555;text-align:center">LEVELING-APP V15.6.1 · Stable</div>
                     <button class="btn-action" onclick="logoutLeveling()" style="border-color:#ff5555;color:#ff7777">Se déconnecter</button>
                 </div>
 
@@ -1747,7 +1729,7 @@ header .hud-stat.v140-clickable:hover{
             autoProgression: true
         };
 
-        /* V15.6.0 — CANONICAL USER STATE BRIDGE
+        /* V15.6.1 — CANONICAL USER STATE BRIDGE
            `userData` est déclaré avec `let`, donc il n'est pas automatiquement disponible
            via `window.userData`. Plusieurs anciens modules lisaient pourtant window.userData,
            ce qui produisait 0 kg / RECRUE malgré des données correctes.
@@ -2470,99 +2452,7 @@ header .hud-stat.v140-clickable:hover{
             calculateWeeklyTonnage();
         }
 
-        function renderBodyChart() {
-            const svg = document.getElementById('body-evolution-chart');
-            if (!svg || bodyHistory.length === 0) return;
-
-            const width = 300;
-            const height = 130;
-            const padding = 20;
-
-            const weights = bodyHistory.map(b => b.weight);
-            const bfs = bodyHistory.map(b => b.bodyFat);
-
-            const minW = Math.min(...weights) - 1;
-            const maxW = Math.max(...weights) + 1;
-            const minB = Math.min(...bfs) - 1;
-            const maxB = Math.max(...bfs) + 1;
-
-            const getX = (i) => padding + (i / Math.max(1, bodyHistory.length - 1)) * (width - 2 * padding);
-            const getYWeight = (w) => height - padding - ((w - minW) / Math.max(1, maxW - minW)) * (height - 2 * padding);
-            const getYBF = (bf) => height - padding - ((bf - minB) / Math.max(1, maxB - minB)) * (height - 2 * padding);
-
-            let weightPoints = "";
-            let bfPoints = "";
-            let circlesHtml = "";
-
-            bodyHistory.forEach((item, i) => {
-                const x = getX(i);
-                const yW = getYWeight(item.weight);
-                const yB = getYBF(item.bodyFat);
-
-                weightPoints += `${x},${yW} `;
-                bfPoints += `${x},${yB} `;
-
-                circlesHtml += `
-                    <circle cx="${x}" cy="${yW}" r="3.5" fill="#00e676" />
-                    <circle cx="${x}" cy="${yB}" r="3.5" fill="#ff007f" />
-                `;
-            });
-
-            svg.innerHTML = `
-                <polyline fill="none" stroke="#00e676" stroke-width="2" points="${weightPoints}" />
-                <polyline fill="none" stroke="#ff007f" stroke-width="2" points="${bfPoints}" />
-                ${circlesHtml}
-            `;
-        }
-
-        function loadSettingsToInputs() {
-            document.getElementById('set-weight').value = userData.weight;
-            document.getElementById('set-height').value = userData.height;
-            document.getElementById('set-bf').value = userData.bodyFat;
-            document.getElementById('set-squat').value = userData.squat;
-            document.getElementById('set-bench').value = userData.bench;
-            document.getElementById('set-deadlift').value = userData.deadlift;
-            document.getElementById('set-default-block').value = currentBlockIndex;
-            document.getElementById('setting-auto-progression').checked = userData.autoProgression;
-        }
-
-        function saveSettingsData() {
-            const newWeight = parseFloat(document.getElementById('set-weight').value) || userData.weight;
-            const newBF = parseFloat(document.getElementById('set-bf').value) || userData.bodyFat;
-
-            if (newWeight !== userData.weight || newBF !== userData.bodyFat) {
-                userData.weight = newWeight;
-                userData.bodyFat = newBF;
-                bodyHistory.push({
-                    date: `S${bodyHistory.length + 1}`,
-                    weight: newWeight,
-                    bodyFat: newBF
-                });
-            }
-
-            userData.height = parseInt(document.getElementById('set-height').value) || userData.height;
-            userData.squat = parseFloat(document.getElementById('set-squat').value) || userData.squat;
-            userData.bench = parseFloat(document.getElementById('set-bench').value) || userData.bench;
-            userData.deadlift = parseFloat(document.getElementById('set-deadlift').value) || userData.deadlift;
-            userData.sbdUpdatedAt = Date.now();
-           
-            saveToLocalStorage();scheduleCloudSaveImmediate();updateResumeWorkoutBanner();
-            updateProfileUI();
-            renderBodyChart();
-            initWorkoutSystem();
-            alert("Informations sauvegardées & Rang recalculé !");
-            switchTab('profile', document.querySelectorAll('.nav-item')[0]);
-        }
-
-        function calculateWeeklyTonnage() {
-            if (typeof window.LevelingStatsV154 === 'object') {
-                const total = window.LevelingStatsV154.currentBlockVolume();
-                const el = document.getElementById('val-weekly-tonnage');
-                if (el) el.innerText = Math.round(total).toLocaleString('fr-FR') + " kg";
-                return total;
-            }
-            return 0;
-        }
+        function renderBodyChart() { return false; }
 
         function renderHistoryUI() {
             const container = document.getElementById('history-container');
@@ -4598,9 +4488,16 @@ function v135OpenPower(){
   if(modal)modal.style.display='flex';
 }
 function v135RenderRankHub(){
-  const dash=document.getElementById('v10-profile-dashboard');if(!dash)return;
+  const panel=document.getElementById('panel-profile');if(!panel)return;
   let hub=document.getElementById('v135-rank-hub');
-  if(!hub){hub=document.createElement('div');hub.id='v135-rank-hub';hub.className='v135-rank-hub';dash.parentNode.insertBefore(hub,dash)}
+  if(!hub){
+    hub=document.createElement('div');
+    hub.id='v135-rank-hub';
+    hub.className='v135-rank-hub';
+    const quests=document.getElementById('v140-quests');
+    if(quests&&quests.parentNode===panel)panel.insertBefore(hub,quests);
+    else panel.insertBefore(hub,panel.querySelector('.goal-card')||panel.firstElementChild?.nextElementSibling||panel.firstElementChild);
+  }
   const lvl=Number(userData.level||1),xp=v135XpRank(lvl),nx=v135Next(V135_XP_RANKS,xp);
   const total=Number(userData.squat||0)+Number(userData.bench||0)+Number(userData.deadlift||0);
   const bw=Number(userData.weight||0),ratio=bw>0?total/bw:0;
@@ -4631,7 +4528,7 @@ function v135ApplyRankSystems(){
 function v135ProfileNav(){
   const panel=document.getElementById('panel-profile');if(!panel||document.getElementById('v135-profile-nav'))return;
   const nav=document.createElement('div');nav.id='v135-profile-nav';nav.className='v135-profile-nav';
-  nav.innerHTML=`<button onclick="v135OpenXp()">🎮 Niveau & XP</button><button onclick="document.getElementById('v10-quests')?.scrollIntoView({behavior:'smooth',block:'center'})">🎯 Quêtes</button><button onclick="v135OpenPower()">🏋️ Rang Power</button><button onclick="document.getElementById('body-evolution-chart')?.scrollIntoView({behavior:'smooth',block:'center'})">📈 Progression</button><button onclick="document.getElementById('val-weight')?.scrollIntoView({behavior:'smooth',block:'center'})">📊 Stats</button>`;
+  nav.innerHTML=`<button onclick="v135OpenXp()">🎮 Niveau & XP</button><button onclick="document.getElementById('v10-quests')?.scrollIntoView({behavior:'smooth',block:'center'})">🎯 Quêtes</button><button onclick="v135OpenPower()">🏋️ Rang Power</button><button onclick="document.getElementById('v1352-progress-hub')?.scrollIntoView({behavior:'smooth',block:'center'})">📈 Progression</button><button onclick="document.getElementById('val-weight')?.scrollIntoView({behavior:'smooth',block:'center'})">📊 Stats</button>`;
   const h=panel.querySelector('h2');if(h)h.after(nav);
 }
 function v135Settings(){
@@ -4831,7 +4728,7 @@ function v1352CleanProfile(){
  <button class="v1352-progress-btn" onclick="v1352OpenProgress('pr')"><b>🔥 Records</b><small>PR et références</small></button>`;
  const rankHub=document.getElementById('v135-rank-hub');(rankHub||p.querySelector('h2'))?.after(hub);
  /* cache les gros blocs de stats/courbes devenus accessibles par les cartes */
- ['Évolution Physique','Statistiques du Chasseur','Bilan & Total Hebdo','Records Personnels'].forEach(txt=>{
+ ['Statistiques du Chasseur','Bilan & Total Hebdo','Records Personnels'].forEach(txt=>{
    [...p.querySelectorAll('h2')].filter(h=>h.textContent.includes(txt)).forEach(h=>{h.classList.add('v1352-profile-clean-hidden');let n=h.nextElementSibling;if(n)n.classList.add('v1352-profile-clean-hidden')})
  });
  const oldNav=document.getElementById('v135-profile-nav');if(oldNav)oldNav.querySelectorAll('button').forEach(b=>{if(b.textContent.includes('Progression'))b.onclick=()=>hub.scrollIntoView({behavior:'smooth',block:'center'})});
@@ -6817,7 +6714,7 @@ html.leveling-ios nav{-webkit-backdrop-filter:none!important;backdrop-filter:non
 
 
 <style id="v1430-stable-ui-css">
-/* ================= V15.6.0 — STABLE SETTINGS / PROGRESSION =================
+/* ================= V15.6.1 — STABLE SETTINGS / PROGRESSION =================
    Réglages: plus aucune sous-page fixed/overlay. Toutes les rubriques restent
    dans le scroll principal de l'app, donc plus de page coupée ni ouverture en bas. */
 #panel-settings{position:relative!important;overflow:visible!important;min-height:0!important}
@@ -6872,7 +6769,7 @@ body.v1358-settings-open{overflow:hidden!important}
 
 <script id="v1430-stable-core-js">
 (function(){
-  const VERSION='15.6.0';
+  const VERSION='15.6.1';
   const q=s=>document.querySelector(s);
   const qa=s=>[...document.querySelectorAll(s)];
   const localDay=(d=new Date())=>`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
@@ -7019,7 +6916,7 @@ body.v1358-settings-open{overflow:hidden!important}
         if(typeof renderProfileV2==='function'&&document.getElementById('profile-v2-modal')?.classList.contains('show'))renderProfileV2();
         if(typeof window.renderPowerRankLive==='function')window.renderPowerRankLive();
         if(typeof render==='function')render();
-      }catch(e){console.warn('V15.6.0 SBD UI refresh',e)}
+      }catch(e){console.warn('V15.6.1 SBD UI refresh',e)}
       syncProgressionState();refreshRanks();
     },0);
     return r;
@@ -7075,7 +6972,7 @@ body.v1358-settings-open{overflow:hidden!important}
 
 
 <style id="v1440-power-rank-clean-css">
-/* V15.6.0 — RANG POWER PROPRE
+/* V15.6.1 — RANG POWER PROPRE
    Une seule logique: total Squat + Bench + Deadlift en KG.
    Une identité visuelle distincte par rang. */
 
@@ -7282,7 +7179,7 @@ body.v1358-settings-open{overflow:hidden!important}
 
 
 <style id="v1451-power-live-neon-css">
-/* V15.6.0 — les cartes visibles utilisent la même identité néon que la vitrine */
+/* V15.6.1 — les cartes visibles utilisent la même identité néon que la vitrine */
 .rank-card.v1451-live-rank{
   --rank:#ff2d55;
   --rank-rgb:255,45,85;
@@ -7432,7 +7329,7 @@ body.v1358-settings-open{overflow:hidden!important}
         mini.classList.add('v1451-live-rank-mini');
         cssVars(mini,r);
       }
-    }catch(e){console.warn('V15.6.0 live rank render',e)}
+    }catch(e){console.warn('V15.6.1 live rank render',e)}
   };
 
   /* Après toute vraie mise à jour de données/UI */
@@ -7493,7 +7390,7 @@ body.v1358-settings-open{overflow:hidden!important}
     try{
       if(typeof window.renderPowerRankLive==='function')window.renderPowerRankLive();
       if(typeof window.v135RenderRankHub==='function')window.v135RenderRankHub();
-    }catch(e){console.warn('V15.6.0 power refresh',e)}
+    }catch(e){console.warn('V15.6.1 power refresh',e)}
   }
 
   const oldLoad=window.loadFromLocalStorage;
@@ -7531,7 +7428,7 @@ body.v1358-settings-open{overflow:hidden!important}
 
 
 <style id="v1454-xp-neon-css">
-/* V15.6.0 — Rang XP : même qualité visuelle néon que le Rang Power */
+/* V15.6.1 — Rang XP : même qualité visuelle néon que le Rang Power */
 #v135-xp-modal .modal-content{
   width:min(620px,96vw)!important;
   max-width:620px!important;
@@ -7656,7 +7553,7 @@ body.v1358-settings-open{overflow:hidden!important}
           bar.style.width=pct+'%';
         }
       }
-    }catch(e){console.warn('V15.6.0 XP live',e)}
+    }catch(e){console.warn('V15.6.1 XP live',e)}
   };
 
   const oldHub=window.v135RenderRankHub;
@@ -8099,7 +7996,7 @@ body.v1358-settings-open{overflow:hidden!important}
 
 
 <style id="v1501-vitrines-fix-css">
-/* V15.6.0 — vitrines actuelles, ancien dashboard V10 supprimé physiquement */
+/* V15.6.1 — vitrines actuelles, ancien dashboard V10 supprimé physiquement */
 
 /* Le hub ne sert plus qu'au Rang XP en grand. Le Power garde sa vraie carte dédiée plus bas. */
 #v135-rank-hub{
@@ -8182,7 +8079,7 @@ body.v1358-settings-open{overflow:hidden!important}
       /* Rafraîchit seulement les données/visuels, sans recréer d'anciens modules. */
       try{window.renderXpRankLive?.()}catch(e){}
       try{window.renderPowerRankLive?.()}catch(e){}
-    }catch(e){console.warn('V15.6.0 vitrines',e)}
+    }catch(e){console.warn('V15.6.1 vitrines',e)}
   }
 
   window.v1501FixVitrines=fixVitrines;
