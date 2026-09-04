@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>LEVELING-APP — Powerbuilding Tracker V15.6.3 SETTINGS CONTROLLER CLEAN</title>
+    <title>LEVELING-APP — Powerbuilding Tracker V15.7.0 PROGRAM CORE CLEAN</title>
     <meta name="theme-color" content="#09090f">
     <meta name="application-name" content="LEVELING-APP">
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -1136,7 +1136,7 @@ header .hud-stat.v140-clickable:hover{
 </style>
 
 <style id="v1563-settings-controller-clean-css">
-/* V15.6.3 — un seul contrôleur Réglages */
+/* V15.7.0 — un seul contrôleur Réglages */
 #panel-settings.v151-ready > #v135-settings-tabs,
 #panel-settings.v151-ready > .v135-settings-tabs,
 #panel-settings.v151-ready > #v15-settings-tabs,
@@ -1462,7 +1462,7 @@ header .hud-stat.v140-clickable:hover{
                         <span class="cloud-badge" id="cloud-live-badge">☁️ CLOUD</span>
                     </div>
                     <div id="cloud-sync-detail" style="margin-top:8px;font-size:.62rem;color:#777;text-align:center">Initialisation du cloud…</div>
-                    <div style="margin-top:5px;font-size:.58rem;color:#555;text-align:center">LEVELING-APP V15.6.3 · Stable</div>
+                    <div style="margin-top:5px;font-size:.58rem;color:#555;text-align:center">LEVELING-APP V15.7.0 · Stable</div>
                     <button class="btn-action" onclick="logoutLeveling()" style="border-color:#ff5555;color:#ff7777">Se déconnecter</button>
                 </div>
 
@@ -1737,7 +1737,7 @@ header .hud-stat.v140-clickable:hover{
             autoProgression: true
         };
 
-        /* V15.6.3 — CANONICAL USER STATE BRIDGE
+        /* V15.7.0 — CANONICAL USER STATE BRIDGE
            `userData` est déclaré avec `let`, donc il n'est pas automatiquement disponible
            via `window.userData`. Plusieurs anciens modules lisaient pourtant window.userData,
            ce qui produisait 0 kg / RECRUE malgré des données correctes.
@@ -2682,7 +2682,8 @@ header .hud-stat.v140-clickable:hover{
         function resetCycleAndRestartMonday() {
             const modal=document.getElementById('modal-sunday-victory');
             if(modal)modal.style.display='none';
-            if(typeof window.v153ResetCycleNow==='function')return window.v153ResetCycleNow();
+            if(typeof window.LevelingProgramV157==='object')return window.LevelingProgramV157.resetCycle();
+            return false;
         }
 
         // ==================== POWER : PROGRAMMES ====================
@@ -3112,8 +3113,8 @@ header .hud-stat.v140-clickable:hover{
         }
 
         function recordCurrentBlockToHistory() {
-            if (typeof window.LevelingStatsV154 === 'object') {
-                return window.LevelingStatsV154.recordCurrentBlock();
+            if (typeof window.LevelingProgramV157 === 'object') {
+                return window.LevelingProgramV157.recordCurrentBlock();
             }
             return false;
         }
@@ -4544,7 +4545,7 @@ function v135ProfileNav(){
   const h=panel.querySelector('h2');if(h)h.after(nav);
 }
 function v135Settings(){
-  /* V15.6.3: ancien contrôleur Réglages supprimé.
+  /* V15.7.0: ancien contrôleur Réglages supprimé.
      On conserve seulement la transformation source nécessaire au DOM moderne. */
   try{if(typeof initCompactSettings==='function')initCompactSettings()}catch(e){}
   return false;
@@ -5195,160 +5196,6 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
   document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')setTimeout(clean,100)});
 })();
 </script>
-
-
-<script id="v1403-session-cycle-fix-js">
-(function(){
-  const sessionKey=(program=activeProgramKey,block=currentBlockIndex,day=currentDayIndex)=>
-    `leveling_validated_${program}_${block}_${day}`;
-
-  function isValidated(){
-    return localStorage.getItem(sessionKey())==='1';
-  }
-
-  function refreshValidationUI(){
-    const btn=document.getElementById('validate-workout-btn');
-    if(btn && isValidated()){
-      btn.style.display='block';
-      btn.disabled=true;
-      btn.classList.add('v1403-validated');
-      btn.textContent='🔥 SÉANCE VALIDÉE';
-    }else if(btn){
-      btn.disabled=false;
-      btn.classList.remove('v1403-validated');
-      if(btn.textContent.includes('SÉANCE VALIDÉE'))btn.textContent='VALIDER LA SÉANCE';
-    }
-
-    document.querySelectorAll('#day-tabs .day-tab').forEach((tab,i)=>{
-      const k=sessionKey(activeProgramKey,currentBlockIndex,i);
-      tab.classList.toggle('v1403-validated',localStorage.getItem(k)==='1');
-    });
-  }
-
-  /* Avatar : on lit directement la donnée du profil au lieu du vieux carré masqué. */
-  function syncAvatarDirect(){
-    const target=document.querySelector('#v1402-account-btn .v1402-avatar');
-    if(!target)return;
-    const avatar=window.userData?.playerAvatarImage || window.userData?.playerAvatar || '';
-    const str=String(avatar||'');
-    if(str.startsWith('data:image/') || str.startsWith('https://') || str.startsWith('http://')){
-      target.style.backgroundImage=`url("${str.replace(/"/g,'%22')}")`;
-      target.textContent='';
-    }else{
-      target.style.backgroundImage='';
-      target.textContent=str || '👤';
-    }
-  }
-
-  /* Anti-farm XP :
-     une séance déjà validée ne peut plus rappeler toute la chaîne finishWorkoutFinal. */
-  if(typeof window.finishWorkoutFinal==='function' && !window.finishWorkoutFinal.v1403){
-    const oldFinish=window.finishWorkoutFinal;
-    window.finishWorkoutFinal=function(){
-      const key=sessionKey();
-      if(localStorage.getItem(key)==='1'){
-        document.getElementById('modal-rating')?.style.setProperty('display','none');
-        refreshValidationUI();
-        alert('🔥 Cette séance est déjà validée. Aucun XP supplémentaire ne peut être gagné.');
-        return;
-      }
-
-      const beforeProgram=activeProgramKey;
-      const beforeBlock=currentBlockIndex;
-      const beforeDay=currentDayIndex;
-      const beforeCount=Number(userData?.workoutsCompleted||0);
-
-      const r=oldFinish.apply(this,arguments);
-
-      /* La validation n'est enregistrée que si la séance a réellement été comptée. */
-      if(Number(userData?.workoutsCompleted||0)>beforeCount){
-        localStorage.setItem(`leveling_validated_${beforeProgram}_${beforeBlock}_${beforeDay}`,'1');
-
-        /* Bloc 4 terminé le dimanche : on prépare le reset automatique du lundi. */
-        if(beforeBlock===3 && beforeDay===6){
-          localStorage.setItem('leveling_cycle_reset_pending','1');
-          localStorage.setItem('leveling_cycle_completed_date',new Date().toISOString().slice(0,10));
-        }
-      }
-
-      setTimeout(()=>{
-        refreshValidationUI();
-        if(typeof updateResumeWorkoutBanner==='function')updateResumeWorkoutBanner();
-      },80);
-      return r;
-    };
-    window.finishWorkoutFinal.v1403=1;
-  }
-
-  /* Ne pas transformer une séance déjà validée en "séance en cours". */
-  const oldHas=window.hasWorkoutProgress;
-  window.hasWorkoutProgress=function(){
-    if(isValidated())return false;
-    return typeof oldHas==='function'?oldHas():false;
-  };
-
-  /* À chaque rendu des exercices, on remet l'état "validée". */
-  if(typeof window.initWorkoutSystem==='function' && !window.initWorkoutSystem.v1403){
-    const oldInit=window.initWorkoutSystem;
-    window.initWorkoutSystem=function(){
-      const r=oldInit.apply(this,arguments);
-      setTimeout(refreshValidationUI,20);
-      return r;
-    };
-    window.initWorkoutSystem.v1403=1;
-  }
-
-  function mondayAutoReset(){ return false; }
-
-  /* Le bouton manuel de l'ancienne modale ne doit plus effacer le cycle le dimanche.
-     On ferme simplement : le reset se fera lundi automatiquement. */
-  window.v1403PrepareSundayModal=function(){
-    const modal=document.getElementById('modal-sunday-victory');
-    if(!modal)return;
-    const p=modal.querySelector('.subtitle');
-    if(p)p.textContent="Cycle complet ! Tes performances restent enregistrées. Confirme pour repartir immédiatement au Bloc 1.";
-    const info=modal.querySelector('.modal-content > div');
-    if(info)info.textContent="🔥 Nouveau cycle prêt. Historique, XP, PR et statistiques sont conservés.";
-    const btn=modal.querySelector('.btn-action');
-    if(btn){
-      btn.textContent='🔥 DÉMARRER LE NOUVEAU CYCLE';
-      btn.onclick=()=>window.v153ResetCycleNow?.();
-    }
-  };
-
-  function boot(){
-    mondayAutoReset();
-    syncAvatarDirect();
-    refreshValidationUI();
-    v1403PrepareSundayModal();
-    if(typeof updateResumeWorkoutBanner==='function')updateResumeWorkoutBanner();
-  }
-
-  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',()=>setTimeout(boot,2100));
-  else setTimeout(boot,2100);
-
-  const obs=new MutationObserver(()=>{
-    if(obs.v1422Pending)return;
-    obs.v1422Pending=true;
-    setTimeout(()=>{
-      obs.v1422Pending=false;
-      syncAvatarDirect();
-      refreshValidationUI();
-      v1403PrepareSundayModal();
-    },20);
-  });
-  obs.observe(document.getElementById('app-container')||document.documentElement,{subtree:true,childList:true,attributes:true,attributeFilter:['style','class']});
-
-  document.addEventListener('visibilitychange',()=>{
-    if(document.visibilityState==='visible'){
-      mondayAutoReset();
-      setTimeout(boot,80);
-    }
-  });
-})();
-</script>
-
-
 <script id="v1404-status-avatar-fix-js">
 (function(){
   function sessionKey(program=activeProgramKey,block=currentBlockIndex,day=currentDayIndex){
@@ -6708,7 +6555,7 @@ html.leveling-ios nav{-webkit-backdrop-filter:none!important;backdrop-filter:non
 
 
 <style id="v1430-stable-ui-css">
-/* ================= V15.6.3 — STABLE SETTINGS / PROGRESSION =================
+/* ================= V15.7.0 — STABLE SETTINGS / PROGRESSION =================
    Réglages: plus aucune sous-page fixed/overlay. Toutes les rubriques restent
    dans le scroll principal de l'app, donc plus de page coupée ni ouverture en bas. */
 #panel-settings{position:relative!important;overflow:visible!important;min-height:0!important}
@@ -6763,7 +6610,7 @@ body.v1358-settings-open{overflow:hidden!important}
 
 <script id="v1430-stable-core-js">
 (function(){
-  const VERSION='15.6.3';
+  const VERSION='15.7.0';
   const q=s=>document.querySelector(s);
   const qa=s=>[...document.querySelectorAll(s)];
   const localDay=(d=new Date())=>`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
@@ -6910,7 +6757,7 @@ body.v1358-settings-open{overflow:hidden!important}
         if(typeof renderProfileV2==='function'&&document.getElementById('profile-v2-modal')?.classList.contains('show'))renderProfileV2();
         if(typeof window.renderPowerRankLive==='function')window.renderPowerRankLive();
         if(typeof render==='function')render();
-      }catch(e){console.warn('V15.6.3 SBD UI refresh',e)}
+      }catch(e){console.warn('V15.7.0 SBD UI refresh',e)}
       syncProgressionState();refreshRanks();
     },0);
     return r;
@@ -6966,7 +6813,7 @@ body.v1358-settings-open{overflow:hidden!important}
 
 
 <style id="v1440-power-rank-clean-css">
-/* V15.6.3 — RANG POWER PROPRE
+/* V15.7.0 — RANG POWER PROPRE
    Une seule logique: total Squat + Bench + Deadlift en KG.
    Une identité visuelle distincte par rang. */
 
@@ -7173,7 +7020,7 @@ body.v1358-settings-open{overflow:hidden!important}
 
 
 <style id="v1451-power-live-neon-css">
-/* V15.6.3 — les cartes visibles utilisent la même identité néon que la vitrine */
+/* V15.7.0 — les cartes visibles utilisent la même identité néon que la vitrine */
 .rank-card.v1451-live-rank{
   --rank:#ff2d55;
   --rank-rgb:255,45,85;
@@ -7323,7 +7170,7 @@ body.v1358-settings-open{overflow:hidden!important}
         mini.classList.add('v1451-live-rank-mini');
         cssVars(mini,r);
       }
-    }catch(e){console.warn('V15.6.3 live rank render',e)}
+    }catch(e){console.warn('V15.7.0 live rank render',e)}
   };
 
   /* Après toute vraie mise à jour de données/UI */
@@ -7384,7 +7231,7 @@ body.v1358-settings-open{overflow:hidden!important}
     try{
       if(typeof window.renderPowerRankLive==='function')window.renderPowerRankLive();
       if(typeof window.v135RenderRankHub==='function')window.v135RenderRankHub();
-    }catch(e){console.warn('V15.6.3 power refresh',e)}
+    }catch(e){console.warn('V15.7.0 power refresh',e)}
   }
 
   const oldLoad=window.loadFromLocalStorage;
@@ -7422,7 +7269,7 @@ body.v1358-settings-open{overflow:hidden!important}
 
 
 <style id="v1454-xp-neon-css">
-/* V15.6.3 — Rang XP : même qualité visuelle néon que le Rang Power */
+/* V15.7.0 — Rang XP : même qualité visuelle néon que le Rang Power */
 #v135-xp-modal .modal-content{
   width:min(620px,96vw)!important;
   max-width:620px!important;
@@ -7547,7 +7394,7 @@ body.v1358-settings-open{overflow:hidden!important}
           bar.style.width=pct+'%';
         }
       }
-    }catch(e){console.warn('V15.6.3 XP live',e)}
+    }catch(e){console.warn('V15.7.0 XP live',e)}
   };
 
   const oldHub=window.v135RenderRankHub;
@@ -7812,7 +7659,7 @@ body.v1358-settings-open{overflow:hidden!important}
     if(!profile)return;
     const target=q('.compact-setting-body',profile);if(!target)return;
 
-    /* V15.6.3 : Profil devient l'unique page pour compte + progression + sauvegarde. */
+    /* V15.7.0 : Profil devient l'unique page pour compte + progression + sauvegarde. */
     const progression=sections.find(s=>/progression/i.test(settingLabel(s)));
     if(progression&&progression!==profile){
       const body=q('.compact-setting-body',progression);
@@ -8015,7 +7862,7 @@ body.v1358-settings-open{overflow:hidden!important}
 
 
 <style id="v1501-vitrines-fix-css">
-/* V15.6.3 — vitrines actuelles, ancien dashboard V10 supprimé physiquement */
+/* V15.7.0 — vitrines actuelles, ancien dashboard V10 supprimé physiquement */
 
 /* Le hub ne sert plus qu'au Rang XP en grand. Le Power garde sa vraie carte dédiée plus bas. */
 #v135-rank-hub{
@@ -8098,7 +7945,7 @@ body.v1358-settings-open{overflow:hidden!important}
       /* Rafraîchit seulement les données/visuels, sans recréer d'anciens modules. */
       try{window.renderXpRankLive?.()}catch(e){}
       try{window.renderPowerRankLive?.()}catch(e){}
-    }catch(e){console.warn('V15.6.3 vitrines',e)}
+    }catch(e){console.warn('V15.7.0 vitrines',e)}
   }
 
   window.v1501FixVitrines=fixVitrines;
@@ -8506,194 +8353,125 @@ body.v1358-settings-open{overflow:hidden!important}
 })();
 </script>
 
-
-<script id="v1530-program-cycle-pr-fix">
+<script id="v1570-program-core-clean">
 (function(){
 'use strict';
 
-const dayKey=(program,block,day)=>`leveling_validated_${program}_${block}_${day}`;
+/* ============================================================
+   V15.7 PROGRAM CORE
+   Une seule couche pour :
+   - validation séance / anti double-validation
+   - passage Bloc 1 -> 2 -> 3 -> 4
+   - reset nouveau cycle
+   - historique par cycle
+   - volumes séance/bloc
+   - protection PR deload
+   - UI "séance validée"
+   ============================================================ */
 
-function clearValidationKeys(){
-  const rm=[];
-  for(let i=0;i<localStorage.length;i++){
-    const k=localStorage.key(i);
-    if(k&&k.startsWith('leveling_validated_'))rm.push(k);
-  }
-  rm.forEach(k=>localStorage.removeItem(k));
-}
-
-window.v153ResetCycleNow=function(){
-  try{
-    const previousCycle=Math.max(1,Number(localStorage.getItem('leveling_cycle_number')||1));
-    localStorage.setItem('leveling_cycle_number',String(previousCycle+1));
-    /* Reset UNIQUEMENT du cycle. Les records, XP, historique, rangs et stats restent. */
-    workoutState={};
-    customSetData={};
-    if(typeof programWorkoutStates!=='undefined')programWorkoutStates={};
-    if(typeof programCustomSetData!=='undefined')programCustomSetData={};
-    currentBlockIndex=0;
-    currentDayIndex=0;
-    clearValidationKeys();
-    localStorage.removeItem('leveling_cycle_reset_pending');
-    localStorage.removeItem('leveling_cycle_completed_date');
-
-    const modal=document.getElementById('modal-sunday-victory');
-    if(modal)modal.style.display='none';
-
-    saveToLocalStorage();
-    try{window.__levelingV10Import?.(window.__levelingV10Export?.()||{})}catch(e){}
-    try{scheduleCloudSaveImmediate?.()}catch(e){}
-    initWorkoutSystem();
-    updateProfileUI();
-    updateResumeWorkoutBanner?.();
-    alert('🔥 Nouveau cycle démarré ! Retour au Bloc 1 — Lundi. Tes XP, PR, historique et statistiques sont conservés.');
-    return true;
-  }catch(e){
-    console.error('V15.3 reset cycle',e);
-    alert('Impossible de réinitialiser le cycle. Tes données ont été conservées.');
-    return false;
-  }
-};
-
-function showCycleModal(){
-  const modal=document.getElementById('modal-sunday-victory');
-  if(!modal)return;
-  const sub=modal.querySelector('.subtitle');
-  if(sub)sub.textContent='Les 4 blocs sont terminés. Tes performances sont enregistrées.';
-  const info=modal.querySelector('.modal-content > div');
-  if(info)info.textContent='🔥 Confirme pour repartir immédiatement au Bloc 1. XP, PR, historique et statistiques seront conservés.';
-  const btn=modal.querySelector('.btn-action');
-  if(btn){
-    btn.textContent='🔥 DÉMARRER LE NOUVEAU CYCLE';
-    btn.onclick=()=>window.v153ResetCycleNow();
-  }
-  modal.style.display='flex';
-}
-
-function advanceAfterValidatedSession(program,block,day){
-  if(day!==6)return;
-  try{recordCurrentBlockToHistory?.();}catch(e){console.warn('V15.4 block history',e)}
-  if(block<3){
-    /* On avance seulement APRÈS la vraie validation avec étoiles. */
-    currentBlockIndex=block+1;
-    currentDayIndex=0;
-    saveToLocalStorage();
-    initWorkoutSystem();
-    updateProfileUI();
-    alert(`Félicitations ! Bloc ${block+1} validé et enregistré. Passage au Bloc ${block+2}.`);
-  }else{
-    saveToLocalStorage();
-    showCycleModal();
-  }
-}
-
-/* PR : un deload/une variante "Léger" n'est jamais autorisé à créer un record.
-   On compare aussi les familles d'exercices afin qu'un "Squat (Léger)" ne crée
-   pas un nouveau record séparé simplement parce que son nom diffère. */
-function normExercise(name){
-  return String(name||'')
-    .toLowerCase()
-    .normalize('NFD').replace(/[\u0300-\u036f]/g,'')
-    .replace(/\((leger|volume|deload|technique|pause|tempo)[^)]*\)/g,'')
-    .replace(/\b(leger|deload|technique)\b/g,'')
-    .replace(/\s+/g,' ').trim();
-}
-const oldDetect=window.detectAutomaticPR;
-window.detectAutomaticPR=function(exIndex,setIndex){
-  const ex=getPrograms()?.[currentBlockIndex]?.[currentDayIndex]?.exercises?.[exIndex];
-  const name=String(ex?.name||'');
-  if(currentBlockIndex===3 || /\b(deload|léger|leger)\b/i.test(name))return false;
-
-  /* Récupère le meilleur record d'une même famille sous le nom courant,
-     pour empêcher un faux "premier PR" dû à un suffixe. */
-  try{
-    ensureV127Data?.();
-    const canonical=normExercise(name);
-    const candidates=Object.entries(userData.prRecords||{}).filter(([k])=>normExercise(k)===canonical);
-    if(candidates.length){
-      const best=candidates.reduce((a,[,v])=>({
-        weight:Math.max(Number(a.weight||0),Number(v.weight||0)),
-        repsAtWeight:Math.max(Number(a.repsAtWeight||0),Number(v.repsAtWeight||0)),
-        e1rm:Math.max(Number(a.e1rm||0),Number(v.e1rm||0)),
-        volume:Math.max(Number(a.volume||0),Number(v.volume||0))
-      }),{weight:0,repsAtWeight:0,e1rm:0,volume:0});
-      userData.prRecords[name]=Object.assign({},userData.prRecords[name]||{},best);
-    }
-  }catch(e){}
-  return oldDetect?.apply(this,arguments);
-};
-
-/* La validation finale est désormais l'unique porte d'entrée du passage bloc/cycle. */
-const prevFinish=window.finishWorkoutFinal;
-if(typeof prevFinish==='function'&&!prevFinish.v1530){
-  window.finishWorkoutFinal=function(){
-    const program=activeProgramKey,block=currentBlockIndex,day=currentDayIndex;
-    const before=Number(userData?.workoutsCompleted||0);
-    const r=prevFinish.apply(this,arguments);
-    if(Number(userData?.workoutsCompleted||0)>before){
-      localStorage.setItem(dayKey(program,block,day),'1');
-      setTimeout(()=>advanceAfterValidatedSession(program,block,day),120);
-    }
-    return r;
-  };
-  window.finishWorkoutFinal.v1530=1;
-}
-
-/* Nettoie les anciens flags "reset lundi" qui auraient pu rester après les tests. */
-localStorage.removeItem('leveling_cycle_reset_pending');
-localStorage.removeItem('leveling_cycle_completed_date');
-
-})();
-</script>
-
-
-<script id="v1540-history-stats-core">
-(function(){
-'use strict';
-
+const WEEK=['Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi','Dimanche'];
 const isoDay=(d=new Date())=>{
   const y=d.getFullYear(),m=String(d.getMonth()+1).padStart(2,'0'),day=String(d.getDate()).padStart(2,'0');
   return `${y}-${m}-${day}`;
 };
 const cycleNo=()=>Math.max(1,Number(localStorage.getItem('leveling_cycle_number')||1));
+const validationKey=(program=activeProgramKey,block=currentBlockIndex,day=currentDayIndex)=>
+  `leveling_validated_${program}_${block}_${day}`;
 
-function selectedName(exIdx, fallback, dayIdx=currentDayIndex){
-  try{return typeof v1351SelectedExerciseName==='function'?v1351SelectedExerciseName(exIdx,fallback,dayIdx):fallback}catch(e){return fallback}
+function isValidated(program=activeProgramKey,block=currentBlockIndex,day=currentDayIndex){
+  return localStorage.getItem(validationKey(program,block,day))==='1';
+}
+
+function clearValidationKeys(){
+  const keys=[];
+  for(let i=0;i<localStorage.length;i++){
+    const k=localStorage.key(i);
+    if(k&&k.startsWith('leveling_validated_'))keys.push(k);
+  }
+  keys.forEach(k=>localStorage.removeItem(k));
+}
+
+function refreshValidationUI(){
+  const btn=document.getElementById('validate-workout-btn');
+  if(btn){
+    const done=isValidated();
+    btn.disabled=done;
+    btn.classList.toggle('v1403-validated',done);
+    if(done){
+      btn.style.display='block';
+      btn.textContent='🔥 SÉANCE VALIDÉE';
+    }else if(btn.textContent.includes('SÉANCE VALIDÉE')){
+      btn.textContent='VALIDER LA SÉANCE';
+    }
+  }
+  document.querySelectorAll('#day-tabs .day-tab').forEach((tab,i)=>{
+    tab.classList.toggle('v1403-validated',isValidated(activeProgramKey,currentBlockIndex,i));
+  });
+}
+
+function syncAvatar(){
+  const target=document.querySelector('#v1402-account-btn .v1402-avatar');
+  if(!target)return;
+  const avatar=userData?.playerAvatarImage || userData?.playerAvatar || '';
+  const s=String(avatar||'');
+  if(/^data:image\/|^https?:\/\//i.test(s)){
+    target.style.backgroundImage=`url("${s.replace(/"/g,'%22')}")`;
+    target.textContent='';
+  }else{
+    target.style.backgroundImage='';
+    target.textContent=s||'👤';
+  }
+}
+
+function selectedName(exIdx,fallback,dayIdx=currentDayIndex){
+  try{return typeof v1351SelectedExerciseName==='function'?v1351SelectedExerciseName(exIdx,fallback,dayIdx):fallback}
+  catch(e){return fallback}
 }
 function isBodyweight(name){
-  try{return typeof v1351IsBodyweight==='function'&&v1351IsBodyweight(name)}catch(e){return false}
+  try{return typeof v1351IsBodyweight==='function'&&v1351IsBodyweight(name)}
+  catch(e){return false}
 }
 function setValues(block,day,exIdx,setIdx){
   const ex=getPrograms()?.[block]?.[day]?.exercises?.[exIdx];
   if(!ex)return {reps:0,weight:0,volume:0,name:''};
+
   let reps=Number(ex.defaultReps||0),weight=Number(ex.defaultWeight||0);
   const name=selectedName(exIdx,ex.name,day);
   const custom=customSetData?.[block]?.[day]?.[exIdx]?.[setIdx];
+
   if(custom){
     if(custom.reps!==undefined&&custom.reps!==null)reps=Number(custom.reps||0);
     if(custom.weight!==undefined&&custom.weight!==null)weight=Number(custom.weight||0);
   }
-  /* Smart refs are defaults only when the user has not entered a set override. */
+
   const sbd=/^(Développé Couché|Soulevé de Terre|Squat|Squat \(Volume\)|Spoto Press)$/i.test(ex.name);
   if(!custom && userData.autoProgression && !sbd && smartHypertrophyRefs?.[ex.name]){
     reps=Number(smartHypertrophyRefs[ex.name].reps??reps);
     weight=Number(smartHypertrophyRefs[ex.name].weight??weight);
   }
-  const volume=isBodyweight(name)?0:Math.max(0,reps)*Math.max(0,weight);
-  return {reps,weight,volume,name};
+
+  return {
+    reps,weight,name,
+    volume:isBodyweight(name)?0:Math.max(0,reps)*Math.max(0,weight)
+  };
 }
-function setDone(block,day,exIdx,setIdx){return !!workoutState?.[block]?.[day]?.[exIdx]?.[setIdx]}
+function setDone(block,day,ei,si){return !!workoutState?.[block]?.[day]?.[ei]?.[si]}
 function dayVolume(block,day){
-  const p=getPrograms()?.[block]?.[day];if(!p)return 0;
+  const p=getPrograms()?.[block]?.[day];
+  if(!p)return 0;
   let total=0;
-  p.exercises.forEach((ex,ei)=>{for(let si=0;si<ex.sets;si++)if(setDone(block,day,ei,si))total+=setValues(block,day,ei,si).volume});
+  p.exercises.forEach((ex,ei)=>{
+    for(let si=0;si<ex.sets;si++){
+      if(setDone(block,day,ei,si))total+=setValues(block,day,ei,si).volume;
+    }
+  });
   return total;
 }
 function blockVolume(block=currentBlockIndex){
-  const p=getPrograms()?.[block];if(!p)return 0;
+  const p=getPrograms()?.[block];
+  if(!p)return 0;
   return p.reduce((sum,_,di)=>sum+dayVolume(block,di),0);
 }
-function currentSessionVolume(block=currentBlockIndex,day=currentDayIndex){return dayVolume(block,day)}
 
 function normalizeHistory(){
   if(!Array.isArray(workoutHistory))workoutHistory=[];
@@ -8714,42 +8492,59 @@ function normalizeHistory(){
 function recordCurrentBlock(){
   normalizeHistory();
   const block=currentBlockIndex;
-  const prog=getPrograms()?.[block];if(!prog)return false;
+  const prog=getPrograms()?.[block];
+  if(!prog)return false;
+
   const cycle=cycleNo();
   const id=`cycle-${cycle}-block-${block}`;
   const dayTonnes={};
   prog.forEach((d,di)=>dayTonnes[d.dayName]=Math.round(dayVolume(block,di)));
   const totalTonnage=Object.values(dayTonnes).reduce((s,n)=>s+Number(n||0),0);
+
   const entry={
     id,cycle,program:activeProgramKey,blockIndex:block,
-    blockName:(activeProgramKey==='powerbuilding'?(blocksData?.[block]?.name||`Bloc ${block+1}`):(getProgramMeta(activeProgramKey)?.title||'Programme')),
-    totalTonnage,dayTonnes,date:new Date().toLocaleDateString('fr-FR'),isoDate:isoDay(),completedAt:new Date().toISOString()
+    blockName:activeProgramKey==='powerbuilding'
+      ? (blocksData?.[block]?.name||`Bloc ${block+1}`)
+      : (getProgramMeta(activeProgramKey)?.title||'Programme'),
+    totalTonnage,dayTonnes,
+    date:new Date().toLocaleDateString('fr-FR'),
+    isoDate:isoDay(),
+    completedAt:new Date().toISOString()
   };
+
   const idx=workoutHistory.findIndex(h=>h?.id===id);
-  if(idx>=0)workoutHistory[idx]=entry;else workoutHistory.push(entry);
+  if(idx>=0)workoutHistory[idx]=entry;
+  else workoutHistory.push(entry);
+
   saveToLocalStorage();
-  try{renderHistoryUI()}catch(e){}
+  try{renderHistoryUI?.()}catch(e){}
   try{window.v11RenderReport?.()}catch(e){}
   return true;
 }
 
-function patchLatestSession(program,block,day){
+function patchSession(program,block,day){
   try{
-    const v=window.__levelingV10Export?.();if(!v)return;
+    const v=window.__levelingV10Export?.();
+    if(!v)return;
     v.sessions=Array.isArray(v.sessions)?v.sessions:[];
     const today=isoDay();
-    const volume=Math.round(currentSessionVolume(block,day));
-    /* Find today's just-created session first; fallback create it. */
-    let s=[...v.sessions].reverse().find(x=>x&&x.date===today&&x.program===program&&Number(x.block)===block&&Number(x.day)===day);
+    const volume=Math.round(dayVolume(block,day));
+    let s=[...v.sessions].reverse().find(x=>
+      x&&x.date===today&&x.program===program&&Number(x.block)===block&&Number(x.day)===day
+    );
     if(!s){
-      s={sessionKey:[today,program,block,day].join('|'),date:today,program,block,day,rating:Number(selectedRating||0)};
+      s={
+        sessionKey:[today,program,block,day].join('|'),
+        date:today,program,block,day,
+        rating:Number(selectedRating||0)
+      };
       v.sessions.push(s);
     }
     s.volume=volume;
     s.cycle=cycleNo();
     s.completedAt=s.completedAt||new Date().toISOString();
     window.__levelingV10Import?.(v);
-  }catch(e){console.warn('V15.4 session stats',e)}
+  }catch(e){console.warn('V15.7 session stats',e)}
 }
 
 function allSessions(){
@@ -8757,25 +8552,192 @@ function allSessions(){
     const v=window.__levelingV10Export?.()||{};
     return (Array.isArray(v.sessions)?v.sessions:[]).map((s,i)=>({
       id:s.sessionKey||`session-${i}`,
-      name:getPrograms()?.[Number(s.block)]?.[Number(s.day)]?.title || `Séance ${Number(s.day)+1}`,
-      date:s.date||'',isoDate:s.date||'',tonnage:Number(s.volume||0),rating:Number(s.rating||0),cycle:Number(s.cycle||1),program:s.program||''
+      name:getPrograms()?.[Number(s.block)]?.[Number(s.day)]?.title||`Séance ${Number(s.day)+1}`,
+      date:s.date||'',isoDate:s.date||'',
+      tonnage:Number(s.volume||0),rating:Number(s.rating||0),
+      cycle:Number(s.cycle||1),program:s.program||''
     }));
   }catch(e){return []}
 }
+function totalValidatedVolume(){return allSessions().reduce((s,x)=>s+Number(x.tonnage||0),0)}
 
-function totalValidatedVolume(){return allSessions().reduce((sum,s)=>sum+Number(s.tonnage||0),0)}
+function refreshStats(){
+  try{
+    const current=blockVolume();
+    const a=document.getElementById('val-weekly-tonnage');
+    const b=document.getElementById('today-volume');
+    const c=document.getElementById('v10-volume');
+    if(a)a.textContent=Math.round(current).toLocaleString('fr-FR')+' kg';
+    if(b)b.textContent=Math.round(current).toLocaleString('fr-FR')+' kg';
+    if(c)c.textContent=Math.round(totalValidatedVolume()).toLocaleString('fr-FR')+' kg';
+    window.v11RenderReport?.();
+  }catch(e){}
+}
 
-window.LevelingStatsV154={
-  setValues,dayVolume,currentSessionVolume,currentBlockVolume:blockVolume,
-  recordCurrentBlock,allSessions,totalValidatedVolume,cycleNo,normalizeHistory
-};
+function showCycleModal(){
+  const modal=document.getElementById('modal-sunday-victory');
+  if(!modal)return;
+  const sub=modal.querySelector('.subtitle');
+  const info=modal.querySelector('.modal-content > div');
+  const btn=modal.querySelector('.btn-action');
+  if(sub)sub.textContent='Les 4 blocs sont terminés. Tes performances sont enregistrées.';
+  if(info)info.textContent='🔥 Confirme pour repartir immédiatement au Bloc 1. XP, PR, historique et statistiques seront conservés.';
+  if(btn){
+    btn.textContent='🔥 DÉMARRER LE NOUVEAU CYCLE';
+    btn.onclick=resetCycle;
+  }
+  modal.style.display='flex';
+}
 
-/* Reports now use validated SESSIONS, not one entry per block. */
+function resetCycle(){
+  try{
+    localStorage.setItem('leveling_cycle_number',String(cycleNo()+1));
+    workoutState={};
+    customSetData={};
+    if(typeof programWorkoutStates!=='undefined')programWorkoutStates={};
+    if(typeof programCustomSetData!=='undefined')programCustomSetData={};
+    currentBlockIndex=0;
+    currentDayIndex=0;
+    clearValidationKeys();
+    localStorage.removeItem('leveling_cycle_reset_pending');
+    localStorage.removeItem('leveling_cycle_completed_date');
+
+    const modal=document.getElementById('modal-sunday-victory');
+    if(modal)modal.style.display='none';
+
+    saveToLocalStorage();
+    try{scheduleCloudSaveImmediate?.()}catch(e){}
+    initWorkoutSystem();
+    updateProfileUI();
+    updateResumeWorkoutBanner?.();
+    refreshValidationUI();
+
+    alert('🔥 Nouveau cycle démarré ! Retour au Bloc 1 — Lundi. XP, PR, historique et statistiques sont conservés.');
+    return true;
+  }catch(e){
+    console.error('V15.7 reset cycle',e);
+    alert('Impossible de réinitialiser le cycle. Tes données ont été conservées.');
+    return false;
+  }
+}
+
+function advanceAfterValidation(block,day){
+  if(day!==6)return;
+  recordCurrentBlock();
+
+  if(block<3){
+    currentBlockIndex=block+1;
+    currentDayIndex=0;
+    saveToLocalStorage();
+    initWorkoutSystem();
+    updateProfileUI();
+    refreshValidationUI();
+    alert(`Félicitations ! Bloc ${block+1} validé et enregistré. Passage au Bloc ${block+2}.`);
+  }else{
+    saveToLocalStorage();
+    showCycleModal();
+  }
+}
+
+/* PR deload : un Bloc 4 ou une variante explicitement légère ne crée jamais de PR. */
+function normExercise(name){
+  return String(name||'')
+    .toLowerCase()
+    .normalize('NFD').replace(/[\u0300-\u036f]/g,'')
+    .replace(/\((leger|volume|deload|technique|pause|tempo)[^)]*\)/g,'')
+    .replace(/\b(leger|deload|technique)\b/g,'')
+    .replace(/\s+/g,' ').trim();
+}
+const oldDetect=window.detectAutomaticPR;
+if(typeof oldDetect==='function'&&!oldDetect.v1570){
+  window.detectAutomaticPR=function(exIndex,setIndex){
+    const ex=getPrograms()?.[currentBlockIndex]?.[currentDayIndex]?.exercises?.[exIndex];
+    const name=String(ex?.name||'');
+    if(currentBlockIndex===3 || /\b(deload|léger|leger)\b/i.test(name))return false;
+
+    try{
+      ensureV127Data?.();
+      const canonical=normExercise(name);
+      const candidates=Object.entries(userData.prRecords||{}).filter(([k])=>normExercise(k)===canonical);
+      if(candidates.length){
+        const best=candidates.reduce((a,[,v])=>({
+          weight:Math.max(Number(a.weight||0),Number(v.weight||0)),
+          repsAtWeight:Math.max(Number(a.repsAtWeight||0),Number(v.repsAtWeight||0)),
+          e1rm:Math.max(Number(a.e1rm||0),Number(v.e1rm||0)),
+          volume:Math.max(Number(a.volume||0),Number(v.volume||0))
+        }),{weight:0,repsAtWeight:0,e1rm:0,volume:0});
+        userData.prRecords[name]=Object.assign({},userData.prRecords[name]||{},best);
+      }
+    }catch(e){}
+    return oldDetect.apply(this,arguments);
+  };
+  window.detectAutomaticPR.v1570=1;
+}
+
+/* Anti-double validation + stats + historique + passage de bloc en une seule couche. */
+const previousFinish=window.finishWorkoutFinal;
+if(typeof previousFinish==='function'&&!previousFinish.v1570){
+  window.finishWorkoutFinal=function(){
+    const program=activeProgramKey,block=currentBlockIndex,day=currentDayIndex;
+    const key=validationKey(program,block,day);
+
+    if(localStorage.getItem(key)==='1'){
+      document.getElementById('modal-rating')?.style.setProperty('display','none');
+      refreshValidationUI();
+      alert('🔥 Cette séance est déjà validée. Aucun XP supplémentaire ne peut être gagné.');
+      return false;
+    }
+
+    const before=Number(userData?.workoutsCompleted||0);
+    const r=previousFinish.apply(this,arguments);
+
+    if(Number(userData?.workoutsCompleted||0)>before){
+      localStorage.setItem(key,'1');
+      patchSession(program,block,day);
+
+      setTimeout(()=>{
+        refreshValidationUI();
+        refreshStats();
+        updateResumeWorkoutBanner?.();
+        advanceAfterValidation(block,day);
+        try{scheduleCloudSaveImmediate?.()}catch(e){}
+      },120);
+    }
+    return r;
+  };
+  window.finishWorkoutFinal.v1570=1;
+}
+
+/* Séance déjà validée != séance en cours. */
+const previousHas=window.hasWorkoutProgress;
+if(typeof previousHas==='function'&&!previousHas.v1570){
+  window.hasWorkoutProgress=function(){
+    if(isValidated())return false;
+    return previousHas.apply(this,arguments);
+  };
+  window.hasWorkoutProgress.v1570=1;
+}
+
+const previousInit=window.initWorkoutSystem;
+if(typeof previousInit==='function'&&!previousInit.v1570){
+  window.initWorkoutSystem=function(){
+    const r=previousInit.apply(this,arguments);
+    setTimeout(refreshValidationUI,20);
+    return r;
+  };
+  window.initWorkoutSystem.v1570=1;
+}
+
+/* Compatibilité rapport V11. */
 window.v11GetWorkoutEntries=function(){
   const sessions=allSessions();
   if(sessions.length)return sessions;
   normalizeHistory();
-  return (workoutHistory||[]).map((h,i)=>({id:h.id||i,name:h.blockName||'Bloc',date:h.isoDate||h.date||'',isoDate:h.isoDate||'',tonnage:Number(h.totalTonnage||0),days:h.dayTonnes||{}}));
+  return (workoutHistory||[]).map((h,i)=>({
+    id:h.id||i,name:h.blockName||'Bloc',
+    date:h.isoDate||h.date||'',isoDate:h.isoDate||'',
+    tonnage:Number(h.totalTonnage||0),days:h.dayTonnes||{}
+  }));
 };
 window.v11DateMs=function(v){
   if(!v)return 0;
@@ -8784,34 +8746,29 @@ window.v11DateMs=function(v){
   return Number.isNaN(d.getTime())?0:d.getTime();
 };
 
-/* Keep visible volume stats aligned with the same source. */
-function refreshStats(){
-  try{
-    const current=blockVolume();
-    const a=document.getElementById('val-weekly-tonnage');if(a)a.textContent=Math.round(current).toLocaleString('fr-FR')+' kg';
-    const b=document.getElementById('today-volume');if(b)b.textContent=Math.round(current).toLocaleString('fr-FR')+' kg';
-    const c=document.getElementById('v10-volume');if(c)c.textContent=Math.round(totalValidatedVolume()).toLocaleString('fr-FR')+' kg';
-    window.v11RenderReport?.();
-  }catch(e){}
-}
+/* API canonique + alias de compatibilité temporaire pour les quelques anciens appels restants. */
+window.LevelingProgramV157={
+  isValidated,refreshValidationUI,
+  setValues,dayVolume,currentBlockVolume:blockVolume,
+  recordCurrentBlock,allSessions,totalValidatedVolume,
+  cycleNo,resetCycle,refreshStats
+};
+window.LevelingStatsV154=window.LevelingProgramV157;
+window.v153ResetCycleNow=resetCycle;
 
-const prevFinish=window.finishWorkoutFinal;
-if(typeof prevFinish==='function'&&!prevFinish.v1540){
-  window.finishWorkoutFinal=function(){
-    const program=activeProgramKey,block=currentBlockIndex,day=currentDayIndex;
-    const before=Number(userData?.workoutsCompleted||0);
-    const r=prevFinish.apply(this,arguments);
-    if(Number(userData?.workoutsCompleted||0)>before){
-      setTimeout(()=>{patchLatestSession(program,block,day);refreshStats();},180);
-    }
-    return r;
-  };
-  window.finishWorkoutFinal.v1540=1;
+function boot(){
+  normalizeHistory();
+  syncAvatar();
+  refreshValidationUI();
+  refreshStats();
 }
+if(document.readyState==='loading'){
+  document.addEventListener('DOMContentLoaded',()=>setTimeout(boot,350),{once:true});
+}else setTimeout(boot,120);
 
-normalizeHistory();
-setTimeout(refreshStats,250);
-document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')setTimeout(refreshStats,80)});
+document.addEventListener('visibilitychange',()=>{
+  if(document.visibilityState==='visible')setTimeout(boot,80);
+});
 })();
 </script>
 
@@ -8819,10 +8776,10 @@ document.addEventListener('visibilitychange',()=>{if(document.visibilityState===
 (function(){
 'use strict';
 function recover(){
-  try{loadFromLocalStorage?.()}catch(e){console.warn('V15.6.3 load local',e)}
-  try{updateProfileUI?.()}catch(e){console.warn('V15.6.3 profile',e)}
-  try{renderHistoryUI?.()}catch(e){console.warn('V15.6.3 history',e)}
-  try{initWorkoutSystem?.()}catch(e){console.warn('V15.6.3 workout',e)}
+  try{loadFromLocalStorage?.()}catch(e){console.warn('V15.7.0 load local',e)}
+  try{updateProfileUI?.()}catch(e){console.warn('V15.7.0 profile',e)}
+  try{renderHistoryUI?.()}catch(e){console.warn('V15.7.0 history',e)}
+  try{initWorkoutSystem?.()}catch(e){console.warn('V15.7.0 workout',e)}
   try{renderPowerHome?.()}catch(e){}
   try{window.v135RenderRankHub?.()}catch(e){}
   try{window.renderXpRankLive?.()}catch(e){}
@@ -8832,7 +8789,7 @@ function recover(){
     if(document.getElementById('panel-settings')?.classList.contains('active')){
       window.v15BuildSettings?.();
     }
-  }catch(e){console.warn('V15.6.3 settings',e)}
+  }catch(e){console.warn('V15.7.0 settings',e)}
 }
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',()=>setTimeout(recover,500),{once:true});
 else setTimeout(recover,250);
