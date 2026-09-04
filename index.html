@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>LEVELING-APP — Powerbuilding Tracker V15.0.0 CLEAN CORE</title>
+    <title>LEVELING-APP — Powerbuilding Tracker V15.0.1 VITRINES FIX</title>
     <meta name="theme-color" content="#09090f">
     <meta name="application-name" content="LEVELING-APP">
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -1512,7 +1512,7 @@ header .hud-stat.v140-clickable:hover{
                         <span class="cloud-badge" id="cloud-live-badge">☁️ CLOUD</span>
                     </div>
                     <div id="cloud-sync-detail" style="margin-top:8px;font-size:.62rem;color:#777;text-align:center">Initialisation du cloud…</div>
-                    <div style="margin-top:5px;font-size:.58rem;color:#555;text-align:center">LEVELING-APP V15.0.0 · Stable</div>
+                    <div style="margin-top:5px;font-size:.58rem;color:#555;text-align:center">LEVELING-APP V15.0.1 · Stable</div>
                     <button class="btn-action" onclick="logoutLeveling()" style="border-color:#ff5555;color:#ff7777">Se déconnecter</button>
                 </div>
 
@@ -1787,7 +1787,7 @@ header .hud-stat.v140-clickable:hover{
             autoProgression: true
         };
 
-        /* V15.0.0 — CANONICAL USER STATE BRIDGE
+        /* V15.0.1 — CANONICAL USER STATE BRIDGE
            `userData` est déclaré avec `let`, donc il n'est pas automatiquement disponible
            via `window.userData`. Plusieurs anciens modules lisaient pourtant window.userData,
            ce qui produisait 0 kg / RECRUE malgré des données correctes.
@@ -7079,7 +7079,7 @@ html.leveling-ios nav{-webkit-backdrop-filter:none!important;backdrop-filter:non
 
 
 <style id="v1430-stable-ui-css">
-/* ================= V15.0.0 — STABLE SETTINGS / PROGRESSION =================
+/* ================= V15.0.1 — STABLE SETTINGS / PROGRESSION =================
    Réglages: plus aucune sous-page fixed/overlay. Toutes les rubriques restent
    dans le scroll principal de l'app, donc plus de page coupée ni ouverture en bas. */
 #panel-settings{position:relative!important;overflow:visible!important;min-height:0!important}
@@ -7134,7 +7134,7 @@ body.v1358-settings-open{overflow:hidden!important}
 
 <script id="v1430-stable-core-js">
 (function(){
-  const VERSION='15.0.0';
+  const VERSION='15.0.1';
   const q=s=>document.querySelector(s);
   const qa=s=>[...document.querySelectorAll(s)];
   const localDay=(d=new Date())=>`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
@@ -7281,7 +7281,7 @@ body.v1358-settings-open{overflow:hidden!important}
         if(typeof renderProfileV2==='function'&&document.getElementById('profile-v2-modal')?.classList.contains('show'))renderProfileV2();
         if(typeof window.renderPowerRankLive==='function')window.renderPowerRankLive();
         if(typeof render==='function')render();
-      }catch(e){console.warn('V15.0.0 SBD UI refresh',e)}
+      }catch(e){console.warn('V15.0.1 SBD UI refresh',e)}
       syncProgressionState();refreshRanks();
     },0);
     return r;
@@ -7337,7 +7337,7 @@ body.v1358-settings-open{overflow:hidden!important}
 
 
 <style id="v1440-power-rank-clean-css">
-/* V15.0.0 — RANG POWER PROPRE
+/* V15.0.1 — RANG POWER PROPRE
    Une seule logique: total Squat + Bench + Deadlift en KG.
    Une identité visuelle distincte par rang. */
 
@@ -7544,7 +7544,7 @@ body.v1358-settings-open{overflow:hidden!important}
 
 
 <style id="v1451-power-live-neon-css">
-/* V15.0.0 — les cartes visibles utilisent la même identité néon que la vitrine */
+/* V15.0.1 — les cartes visibles utilisent la même identité néon que la vitrine */
 .rank-card.v1451-live-rank{
   --rank:#ff2d55;
   --rank-rgb:255,45,85;
@@ -7694,7 +7694,7 @@ body.v1358-settings-open{overflow:hidden!important}
         mini.classList.add('v1451-live-rank-mini');
         cssVars(mini,r);
       }
-    }catch(e){console.warn('V15.0.0 live rank render',e)}
+    }catch(e){console.warn('V15.0.1 live rank render',e)}
   };
 
   /* Après toute vraie mise à jour de données/UI */
@@ -7755,7 +7755,7 @@ body.v1358-settings-open{overflow:hidden!important}
     try{
       if(typeof window.renderPowerRankLive==='function')window.renderPowerRankLive();
       if(typeof window.v135RenderRankHub==='function')window.v135RenderRankHub();
-    }catch(e){console.warn('V15.0.0 power refresh',e)}
+    }catch(e){console.warn('V15.0.1 power refresh',e)}
   }
 
   const oldLoad=window.loadFromLocalStorage;
@@ -7793,7 +7793,7 @@ body.v1358-settings-open{overflow:hidden!important}
 
 
 <style id="v1454-xp-neon-css">
-/* V15.0.0 — Rang XP : même qualité visuelle néon que le Rang Power */
+/* V15.0.1 — Rang XP : même qualité visuelle néon que le Rang Power */
 #v135-xp-modal .modal-content{
   width:min(620px,96vw)!important;
   max-width:620px!important;
@@ -7918,7 +7918,7 @@ body.v1358-settings-open{overflow:hidden!important}
           bar.style.width=pct+'%';
         }
       }
-    }catch(e){console.warn('V15.0.0 XP live',e)}
+    }catch(e){console.warn('V15.0.1 XP live',e)}
   };
 
   const oldHub=window.v135RenderRankHub;
@@ -8208,6 +8208,122 @@ body.v1358-settings-open{overflow:inherit!important}
   }else setTimeout(boot,30);
 
   window.addEventListener('pageshow',()=>setTimeout(boot,40));
+})();
+</script>
+
+
+<style id="v1501-vitrines-fix-css">
+/* V15.0.1 — restaure la présentation propre des vitrines sans réactiver les vieux contrôleurs */
+
+/* Ancienne carte PLAYER STATUS = doublon historique V10, désormais masquée. */
+#v10-profile-dashboard{display:none!important}
+
+/* Le hub ne sert plus qu'au Rang XP en grand. Le Power garde sa vraie carte dédiée plus bas. */
+#v135-rank-hub{
+  display:block!important;
+  margin:10px 0!important;
+}
+#v135-rank-hub .v135-rank-card.power{
+  display:none!important;
+}
+
+/* Rang XP = vraie grande vitrine, comme avant la refonte */
+#v135-rank-hub .v135-rank-card.xp{
+  width:100%!important;
+  min-height:118px!important;
+  padding:18px 20px!important;
+  border-radius:16px!important;
+  display:flex!important;
+  flex-direction:column!important;
+  justify-content:center!important;
+  text-align:center!important;
+}
+#v135-rank-hub .v135-rank-card.xp .v135-rank-kicker{
+  position:absolute!important;
+  top:13px!important;
+  left:16px!important;
+  font-size:.58rem!important;
+  letter-spacing:.08em!important;
+  opacity:.72!important;
+}
+#v135-rank-hub .v135-rank-card.xp .v135-rank-name{
+  font-size:1.45rem!important;
+  margin-top:5px!important;
+}
+#v135-rank-hub .v135-rank-card.xp .v135-rank-meta{
+  font-size:.68rem!important;
+  margin-top:5px!important;
+}
+#v135-rank-hub .v135-rank-card.xp .v135-progress{
+  height:7px!important;
+  margin-top:13px!important;
+  border-radius:99px!important;
+}
+
+/* La vraie carte Power dédiée garde son emplacement et son style néon complet. */
+#panel-profile .rank-card.v1354-power-hero{
+  display:block!important;
+  width:100%!important;
+  margin-top:12px!important;
+}
+
+/* Evite un trou si l'ancien dashboard était utilisé comme ancre. */
+#v135-rank-hub + #v10-profile-dashboard{margin:0!important}
+
+@media(max-width:600px){
+  #v135-rank-hub .v135-rank-card.xp{
+    min-height:108px!important;
+    padding:16px 14px!important;
+  }
+  #v135-rank-hub .v135-rank-card.xp .v135-rank-name{
+    font-size:1.28rem!important;
+  }
+}
+</style>
+
+<script id="v1501-vitrines-fix-js">
+(function(){
+  function fixVitrines(){
+    try{
+      const hub=document.getElementById('v135-rank-hub');
+      const old=document.getElementById('v10-profile-dashboard');
+      const panel=document.getElementById('panel-profile');
+      if(old)old.style.display='none';
+      if(!hub||!panel)return;
+
+      /* XP reste la seule carte du hub. */
+      const powerMini=hub.querySelector('.v135-rank-card.power');
+      if(powerMini)powerMini.style.display='none';
+
+      /* Replace le hub tout en haut du profil, avant les quêtes. */
+      const quests=document.getElementById('v140-quests');
+      if(quests && quests.previousElementSibling!==hub){
+        quests.parentNode.insertBefore(hub,quests);
+      }
+
+      /* Rafraîchit seulement les données/visuels, sans recréer d'anciens modules. */
+      try{window.renderXpRankLive?.()}catch(e){}
+      try{window.renderPowerRankLive?.()}catch(e){}
+    }catch(e){console.warn('V15.0.1 vitrines',e)}
+  }
+
+  window.v1501FixVitrines=fixVitrines;
+
+  const oldArrange=window.v15ArrangeProfile;
+  if(typeof oldArrange==='function'&&!oldArrange.v1501){
+    window.v15ArrangeProfile=function(){
+      const r=oldArrange.apply(this,arguments);
+      queueMicrotask(fixVitrines);
+      return r;
+    };
+    window.v15ArrangeProfile.v1501=1;
+  }
+
+  if(document.readyState==='loading'){
+    document.addEventListener('DOMContentLoaded',()=>setTimeout(fixVitrines,160),{once:true});
+  }else setTimeout(fixVitrines,40);
+
+  window.addEventListener('pageshow',()=>setTimeout(fixVitrines,50));
 })();
 </script>
 
