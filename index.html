@@ -473,8 +473,12 @@ main{padding-bottom:calc(96px + env(safe-area-inset-bottom,0px))!important}
 .goal-card{grid-column:1/-1}.goal-row{display:grid;grid-template-columns:100px minmax(0,1fr) 74px;gap:8px;align-items:center;margin:9px 0}.goal-name{font-size:.67rem;font-weight:900;color:#ddd}
 .goal-track{height:8px;background:#09090e;border:1px solid #292934;border-radius:99px;overflow:hidden}.goal-fill{height:100%;width:0;background:linear-gradient(90deg,#00d2ff,#bd00ff);transition:.35s}
 .goal-input{width:100%;background:#09090e;border:1px solid #373743;color:#fff;border-radius:7px;padding:6px;text-align:center;font-size:.67rem}.goal-caption{font-size:.56rem;color:#777;text-align:right}
-.profile-v2-modal{display:none;position:fixed;inset:0;z-index:7200;background:rgba(0,0,0,.82);align-items:center;justify-content:center;padding:16px}.profile-v2-modal.show{display:flex}
-.profile-v2-box{width:100%;max-width:600px;max-height:90dvh;overflow:auto;background:#0e0e15;border:1px solid rgba(189,0,255,.55);border-radius:18px;padding:16px;box-shadow:0 0 35px rgba(189,0,255,.22)}
+.profile-v2-modal{display:none;position:fixed;inset:0;z-index:9999;background:var(--bg-color);align-items:stretch;justify-content:stretch;padding:0}.profile-v2-modal.show{display:flex}
+.profile-v2-box{width:100%;max-width:none;height:100%;max-height:none;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior-y:contain;background:var(--bg-color);border:0;border-radius:0;box-shadow:none;padding:calc(14px + env(safe-area-inset-top,0px)) 16px calc(24px + env(safe-area-inset-bottom,0px));box-sizing:border-box}
+/* V1422 — le profil est maintenant une vraie page plein écran (identique iPhone/Android),
+   au lieu d'une petite fenêtre flottante au centre de l'écran. */
+.profile-v2-box > div:first-child{position:sticky;top:calc(-14px - env(safe-area-inset-top,0px));background:var(--bg-color);margin:calc(-14px - env(safe-area-inset-top,0px)) -16px 14px;padding:calc(14px + env(safe-area-inset-top,0px)) 16px 12px;border-bottom:1px solid #23232f;z-index:2}
+body.v1422-modal-open main{overflow:hidden!important}
 .profile-v2-hero{display:flex;align-items:center;gap:14px}.profile-v2-avatar{width:86px;height:86px;border-radius:20px;overflow:hidden;display:grid;place-items:center;font-size:2rem;font-weight:1000;background:radial-gradient(circle at 35% 25%,#fff,#bd00ff 25%,#17001f 72%);border:2px solid #bd00ff;flex:none}
 .profile-v2-avatar img{width:100%;height:100%;object-fit:cover}.profile-v2-name{font-size:1.25rem;font-weight:1000}.profile-v2-rank{font-size:.7rem;color:#00d2ff;margin-top:3px}
 .profile-v2-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:13px}.profile-v2-stat{background:#09090e;border:1px solid #292934;border-radius:10px;padding:9px;text-align:center}.profile-v2-stat span{display:block;font-size:.52rem;color:#777;text-transform:uppercase}.profile-v2-stat b{font-size:.76rem}
@@ -7892,6 +7896,49 @@ html.leveling-ios nav{-webkit-backdrop-filter:none!important;backdrop-filter:non
       if(!isStandalone) alert("Plein écran refusé par le navigateur. Installe l’app sur l’écran d’accueil pour un affichage stable.");
     }
   };
+})();
+</script>
+
+
+<script id="v1422-profile-fullpage-fullscreen-fix">
+(function(){
+  /* 1) Le profil (icône 👤 en haut) s'ouvre désormais comme une vraie page plein écran,
+        identique sur iPhone et Android, et ne se superpose plus aux Réglages. */
+  if(typeof window.openProfileV2==='function' && !window.openProfileV2.v1422){
+    const prevOpen=window.openProfileV2;
+    window.openProfileV2=function(){
+      if(typeof window.v1358CloseSettingsPage==='function')window.v1358CloseSettingsPage();
+      document.body.classList.add('v1422-modal-open');
+      return prevOpen.apply(this,arguments);
+    };
+    window.openProfileV2.v1422=1;
+  }
+  if(typeof window.closeProfileV2==='function' && !window.closeProfileV2.v1422){
+    const prevClose=window.closeProfileV2;
+    window.closeProfileV2=function(){
+      document.body.classList.remove('v1422-modal-open');
+      return prevClose.apply(this,arguments);
+    };
+    window.closeProfileV2.v1422=1;
+  }
+  /* Si on ouvre un sous-onglet des Réglages pendant que le profil est affiché, on le referme
+     proprement pour ne jamais avoir deux pages plein écran empilées. */
+  document.addEventListener('click',e=>{
+    if(e.target.closest('#v135-settings-tabs button')){
+      document.getElementById('profile-v2-modal')?.classList.remove('show');
+      document.body.classList.remove('v1422-modal-open');
+    }
+  },true);
+
+  /* 2) Plein écran réel : sur Android, l'API Fullscreen native fonctionne (déjà gérée par
+        toggleFullScreen). Sur iPhone, Safari ne permet JAMAIS le plein écran natif pour un
+        simple site web, même en JS — c'est une limitation d'Apple, pas un bug de l'appli.
+        Le seul plein écran réel sur iPhone est l'appli installée sur l'écran d'accueil
+        (bouton "Ajouter à l'écran d'accueil"). On marque ce cas pour rester cohérent. */
+  const ua=navigator.userAgent||'';
+  const isIOS=/iPhone|iPad|iPod/i.test(ua)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);
+  const isStandalone=(window.matchMedia&&window.matchMedia('(display-mode: standalone)').matches)||navigator.standalone===true;
+  document.documentElement.classList.toggle('v1422-ios-needs-install', !!(isIOS && !isStandalone));
 })();
 </script>
 
