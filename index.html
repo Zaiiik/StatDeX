@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>LEVELING-APP — Powerbuilding Tracker V15.8.1 VALIDATION PERSIST FIX</title>
+    <title>LEVELING-APP — Powerbuilding Tracker V15.9.0 HEADER SESSION UI CLEAN</title>
     <meta name="theme-color" content="#09090f">
     <meta name="application-name" content="LEVELING-APP">
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -848,31 +848,6 @@ header .hud-stat.v140-clickable:hover{
   .v140-title{font-size:.82rem!important;margin-bottom:7px!important}
 }
 </style>
-
-
-<style id="v1402-clean-header-profile">
-/* V14.0.2 — profil plus lisible */
-#v135-profile-nav{display:none!important}
-#v11-identity-card{display:none!important}
-
-/* Petit accès compte dans le header */
-#v1402-account-btn{
-  width:34px;height:34px;min-width:34px;border-radius:10px;
-  border:1px solid color-mix(in srgb,var(--accent-rose) 60%,#353540);
-  background:#101016;color:#fff;display:flex;align-items:center;justify-content:center;
-  overflow:hidden;cursor:pointer;padding:0;box-shadow:0 0 10px color-mix(in srgb,var(--accent-rose) 12%,transparent)
-}
-#v1402-account-btn .v1402-avatar{
-  width:100%;height:100%;display:flex;align-items:center;justify-content:center;
-  background-size:cover;background-position:center;font-size:1rem;font-weight:900
-}
-#v1402-account-btn:active{transform:scale(.94)}
-@media(max-width:600px){
-  #v1402-account-btn{width:31px;height:31px;min-width:31px}
-}
-</style>
-
-
 <style id="v1403-session-cycle-fix">
 /* V14.0.3 — avatar + séance validée */
 #v1402-account-btn .v1402-avatar{
@@ -894,165 +869,6 @@ header .hud-stat.v140-clickable:hover{
   content:" 🔥";
 }
 </style>
-
-
-<style id="v1404-status-avatar-fix">
-/* V14.0.4 — statuts de séance + avatar stable */
-.day-tab.v1404-inprogress::after{content:" ⏳";color:#ffd54f}
-.day-tab.v1403-validated::after{content:" ✅"!important;color:#00e676!important}
-.day-tab.v1404-inprogress{border-color:#ffd54f!important}
-.day-tab.v1403-validated{border-color:#00e676!important}
-
-#v1402-account-btn .v1402-avatar{
-  transition:none!important;
-  animation:none!important;
-  will-change:auto!important;
-}
-</style>
-
-
-<style id="v1405-avatar-status-final">
-/* V14.0.5 — avatar sans clignotement + ancien check vert */
-#v1402-account-btn .v1402-avatar{display:none!important}
-#v1402-account-btn .v1405-avatar{
-  width:100%;height:100%;display:flex;align-items:center;justify-content:center;
-  border-radius:9px;background-size:cover;background-position:center;background-repeat:no-repeat;
-  font-size:1rem;font-weight:900;color:#fff
-}
-
-/* On remplace le ✅ par l'ancien ✓ vert dans un rond lumineux */
-.day-tab.v1403-validated::after{
-  content:"✓"!important;
-  display:inline-flex!important;
-  align-items:center!important;
-  justify-content:center!important;
-  width:16px!important;
-  height:16px!important;
-  margin-left:5px!important;
-  border-radius:50%!important;
-  background:#00e676!important;
-  color:#fff!important;
-  font-size:11px!important;
-  font-weight:1000!important;
-  box-shadow:0 0 8px rgba(0,230,118,.8)!important;
-  vertical-align:middle!important;
-}
-.day-tab.v1404-inprogress::after{
-  content:"⏳"!important;
-  margin-left:5px!important;
-  color:#ffd54f!important;
-  background:none!important;
-  box-shadow:none!important;
-  width:auto!important;
-  height:auto!important;
-}
-
-/* Bouton final de séance validée avec le même style ancien */
-#validate-workout-btn.v1403-validated::before{
-  content:"✓";
-  display:inline-flex;
-  align-items:center;
-  justify-content:center;
-  width:20px;
-  height:20px;
-  margin-right:8px;
-  border-radius:50%;
-  background:#00e676;
-  color:#fff;
-  box-shadow:0 0 9px rgba(0,230,118,.8);
-}
-</style>
-
-
-<style id="v1406-check-avatar">
-/* V14.0.6 — retour à la coche ✔️ + vraie photo dans le bouton compte */
-.day-tab.v1403-validated::after{
-  content:" ✔️"!important;
-  display:inline!important;
-  width:auto!important;height:auto!important;
-  margin-left:4px!important;
-  border-radius:0!important;
-  background:none!important;
-  color:inherit!important;
-  font-size:inherit!important;
-  box-shadow:none!important;
-  vertical-align:baseline!important;
-}
-.day-tab.v1404-inprogress::after{
-  content:" ⏳"!important;
-  display:inline!important;
-  margin-left:4px!important;
-  background:none!important;
-  box-shadow:none!important;
-  width:auto!important;height:auto!important;
-}
-#validate-workout-btn.v1403-validated::before{display:none!important}
-
-#v1402-account-btn{
-  background-color:#101016!important;
-}
-#v1402-account-btn .v1405-avatar,
-#v1402-account-btn .v1402-avatar{display:none!important}
-#v1406-header-avatar{
-  width:100%;height:100%;object-fit:cover;display:none;border-radius:9px;
-  pointer-events:none
-}
-#v1406-header-fallback{
-  width:100%;height:100%;display:flex;align-items:center;justify-content:center;
-  font-size:1rem;font-weight:900;color:#fff;pointer-events:none
-}
-</style>
-
-
-<style id="v1407-profile-rank-avatar">
-/* V14.0.7 — profil modal = même Rang Power + avatar header direct */
-#v1402-account-btn{
-  background-size:cover!important;
-  background-position:center!important;
-  background-repeat:no-repeat!important;
-  color:#fff!important;
-}
-#v1402-account-btn.v1407-has-photo > *{
-  display:none!important;
-}
-</style>
-
-
-<style id="v1408-header-avatar-hardfix">
-/* V14.0.8 — correctif définitif avatar header */
-#v1402-account-btn{
-  position:relative!important;
-  overflow:hidden!important;
-  background-color:#0d0d13!important;
-  background-size:cover!important;
-  background-position:center!important;
-  background-repeat:no-repeat!important;
-}
-#v1402-account-btn::after{
-  content:"";
-  position:absolute;
-  inset:0;
-  border-radius:inherit;
-  pointer-events:none;
-}
-#v1402-account-btn.v1408-photo{
-  border-color:var(--accent-rose)!important;
-}
-#v1402-account-btn.v1408-photo > *{
-  display:none!important;
-}
-#v1402-account-btn:not(.v1408-photo)::before{
-  content:"👤";
-  position:absolute;
-  inset:0;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  font-size:1rem;
-}
-</style>
-
-
 <style id="v1409-month-calendar-css">
 /* V14.0.9 — calendrier mensuel Solo Leveling */
 #v140-streak-modal .v140-modalbox{
@@ -1133,7 +949,7 @@ header .hud-stat.v140-clickable:hover{
 </style>
 
 <style id="v1563-settings-controller-clean-css">
-/* V15.8.1 — un seul contrôleur Réglages */
+/* V15.9.0 — un seul contrôleur Réglages */
 #panel-settings.v151-ready > #v135-settings-tabs,
 #panel-settings.v151-ready > .v135-settings-tabs,
 #panel-settings.v151-ready > #v15-settings-tabs,
@@ -1150,6 +966,29 @@ header .hud-stat.v140-clickable:hover{
 }
 /* Aucun contenu Ambiance ne doit flotter sur l'accueil. */
 #v134-theme-collection{max-width:100%;min-width:0}
+</style>
+
+
+<style id="v1590-header-session-ui-css">
+/* V15.9 — header/avatar/statuts séance : une seule couche */
+#v135-profile-nav,#v11-identity-card{display:none!important}
+#v1402-account-btn{
+  width:34px;height:34px;min-width:34px;border-radius:10px;
+  border:1px solid color-mix(in srgb,var(--accent-rose) 60%,#353540);
+  background:#0d0d13;color:#fff;display:flex;align-items:center;justify-content:center;
+  overflow:hidden;cursor:pointer;padding:0;position:relative;
+  box-shadow:0 0 10px color-mix(in srgb,var(--accent-rose) 12%,transparent)
+}
+#v1402-account-btn:active{transform:scale(.94)}
+#v1590-header-avatar{width:100%;height:100%;object-fit:cover;object-position:center;display:none;pointer-events:none}
+#v1590-header-fallback{width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:1rem;font-weight:900;pointer-events:none}
+#v1402-account-btn.v1590-has-photo #v1590-header-avatar{display:block}
+#v1402-account-btn.v1590-has-photo #v1590-header-fallback{display:none}
+.day-tab.v1403-validated{border-color:#00e676!important}
+.day-tab.v1403-validated::after{content:" ✔️"!important;margin-left:4px!important}
+.day-tab.v1590-inprogress{border-color:#ffd54f!important}
+.day-tab.v1590-inprogress::after{content:" ⏳"!important;margin-left:4px!important;color:#ffd54f!important}
+@media(max-width:600px){#v1402-account-btn{width:31px;height:31px;min-width:31px}}
 </style>
 
 </head>
@@ -1459,7 +1298,7 @@ header .hud-stat.v140-clickable:hover{
                         <span class="cloud-badge" id="cloud-live-badge">☁️ CLOUD</span>
                     </div>
                     <div id="cloud-sync-detail" style="margin-top:8px;font-size:.62rem;color:#777;text-align:center">Initialisation du cloud…</div>
-                    <div style="margin-top:5px;font-size:.58rem;color:#555;text-align:center">LEVELING-APP V15.8.1 · Stable</div>
+                    <div style="margin-top:5px;font-size:.58rem;color:#555;text-align:center">LEVELING-APP V15.9.0 · Stable</div>
                     <button class="btn-action" onclick="logoutLeveling()" style="border-color:#ff5555;color:#ff7777">Se déconnecter</button>
                 </div>
 
@@ -1734,7 +1573,7 @@ header .hud-stat.v140-clickable:hover{
             autoProgression: true
         };
 
-        /* V15.8.1 — CANONICAL USER STATE BRIDGE
+        /* V15.9.0 — CANONICAL USER STATE BRIDGE
            `userData` est déclaré avec `let`, donc il n'est pas automatiquement disponible
            via `window.userData`. Plusieurs anciens modules lisaient pourtant window.userData,
            ce qui produisait 0 kg / RECRUE malgré des données correctes.
@@ -4542,7 +4381,7 @@ function v135ProfileNav(){
   const h=panel.querySelector('h2');if(h)h.after(nav);
 }
 function v135Settings(){
-  /* V15.8.1: ancien contrôleur Réglages supprimé.
+  /* V15.9.0: ancien contrôleur Réglages supprimé.
      On conserve seulement la transformation source nécessaire au DOM moderne. */
   try{if(typeof initCompactSettings==='function')initCompactSettings()}catch(e){}
   return false;
@@ -5075,592 +4914,158 @@ document.addEventListener('visibilitychange',()=>{if(document.visibilityState===
 })();
 </script>
 
-
-<script id="v1402-clean-header-profile-js">
+<script id="v1590-header-session-ui-clean">
 (function(){
-  const validatedKey=()=>`leveling_validated_${activeProgramKey}_${currentBlockIndex}_${currentDayIndex}`;
+'use strict';
 
-  function currentDayHasProgress(){
-    try{
-      const day=workoutState?.[currentBlockIndex]?.[currentDayIndex];
-      if(!day)return false;
-      return Object.values(day).some(ex=>ex&&Object.values(ex).some(Boolean));
-    }catch(e){return false}
-  }
+function validated(program=activeProgramKey,block=currentBlockIndex,day=currentDayIndex){
+  try{
+    if(window.LevelingProgramV157?.isValidated)return !!window.LevelingProgramV157.isValidated(program,block,day);
+  }catch(e){}
+  const k=`leveling_validated_${program}_${block}_${day}`;
+  try{return localStorage.getItem(k)==='1' || !!userData?.validatedSessions?.[k]}catch(e){return false}
+}
 
-  function currentDayComplete(){
-    try{return typeof isDayCompleted==='function' && isDayCompleted(currentBlockIndex,currentDayIndex)}
-    catch(e){return false}
-  }
+function currentDayHasProgress(dayIndex=currentDayIndex){
+  try{
+    const day=workoutState?.[currentBlockIndex]?.[dayIndex];
+    if(!day)return false;
+    return Object.values(day).some(ex=>ex&&Object.values(ex).some(Boolean));
+  }catch(e){return false}
+}
 
-  /* Corrige le bandeau "Séance en cours" :
-     - regarde seulement la séance/jour actuel
-     - disparaît après validation finale
-     - ne reste plus affiché à cause des anciennes séances cochées */
-  window.hasWorkoutProgress=function(){
-    if(localStorage.getItem(validatedKey())==='1')return false;
-    return currentDayHasProgress();
-  };
+window.hasWorkoutProgress=function(){
+  if(validated())return false;
+  return currentDayHasProgress();
+};
 
-  window.updateResumeWorkoutBanner=function(){
-    const b=document.getElementById('resume-workout-banner');
-    const t=document.getElementById('resume-workout-text');
-    if(!b)return;
-    if(hasWorkoutProgress()){
-      const meta=typeof getProgramMeta==='function'?getProgramMeta(activeProgramKey):null;
-      if(t)t.textContent=`🏋️ Séance en cours · ${meta?.title||activeProgramKey} · Jour ${currentDayIndex+1}`;
-      b.classList.add('show');
-    }else{
-      b.classList.remove('show');
-    }
-  };
+window.updateResumeWorkoutBanner=function(){
+  const banner=document.getElementById('resume-workout-banner');
+  const text=document.getElementById('resume-workout-text');
+  if(!banner)return;
+  if(window.hasWorkoutProgress()){
+    const meta=typeof getProgramMeta==='function'?getProgramMeta(activeProgramKey):null;
+    if(text)text.textContent=`⏳ Séance en cours · ${meta?.title||activeProgramKey} · Jour ${currentDayIndex+1}`;
+    banner.classList.add('show');
+  }else banner.classList.remove('show');
+};
 
-  /* V15.8.1 : une séance validée reste verrouillée.
-     Modifier/cliquer une série ne doit plus effacer son marqueur de validation. */
-
-  /* Après la vraie validation avec étoiles, mémorise que cette séance est terminée. */
-  if(typeof window.finishWorkoutFinal==='function'&&!window.finishWorkoutFinal.v1402){
-    const oldFinish=window.finishWorkoutFinal;
-    window.finishWorkoutFinal=function(){
-      const beforeBlock=currentBlockIndex,beforeDay=currentDayIndex,beforeProgram=activeProgramKey;
-      const r=oldFinish.apply(this,arguments);
-      localStorage.setItem(`leveling_validated_${beforeProgram}_${beforeBlock}_${beforeDay}`,'1');
-      setTimeout(()=>{
-        document.getElementById('resume-workout-banner')?.classList.remove('show');
-        if(typeof updateResumeWorkoutBanner==='function')updateResumeWorkoutBanner();
-      },50);
-      return r;
-    };
-    window.finishWorkoutFinal.v1402=1;
-  }
-
-  function syncAccountButton(){
-    const header=document.querySelector('header');
-    if(!header)return;
-    const hud=header.querySelector('.hud-right') || header.lastElementChild;
-    if(!hud)return;
-
-    let btn=document.getElementById('v1402-account-btn');
-    if(!btn){
-      btn=document.createElement('button');
-      btn.id='v1402-account-btn';
-      btn.type='button';
-      btn.title='Mon compte';
-      btn.setAttribute('aria-label','Ouvrir mon compte');
-      btn.innerHTML='<span class="v1402-avatar">👤</span>';
-      btn.onclick=()=>{
-        try{playSound('click')}catch(e){}
-        if(typeof openProfileV2==='function')openProfileV2();
-        else{
-          const settingsBtn=[...document.querySelectorAll('.nav-item')].find(x=>(x.textContent||'').toLowerCase().includes('réglages'));
-          if(typeof switchTab==='function')switchTab('settings',settingsBtn);
-        }
-      };
-      hud.appendChild(btn);
-    }
-
-    const source=document.getElementById('v11-avatar');
-    const target=btn.querySelector('.v1402-avatar');
-    if(source&&target){
-      const bg=source.style.backgroundImage || getComputedStyle(source).backgroundImage;
-      if(bg&&bg!=='none'){
-        target.style.backgroundImage=bg;
-        target.textContent='';
-      }else{
-        target.style.backgroundImage='';
-        target.textContent=(source.textContent||'👤').trim().slice(0,2)||'👤';
-      }
-    }
-  }
-
-  function clean(){
-    document.getElementById('v135-profile-nav')?.setAttribute('aria-hidden','true');
-    syncAccountButton();
-    updateResumeWorkoutBanner();
-  }
-
-  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',()=>setTimeout(clean,1900));
-  else setTimeout(clean,1900);
-
-  const obs=new MutationObserver(()=>{
-    if(obs.v1422Pending)return;
-    obs.v1422Pending=true;
-    setTimeout(()=>{obs.v1422Pending=false;syncAccountButton()},30);
+function refreshDayStatus(){
+  document.querySelectorAll('#day-tabs .day-tab').forEach((tab,i)=>{
+    const done=validated(activeProgramKey,currentBlockIndex,i);
+    const progress=!done&&currentDayHasProgress(i);
+    tab.classList.toggle('v1403-validated',done);
+    tab.classList.toggle('v1590-inprogress',progress);
+    tab.classList.remove('v1404-inprogress');
   });
-  obs.observe(document.getElementById('app-container')||document.documentElement,{childList:true,subtree:true,attributes:true,attributeFilter:['style','class']});
+  window.updateResumeWorkoutBanner();
+}
 
-  document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')setTimeout(clean,100)});
-})();
-</script>
-<script id="v1404-status-avatar-fix-js">
-(function(){
-  function sessionKey(program=activeProgramKey,block=currentBlockIndex,day=currentDayIndex){
-    return `leveling_validated_${program}_${block}_${day}`;
-  }
-
-  function dayHasProgress(dayIndex){
-    try{
-      const day=workoutState?.[currentBlockIndex]?.[dayIndex];
-      if(!day)return false;
-      return Object.values(day).some(ex=>ex&&Object.values(ex).some(Boolean));
-    }catch(e){return false}
-  }
-
-  function refreshDayStatus(){
-    document.querySelectorAll('#day-tabs .day-tab').forEach((tab,i)=>{
-      const validated=localStorage.getItem(sessionKey(activeProgramKey,currentBlockIndex,i))==='1';
-      const progress=!validated && dayHasProgress(i);
-      tab.classList.toggle('v1403-validated',validated);
-      tab.classList.toggle('v1404-inprogress',progress);
-    });
-
-    const text=document.getElementById('resume-workout-text');
-    if(text && typeof hasWorkoutProgress==='function' && hasWorkoutProgress()){
-      const meta=typeof getProgramMeta==='function'?getProgramMeta(activeProgramKey):null;
-      text.textContent=`⏳ Séance en cours · ${meta?.title||activeProgramKey} · Jour ${currentDayIndex+1}`;
-    }
-  }
-
-  /* Avatar stable : on ne le réécrit que si sa valeur change réellement. */
-  let lastAvatarValue=null;
-  function syncStableAvatar(){
-    const target=document.querySelector('#v1402-account-btn .v1402-avatar');
-    if(!target)return;
-
-    const avatar=String(
-      window.userData?.playerAvatarImage ||
-      window.userData?.playerAvatar ||
-      ''
-    );
-
-    if(avatar===lastAvatarValue)return;
-    lastAvatarValue=avatar;
-
-    if(avatar.startsWith('data:image/') || avatar.startsWith('https://') || avatar.startsWith('http://')){
-      target.style.backgroundImage=`url("${avatar.replace(/"/g,'%22')}")`;
-      target.textContent='';
-    }else{
-      target.style.backgroundImage='';
-      target.textContent=avatar || '👤';
-    }
-  }
-
-  /* Coupe les anciens observers qui causaient des réécritures visuelles :
-     on synchronise seulement aux moments utiles. */
-  function refresh(){
-    syncStableAvatar();
-    refreshDayStatus();
-  }
-
-  if(typeof window.initWorkoutSystem==='function' && !window.initWorkoutSystem.v1404){
-    const old=window.initWorkoutSystem;
-    window.initWorkoutSystem=function(){
-      const r=old.apply(this,arguments);
-      setTimeout(refresh,40);
-      return r;
+function ensureAccountButton(){
+  const header=document.querySelector('header');
+  if(!header)return null;
+  const hud=header.querySelector('.hud-right')||header.lastElementChild;
+  if(!hud)return null;
+  let btn=document.getElementById('v1402-account-btn');
+  if(!btn){
+    btn=document.createElement('button');
+    btn.id='v1402-account-btn';
+    btn.type='button';
+    btn.title='Mon compte';
+    btn.setAttribute('aria-label','Ouvrir mon compte');
+    btn.innerHTML='<img id="v1590-header-avatar" alt="Avatar"><span id="v1590-header-fallback">👤</span>';
+    btn.onclick=()=>{
+      try{playSound('click')}catch(e){}
+      if(typeof openProfileV2==='function')return openProfileV2();
+      const nav=[...document.querySelectorAll('.nav-item')].find(x=>(x.textContent||'').toLowerCase().includes('réglages'));
+      if(typeof switchTab==='function')switchTab('settings',nav);
     };
-    window.initWorkoutSystem.v1404=1;
+    hud.appendChild(btn);
   }
-
-  if(typeof window.updateProfileUI==='function' && !window.updateProfileUI.v1404){
-    const old=window.updateProfileUI;
-    window.updateProfileUI=function(){
-      const r=old.apply(this,arguments);
-      setTimeout(syncStableAvatar,40);
-      return r;
-    };
-    window.updateProfileUI.v1404=1;
+  if(!btn.querySelector('#v1590-header-avatar')){
+    btn.innerHTML='<img id="v1590-header-avatar" alt="Avatar"><span id="v1590-header-fallback">👤</span>';
   }
+  return btn;
+}
 
-  document.addEventListener('click',e=>{
-    if(e.target.closest('.btn-check'))setTimeout(refreshDayStatus,60);
-  },true);
-
-  if(document.readyState==='loading'){
-    document.addEventListener('DOMContentLoaded',()=>setTimeout(refresh,2200));
+function syncAvatar(){
+  const btn=ensureAccountButton();
+  if(!btn)return;
+  const img=btn.querySelector('#v1590-header-avatar');
+  const fallback=btn.querySelector('#v1590-header-fallback');
+  const src=String(userData?.playerAvatarImage||'').trim();
+  const fb=String(userData?.playerAvatar||((userData?.playerName||'J').trim()[0]||'J')).trim()||'👤';
+  if(fallback)fallback.textContent=fb;
+  if(src&&img){
+    if(img.getAttribute('src')!==src)img.src=src;
+    btn.classList.add('v1590-has-photo');
+    img.onerror=()=>btn.classList.remove('v1590-has-photo');
   }else{
-    setTimeout(refresh,2200);
+    img?.removeAttribute('src');
+    btn.classList.remove('v1590-has-photo');
   }
+}
 
-  document.addEventListener('visibilitychange',()=>{
-    if(document.visibilityState==='visible')setTimeout(refresh,100);
-  });
+function syncProfileRank(){
+  try{
+    const el=document.getElementById('profile-v2-rank');
+    if(!el)return;
+    const rank=typeof getUnifiedPowerRank==='function'?getUnifiedPowerRank():null;
+    if(rank)el.textContent=`${rank.icon||''} ${rank.name||'RECRUE'}`.trim();
+  }catch(e){}
+}
 
-  /* Petit rafraîchissement très léger, sans toucher au DOM si rien n'a changé. */
+function refresh(){
+  syncAvatar();
+  refreshDayStatus();
+  syncProfileRank();
+}
+
+/* Un seul wrapper de rendu programme. Aucun wrapper sur finishWorkoutFinal. */
+const previousInit=window.initWorkoutSystem;
+if(typeof previousInit==='function'&&!previousInit.v1590){
+  window.initWorkoutSystem=function(){
+    const r=previousInit.apply(this,arguments);
+    setTimeout(refreshDayStatus,20);
+    return r;
+  };
+  window.initWorkoutSystem.v1590=1;
+}
+
+const previousProfile=window.updateProfileUI;
+if(typeof previousProfile==='function'&&!previousProfile.v1590){
+  window.updateProfileUI=function(){
+    const r=previousProfile.apply(this,arguments);
+    setTimeout(()=>{syncAvatar();syncProfileRank()},20);
+    return r;
+  };
+  window.updateProfileUI.v1590=1;
+}
+
+const previousIdentity=window.v11RenderIdentity;
+if(typeof previousIdentity==='function'&&!previousIdentity.v1590){
+  window.v11RenderIdentity=function(){
+    const r=previousIdentity.apply(this,arguments);
+    setTimeout(syncAvatar,20);
+    return r;
+  };
+  window.v11RenderIdentity.v1590=1;
+}
+
+document.addEventListener('click',e=>{
+  if(e.target.closest('.btn-check'))setTimeout(refreshDayStatus,30);
+},true);
+
+document.addEventListener('visibilitychange',()=>{
+  if(document.visibilityState==='visible')setTimeout(refresh,60);
+});
+
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',()=>setTimeout(refresh,180),{once:true});
+else setTimeout(refresh,60);
+
+window.LevelingHeaderSessionV159={refresh,syncAvatar,refreshDayStatus};
 })();
 </script>
-
-
-<script id="v1405-avatar-status-final-js">
-(function(){
-  let lastAvatar='__unset__';
-
-  function getAvatarValue(){
-    return String(
-      window.userData?.playerAvatarImage ||
-      window.userData?.playerAvatar ||
-      ''
-    );
-  }
-
-  function buildStableAvatar(){
-    const btn=document.getElementById('v1402-account-btn');
-    if(!btn)return;
-
-    let old=btn.querySelector('.v1402-avatar');
-    if(old)old.remove();
-
-    let av=btn.querySelector('.v1405-avatar');
-    if(!av){
-      av=document.createElement('span');
-      av.className='v1405-avatar';
-      btn.prepend(av);
-    }
-
-    const value=getAvatarValue();
-    if(value===lastAvatar)return;
-    lastAvatar=value;
-
-    if(value.startsWith('data:image/') || value.startsWith('https://') || value.startsWith('http://')){
-      av.style.backgroundImage=`url("${value.replace(/"/g,'%22')}")`;
-      av.textContent='';
-    }else{
-      av.style.backgroundImage='';
-      av.textContent=value || '👤';
-    }
-  }
-
-  /* Empêche les anciens scripts avatar de recréer sans arrêt leur élément clignotant. */
-  const guard=new MutationObserver(()=>{
-    const btn=document.getElementById('v1402-account-btn');
-    if(!btn)return;
-    const old=btn.querySelector('.v1402-avatar');
-    if(old)old.remove();
-    if(!btn.querySelector('.v1405-avatar'))buildStableAvatar();
-  });
-
-  function refreshValidatedButton(){
-    const btn=document.getElementById('validate-workout-btn');
-    if(btn?.classList.contains('v1403-validated')){
-      btn.textContent='SÉANCE VALIDÉE';
-    }
-  }
-
-  function boot(){
-    buildStableAvatar();
-    refreshValidatedButton();
-    const btn=document.getElementById('v1402-account-btn');
-    if(btn)guard.observe(btn,{childList:true,subtree:true});
-  }
-
-  if(typeof window.updateProfileUI==='function'&&!window.updateProfileUI.v1405){
-    const old=window.updateProfileUI;
-    window.updateProfileUI=function(){
-      const r=old.apply(this,arguments);
-      setTimeout(buildStableAvatar,60);
-      return r;
-    };
-    window.updateProfileUI.v1405=1;
-  }
-
-  if(typeof window.initWorkoutSystem==='function'&&!window.initWorkoutSystem.v1405){
-    const old=window.initWorkoutSystem;
-    window.initWorkoutSystem=function(){
-      const r=old.apply(this,arguments);
-      setTimeout(refreshValidatedButton,50);
-      return r;
-    };
-    window.initWorkoutSystem.v1405=1;
-  }
-
-  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',()=>setTimeout(boot,2300));
-  else setTimeout(boot,2300);
-
-  document.addEventListener('visibilitychange',()=>{
-    if(document.visibilityState==='visible')setTimeout(buildStableAvatar,100);
-  });
-})();
-</script>
-
-
-<script id="v1406-check-avatar-js">
-(function(){
-  let lastSrc=null;
-
-  function ensureHeaderAvatar(){
-    const btn=document.getElementById('v1402-account-btn');
-    if(!btn)return;
-
-    let img=document.getElementById('v1406-header-avatar');
-    let fallback=document.getElementById('v1406-header-fallback');
-
-    if(!img){
-      img=document.createElement('img');
-      img.id='v1406-header-avatar';
-      img.alt='Avatar';
-      btn.prepend(img);
-    }
-    if(!fallback){
-      fallback=document.createElement('span');
-      fallback.id='v1406-header-fallback';
-      btn.appendChild(fallback);
-    }
-
-    const src=String(window.userData?.playerAvatarImage||'');
-    if(src!==lastSrc){
-      lastSrc=src;
-      if(src){
-        img.src=src;
-        img.style.display='block';
-        fallback.style.display='none';
-      }else{
-        img.removeAttribute('src');
-        img.style.display='none';
-        fallback.style.display='flex';
-        fallback.textContent=String(window.userData?.playerAvatar||'👤');
-      }
-    }
-
-    /* Si l'image ne peut pas se charger, on retombe sur l'emoji. */
-    img.onerror=()=>{
-      img.style.display='none';
-      fallback.style.display='flex';
-      fallback.textContent=String(window.userData?.playerAvatar||'👤');
-    };
-  }
-
-  function refreshValidationText(){
-    const btn=document.getElementById('validate-workout-btn');
-    if(btn?.classList.contains('v1403-validated')){
-      btn.textContent='✔️ SÉANCE VALIDÉE';
-    }
-  }
-
-  /* Quand le profil modal sait afficher la photo, on reprend exactement la même source. */
-  if(typeof window.renderProfileV2==='function'&&!window.renderProfileV2.v1406){
-    const old=window.renderProfileV2;
-    window.renderProfileV2=function(){
-      const r=old.apply(this,arguments);
-      setTimeout(ensureHeaderAvatar,20);
-      return r;
-    };
-    window.renderProfileV2.v1406=1;
-  }
-
-  if(typeof window.v11RenderIdentity==='function'&&!window.v11RenderIdentity.v1406){
-    const old=window.v11RenderIdentity;
-    window.v11RenderIdentity=function(){
-      const r=old.apply(this,arguments);
-      setTimeout(ensureHeaderAvatar,20);
-      return r;
-    };
-    window.v11RenderIdentity.v1406=1;
-  }
-
-  if(typeof window.initWorkoutSystem==='function'&&!window.initWorkoutSystem.v1406){
-    const old=window.initWorkoutSystem;
-    window.initWorkoutSystem=function(){
-      const r=old.apply(this,arguments);
-      setTimeout(refreshValidationText,50);
-      return r;
-    };
-    window.initWorkoutSystem.v1406=1;
-  }
-
-  function boot(){
-    ensureHeaderAvatar();
-    refreshValidationText();
-  }
-
-  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',()=>setTimeout(boot,2400));
-  else setTimeout(boot,2400);
-
-  document.addEventListener('visibilitychange',()=>{
-    if(document.visibilityState==='visible')setTimeout(boot,100);
-  });
-
-  /* La donnée cloud peut arriver après le rendu initial. On ne touche au DOM
-     que si la source a réellement changé. */
-})();
-</script>
-
-
-<script id="v1407-profile-rank-avatar-js">
-(function(){
-  function getUnifiedPowerRank(){
-    const total=Number(userData?.squat||0)+Number(userData?.bench||0)+Number(userData?.deadlift||0);
-    if(typeof v135PowerRank==='function') return v135PowerRank(total);
-    if(typeof getSBDRank==='function') return getSBDRank(total,Number(userData?.weight||0));
-    return {name:'NOVICE',icon:'🌱'};
-  }
-
-  /* Le profil du chasseur utilise exactement le même rang que le gros Rang Power. */
-  if(typeof window.renderProfileV2==='function'&&!window.renderProfileV2.v1407){
-    const old=window.renderProfileV2;
-    window.renderProfileV2=function(){
-      const r=old.apply(this,arguments);
-      try{
-        const rank=getUnifiedPowerRank();
-        const el=document.getElementById('profile-v2-rank');
-        if(el)el.textContent=`${rank.icon||''} ${rank.name||'NOVICE'}`.trim();
-      }catch(e){}
-      return r;
-    };
-    window.renderProfileV2.v1407=1;
-  }
-
-  function syncHeaderAvatarDirect(){
-    const btn=document.getElementById('v1402-account-btn');
-    if(!btn)return;
-    const src=String(userData?.playerAvatarImage||'');
-    if(src){
-      btn.style.backgroundImage=`url("${src.replace(/"/g,'%22')}")`;
-      btn.classList.add('v1407-has-photo');
-      btn.textContent='';
-    }else{
-      btn.style.backgroundImage='';
-      btn.classList.remove('v1407-has-photo');
-      btn.textContent=String(userData?.playerAvatar||'👤');
-    }
-  }
-
-  /* On resynchronise aux bons moments, sans clignotement. */
-  const oldOpen=window.openProfileV2;
-  if(typeof oldOpen==='function'&&!oldOpen.v1407){
-    window.openProfileV2=function(){
-      syncHeaderAvatarDirect();
-      return oldOpen.apply(this,arguments);
-    };
-    window.openProfileV2.v1407=1;
-  }
-
-  if(typeof window.v11RenderIdentity==='function'&&!window.v11RenderIdentity.v1407){
-    const old=window.v11RenderIdentity;
-    window.v11RenderIdentity=function(){
-      const r=old.apply(this,arguments);
-      setTimeout(syncHeaderAvatarDirect,20);
-      return r;
-    };
-    window.v11RenderIdentity.v1407=1;
-  }
-
-  if(document.readyState==='loading'){
-    document.addEventListener('DOMContentLoaded',()=>setTimeout(syncHeaderAvatarDirect,2500));
-  }else setTimeout(syncHeaderAvatarDirect,2500);
-
-  document.addEventListener('visibilitychange',()=>{
-    if(document.visibilityState==='visible')setTimeout(syncHeaderAvatarDirect,120);
-  });
-})();
-</script>
-
-
-<script id="v1408-header-avatar-hardfix-js">
-(function(){
-  let lastApplied='';
-
-  function findAvatarSrc(){
-    const direct=String(window.userData?.playerAvatarImage||'').trim();
-    if(direct) return direct;
-
-    /* Le profil du chasseur sait déjà afficher la bonne photo :
-       on lui fait juste remplir son contenu en arrière-plan, sans ouvrir la fenêtre. */
-    try{
-      if(typeof window.renderProfileV2==='function') window.renderProfileV2();
-    }catch(e){}
-
-    const modalImg=document.querySelector('#profile-v2-avatar img');
-    if(modalImg?.src) return modalImg.src;
-
-    const previewImg=document.querySelector('#profile-avatar-preview img');
-    if(previewImg?.src) return previewImg.src;
-
-    const legacyImg=document.querySelector('#v11-avatar img');
-    if(legacyImg?.src) return legacyImg.src;
-
-    return '';
-  }
-
-  function applyAvatar(){
-    const btn=document.getElementById('v1402-account-btn');
-    if(!btn)return;
-
-    const src=findAvatarSrc();
-
-    if(src){
-      if(src!==lastApplied){
-        lastApplied=src;
-        btn.style.backgroundImage=`url("${src.replace(/"/g,'%22')}")`;
-      }
-      btn.classList.add('v1408-photo');
-      btn.setAttribute('aria-label','Ouvrir mon profil');
-    }else{
-      btn.style.backgroundImage='';
-      btn.classList.remove('v1408-photo');
-    }
-  }
-
-  /* Au chargement, puis après la synchro cloud qui peut arriver plus tard. */
-  function start(){
-    applyAvatar();
-    let tries=0;
-    const timer=setInterval(()=>{
-      applyAvatar();
-      tries++;
-      if(tries>=30 && document.getElementById('v1402-account-btn')?.classList.contains('v1408-photo')){
-        clearInterval(timer);
-      }
-    },500);
-  }
-
-  /* Quand on sauvegarde/change la photo, mise à jour immédiate. */
-  if(typeof window.handleProfileAvatar==='function'&&!window.handleProfileAvatar.v1408){
-    const old=window.handleProfileAvatar;
-    window.handleProfileAvatar=async function(){
-      const r=await old.apply(this,arguments);
-      lastApplied='';
-      setTimeout(applyAvatar,50);
-      return r;
-    };
-    window.handleProfileAvatar.v1408=1;
-  }
-
-  if(typeof window.removeProfileAvatar==='function'&&!window.removeProfileAvatar.v1408){
-    const old=window.removeProfileAvatar;
-    window.removeProfileAvatar=function(){
-      const r=old.apply(this,arguments);
-      lastApplied='';
-      setTimeout(applyAvatar,50);
-      return r;
-    };
-    window.removeProfileAvatar.v1408=1;
-  }
-
-  if(typeof window.v11RenderIdentity==='function'&&!window.v11RenderIdentity.v1408){
-    const old=window.v11RenderIdentity;
-    window.v11RenderIdentity=function(){
-      const r=old.apply(this,arguments);
-      setTimeout(applyAvatar,30);
-      return r;
-    };
-    window.v11RenderIdentity.v1408=1;
-  }
-
-  if(document.readyState==='loading'){
-    document.addEventListener('DOMContentLoaded',()=>setTimeout(start,1800));
-  }else{
-    setTimeout(start,1800);
-  }
-
-  document.addEventListener('visibilitychange',()=>{
-    if(document.visibilityState==='visible'){
-      lastApplied='';
-      setTimeout(applyAvatar,100);
-    }
-  });
-})();
-</script>
-
 
 <script id="v1409-month-calendar-js">
 (function(){
@@ -6015,280 +5420,6 @@ document.addEventListener('visibilitychange',()=>{if(document.visibilityState===
   });
 })();
 </script>
-<style id="v1413-avatar-real-fix">
-/* V14.1.3 — une seule source d'affichage pour l'avatar du header */
-#v1402-account-btn{
-  background-color:#0d0d13!important;
-  background-image:var(--v1413-avatar-image,none)!important;
-  background-size:cover!important;
-  background-position:center!important;
-  background-repeat:no-repeat!important;
-}
-#v1402-account-btn.v1413-avatar-ready::before{display:none!important}
-#v1402-account-btn.v1413-avatar-ready > *{display:none!important}
-</style>
-
-<script id="v1413-avatar-real-fix-js">
-(function(){
-  let last='__init__';
-
-  function sync(){
-    const btn=document.getElementById('v1402-account-btn');
-    if(!btn)return;
-    const src=String(window.userData?.playerAvatarImage||'').trim();
-
-    if(src){
-      if(src!==last){
-        btn.style.setProperty('--v1413-avatar-image',`url("${src.replace(/"/g,'%22')}")`);
-        last=src;
-      }
-      btn.classList.add('v1413-avatar-ready');
-      btn.classList.add('v1408-photo');
-    }else{
-      btn.style.setProperty('--v1413-avatar-image','none');
-      btn.classList.remove('v1413-avatar-ready');
-      last='';
-    }
-  }
-
-  window.v1413SyncHeaderAvatar=sync;
-
-  /* La donnée peut arriver après le chargement cloud. */
-  let tries=0;
-  const timer=setInterval(()=>{
-    sync();
-    tries++;
-    if(tries>40 && String(window.userData?.playerAvatarImage||'').trim())clearInterval(timer);
-  },350);
-
-  if(typeof window.renderProfileV2==='function'&&!window.renderProfileV2.v1413){
-    const old=window.renderProfileV2;
-    window.renderProfileV2=function(){
-      const r=old.apply(this,arguments);
-      setTimeout(sync,0);
-      return r;
-    };
-    window.renderProfileV2.v1413=1;
-  }
-
-  if(typeof window.handleProfileAvatar==='function'&&!window.handleProfileAvatar.v1413){
-    const old=window.handleProfileAvatar;
-    window.handleProfileAvatar=async function(){
-      const r=await old.apply(this,arguments);
-      last='__refresh__';
-      setTimeout(sync,30);
-      return r;
-    };
-    window.handleProfileAvatar.v1413=1;
-  }
-
-  document.addEventListener('visibilitychange',()=>{
-    if(document.visibilityState==='visible')setTimeout(sync,80);
-  });
-})();
-</script>
-
-
-<style id="v1414-cleanup-css">
-/* V14.1.4 — avatar header via vrai <img>, sans background-image */
-#v1402-account-btn{
-  position:relative!important;
-  overflow:hidden!important;
-  background-color:#0d0d13!important;
-  background-image:none!important;
-}
-#v1402-account-btn > *{display:none!important}
-#v1402-account-btn #v1414-header-avatar{
-  display:block!important;
-  width:100%!important;
-  height:100%!important;
-  object-fit:cover!important;
-  object-position:center!important;
-  border-radius:inherit!important;
-  pointer-events:none!important;
-}
-#v1402-account-btn #v1414-header-fallback{
-  display:flex!important;
-  position:absolute!important;
-  inset:0!important;
-  align-items:center!important;
-  justify-content:center!important;
-  font-size:1rem!important;
-  pointer-events:none!important;
-}
-#v1402-account-btn.v1414-has-photo #v1414-header-fallback{display:none!important}
-</style>
-
-<script id="v1414-cleanup-js">
-(function(){
-  function profileData(){
-    try{
-      if(typeof userData!=='undefined' && userData) return userData;
-    }catch(e){}
-    return window.userData || {};
-  }
-
-  function syncAvatar(){
-    const btn=document.getElementById('v1402-account-btn');
-    if(!btn)return;
-
-    let img=document.getElementById('v1414-header-avatar');
-    let fallback=document.getElementById('v1414-header-fallback');
-
-    if(!img){
-      img=document.createElement('img');
-      img.id='v1414-header-avatar';
-      img.alt='Avatar du profil';
-      img.decoding='async';
-      btn.prepend(img);
-    }
-    if(!fallback){
-      fallback=document.createElement('span');
-      fallback.id='v1414-header-fallback';
-      btn.appendChild(fallback);
-    }
-
-    const u=profileData();
-    const src=String(u.playerAvatarImage||'').trim();
-    const fb=String(u.playerAvatar||((u.playerName||'J').trim()[0]||'J')).trim()||'👤';
-
-    fallback.textContent=fb;
-
-    if(src){
-      if(img.getAttribute('src')!==src) img.src=src;
-      img.style.display='block';
-      btn.classList.add('v1414-has-photo');
-    }else{
-      img.removeAttribute('src');
-      img.style.display='none';
-      btn.classList.remove('v1414-has-photo');
-    }
-
-    img.onerror=function(){
-      btn.classList.remove('v1414-has-photo');
-      img.style.display='none';
-    };
-  }
-
-  function dateKey(d){
-    return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
-  }
-
-  function trainingDays(){
-    try{
-      const s=JSON.parse(localStorage.getItem('leveling_v140_rpg')||'{}');
-      return [...new Set((Array.isArray(s.trainingDays)?s.trainingDays:[]).filter(x=>/^\d{4}-\d{2}-\d{2}$/.test(x)))].sort();
-    }catch(e){return []}
-  }
-
-  function realCurrentStreak(){
-    const set=new Set(trainingDays());
-    if(!set.size)return 0;
-
-    let d=new Date();
-    d.setHours(12,0,0,0);
-
-    /* Une série reste active si la dernière séance est aujourd'hui ou hier. */
-    if(!set.has(dateKey(d))){
-      d.setDate(d.getDate()-1);
-      if(!set.has(dateKey(d)))return 0;
-    }
-
-    let n=0;
-    while(set.has(dateKey(d)) && n<3660){
-      n++;
-      d.setDate(d.getDate()-1);
-    }
-    return n;
-  }
-
-  function syncStreak(){
-    const el=document.getElementById('today-streak');
-    if(el)el.textContent=`${realCurrentStreak()} 🔥`;
-  }
-
-  function syncQuestText(){
-    const box=document.getElementById('v140-quests');
-    if(!box)return;
-
-    let sets=0;
-    try{
-      const prog=getPrograms()?.[currentBlockIndex]?.[currentDayIndex];
-      (prog?.exercises||[]).forEach((ex,ei)=>{
-        for(let si=0;si<Number(ex.sets||0);si++){
-          if(workoutState?.[currentBlockIndex]?.[currentDayIndex]?.[ei]?.[si])sets++;
-        }
-      });
-    }catch(e){}
-
-    const cards=[...box.querySelectorAll('.v140-quest')];
-    const target=cards.find(c=>/15 séries/i.test(c.textContent||''));
-    const small=target?.querySelector('small');
-    if(small){
-      small.textContent=sets>15
-        ? `15/15+ · ${sets} séries validées`
-        : `${sets}/15 séries validées`;
-    }
-  }
-
-  function refresh(){
-    syncAvatar();
-    syncStreak();
-    syncQuestText();
-  }
-
-  window.v1414RefreshUI=refresh;
-
-  if(document.readyState==='loading'){
-    document.addEventListener('DOMContentLoaded',()=>setTimeout(refresh,400));
-  }else setTimeout(refresh,100);
-
-  /* Couvre chargement Supabase, navigation, retour onglet et changement d'avatar. */
-  let tries=0;
-  const timer=setInterval(()=>{
-    refresh();
-    tries++;
-    if(tries>=40)clearInterval(timer);
-  },500);
-
-  document.addEventListener('visibilitychange',()=>{
-    if(document.visibilityState==='visible')setTimeout(refresh,80);
-  });
-
-  if(typeof window.updateProfileUI==='function'&&!window.updateProfileUI.v1414){
-    const old=window.updateProfileUI;
-    window.updateProfileUI=function(){
-      const r=old.apply(this,arguments);
-      setTimeout(refresh,20);
-      return r;
-    };
-    window.updateProfileUI.v1414=1;
-  }
-
-  if(typeof window.handleProfileAvatar==='function'&&!window.handleProfileAvatar.v1414){
-    const old=window.handleProfileAvatar;
-    window.handleProfileAvatar=async function(){
-      const r=await old.apply(this,arguments);
-      setTimeout(refresh,30);
-      return r;
-    };
-    window.handleProfileAvatar.v1414=1;
-  }
-
-  if(typeof window.toggleSet==='function'&&!window.toggleSet.v1414){
-    const old=window.toggleSet;
-    window.toggleSet=function(){
-      const r=old.apply(this,arguments);
-      setTimeout(refresh,30);
-      return r;
-    };
-    window.toggleSet.v1414=1;
-  }
-})();
-</script>
-
-
-
 <style id="v1421-mobile-unified-fix">
 /* V14.2.1 — MOBILE UNIFIED FIX
    One layout authority for iOS + Android. No JS-driven viewport height during scroll. */
@@ -6551,7 +5682,7 @@ html.leveling-ios nav{-webkit-backdrop-filter:none!important;backdrop-filter:non
 
 
 <style id="v1430-stable-ui-css">
-/* ================= V15.8.1 — STABLE SETTINGS / PROGRESSION =================
+/* ================= V15.9.0 — STABLE SETTINGS / PROGRESSION =================
    Réglages: plus aucune sous-page fixed/overlay. Toutes les rubriques restent
    dans le scroll principal de l'app, donc plus de page coupée ni ouverture en bas. */
 #panel-settings{position:relative!important;overflow:visible!important;min-height:0!important}
@@ -6606,7 +5737,7 @@ body.v1358-settings-open{overflow:hidden!important}
 
 <script id="v1430-stable-core-js">
 (function(){
-  const VERSION='15.8.1';
+  const VERSION='15.9.0';
   const q=s=>document.querySelector(s);
   const qa=s=>[...document.querySelectorAll(s)];
   const localDay=(d=new Date())=>`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
@@ -6753,7 +5884,7 @@ body.v1358-settings-open{overflow:hidden!important}
         if(typeof renderProfileV2==='function'&&document.getElementById('profile-v2-modal')?.classList.contains('show'))renderProfileV2();
         if(typeof window.renderPowerRankLive==='function')window.renderPowerRankLive();
         if(typeof render==='function')render();
-      }catch(e){console.warn('V15.8.1 SBD UI refresh',e)}
+      }catch(e){console.warn('V15.9.0 SBD UI refresh',e)}
       syncProgressionState();refreshRanks();
     },0);
     return r;
@@ -6809,7 +5940,7 @@ body.v1358-settings-open{overflow:hidden!important}
 
 
 <style id="v1440-power-rank-clean-css">
-/* V15.8.1 — RANG POWER PROPRE
+/* V15.9.0 — RANG POWER PROPRE
    Une seule logique: total Squat + Bench + Deadlift en KG.
    Une identité visuelle distincte par rang. */
 
@@ -7016,7 +6147,7 @@ body.v1358-settings-open{overflow:hidden!important}
 
 
 <style id="v1451-power-live-neon-css">
-/* V15.8.1 — les cartes visibles utilisent la même identité néon que la vitrine */
+/* V15.9.0 — les cartes visibles utilisent la même identité néon que la vitrine */
 .rank-card.v1451-live-rank{
   --rank:#ff2d55;
   --rank-rgb:255,45,85;
@@ -7166,7 +6297,7 @@ body.v1358-settings-open{overflow:hidden!important}
         mini.classList.add('v1451-live-rank-mini');
         cssVars(mini,r);
       }
-    }catch(e){console.warn('V15.8.1 live rank render',e)}
+    }catch(e){console.warn('V15.9.0 live rank render',e)}
   };
 
   /* Après toute vraie mise à jour de données/UI */
@@ -7227,7 +6358,7 @@ body.v1358-settings-open{overflow:hidden!important}
     try{
       if(typeof window.renderPowerRankLive==='function')window.renderPowerRankLive();
       if(typeof window.v135RenderRankHub==='function')window.v135RenderRankHub();
-    }catch(e){console.warn('V15.8.1 power refresh',e)}
+    }catch(e){console.warn('V15.9.0 power refresh',e)}
   }
 
   const oldLoad=window.loadFromLocalStorage;
@@ -7265,7 +6396,7 @@ body.v1358-settings-open{overflow:hidden!important}
 
 
 <style id="v1454-xp-neon-css">
-/* V15.8.1 — Rang XP : même qualité visuelle néon que le Rang Power */
+/* V15.9.0 — Rang XP : même qualité visuelle néon que le Rang Power */
 #v135-xp-modal .modal-content{
   width:min(620px,96vw)!important;
   max-width:620px!important;
@@ -7390,7 +6521,7 @@ body.v1358-settings-open{overflow:hidden!important}
           bar.style.width=pct+'%';
         }
       }
-    }catch(e){console.warn('V15.8.1 XP live',e)}
+    }catch(e){console.warn('V15.9.0 XP live',e)}
   };
 
   const oldHub=window.v135RenderRankHub;
@@ -7655,7 +6786,7 @@ body.v1358-settings-open{overflow:hidden!important}
     if(!profile)return;
     const target=q('.compact-setting-body',profile);if(!target)return;
 
-    /* V15.8.1 : Profil devient l'unique page pour compte + progression + sauvegarde. */
+    /* V15.9.0 : Profil devient l'unique page pour compte + progression + sauvegarde. */
     const progression=sections.find(s=>/progression/i.test(settingLabel(s)));
     if(progression&&progression!==profile){
       const body=q('.compact-setting-body',progression);
@@ -7858,7 +6989,7 @@ body.v1358-settings-open{overflow:hidden!important}
 
 
 <style id="v1501-vitrines-fix-css">
-/* V15.8.1 — vitrines actuelles, ancien dashboard V10 supprimé physiquement */
+/* V15.9.0 — vitrines actuelles, ancien dashboard V10 supprimé physiquement */
 
 /* Le hub ne sert plus qu'au Rang XP en grand. Le Power garde sa vraie carte dédiée plus bas. */
 #v135-rank-hub{
@@ -7941,7 +7072,7 @@ body.v1358-settings-open{overflow:hidden!important}
       /* Rafraîchit seulement les données/visuels, sans recréer d'anciens modules. */
       try{window.renderXpRankLive?.()}catch(e){}
       try{window.renderPowerRankLive?.()}catch(e){}
-    }catch(e){console.warn('V15.8.1 vitrines',e)}
+    }catch(e){console.warn('V15.9.0 vitrines',e)}
   }
 
   window.v1501FixVitrines=fixVitrines;
@@ -8692,7 +7823,7 @@ if(typeof oldDetect==='function'&&!oldDetect.v1570){
   window.detectAutomaticPR.v1570=1;
 }
 
-/* Verrou V15.8.1 : impossible même de rouvrir la validation d'une séance déjà terminée. */
+/* Verrou V15.9.0 : impossible même de rouvrir la validation d'une séance déjà terminée. */
 const previousOpenRating=window.openRatingModal;
 if(typeof previousOpenRating==='function'&&!previousOpenRating.v1571){
   window.openRatingModal=function(){
@@ -8836,10 +7967,10 @@ document.addEventListener('visibilitychange',()=>{
 (function(){
 'use strict';
 function recover(){
-  try{loadFromLocalStorage?.()}catch(e){console.warn('V15.8.1 load local',e)}
-  try{updateProfileUI?.()}catch(e){console.warn('V15.8.1 profile',e)}
-  try{renderHistoryUI?.()}catch(e){console.warn('V15.8.1 history',e)}
-  try{initWorkoutSystem?.()}catch(e){console.warn('V15.8.1 workout',e)}
+  try{loadFromLocalStorage?.()}catch(e){console.warn('V15.9.0 load local',e)}
+  try{updateProfileUI?.()}catch(e){console.warn('V15.9.0 profile',e)}
+  try{renderHistoryUI?.()}catch(e){console.warn('V15.9.0 history',e)}
+  try{initWorkoutSystem?.()}catch(e){console.warn('V15.9.0 workout',e)}
   try{renderPowerHome?.()}catch(e){}
   try{window.v135RenderRankHub?.()}catch(e){}
   try{window.renderXpRankLive?.()}catch(e){}
@@ -8849,7 +7980,7 @@ function recover(){
     if(document.getElementById('panel-settings')?.classList.contains('active')){
       window.v15BuildSettings?.();
     }
-  }catch(e){console.warn('V15.8.1 settings',e)}
+  }catch(e){console.warn('V15.9.0 settings',e)}
 }
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',()=>setTimeout(recover,500),{once:true});
 else setTimeout(recover,250);
