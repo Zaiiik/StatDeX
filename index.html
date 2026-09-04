@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>LEVELING-APP — Powerbuilding Tracker V14.3.0</title>
+    <title>LEVELING-APP — Powerbuilding Tracker V14.5.0</title>
     <meta name="theme-color" content="#09090f">
     <meta name="application-name" content="LEVELING-APP">
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -1582,7 +1582,7 @@ header .hud-stat.v140-clickable:hover{
                 </div>
 
                 <div class="rank-card" onclick="playSound('click'); openRankShowcaseModal()">
-                    <div class="rank-title">RANG POWER · SBD / POIDS CORPOREL</div>
+                    <div class="rank-title">RANG POWER · SBD + POIDS DU CORPS</div>
                     <div class="rank-badge" id="rank-name">NOVICE</div>
                     <div class="sbd-total-display">Total : <strong id="val-sbd-total" style="color:var(--success);">150 kg</strong> (<span id="val-sbd-ratio" style="color:var(--accent-purple); font-weight:bold;">1.76x</span> PDC)</div>
                     <div class="rank-hint">🔍 Cliquer pour voir la vitrine des rangs & objectifs</div>
@@ -1817,7 +1817,7 @@ header .hud-stat.v140-clickable:hover{
                         <span class="cloud-badge" id="cloud-live-badge">☁️ CLOUD</span>
                     </div>
                     <div id="cloud-sync-detail" style="margin-top:8px;font-size:.62rem;color:#777;text-align:center">Initialisation du cloud…</div>
-                    <div style="margin-top:5px;font-size:.58rem;color:#555;text-align:center">LEVELING-APP V14.3.0 · Stable</div>
+                    <div style="margin-top:5px;font-size:.58rem;color:#555;text-align:center">LEVELING-APP V14.5.0 · Stable</div>
                     <button class="btn-action" onclick="logoutLeveling()" style="border-color:#ff5555;color:#ff7777">Se déconnecter</button>
                 </div>
 
@@ -2130,46 +2130,44 @@ header .hud-stat.v140-clickable:hover{
             return Math.round(val / 2.5) * 2.5;
         }
 
-        const ranksConfig = [
-            { minRatio: 7.5, name: '🔥 LÉGENDE', color: '#ff0033' },
-            { minRatio: 6.5, name: '⚡ ÉLITE', color: '#ffea00' },
-            { minRatio: 5.5, name: '💎 AVANCÉ', color: '#00d2ff' },
-            { minRatio: 4.5, name: '⚔️ INTERMÉDIAIRE', color: '#bd00ff' },
-            { minRatio: 3.5, name: '🛡️ APPRENTI', color: '#00ff66' },
-            { minRatio: 0.0, name: '🌱 NOVICE', color: '#aaaaaa' }
+        const POWER_RANKS = [
+            { name:'RECRUE',        icon:'🌱', minKg:0,   minRatio:0.0,  color:'#ff2d55', glow:'255,45,85',   motif:'✦' },
+            { name:'APPRENTI',      icon:'🛡️', minKg:225, minRatio:2.5,  color:'#39ff88', glow:'57,255,136',  motif:'◆' },
+            { name:'INTERMÉDIAIRE', icon:'⚔️', minKg:300, minRatio:3.5,  color:'#a855ff', glow:'168,85,255',  motif:'⚔' },
+            { name:'AVANCÉ',        icon:'💎', minKg:400, minRatio:4.5,  color:'#00e5ff', glow:'0,229,255',   motif:'◇' },
+            { name:'ÉLITE',         icon:'⚡', minKg:500, minRatio:5.5,  color:'#ffe600', glow:'255,230,0',   motif:'ϟ' },
+            { name:'LÉGENDE',       icon:'🔥', minKg:575, minRatio:6.25, color:'#ff1744', glow:'255,23,68',   motif:'✹' },
+            { name:'MONARQUE',      icon:'👑', minKg:650, minRatio:7.0,  color:'#ff35f2', glow:'255,53,242',  motif:'♛' }
         ];
 
+        /*
+          Rang Power hybride :
+          - force absolue = total SBD en kg
+          - force relative = total SBD / poids du corps
+          Pour obtenir un rang, les DEUX seuils doivent être atteints.
+        */
+        const ranksConfig = POWER_RANKS;
+
         function getSBDRank(total, bodyWeight) {
-            if (!bodyWeight || bodyWeight <= 0) bodyWeight = 85;
-            const ratio = total / bodyWeight;
-            for (let r of ranksConfig) {
-                if (ratio >= r.minRatio) return r;
+            total = Number(total || 0);
+            bodyWeight = Number(bodyWeight || userData?.weight || 0);
+            const ratio = bodyWeight > 0 ? total / bodyWeight : 0;
+            let rank = POWER_RANKS[0];
+            for (const r of POWER_RANKS) {
+                if (total >= r.minKg && ratio >= r.minRatio) rank = r;
             }
-            return ranksConfig[ranksConfig.length - 1];
+            return {...rank, ratio};
+        }
+
+        function getNextSBDRank(rank) {
+            const i = POWER_RANKS.findIndex(r => r.name === rank.name);
+            return i >= 0 && i < POWER_RANKS.length - 1 ? POWER_RANKS[i + 1] : null;
         }
 
         function openRankShowcaseModal() {
-            const container = document.getElementById('showcase-list-container');
-            const currentTotal = userData.squat + userData.bench + userData.deadlift;
-            const bw = userData.weight || 85;
-            const userRankObj = getSBDRank(currentTotal, bw);
-
-            let html = '';
-            ranksConfig.forEach(r => {
-                const isCurrent = (r.name === userRankObj.name);
-                const targetSBDWeight = Math.round(r.minRatio * bw);
-                html += `
-                    <div class="showcase-item ${isCurrent ? 'current-user-rank' : ''}">
-                        <div class="showcase-rank-info">
-                            <div style="color:${r.color};">${r.name} ${isCurrent ? ' (Votre Rang)' : ''}</div>
-                            <div>Objectif SBD min. : ~<strong>${targetSBDWeight} kg</strong></div>
-                        </div>
-                        <div class="showcase-ratio">≥ ${r.minRatio}x PDC</div>
-                    </div>
-                `;
-            });
-            container.innerHTML = html;
-            document.getElementById('modal-rank-showcase').style.display = 'flex';
+            if (typeof v135OpenPower === 'function') return v135OpenPower();
+            const modal = document.getElementById('modal-rank-showcase');
+            if (modal) modal.style.display = 'flex';
         }
 
         function closeRankShowcaseModal() {
@@ -3911,7 +3909,7 @@ const sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_PUBLISHABLE_KEY,{
   auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true,storage:window.localStorage}
 });
 let cloudUser=null,cloudLicensed=false,cloudLoadedOnce=false,cloudSaveTimer=null,suppressCloudSave=false,licenseWatchTimer=null,lastLicenseStatus='UNKNOWN';
-const APP_VERSION='14.3.0';
+const APP_VERSION='14.5.0';
 const ACCOUNT_LOCAL_KEYS=['solo_leveling_user','solo_leveling_smart_refs','solo_leveling_body_hist','solo_leveling_inv','solo_leveling_block','solo_leveling_day','solo_leveling_state','solo_leveling_custom_sets','solo_leveling_history','solo_leveling_active_program','solo_leveling_program_states','solo_leveling_program_custom_sets','solo_leveling_custom_program','leveling_last_local_save','leveling_last_cloud_sync','leveling_v10'];
 function clearLevelingAccountLocalData(){
   try{ACCOUNT_LOCAL_KEYS.forEach(k=>localStorage.removeItem(k));sessionStorage.removeItem('leveling_pending_license')}catch(e){console.warn('Local account cleanup:',e)}
@@ -4906,17 +4904,9 @@ const V135_XP_RANKS=[
   {name:'ASCENDANT',icon:'✨',min:50},
   {name:'EMPEREUR',icon:'👑',min:67}
 ];
-const V135_POWER_RANKS=[
-  {name:'RECRUE',icon:'🌱',min:0},
-  {name:'APPRENTI',icon:'🛡️',min:250},
-  {name:'INTERMÉDIAIRE',icon:'⚔️',min:350},
-  {name:'AVANCÉ',icon:'💎',min:425},
-  {name:'ÉLITE',icon:'⚡',min:500},
-  {name:'LÉGENDE',icon:'🔥',min:535},
-  {name:'MONARQUE',icon:'👑',min:569}
-];
+const V135_POWER_RANKS=POWER_RANKS;
 function v135XpRank(level){let r=V135_XP_RANKS[0];for(const x of V135_XP_RANKS)if(level>=x.min)r=x;return r}
-function v135PowerRank(total){let r=V135_POWER_RANKS[0];for(const x of V135_POWER_RANKS)if(total>=x.min)r=x;return r}
+function v135PowerRank(total){return getSBDRank(total,Number(userData?.weight||0))}
 function v135Next(arr,current){const i=arr.indexOf(current);return i>=0&&i<arr.length-1?arr[i+1]:null}
 function v135Close(id){document.getElementById(id).style.display='none'}
 function v135OpenXp(){
@@ -4928,23 +4918,61 @@ function v135OpenXp(){
   document.getElementById('v135-xp-modal').style.display='flex';
 }
 function v135OpenPower(){
-  const total=Number(userData.squat||0)+Number(userData.bench||0)+Number(userData.deadlift||0),cur=v135PowerRank(total),next=v135Next(V135_POWER_RANKS,cur);
-  document.getElementById('v135-power-showcase').innerHTML=V135_POWER_RANKS.map(r=>{
-    const current=r===cur,done=total>=r.min;
-    return `<div class="v135-rank-row ${current?'current':done?'done':'locked'}"><div class="v135-rank-icon">${done?r.icon:'🔒'}</div><div><b>${r.name}${current?' · TON RANG':''}</b><small>${r.min===0?'Départ':r.min+' kg SBD+'}</small></div><div class="v135-rank-state">${current?'ACTUEL':done?'✓':'🔒'}</div></div>`
-  }).join('')+(next?`<div class="v10-muted" style="text-align:center;margin-top:7px">${total} / ${next.min} kg avant ${next.name} · encore ${Math.max(0,next.min-total)} kg</div>`:`<div class="v10-muted" style="text-align:center;margin-top:7px">👑 MONARQUE · objectif 569 kg atteint</div>`);
-  document.getElementById('v135-power-modal').style.display='flex';
+  const total=Number(userData.squat||0)+Number(userData.bench||0)+Number(userData.deadlift||0);
+  const bw=Number(userData.weight||0);
+  const ratio=bw>0?total/bw:0;
+  const cur=getSBDRank(total,bw),next=getNextSBDRank(cur);
+  const box=document.getElementById('v135-power-showcase');
+  if(!box)return;
+
+  box.innerHTML=POWER_RANKS.map(r=>{
+    const current=r.name===cur.name;
+    const done=total>=r.minKg && ratio>=r.minRatio;
+    const kgPct=r.minKg>0?Math.min(100,total/r.minKg*100):100;
+    const ratioPct=r.minRatio>0?Math.min(100,ratio/r.minRatio*100):100;
+
+    return `<div class="power-rank-tier ${current?'current':done?'done':'locked'}"
+      style="--rank:${r.color};--rank-rgb:${r.glow}">
+      <div class="power-rank-pattern">${r.motif}</div>
+      <div class="power-rank-icon">${done?r.icon:'🔒'}</div>
+      <div class="power-rank-copy">
+        <b>${r.name}${current?' <em>TON RANG</em>':''}</b>
+        <small>${r.minKg===0?'Départ':`${r.minKg} kg SBD + ${r.minRatio.toFixed(2)}× PDC minimum`}</small>
+        <div class="power-rank-dual">
+          <span><i style="width:${kgPct}%"></i><b>${Math.round(total)}/${r.minKg||0} kg</b></span>
+          <span><i style="width:${ratioPct}%"></i><b>${ratio.toFixed(2)}/${r.minRatio.toFixed(2)}×</b></span>
+        </div>
+      </div>
+      <div class="power-rank-state">${current?'ACTUEL':done?'VALIDÉ':'VERROUILLÉ'}</div>
+    </div>`;
+  }).join('')+
+  `<div class="power-rank-summary" style="--rank:${cur.color};--rank-rgb:${cur.glow}">
+     <b>${cur.icon} ${cur.name}</b>
+     <span>${total} kg SBD · ${bw||0} kg PDC · ${ratio.toFixed(2)}× PDC</span>
+     ${next?`<small>Prochain : ${next.minKg} kg ET ${next.minRatio.toFixed(2)}× PDC</small>`:'<small>Rang maximum</small>'}
+   </div>`;
+
+  const modal=document.getElementById('v135-power-modal');
+  if(modal)modal.style.display='flex';
 }
 function v135RenderRankHub(){
   const dash=document.getElementById('v10-profile-dashboard');if(!dash)return;
   let hub=document.getElementById('v135-rank-hub');
   if(!hub){hub=document.createElement('div');hub.id='v135-rank-hub';hub.className='v135-rank-hub';dash.parentNode.insertBefore(hub,dash)}
   const lvl=Number(userData.level||1),xp=v135XpRank(lvl),nx=v135Next(V135_XP_RANKS,xp);
-  const total=Number(userData.squat||0)+Number(userData.bench||0)+Number(userData.deadlift||0),pw=v135PowerRank(total),np=v135Next(V135_POWER_RANKS,pw);
+  const total=Number(userData.squat||0)+Number(userData.bench||0)+Number(userData.deadlift||0);
+  const bw=Number(userData.weight||0),ratio=bw>0?total/bw:0;
+  const pw=getSBDRank(total,bw),np=getNextSBDRank(pw);
   const xpPct=nx?Math.max(0,Math.min(100,(lvl-xp.min)/(nx.min-xp.min)*100)):100;
-  const pwPct=np?Math.max(0,Math.min(100,(total-pw.min)/(np.min-pw.min)*100)):100;
+  let pwPct=100;
+  if(np){
+    const kgSpan=Math.max(1,np.minKg-pw.minKg), ratioSpan=Math.max(.01,np.minRatio-pw.minRatio);
+    const kgPct=Math.max(0,Math.min(100,(total-pw.minKg)/kgSpan*100));
+    const ratioPct=Math.max(0,Math.min(100,(ratio-pw.minRatio)/ratioSpan*100));
+    pwPct=Math.min(kgPct,ratioPct);
+  }
   hub.innerHTML=`<div class="v135-rank-card xp" onclick="playSound('click');v135OpenXp()"><div class="v135-rank-kicker">🎮 RANG XP</div><div class="v135-rank-name">${xp.icon} ${xp.name}</div><div class="v135-rank-meta">Niveau ${lvl}${nx?' · prochain : '+nx.name:' · MAX'}</div><div class="v135-progress"><i style="width:${xpPct}%"></i></div></div>
-  <div class="v135-rank-card power" onclick="playSound('click');v135OpenPower()"><div class="v135-rank-kicker">🏋️ RANG POWER</div><div class="v135-rank-name">${pw.icon} ${pw.name}</div><div class="v135-rank-meta">${total} kg SBD${np?' · '+np.min+' kg pour '+np.name:' · MAX'}</div><div class="v135-progress"><i style="width:${pwPct}%"></i></div></div>`;
+  <div class="v135-rank-card power" onclick="playSound('click');v135OpenPower()"><div class="v135-rank-kicker">🏋️ RANG POWER</div><div class="v135-rank-name" style="color:${pw.color};text-shadow:0 0 10px ${pw.color}">${pw.icon} ${pw.name}</div><div class="v135-rank-meta">${total} kg SBD · ${ratio.toFixed(2)}× PDC${np?' · prochain : '+np.minKg+' kg + '+np.minRatio.toFixed(2)+'×':' · MAX'}</div><div class="v135-progress"><i style="width:${pwPct}%;background:${pw.color};box-shadow:0 0 10px ${pw.color}"></i></div></div>`;
 }
 function v135CheckRankUp(){
   const lvl=Number(userData.level||1),r=v135XpRank(lvl),key='leveling_v135_last_xp_rank',old=localStorage.getItem(key);
@@ -4956,9 +4984,6 @@ function v135CheckRankUp(){
 function v135ApplyRankSystems(){
   try{
     hunterRanks.splice(0,hunterRanks.length,...V135_XP_RANKS.map(r=>[`${r.icon} ${r.name}`,r.min]));
-    ranksConfig.splice(0,ranksConfig.length,...V135_POWER_RANKS.slice().reverse().map(r=>({minRatio:0,name:`${r.icon} ${r.name}`,color:'var(--accent-rose)',minKg:r.min})));
-    getSBDRank=function(total){const r=v135PowerRank(Number(total||0));return {name:`${r.icon} ${r.name}`,color:'var(--accent-rose)',minRatio:0,minKg:r.min}};
-    openRankShowcaseModal=v135OpenPower;
   }catch(e){console.warn('V13.5 ranks',e)}
 }
 function v135ProfileNav(){
@@ -5249,11 +5274,11 @@ setTimeout(()=>{v1352CleanProfile();v1352AddNotificationSettings()},1000);
       const badge=document.getElementById('rank-name');
       if(badge){
         badge.textContent=`${rank.icon} ${rank.name}`;
-        badge.style.color='var(--accent-rose)';
+        badge.style.color=rank.color||'var(--accent-rose)';
       }
 
       const title=document.querySelector('.rank-card .rank-title');
-      if(title)title.textContent='RANG POWER · SBD / POIDS CORPOREL';
+      if(title)title.textContent='RANG POWER · SBD + POIDS DU CORPS';
 
       const powerCard=document.querySelector('#v135-rank-hub .v135-rank-card.power');
       if(powerCard){
@@ -5837,7 +5862,10 @@ function totals(){
  const squat=Number(window.userData?.squat||0),bench=Number(window.userData?.bench||0),dead=Number(window.userData?.deadlift||0);
  return {squat,bench,dead,total:squat+bench+dead};
 }
-function powerRank(t){if(t>=600)return['👑','MONARQUE',9999];if(t>=500)return['💎','ÉLITE',600];if(t>=425)return['⚔️','AVANCÉ',500];if(t>=300)return['🛡️','INTERMÉDIAIRE',425];return['🌱','NOVICE',300]}
+function powerRank(t){
+ const r=getSBDRank(Number(t||0),Number(userData?.weight||0)),n=getNextSBDRank(r);
+ return [r.icon,r.name,n?n.minKg:9999]
+}
 function currentProgram(){return window.userData?.activeProgram||window.userData?.program||'Programme'}
 function currentDay(){return window.userData?.currentDay||window.userData?.day||'Séance du jour'}
 function sessions(){let s=state();return s.trainingDays.length}
@@ -7878,7 +7906,7 @@ html.leveling-ios nav{-webkit-backdrop-filter:none!important;backdrop-filter:non
 
 
 <style id="v1430-stable-ui-css">
-/* ================= V14.3.0 — STABLE SETTINGS / PROGRESSION =================
+/* ================= V14.5.0 — STABLE SETTINGS / PROGRESSION =================
    Réglages: plus aucune sous-page fixed/overlay. Toutes les rubriques restent
    dans le scroll principal de l'app, donc plus de page coupée ni ouverture en bas. */
 #panel-settings{position:relative!important;overflow:visible!important;min-height:0!important}
@@ -7933,42 +7961,32 @@ body.v1358-settings-open{overflow:hidden!important}
 
 <script id="v1430-stable-core-js">
 (function(){
-  const VERSION='14.3.0';
+  const VERSION='14.5.0';
   const q=s=>document.querySelector(s);
   const qa=s=>[...document.querySelectorAll(s)];
   const localDay=(d=new Date())=>`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
 
-  /* ---------- 1. RANG POWER : UNE SEULE SOURCE ---------- */
-  const POWER_RANKS=[
-    {name:'RECRUE',icon:'🌱',min:0,color:'#aaaaaa'},
-    {name:'APPRENTI',icon:'🛡️',min:250,color:'#00ff66'},
-    {name:'INTERMÉDIAIRE',icon:'⚔️',min:350,color:'#bd00ff'},
-    {name:'AVANCÉ',icon:'💎',min:425,color:'#00d2ff'},
-    {name:'ÉLITE',icon:'⚡',min:500,color:'#ffea00'},
-    {name:'LÉGENDE',icon:'🔥',min:535,color:'#ff5b6e'},
-    {name:'MONARQUE',icon:'👑',min:569,color:'#ffcc33'}
-  ];
-  function unifiedPowerRank(total){
-    total=Number(total||0);let r=POWER_RANKS[0];for(const x of POWER_RANKS)if(total>=x.min)r=x;return r;
-  }
-  window.getUnifiedPowerRankV1430=unifiedPowerRank;
-  /* Toutes les anciennes zones qui demandaient getSBDRank récupèrent désormais le même rang. */
-  try{window.getSBDRank=function(total){return unifiedPowerRank(total)}}catch(e){}
-  try{getSBDRank=function(total){return unifiedPowerRank(total)}}catch(e){}
-  /* L'ancienne "Vitrine des rangs" ratio/PDC était la cause INTERMÉDIAIRE vs AVANCÉ. */
-  window.openRankShowcaseModal=function(){
-    try{q('#modal-rank-showcase')?.style.setProperty('display','none') }catch(e){}
-    if(typeof window.v135OpenPower==='function') return window.v135OpenPower();
-    if(typeof v135OpenPower==='function') return v135OpenPower();
-  };
-
+  /* ---------- 1. RANG POWER : SOURCE CANONIQUE V14.5 ---------- */
   function refreshRanks(){
     const total=Number(window.userData?.squat||0)+Number(window.userData?.bench||0)+Number(window.userData?.deadlift||0);
-    const r=unifiedPowerRank(total);
-    const legacy=q('#rank-name');if(legacy){legacy.textContent=`${r.icon} ${r.name}`;legacy.style.color=r.color}
-    const pv=q('#profile-v2-rank');if(pv)pv.textContent=`${r.icon} ${r.name}`;
+    const bw=Number(window.userData?.weight||0);
+    const r=getSBDRank(total,bw);
+    const legacy=q('#rank-name');
+    if(legacy){
+      legacy.textContent=`${r.icon} ${r.name}`;
+      legacy.style.color=r.color;
+      legacy.style.textShadow=`0 0 9px ${r.color},0 0 22px ${r.color}`;
+    }
+    const pv=q('#profile-v2-rank');
+    if(pv)pv.textContent=`${r.icon} ${r.name} · ${total} kg · ${r.ratio.toFixed(2)}× PDC`;
     try{if(typeof window.v135RenderRankHub==='function')window.v135RenderRankHub()}catch(e){}
   }
+
+  window.openRankShowcaseModal=function(){
+    try{q('#modal-rank-showcase')?.style.setProperty('display','none')}catch(e){}
+    if(typeof window.v135OpenPower==='function')return window.v135OpenPower();
+    if(typeof v135OpenPower==='function')return v135OpenPower();
+  };
 
   /* ---------- 2. RÉGLAGES : PAS D'OVERLAY, PAS DE SCROLL ALÉATOIRE ---------- */
   function sectionLabel(sec){return (sec?.querySelector('.compact-setting-title')?.textContent||sec?.textContent||'').toLowerCase()}
@@ -8107,6 +8125,214 @@ body.v1358-settings-open{overflow:hidden!important}
   document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')setTimeout(boot,120)});
 })();
 </script>
+
+
+
+<style id="v1440-power-rank-clean-css">
+/* V14.5.0 — RANG POWER PROPRE
+   Une seule logique: total Squat + Bench + Deadlift en KG.
+   Une identité visuelle distincte par rang. */
+
+#v135-power-modal .modal-content{
+  width:min(620px,96vw)!important;
+  max-width:620px!important;
+  border:1px solid rgba(255,255,255,.12)!important;
+  background:
+    radial-gradient(circle at 50% -15%,rgba(168,85,255,.22),transparent 38%),
+    linear-gradient(180deg,#0b0710,#07070c)!important;
+  box-shadow:0 0 34px rgba(168,85,255,.18),0 0 80px rgba(255,23,68,.08)!important;
+}
+
+#v135-power-modal h2{
+  color:#fff!important;
+  text-shadow:0 0 9px #fff,0 0 22px var(--accent-purple)!important;
+  letter-spacing:.08em!important;
+}
+
+#v135-power-showcase{
+  display:flex!important;
+  flex-direction:column!important;
+  gap:9px!important;
+  margin-top:12px!important;
+}
+
+.power-rank-tier{
+  --rank:#aaa;
+  --rank-rgb:170,170,170;
+  position:relative;
+  min-height:78px;
+  display:grid;
+  grid-template-columns:48px minmax(0,1fr) auto;
+  align-items:center;
+  gap:11px;
+  padding:12px 13px;
+  overflow:hidden;
+  border-radius:13px;
+  border:1px solid rgba(var(--rank-rgb),.38);
+  background:
+    linear-gradient(105deg,rgba(var(--rank-rgb),.13),rgba(10,10,16,.96) 48%,rgba(var(--rank-rgb),.06));
+  box-shadow:
+    inset 0 0 22px rgba(var(--rank-rgb),.045),
+    0 0 10px rgba(var(--rank-rgb),.08);
+}
+
+.power-rank-tier::before{
+  content:"";
+  position:absolute;
+  inset:-1px;
+  pointer-events:none;
+  background:
+    linear-gradient(115deg,transparent 0 32%,rgba(var(--rank-rgb),.11) 32.5% 33.5%,transparent 34% 64%,rgba(var(--rank-rgb),.07) 64.5% 65.5%,transparent 66%),
+    radial-gradient(circle at 88% 25%,rgba(var(--rank-rgb),.16),transparent 31%);
+  opacity:.9;
+}
+
+.power-rank-pattern{
+  position:absolute;
+  right:12%;
+  top:50%;
+  transform:translateY(-50%) rotate(-13deg);
+  font-size:5rem;
+  line-height:1;
+  font-weight:1000;
+  color:var(--rank);
+  opacity:.065;
+  filter:drop-shadow(0 0 12px rgba(var(--rank-rgb),.7));
+  pointer-events:none;
+}
+
+.power-rank-icon{
+  position:relative;
+  z-index:1;
+  width:44px;height:44px;
+  display:grid;place-items:center;
+  border-radius:12px;
+  font-size:1.35rem;
+  background:rgba(var(--rank-rgb),.10);
+  border:1px solid rgba(var(--rank-rgb),.42);
+  box-shadow:inset 0 0 14px rgba(var(--rank-rgb),.16);
+}
+
+.power-rank-copy{position:relative;z-index:1;min-width:0}
+.power-rank-copy b{
+  display:flex;align-items:center;gap:8px;flex-wrap:wrap;
+  color:var(--rank);
+  font-size:.84rem;
+  letter-spacing:.055em;
+  text-shadow:0 0 9px rgba(var(--rank-rgb),.72);
+}
+.power-rank-copy b em{
+  font-style:normal;
+  font-size:.48rem;
+  color:#fff;
+  padding:3px 6px;
+  border-radius:99px;
+  background:rgba(var(--rank-rgb),.24);
+  border:1px solid rgba(var(--rank-rgb),.65);
+  box-shadow:0 0 10px rgba(var(--rank-rgb),.30);
+}
+.power-rank-copy small{
+  display:block;
+  color:#9292a2;
+  font-size:.56rem;
+  margin-top:4px;
+}
+.power-rank-state{
+  position:relative;z-index:1;
+  font-size:.49rem;
+  font-weight:1000;
+  letter-spacing:.08em;
+  color:rgba(255,255,255,.45);
+}
+
+.power-rank-tier.done{
+  border-color:rgba(var(--rank-rgb),.62);
+}
+.power-rank-tier.done .power-rank-state{color:rgba(var(--rank-rgb),.88)}
+
+.power-rank-tier.current{
+  transform:scale(1.012);
+  border-color:var(--rank);
+  background:
+    linear-gradient(105deg,rgba(var(--rank-rgb),.27),rgba(9,8,15,.97) 47%,rgba(var(--rank-rgb),.16));
+  box-shadow:
+    0 0 10px rgba(var(--rank-rgb),.65),
+    0 0 27px rgba(var(--rank-rgb),.34),
+    inset 0 0 28px rgba(var(--rank-rgb),.12);
+}
+.power-rank-tier.current .power-rank-icon{
+  background:rgba(var(--rank-rgb),.20);
+  border-color:var(--rank);
+  box-shadow:0 0 16px rgba(var(--rank-rgb),.48),inset 0 0 15px rgba(var(--rank-rgb),.20);
+}
+.power-rank-tier.current .power-rank-state{
+  color:#fff;
+  text-shadow:0 0 8px var(--rank),0 0 16px var(--rank);
+}
+.power-rank-tier.locked{opacity:.48;filter:saturate(.45)}
+
+.power-rank-mini{
+  width:100%;
+  height:4px;
+  margin-top:7px;
+  border-radius:99px;
+  overflow:hidden;
+  background:rgba(255,255,255,.07);
+}
+.power-rank-mini i{
+  display:block;height:100%;
+  border-radius:inherit;
+  background:linear-gradient(90deg,var(--rank),#fff,var(--rank));
+  box-shadow:0 0 9px var(--rank);
+}
+
+.power-rank-summary{
+  --rank:#fff;--rank-rgb:255,255,255;
+  margin-top:3px;
+  padding:10px 12px;
+  border-radius:11px;
+  text-align:center;
+  border:1px solid rgba(var(--rank-rgb),.52);
+  background:rgba(var(--rank-rgb),.08);
+  box-shadow:0 0 18px rgba(var(--rank-rgb),.12);
+}
+.power-rank-summary b{
+  display:block;color:var(--rank);
+  text-shadow:0 0 10px rgba(var(--rank-rgb),.7);
+  font-size:.8rem;
+}
+.power-rank-summary span{display:block;margin-top:4px;font-size:.58rem;color:#aaa}
+
+/* La grosse carte Profil prend automatiquement la couleur du rang courant. */
+.rank-card.v1354-power-hero{
+  overflow:hidden!important;
+  position:relative!important;
+}
+.rank-card.v1354-power-hero::after{
+  content:"⚔"!important;
+  opacity:.07!important;
+  filter:drop-shadow(0 0 16px currentColor)!important;
+}
+#rank-name{font-weight:1000!important}
+
+@media(max-width:520px){
+  .power-rank-tier{grid-template-columns:42px minmax(0,1fr);padding:10px;min-height:72px}
+  .power-rank-state{grid-column:2;font-size:.45rem;margin-top:-4px}
+  .power-rank-icon{width:38px;height:38px;font-size:1.15rem}
+  .power-rank-copy b{font-size:.75rem}
+  .power-rank-pattern{font-size:4.2rem;right:7%}
+}
+</style>
+
+
+<style id="v1450-hybrid-power-rank-css">
+.power-rank-dual{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:8px}
+.power-rank-dual>span{position:relative;height:17px;border-radius:99px;overflow:hidden;background:rgba(255,255,255,.06);border:1px solid rgba(var(--rank-rgb),.18)}
+.power-rank-dual>span>i{position:absolute;inset:0 auto 0 0;border-radius:inherit;background:linear-gradient(90deg,rgba(var(--rank-rgb),.50),var(--rank));box-shadow:0 0 8px rgba(var(--rank-rgb),.45)}
+.power-rank-dual>span>b{position:relative;z-index:1;display:block;text-align:center;line-height:15px;font-size:.43rem;color:#fff;text-shadow:0 1px 3px #000}
+.power-rank-summary small{display:block;margin-top:4px;font-size:.53rem;color:#d1d1dd}
+@media(max-width:430px){.power-rank-dual{grid-template-columns:1fr}.power-rank-tier{min-height:90px}}
+</style>
 
 </body>
 </html>
