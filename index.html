@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>LEVELING-APP — Powerbuilding Tracker V15.10.0 PROGRESSION CORE CLEAN</title>
+    <title>LEVELING-APP — Powerbuilding Tracker V15.13.0 CLOUD STATE CLEAN</title>
     <meta name="theme-color" content="#09090f">
     <meta name="application-name" content="LEVELING-APP">
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -869,87 +869,8 @@ header .hud-stat.v140-clickable:hover{
   content:" 🔥";
 }
 </style>
-<style id="v1409-month-calendar-css">
-/* V14.0.9 — calendrier mensuel Solo Leveling */
-#v140-streak-modal .v140-modalbox{
-  width:min(560px,96vw)!important;
-  max-height:88dvh!important;
-  overflow:auto!important;
-  padding:16px!important;
-  text-align:left!important;
-  background:
-    radial-gradient(circle at 50% -15%,rgba(189,0,255,.25),transparent 38%),
-    linear-gradient(180deg,#101018,#08080d)!important;
-  border:1px solid color-mix(in srgb,var(--accent-purple) 70%,#3a3045)!important;
-  box-shadow:0 0 35px rgba(189,0,255,.20)!important;
-}
-.v1409-cal-head{
-  display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:12px
-}
-.v1409-cal-title{
-  flex:1;text-align:center;font-size:1rem;font-weight:1000;color:#fff;
-  text-transform:uppercase;letter-spacing:.06em;text-shadow:0 0 12px var(--accent-purple)
-}
-.v1409-nav{
-  width:38px;height:38px;border-radius:10px;border:1px solid #353541;background:#111119;
-  color:#fff;font-size:1.2rem;font-weight:1000;cursor:pointer
-}
-.v1409-weekdays,.v1409-grid{
-  display:grid;grid-template-columns:repeat(7,1fr);gap:6px
-}
-.v1409-weekdays{margin-bottom:6px}
-.v1409-weekdays div{
-  text-align:center;font-size:.57rem;color:#7f7f8d;font-weight:900
-}
-.v1409-day{
-  min-height:58px;border-radius:10px;border:1px solid #282832;background:#101017;
-  padding:6px;position:relative;display:flex;flex-direction:column;justify-content:space-between;
-  transition:.15s
-}
-.v1409-day.other{opacity:.24}
-.v1409-day.today{
-  border-color:var(--accent-purple);
-  box-shadow:0 0 12px rgba(189,0,255,.22)
-}
-.v1409-day.validated{
-  border-color:#00e676;
-  background:linear-gradient(145deg,rgba(0,230,118,.13),#0d1512);
-  box-shadow:inset 0 0 14px rgba(0,230,118,.05)
-}
-.v1409-num{font-size:.68rem;font-weight:900;color:#ddd}
-.v1409-day.validated .v1409-num{color:#a8ffc8}
-.v1409-check{font-size:.82rem;align-self:flex-end}
-.v1409-session-label{
-  font-size:.47rem;line-height:1.15;color:#8dffba;white-space:nowrap;overflow:hidden;text-overflow:ellipsis
-}
-.v1409-stats{
-  display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin:12px 0
-}
-.v1409-stat{
-  background:#101017;border:1px solid #292933;border-radius:10px;padding:9px;text-align:center
-}
-.v1409-stat span{display:block;font-size:.5rem;color:#777;text-transform:uppercase}
-.v1409-stat b{display:block;margin-top:4px;font-size:.9rem;color:#fff}
-.v1409-legend{
-  display:flex;gap:12px;flex-wrap:wrap;font-size:.55rem;color:#8c8c98;margin:8px 0
-}
-.v1409-dot{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:4px;vertical-align:-1px}
-.v1409-dot.done{background:#00e676;box-shadow:0 0 5px rgba(0,230,118,.6)}
-.v1409-dot.today{background:var(--accent-purple)}
-#v140-streak-modal .v140-week{display:none!important}
-#v140-streak-modal .stats{display:none!important}
-@media(max-width:480px){
-  #v140-streak-modal{padding:8px!important}
-  #v140-streak-modal .v140-modalbox{padding:12px!important}
-  .v1409-day{min-height:48px;padding:4px}
-  .v1409-grid,.v1409-weekdays{gap:4px}
-  .v1409-session-label{display:none}
-  .v1409-stats{gap:5px}
-}
-</style>
-
 <style id="v1563-settings-controller-clean-css">
-/* V15.10.0 — un seul contrôleur Réglages */
+/* V15.13.0 — un seul contrôleur Réglages */
 #panel-settings.v151-ready > #v135-settings-tabs,
 #panel-settings.v151-ready > .v135-settings-tabs,
 #panel-settings.v151-ready > #v15-settings-tabs,
@@ -989,6 +910,72 @@ header .hud-stat.v140-clickable:hover{
 .day-tab.v1590-inprogress{border-color:#ffd54f!important}
 .day-tab.v1590-inprogress::after{content:" ⏳"!important;margin-left:4px!important;color:#ffd54f!important}
 @media(max-width:600px){#v1402-account-btn{width:31px;height:31px;min-width:31px}}
+</style>
+
+
+<style id="v15110-calendar-clean-css">
+#v140-streak-modal .v140-modalbox{
+  width:min(560px,96vw)!important;
+  max-height:88dvh!important;
+  overflow:auto!important;
+  padding:16px!important;
+  text-align:left!important;
+  background:
+    radial-gradient(circle at 50% -15%,rgba(189,0,255,.25),transparent 38%),
+    linear-gradient(180deg,#101018,#08080d)!important;
+  border:1px solid color-mix(in srgb,var(--accent-purple) 70%,#3a3045)!important;
+  box-shadow:0 0 35px rgba(189,0,255,.20)!important;
+}
+#v15110-calendar-root{min-width:0}
+.v15110-cal-head{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:12px}
+.v15110-cal-title{
+  flex:1;text-align:center;font-size:1rem;font-weight:1000;color:#fff;
+  text-transform:uppercase;letter-spacing:.06em;text-shadow:0 0 12px var(--accent-purple)
+}
+.v15110-nav{
+  width:38px;height:38px;border-radius:10px;border:1px solid #353541;background:#111119;
+  color:#fff;font-size:1.2rem;font-weight:1000;cursor:pointer
+}
+.v15110-weekdays,.v15110-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:6px}
+.v15110-weekdays{margin-bottom:6px}
+.v15110-weekdays div{text-align:center;font-size:.57rem;color:#7f7f8d;font-weight:900}
+.v15110-day{
+  min-height:58px;border-radius:10px;border:1px solid #282832;background:#101017;
+  padding:6px;position:relative;display:flex;flex-direction:column;justify-content:space-between
+}
+.v15110-day.other{opacity:.24}
+.v15110-day.today{border-color:var(--accent-purple);box-shadow:0 0 12px rgba(189,0,255,.22)}
+.v15110-day.validated{
+  border-color:#00e676;background:linear-gradient(145deg,rgba(0,230,118,.13),#0d1512);
+  box-shadow:inset 0 0 14px rgba(0,230,118,.05)
+}
+.v15110-num{font-size:.68rem;font-weight:900;color:#ddd}
+.v15110-day.validated .v15110-num{color:#a8ffc8}
+.v15110-check{font-size:.82rem;align-self:flex-end}
+.v15110-label{
+  font-size:.47rem;line-height:1.15;color:#8dffba;white-space:nowrap;overflow:hidden;text-overflow:ellipsis
+}
+.v15110-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin:12px 0}
+.v15110-stat{background:#101017;border:1px solid #292933;border-radius:10px;padding:9px;text-align:center}
+.v15110-stat span{display:block;font-size:.5rem;color:#777;text-transform:uppercase}
+.v15110-stat b{display:block;margin-top:4px;font-size:.9rem;color:#fff}
+.v15110-legend{display:flex;gap:12px;flex-wrap:wrap;font-size:.55rem;color:#8c8c98;margin:8px 0}
+.v15110-dot{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:4px;vertical-align:-1px}
+.v15110-dot.done{background:#00e676;box-shadow:0 0 5px rgba(0,230,118,.6)}
+.v15110-dot.today{background:var(--accent-purple)}
+#v140-streak-modal .v140-week,#v140-streak-modal .stats{display:none!important}
+.v15110-calendar-icon{
+  font-size:15px!important;line-height:1!important;
+  filter:drop-shadow(0 0 4px rgba(189,0,255,.55))
+}
+@media(max-width:480px){
+  #v140-streak-modal{padding:8px!important}
+  #v140-streak-modal .v140-modalbox{padding:12px!important}
+  .v15110-day{min-height:48px;padding:4px}
+  .v15110-grid,.v15110-weekdays{gap:4px}
+  .v15110-label{display:none}
+  .v15110-stats{gap:5px}
+}
 </style>
 
 </head>
@@ -1298,7 +1285,7 @@ header .hud-stat.v140-clickable:hover{
                         <span class="cloud-badge" id="cloud-live-badge">☁️ CLOUD</span>
                     </div>
                     <div id="cloud-sync-detail" style="margin-top:8px;font-size:.62rem;color:#777;text-align:center">Initialisation du cloud…</div>
-                    <div style="margin-top:5px;font-size:.58rem;color:#555;text-align:center">LEVELING-APP V15.10.0 · Stable</div>
+                    <div style="margin-top:5px;font-size:.58rem;color:#555;text-align:center">LEVELING-APP V15.13.0 · Stable</div>
                     <button class="btn-action" onclick="logoutLeveling()" style="border-color:#ff5555;color:#ff7777">Se déconnecter</button>
                 </div>
 
@@ -1573,7 +1560,7 @@ header .hud-stat.v140-clickable:hover{
             autoProgression: true
         };
 
-        /* V15.10.0 — CANONICAL USER STATE BRIDGE
+        /* V15.13.0 — CANONICAL USER STATE BRIDGE
            `userData` est déclaré avec `let`, donc il n'est pas automatiquement disponible
            via `window.userData`. Plusieurs anciens modules lisaient pourtant window.userData,
            ce qui produisait 0 kg / RECRUE malgré des données correctes.
@@ -2940,7 +2927,7 @@ header .hud-stat.v140-clickable:hover{
                 return false;
             }
 
-            /* V15.10.0 HARD LOCK : écrit AVANT toute récompense / compteur. */
+            /* V15.13.0 HARD LOCK : écrit AVANT toute récompense / compteur. */
             const __validationKey = `leveling_validated_${activeProgramKey}_${currentBlockIndex}_${currentDayIndex}`;
             if (localStorage.getItem(__validationKey) === '1' || !!userData?.validatedSessions?.[__validationKey]) {
                 document.getElementById('modal-rating').style.display = 'none';
@@ -3376,7 +3363,7 @@ function setCloudStatus(state,text){
   if(badge)badge.textContent=state==='synced'?'☁️ SYNCHRONISÉ':state==='syncing'?'☁️ SYNC…':state==='offline'?'📴 HORS LIGNE':'☁️ CLOUD';
   if(detail)detail.textContent=state==='offline'?'Changements enregistrés sur cet appareil. Synchronisation à la reconnexion.':(text||formatSyncAge(lastCloudSyncAt));
 }
-setInterval(()=>{if(lastCloudSyncAt&&cloudUser&&cloudLicensed&&navigator.onLine)setCloudStatus('synced')},5000);
+setInterval(()=>{if(lastCloudSyncAt&&cloudUser&&cloudLicensed&&navigator.onLine&&document.visibilityState==='visible')setCloudStatus('synced')},60000);
 function scheduleCloudSaveImmediate(){if(!cloudUser||!cloudLicensed||suppressCloudSave)return;clearTimeout(cloudSaveTimer);saveCloudData()}
 window.scheduleCloudSaveImmediate=scheduleCloudSaveImmediate;
 
@@ -3495,7 +3482,7 @@ async function checkAppRelease(){
   }catch(e){console.warn('Release check:',e)}
   finally{releaseCheckBusy=false}
 }
-const releasePollTimer=setInterval(()=>{if(cloudUser&&cloudLicensed&&document.visibilityState==='visible')checkAppRelease()},30000);
+const releasePollTimer=setInterval(()=>{if(cloudUser&&cloudLicensed&&document.visibilityState==='visible')checkAppRelease()},300000);
 
 async function initSupabaseGate(){
   const {data:{session}}=await sb.auth.getSession();
@@ -4347,7 +4334,7 @@ function v135ProfileNav(){
   const h=panel.querySelector('h2');if(h)h.after(nav);
 }
 function v135Settings(){
-  /* V15.10.0: ancien contrôleur Réglages supprimé.
+  /* V15.13.0: ancien contrôleur Réglages supprimé.
      On conserve seulement la transformation source nécessaire au DOM moderne. */
   try{if(typeof initCompactSettings==='function')initCompactSettings()}catch(e){}
   return false;
@@ -4869,13 +4856,6 @@ document.addEventListener('visibilitychange',()=>{if(document.visibilityState===
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',()=>setTimeout(run,1900));
   else setTimeout(run,1900);
 
-  const obs=new MutationObserver(()=>{
-    if(obs.v1422Pending)return;
-    obs.v1422Pending=true;
-    setTimeout(()=>{obs.v1422Pending=false;run()},20);
-  });
-  obs.observe(document.getElementById('app-container')||document.documentElement,{childList:true,subtree:true});
-
   document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')setTimeout(run,80)});
 })();
 </script>
@@ -5033,357 +5013,206 @@ window.LevelingHeaderSessionV159={refresh,syncAvatar,refreshDayStatus};
 })();
 </script>
 
-<script id="v1409-month-calendar-js">
+<script id="v15110-calendar-clean">
 (function(){
-  let viewDate=new Date();
-  viewDate.setDate(1);
+'use strict';
 
-  function localDateKey(d){
-    const y=d.getFullYear(),m=String(d.getMonth()+1).padStart(2,'0'),day=String(d.getDate()).padStart(2,'0');
-    return `${y}-${m}-${day}`;
-  }
+let viewDate=new Date();
+viewDate.setDate(1);
 
-  function allValidatedSessions(){
-    const map={};
+const localDateKey=d=>{
+  const y=d.getFullYear(),m=String(d.getMonth()+1).padStart(2,'0'),day=String(d.getDate()).padStart(2,'0');
+  return `${y}-${m}-${day}`;
+};
 
-    /* Nouveau système V14 */
-    try{
-      const s=JSON.parse(localStorage.getItem('leveling_v140_rpg')||'{}');
-      (s.trainingDays||[]).forEach(k=>{if(k)map[k]=map[k]||'Séance validée'});
-    }catch(e){}
+function sessionMap(){
+  const map={};
 
-    /* Ancien système V10 : contient les vraies séances et leur programme. */
-    try{
-      const v=JSON.parse(localStorage.getItem('leveling_v10')||'{}');
-      (v.sessions||[]).forEach(x=>{
-        if(!x?.date)return;
-        const k=String(x.date).slice(0,10);
-        map[k]=x.program?String(x.program).replace(/^./,c=>c.toUpperCase()):'Séance validée';
-      });
-    }catch(e){}
-
-    /* Marqueurs anti-farm récents : si la séance du jour est validée,
-       on l'ajoute même si l'ancien système n'a pas encore écrit trainingDays. */
-    try{
-      const today=localDateKey(new Date());
-      const prefix='leveling_validated_';
-      for(let i=0;i<localStorage.length;i++){
-        const key=localStorage.key(i);
-        if(key?.startsWith(prefix)&&localStorage.getItem(key)==='1'){
-          map[today]=map[today]||'Séance validée';
-        }
-      }
-    }catch(e){}
-
-    return map;
-  }
-
-  function currentStreak(keys){
-    const set=new Set(keys),d=new Date();let n=0,started=false;
-    for(let i=0;i<366;i++){
-      const k=localDateKey(d);
-      if(set.has(k)){n++;started=true}
-      else if(started)break;
-      d.setDate(d.getDate()-1);
-    }
-    return n;
-  }
-
-  function bestStreak(keys){
-    const arr=[...new Set(keys)].sort();
-    let best=0,cur=0,prev=null;
-    arr.forEach(k=>{
-      const d=new Date(k+'T12:00:00');
-      if(prev){
-        const diff=Math.round((d-prev)/86400000);
-        cur=diff===1?cur+1:1;
-      }else cur=1;
-      best=Math.max(best,cur);prev=d;
+  /* Source canonique V15.10 : sessions de progression. */
+  try{
+    const v=window.__levelingV10Export?.()||{};
+    (v.sessions||[]).forEach(x=>{
+      const k=String(x?.date||'').slice(0,10);
+      if(!k)return;
+      const meta=typeof getProgramMeta==='function'?getProgramMeta(x.program):null;
+      map[k]=meta?.title||'Séance validée';
     });
-    return best;
-  }
+  }catch(e){}
 
-  function ensureShell(){
-    const modal=document.getElementById('v140-streak-modal');
-    const box=modal?.querySelector('.v140-modalbox');
-    if(!modal||!box)return null;
-    let root=box.querySelector('#v1409-calendar-root');
-    if(!root){
-      root=document.createElement('div');
-      root.id='v1409-calendar-root';
-      const oldTitle=box.querySelector('.v140-title');
-      oldTitle?.after(root);
+  /* TrainingDays reste le stockage calendrier/streak persistant. */
+  try{
+    const rpg=JSON.parse(localStorage.getItem('leveling_v140_rpg')||'{}')||{};
+    (rpg.trainingDays||[]).forEach(k=>{
+      if(k)map[String(k).slice(0,10)]=map[String(k).slice(0,10)]||'Séance validée';
+    });
+  }catch(e){}
+
+  /* Compatibilité des validations du cycle courant. */
+  try{
+    const today=localDateKey(new Date());
+    for(let i=0;i<localStorage.length;i++){
+      const k=localStorage.key(i);
+      if(k?.startsWith('leveling_validated_')&&localStorage.getItem(k)==='1'){
+        map[today]=map[today]||'Séance validée';
+      }
     }
-    return {modal,box,root};
+  }catch(e){}
+
+  return map;
+}
+
+function currentStreak(keys){
+  const set=new Set(keys),d=new Date();
+  let n=0,started=false;
+  for(let i=0;i<366;i++){
+    const k=localDateKey(d);
+    if(set.has(k)){n++;started=true}
+    else if(started)break;
+    d.setDate(d.getDate()-1);
+  }
+  return n;
+}
+function bestStreak(keys){
+  const arr=[...new Set(keys)].sort();
+  let best=0,cur=0,prev=null;
+  arr.forEach(k=>{
+    const d=new Date(k+'T12:00:00');
+    if(prev){
+      const diff=Math.round((d-prev)/86400000);
+      cur=diff===1?cur+1:1;
+    }else cur=1;
+    best=Math.max(best,cur);
+    prev=d;
+  });
+  return best;
+}
+
+function ensureModal(){
+  let modal=document.getElementById('v140-streak-modal');
+  if(!modal){
+    document.body.insertAdjacentHTML('beforeend',`
+      <div id="v140-streak-modal">
+        <div class="v140-modalbox">
+          <div class="v140-title">🔥 CALENDRIER D'ENTRAÎNEMENT</div>
+          <div id="v15110-calendar-root"></div>
+          <button class="v140-close" onclick="this.closest('#v140-streak-modal').style.display='none'">FERMER</button>
+        </div>
+      </div>`);
+    modal=document.getElementById('v140-streak-modal');
+  }
+  const box=modal.querySelector('.v140-modalbox');
+  let root=box.querySelector('#v15110-calendar-root');
+  if(!root){
+    root=document.createElement('div');
+    root.id='v15110-calendar-root';
+    (box.querySelector('.v140-title')||box.firstElementChild)?.after(root);
+  }
+  return {modal,root};
+}
+
+function render(){
+  const {modal,root}=ensureModal();
+  const sessions=sessionMap(),keys=Object.keys(sessions);
+  const y=viewDate.getFullYear(),m=viewDate.getMonth();
+  const first=new Date(y,m,1),start=new Date(first);
+  start.setDate(1-((first.getDay()+6)%7));
+
+  const monthName=new Intl.DateTimeFormat('fr-FR',{month:'long',year:'numeric'}).format(first);
+
+  let cells='';
+  for(let i=0;i<42;i++){
+    const d=new Date(start); d.setDate(start.getDate()+i);
+    const k=localDateKey(d);
+    const same=d.getMonth()===m,done=!!sessions[k],today=k===localDateKey(new Date());
+    cells+=`<div class="v15110-day ${same?'':'other'} ${done?'validated':''} ${today?'today':''}">
+      <span class="v15110-num">${d.getDate()}</span>
+      ${done?`<span class="v15110-label">${sessions[k]}</span><span class="v15110-check">✔️</span>`:''}
+    </div>`;
   }
 
-  function renderCalendar(){
-    const shell=ensureShell();if(!shell)return;
-    const {modal,root}=shell, sessions=allValidatedSessions(),keys=Object.keys(sessions);
+  const prefix=`${y}-${String(m+1).padStart(2,'0')}`;
+  const monthCount=keys.filter(k=>k.startsWith(prefix)).length;
+  const current=window.LevelingProgressionV15?.getStreak?.() ?? currentStreak(keys);
 
-    const y=viewDate.getFullYear(),m=viewDate.getMonth();
-    const first=new Date(y,m,1);
-    const start=new Date(first);
-    start.setDate(1-((first.getDay()+6)%7)); // lundi
-    const monthName=new Intl.DateTimeFormat('fr-FR',{month:'long',year:'numeric'}).format(first);
+  root.innerHTML=`
+    <div class="v15110-cal-head">
+      <button class="v15110-nav" data-dir="-1">‹</button>
+      <div class="v15110-cal-title">⚔️ ${monthName}</div>
+      <button class="v15110-nav" data-dir="1">›</button>
+    </div>
+    <div class="v15110-weekdays"><div>LUN</div><div>MAR</div><div>MER</div><div>JEU</div><div>VEN</div><div>SAM</div><div>DIM</div></div>
+    <div class="v15110-grid">${cells}</div>
+    <div class="v15110-stats">
+      <div class="v15110-stat"><span>Ce mois</span><b>${monthCount}</b></div>
+      <div class="v15110-stat"><span>Série actuelle</span><b>${current} 🔥</b></div>
+      <div class="v15110-stat"><span>Meilleure série</span><b>${bestStreak(keys)} j</b></div>
+    </div>
+    <div class="v15110-legend">
+      <span><i class="v15110-dot done"></i>Séance validée</span>
+      <span><i class="v15110-dot today"></i>Aujourd'hui</span>
+    </div>`;
 
-    let cells='';
-    for(let i=0;i<42;i++){
-      const d=new Date(start);d.setDate(start.getDate()+i);
-      const k=localDateKey(d),same=d.getMonth()===m,done=!!sessions[k],isToday=k===localDateKey(new Date());
-      cells+=`<div class="v1409-day ${same?'':'other'} ${done?'validated':''} ${isToday?'today':''}">
-        <span class="v1409-num">${d.getDate()}</span>
-        ${done?`<span class="v1409-session-label">${sessions[k]}</span><span class="v1409-check">✔️</span>`:''}
-      </div>`;
+  root.querySelectorAll('[data-dir]').forEach(btn=>{
+    btn.onclick=()=>{
+      viewDate.setMonth(viewDate.getMonth()+Number(btn.dataset.dir));
+      render();
+    };
+  });
+
+  modal.style.display='flex';
+}
+
+function openCalendar(){
+  viewDate=new Date();
+  viewDate.setDate(1);
+  render();
+}
+
+function bindHud(){
+  const days=document.getElementById('hud-days');
+  const stat=days?.closest('.hud-stat');
+  if(!stat)return;
+
+  /* Une seule icône calendrier, aucun setTimeout en cascade. */
+  let icon=stat.querySelector('.v15110-calendar-icon');
+  [...stat.childNodes].forEach(node=>{
+    if(node.nodeType===Node.TEXT_NODE && node.nodeValue?.includes('🔥')){
+      node.nodeValue=node.nodeValue.replace(/🔥/g,'');
     }
+  });
+  stat.querySelectorAll('span,i,b,strong').forEach(el=>{
+    if(el!==days&&el.textContent.trim()==='🔥')el.remove();
+  });
 
-    const monthPrefix=`${y}-${String(m+1).padStart(2,'0')}`;
-    const monthCount=keys.filter(k=>k.startsWith(monthPrefix)).length;
-
-    root.innerHTML=`
-      <div class="v1409-cal-head">
-        <button class="v1409-nav" id="v1409-prev">‹</button>
-        <div class="v1409-cal-title">⚔️ ${monthName}</div>
-        <button class="v1409-nav" id="v1409-next">›</button>
-      </div>
-      <div class="v1409-weekdays"><div>LUN</div><div>MAR</div><div>MER</div><div>JEU</div><div>VEN</div><div>SAM</div><div>DIM</div></div>
-      <div class="v1409-grid">${cells}</div>
-      <div class="v1409-stats">
-        <div class="v1409-stat"><span>Ce mois</span><b>${monthCount}</b></div>
-        <div class="v1409-stat"><span>Série actuelle</span><b>${currentStreak(keys)} 🔥</b></div>
-        <div class="v1409-stat"><span>Meilleure série</span><b>${bestStreak(keys)} j</b></div>
-      </div>
-      <div class="v1409-legend">
-        <span><i class="v1409-dot done"></i>Séance validée</span>
-        <span><i class="v1409-dot today"></i>Aujourd'hui</span>
-      </div>`;
-
-    root.querySelector('#v1409-prev').onclick=()=>{viewDate.setMonth(viewDate.getMonth()-1);renderCalendar()};
-    root.querySelector('#v1409-next').onclick=()=>{viewDate.setMonth(viewDate.getMonth()+1);renderCalendar()};
-    modal.style.display='flex';
+  if(!icon){
+    icon=document.createElement('span');
+    icon.className='v15110-calendar-icon';
+    icon.textContent='📅';
+    stat.insertBefore(icon,stat.firstChild);
   }
 
-  window.v1409OpenCalendar=function(){
-    viewDate=new Date();viewDate.setDate(1);
-    renderCalendar();
-  };
+  stat.title="Ouvrir le calendrier d'entraînement";
+  stat.setAttribute('aria-label',"Ouvrir le calendrier d'entraînement");
+  stat.style.cursor='pointer';
 
-  function bindFlame(){
-    const flame=document.querySelector('header #hud-days')?.closest('.hud-stat');
-    if(!flame||flame.dataset.v1409==='1')return;
-    flame.dataset.v1409='1';
-    flame.style.cursor='pointer';
-    flame.addEventListener('click',e=>{
+  if(stat.dataset.v15110!=='1'){
+    stat.dataset.v15110='1';
+    stat.addEventListener('click',e=>{
       e.preventDefault();
       e.stopImmediatePropagation();
-      v1409OpenCalendar();
+      openCalendar();
     },true);
   }
-
-  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',()=>setTimeout(bindFlame,2200));
-  else setTimeout(bindFlame,2200);
-
-  document.addEventListener('visibilitychange',()=>{
-    if(document.visibilityState==='visible')setTimeout(bindFlame,100);
-  });
-})();
-</script>
-
-
-<style id="v1410-calendar-icon-css">
-/* V14.1.0 — le calendrier remplace la flamme du streak */
-.v1410-calendar-icon{
-  font-size:15px!important;
-  line-height:1!important;
-  filter:drop-shadow(0 0 4px rgba(189,0,255,.55));
 }
-</style>
-<script id="v1410-calendar-icon-js">
-(function(){
-  function replaceFlame(){
-    const days=document.getElementById('hud-days');
-    const stat=days?.closest('.hud-stat');
-    if(!stat)return;
 
-    /* On ne touche qu'au pictogramme du bouton streak, pas au compteur de jours. */
-    const walker=document.createTreeWalker(stat,NodeFilter.SHOW_TEXT);
-    const nodes=[];
-    while(walker.nextNode()) nodes.push(walker.currentNode);
-    nodes.forEach(n=>{
-      if(n.nodeValue && n.nodeValue.includes('🔥')) n.nodeValue=n.nodeValue.replace(/🔥/g,'');
-    });
+window.v1409OpenCalendar=openCalendar;
+window.v15110OpenCalendar=openCalendar;
 
-    const emojiEls=[...stat.querySelectorAll('span,i,b,strong')].filter(el=>
-      el!==days && el.textContent.trim()==='🔥'
-    );
-    emojiEls.forEach(el=>{
-      el.textContent='📅';
-      el.classList.add('v1410-calendar-icon');
-    });
-
-    /* Si l'icône était créée par ::before / fond CSS et non dans le HTML. */
-    if(!stat.querySelector('.v1410-calendar-icon')){
-      const icon=document.createElement('span');
-      icon.className='v1410-calendar-icon';
-      icon.textContent='📅';
-      stat.insertBefore(icon,stat.firstChild);
-    }
-
-    stat.title="Ouvrir le calendrier d'entraînement";
-    stat.setAttribute('aria-label',"Ouvrir le calendrier d'entraînement");
-  }
-
-  function init(){
-    replaceFlame();
-    setTimeout(replaceFlame,500);
-    setTimeout(replaceFlame,1800);
-  }
-  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);
-  else init();
-})();
-</script>
-
-
-<script id="v1411-stability-audit-fixes">
-/* V14.1.1 — correctifs stabilité issus de l'audit complet */
-(function(){
-  const V1411='14.1.1';
-
-  function validatedSnapshot(){
-    const out={};
-    try{
-      for(let i=0;i<localStorage.length;i++){
-        const k=localStorage.key(i);
-        if(k && k.startsWith('leveling_validated_')) out[k]=localStorage.getItem(k);
-      }
-    }catch(e){}
-    return out;
-  }
-
-  function restoreValidatedSnapshot(obj){
-    try{
-      const rm=[];
-      for(let i=0;i<localStorage.length;i++){
-        const k=localStorage.key(i);
-        if(k && k.startsWith('leveling_validated_')) rm.push(k);
-      }
-      rm.forEach(k=>localStorage.removeItem(k));
-      if(obj && typeof obj==='object'){
-        Object.entries(obj).forEach(([k,v])=>{
-          if(k.startsWith('leveling_validated_') && v==='1') localStorage.setItem(k,'1');
-        });
-      }
-    }catch(e){}
-  }
-
-  /* Cloud : les données ajoutées en V14 doivent suivre le compte sur tous les appareils. */
-  if(typeof window.exportAppData==='function' && !window.exportAppData.v1411){
-    const oldExport=window.exportAppData;
-    window.exportAppData=function(){
-      const d=oldExport.apply(this,arguments) || {};
-      d.version='14.2.0';
-      try{d.v140Rpg=JSON.parse(localStorage.getItem('leveling_v140_rpg')||'{}')}catch(e){d.v140Rpg={}}
-      d.validatedSessions=validatedSnapshot();
-      d.cycleResetPending=localStorage.getItem('leveling_cycle_reset_pending')||'';
-      d.cycleCompletedDate=localStorage.getItem('leveling_cycle_completed_date')||'';
-      return d;
-    };
-    window.exportAppData.v1411=1;
-  }
-
-  if(typeof window.importAppData==='function' && !window.importAppData.v1411){
-    const oldImport=window.importAppData;
-    window.importAppData=function(d){
-      const r=oldImport.apply(this,arguments);
-      try{
-        if(d?.v140Rpg && typeof d.v140Rpg==='object'){
-          localStorage.setItem('leveling_v140_rpg',JSON.stringify(d.v140Rpg));
-        }
-        if(d?.validatedSessions) restoreValidatedSnapshot(d.validatedSessions);
-        if(d?.cycleResetPending) localStorage.setItem('leveling_cycle_reset_pending',d.cycleResetPending);
-        else localStorage.removeItem('leveling_cycle_reset_pending');
-        if(d?.cycleCompletedDate) localStorage.setItem('leveling_cycle_completed_date',d.cycleCompletedDate);
-        else localStorage.removeItem('leveling_cycle_completed_date');
-      }catch(e){console.warn('V14.1.1 import RPG:',e)}
-      return r;
-    };
-    window.importAppData.v1411=1;
-  }
-
-  /* Isolation des comptes : pas d'XP/calendrier V14 qui reste lors d'une déconnexion. */
-  if(typeof window.clearLevelingAccountLocalData==='function' && !window.clearLevelingAccountLocalData.v1411){
-    const oldClear=window.clearLevelingAccountLocalData;
-    window.clearLevelingAccountLocalData=function(){
-      oldClear.apply(this,arguments);
-      try{
-        ['leveling_v140_rpg','leveling_cycle_reset_pending','leveling_cycle_completed_date']
-          .forEach(k=>localStorage.removeItem(k));
-        const rm=[];
-        for(let i=0;i<localStorage.length;i++){
-          const k=localStorage.key(i);
-          if(k && k.startsWith('leveling_validated_')) rm.push(k);
-        }
-        rm.forEach(k=>localStorage.removeItem(k));
-      }catch(e){}
-    };
-    window.clearLevelingAccountLocalData.v1411=1;
-  }
-
-  function parseDay(s){
-    if(!/^\d{4}-\d{2}-\d{2}$/.test(String(s||''))) return null;
-    const [y,m,d]=s.split('-').map(Number);
-    return new Date(y,m-1,d,12,0,0,0);
-  }
-  function dayKey(d){
-    return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
-  }
-
-  /* Le cycle doit repartir le lundi, même si l'utilisateur ne rouvre l'app que mardi/mercredi. */
-  window.v1411CycleResetIfDue=function(){
-    try{
-      if(localStorage.getItem('leveling_cycle_reset_pending')!=='1') return false;
-      const completed=parseDay(localStorage.getItem('leveling_cycle_completed_date'));
-      if(!completed) return false;
-
-      const nextMonday=new Date(completed);
-      const add=(8-nextMonday.getDay())%7 || 7;
-      nextMonday.setDate(nextMonday.getDate()+add);
-
-      const now=new Date(); now.setHours(12,0,0,0);
-      if(now < nextMonday) return false;
-
-      workoutState={};
-      customSetData={};
-      programWorkoutStates={};
-      programCustomSetData={};
-      currentBlockIndex=0;
-      currentDayIndex=0;
-
-      restoreValidatedSnapshot({});
-      localStorage.removeItem('leveling_cycle_reset_pending');
-      localStorage.removeItem('leveling_cycle_completed_date');
-
-      if(typeof saveToLocalStorage==='function') saveToLocalStorage();
-      if(typeof scheduleCloudSaveImmediate==='function') scheduleCloudSaveImmediate();
-      if(typeof initWorkoutSystem==='function') setTimeout(initWorkoutSystem,30);
-      if(typeof updateProfileUI==='function') setTimeout(updateProfileUI,40);
-      if(typeof updateResumeWorkoutBanner==='function') setTimeout(updateResumeWorkoutBanner,50);
-      return true;
-    }catch(e){
-      console.warn('V14.1.1 reset cycle:',e);
-      return false;
-    }
-  };
-
-  function boot(){
-    v1411CycleResetIfDue();
-  }
-  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',()=>setTimeout(boot,2500));
-  else setTimeout(boot,2500);
-
-  document.addEventListener('visibilitychange',()=>{
-    if(document.visibilityState==='visible') setTimeout(v1411CycleResetIfDue,100);
-  });
+function boot(){bindHud()}
+if(document.readyState==='loading'){
+  document.addEventListener('DOMContentLoaded',()=>setTimeout(boot,180),{once:true});
+}else setTimeout(boot,50);
+window.addEventListener('pageshow',()=>setTimeout(boot,50));
 })();
 </script>
 <style id="v1421-mobile-unified-fix">
@@ -5557,21 +5386,8 @@ html.leveling-ios nav{-webkit-backdrop-filter:none!important;backdrop-filter:non
     window.switchTab.v1421=1;
   }
 
-  /* Settings overlay: always starts at the top and occupies the entire viewport. */
-  const observer=new MutationObserver(mutations=>{
-    for(const m of mutations){
-      if(m.type!=='attributes')continue;
-      const el=m.target;
-      if(!(el instanceof Element) || !el.matches('#panel-settings .compact-setting-section'))continue;
-      if(el.classList.contains('v1358-overlay')){
-        el.scrollTop=0;
-        const body=el.querySelector(':scope > .compact-setting-body');
-        if(body) body.scrollTop=0;
-      }
-    }
-  });
-  const settings=document.getElementById('panel-settings');
-  if(settings) observer.observe(settings,{subtree:true,attributes:true,attributeFilter:['class']});
+  /* V15.13: l'ancien observer v1358 est supprimé.
+     Le contrôleur Réglages V15.1 remet déjà chaque page en haut lors de l'ouverture. */
 
   /* Fullscreen: Android uses the native Fullscreen API. iPhone Safari does not expose it
      for normal pages, so installed standalone mode is the actual fullscreen path. */
@@ -5602,6 +5418,31 @@ html.leveling-ios nav{-webkit-backdrop-filter:none!important;backdrop-filter:non
 })();
 </script>
 
+
+<script id="v15130-mobile-lifecycle-clean">
+(function(){
+'use strict';
+let pending=0;
+function refresh(){
+  pending=0;
+  try{window.v15ArrangeProfile?.()}catch(e){}
+  try{window.renderPowerRankLive?.()}catch(e){}
+  try{window.renderXpRankLive?.()}catch(e){}
+  try{window.LevelingProgramV157?.refreshValidationUI?.()}catch(e){}
+  try{window.LevelingProgressionV15?.render?.()}catch(e){}
+}
+function schedule(delay=40){
+  clearTimeout(pending);
+  pending=setTimeout(refresh,delay);
+}
+window.v15130MobileRefresh=schedule;
+window.addEventListener('pageshow',()=>schedule(50),{passive:true});
+document.addEventListener('visibilitychange',()=>{
+  if(document.visibilityState==='visible')schedule(60);
+},{passive:true});
+window.addEventListener('online',()=>schedule(80),{passive:true});
+})();
+</script>
 
 <script id="v1422-profile-fullpage-fullscreen-fix">
 (function(){
@@ -5648,7 +5489,7 @@ html.leveling-ios nav{-webkit-backdrop-filter:none!important;backdrop-filter:non
 
 
 <style id="v1430-stable-ui-css">
-/* ================= V15.10.0 — STABLE SETTINGS / PROGRESSION =================
+/* ================= V15.13.0 — STABLE SETTINGS / PROGRESSION =================
    Réglages: plus aucune sous-page fixed/overlay. Toutes les rubriques restent
    dans le scroll principal de l'app, donc plus de page coupée ni ouverture en bas. */
 #panel-settings{position:relative!important;overflow:visible!important;min-height:0!important}
@@ -5701,212 +5542,187 @@ body.v1358-settings-open{overflow:hidden!important}
 }
 </style>
 
-<script id="v1430-stable-core-js">
+<script id="v15120-cloud-state-clean">
 (function(){
-  const VERSION='15.10.0';
-  const q=s=>document.querySelector(s);
-  const qa=s=>[...document.querySelectorAll(s)];
-  const localDay=(d=new Date())=>`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+'use strict';
 
-  /* ---------- 1. RANG POWER : SOURCE CANONIQUE V14.5 ---------- */
-  function refreshRanks(){
-    if(typeof window.renderPowerRankLive==='function'){
-      window.renderPowerRankLive();
-      return;
-    }
-    const total=Number(userData?.squat||0)+Number(userData?.bench||0)+Number(userData?.deadlift||0);
-    const bw=Number(userData?.weight||0);
-    const r=getSBDRank(total,bw);
-    const legacy=q('#rank-name');
-    if(legacy){
-      legacy.textContent=`${r.icon} ${r.name}`;
-      legacy.style.color=r.color;
-      legacy.style.textShadow=`0 0 9px ${r.color},0 0 22px ${r.color}`;
-    }
-  }
+/* ============================================================
+   V15.12 CLOUD / STATE CORE
+   Une seule couche pour :
+   - export/import cloud
+   - progression/streak dans la sauvegarde
+   - validations de séances
+   - protection SBD contre un import vide/ancien
+   - nettoyage compte à la déconnexion
+   Aucun hook finishWorkoutFinal / updateProfileUI / switchTab.
+   ============================================================ */
 
-  window.openRankShowcaseModal=function(){
-    try{q('#modal-rank-showcase')?.style.setProperty('display','none')}catch(e){}
-    if(typeof window.v135OpenPower==='function')return window.v135OpenPower();
-    if(typeof v135OpenPower==='function')return v135OpenPower();
+const VERSION='15.13.0';
+const RPG_KEY='leveling_v140_rpg';
+
+function loadRpg(){try{return JSON.parse(localStorage.getItem(RPG_KEY)||'{}')||{}}catch(e){return {}}}
+function saveRpg(v){try{localStorage.setItem(RPG_KEY,JSON.stringify(v&&typeof v==='object'?v:{}))}catch(e){}}
+
+function validatedSnapshot(){
+  const out={};
+  try{
+    for(let i=0;i<localStorage.length;i++){
+      const k=localStorage.key(i);
+      if(k?.startsWith('leveling_validated_')&&localStorage.getItem(k)==='1')out[k]='1';
+    }
+    Object.entries(userData?.validatedSessions||{}).forEach(([k,v])=>{
+      if(k.startsWith('leveling_validated_')&&v)out[k]='1';
+    });
+  }catch(e){}
+  return out;
+}
+function restoreValidated(obj){
+  if(!obj||typeof obj!=='object')return;
+  if(!userData.validatedSessions||typeof userData.validatedSessions!=='object')userData.validatedSessions={};
+  try{
+    Object.entries(obj).forEach(([k,v])=>{
+      if(!k.startsWith('leveling_validated_')||v!=='1')return;
+      localStorage.setItem(k,'1');
+      userData.validatedSessions[k]=userData.validatedSessions[k]||Date.now();
+    });
+  }catch(e){}
+}
+
+function sbdSnapshot(u){
+  u=u||{};
+  return {
+    squat:Number(u.squat||0),bench:Number(u.bench||0),deadlift:Number(u.deadlift||0),
+    weight:Number(u.weight||0),updatedAt:Number(u.sbdUpdatedAt||0)
   };
+}
+function validSbd(s){return Number(s?.squat)>0&&Number(s?.bench)>0&&Number(s?.deadlift)>0}
+function safeKey(){
+  let owner='local';
+  try{owner=window.cloudUser?.id||localStorage.getItem('leveling_local_owner')||'local'}catch(e){}
+  return 'leveling_sbd_safe_'+owner;
+}
+function loadSafe(){try{return JSON.parse(localStorage.getItem(safeKey())||'null')}catch(e){return null}}
+function saveSafe(s){
+  if(!validSbd(s))return;
+  try{localStorage.setItem(safeKey(),JSON.stringify({...s,savedAt:Date.now()}))}catch(e){}
+}
+function applySbd(u,s){
+  if(!u||!s)return;
+  u.squat=Number(s.squat||0);u.bench=Number(s.bench||0);u.deadlift=Number(s.deadlift||0);
+  if(Number(s.weight)>0)u.weight=Number(s.weight);
+  u.sbdUpdatedAt=Math.max(Number(u.sbdUpdatedAt||0),Number(s.updatedAt||0),Date.now());
+}
+function selectSbdWinner(local,incoming,safe){
+  if(validSbd(local)&&!validSbd(incoming))return local;
+  if(validSbd(local)&&validSbd(incoming)){
+    const lt=Number(local.updatedAt||0),it=Number(incoming.updatedAt||0);
+    return lt>0&&it>0&&lt>it?local:incoming;
+  }
+  if(validSbd(incoming))return incoming;
+  if(validSbd(safe))return safe;
+  return null;
+}
+window.v1452SaveSbdSafe=function(){saveSafe(sbdSnapshot(userData))};
 
-  /* ---------- 3. STREAK + QUÊTES : SYNCHRO ET MIGRATION ---------- */
-  function loadRpg(){try{return JSON.parse(localStorage.getItem('leveling_v140_rpg')||'{}')||{}}catch(e){return {}}}
-  function saveRpg(s){try{localStorage.setItem('leveling_v140_rpg',JSON.stringify(s))}catch(e){}}
-  function normalizeDate(v){
-    if(!v)return null;const m=String(v).match(/(20\d{2})[-\/]([01]\d)[-\/]([0-3]\d)/);if(m)return `${m[1]}-${m[2]}-${m[3]}`;
-    const d=new Date(v);return Number.isNaN(d.getTime())?null:localDay(d);
+const baseExport=typeof window.exportAppData==='function'?window.exportAppData:null;
+const baseImport=typeof window.importAppData==='function'?window.importAppData:null;
+
+function exportClean(){
+  const d=baseExport?baseExport():{};
+  d.version=VERSION;
+  d.v140Rpg=loadRpg();
+  d.validatedSessions=validatedSnapshot();
+  d.cycleNumber=Math.max(1,Number(localStorage.getItem('leveling_cycle_number')||1));
+  try{d.v10=window.__levelingV10Export?.()||d.v10}catch(e){}
+  return d;
+}
+
+function importClean(data){
+  const localBefore=sbdSnapshot(userData);
+  if(validSbd(localBefore))saveSafe(localBefore);
+  const incoming=sbdSnapshot(data?.userData||{});
+  const winner=selectSbdWinner(localBefore,incoming,loadSafe());
+
+  let payload=data;
+  if(data&&typeof data==='object'){
+    try{payload=JSON.parse(JSON.stringify(data))}catch(e){payload={...data}}
+    payload.userData={...(data.userData||{})};
+    if(winner)applySbd(payload.userData,winner);
   }
-  function currentStreak(days){
-    const set=new Set(days),d=new Date();let n=0,started=false;
-    for(let i=0;i<366;i++){const k=localDay(d);if(set.has(k)){n++;started=true}else if(started)break;d.setDate(d.getDate()-1)}return n;
+
+  const result=baseImport?baseImport(payload):undefined;
+
+  if(winner){
+    applySbd(userData,winner);
+    saveSafe(sbdSnapshot(userData));
   }
-  function syncProgressionState(){
-    const s=loadRpg();s.trainingDays=Array.isArray(s.trainingDays)?s.trainingDays:[];
-    const merged=new Set(s.trainingDays.map(normalizeDate).filter(Boolean));
+  if(payload?.v140Rpg)saveRpg(payload.v140Rpg);
+  if(payload?.validatedSessions)restoreValidated(payload.validatedSessions);
+  if(Number(payload?.cycleNumber)>0)localStorage.setItem('leveling_cycle_number',String(Math.max(1,Number(payload.cycleNumber))));
+  try{if(payload?.v10)window.__levelingV10Import?.(payload.v10)}catch(e){}
+
+  try{saveToLocalStorage()}catch(e){}
+  setTimeout(()=>{
+    try{updateProfileUI?.()}catch(e){}
+    try{renderGoals?.()}catch(e){}
+    try{renderProfileV2?.()}catch(e){}
+    try{window.renderPowerRankLive?.()}catch(e){}
+    try{window.renderXpRankLive?.()}catch(e){}
+    try{window.LevelingProgramV157?.refreshValidationUI?.()}catch(e){}
+    try{window.LevelingProgressionV15?.render?.()}catch(e){}
+    try{renderAll?.()}catch(e){}
+  },0);
+  return result;
+}
+
+window.exportAppData=exportClean;
+window.importAppData=importClean;
+window.v15120ExportAppData=exportClean;
+window.v15120ImportAppData=importClean;
+
+/* Compat temporaire : les quelques appels V15.10 qui demandent encore une synchro
+   passent directement au moteur progression canonique, sans deuxième calcul. */
+window.v1430SyncProgressionState=function(){
+  try{return window.LevelingProgressionV15?.render?.()}catch(e){return 0}
+};
+
+/* Déconnexion : une seule extension de nettoyage local. */
+const baseClear=typeof window.clearLevelingAccountLocalData==='function'?window.clearLevelingAccountLocalData:null;
+if(baseClear&&!baseClear.v15120){
+  window.clearLevelingAccountLocalData=function(){
+    const r=baseClear.apply(this,arguments);
     try{
-      const v=typeof window.__levelingV10Export==='function'?window.__levelingV10Export():null;
-      (v?.sessions||[]).forEach(x=>{const d=normalizeDate(x?.date);if(d)merged.add(d)});
-      /* Si la séance courante est validée, aujourd'hui doit forcément compter dans le streak. */
-      const key=`leveling_validated_${window.activeProgramKey??activeProgramKey}_${window.currentBlockIndex??currentBlockIndex}_${window.currentDayIndex??currentDayIndex}`;
-      if(localStorage.getItem(key)==='1')merged.add(localDay());
-      const streak=currentStreak([...merged]);
-      if(v){v.streak=streak;if(typeof window.__levelingV10Import==='function')window.__levelingV10Import(v)}
-      const el=q('#v10-streak');if(el)el.textContent=`${streak} 🔥`;
+      [RPG_KEY,'solo_leveling_v10','leveling_cycle_reset_pending','leveling_cycle_completed_date','leveling_cycle_number']
+        .forEach(k=>localStorage.removeItem(k));
+      const rm=[];
+      for(let i=0;i<localStorage.length;i++){
+        const k=localStorage.key(i);
+        if(k?.startsWith('leveling_validated_'))rm.push(k);
+      }
+      rm.forEach(k=>localStorage.removeItem(k));
     }catch(e){}
-    try{(window.workoutHistory||workoutHistory||[]).forEach(x=>{const d=normalizeDate(x?.date);if(d)merged.add(d)})}catch(e){}
-    s.trainingDays=[...merged].sort();saveRpg(s);
-    try{if(typeof window.v152RenderProgression==='function')window.v152RenderProgression()}catch(e){}
-    return currentStreak(s.trainingDays);
-  }
-  window.v1430SyncProgressionState=syncProgressionState;
-
-  /* ---------- 4. CLOUD : RPG, STREAK, QUÊTES ET VALIDATIONS DANS LE BACKUP ---------- */
-  function validatedSnapshot(){
-    const o={};try{for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(k?.startsWith('leveling_validated_')&&localStorage.getItem(k)==='1')o[k]='1'}}catch(e){}return o;
-  }
-  function restoreValidated(o){
-    if(!o||typeof o!=='object')return;try{Object.entries(o).forEach(([k,v])=>{if(k.startsWith('leveling_validated_')&&v==='1')localStorage.setItem(k,'1')})}catch(e){}
-  }
-  const baseExport=typeof window.exportAppData==='function'?window.exportAppData:null;
-  window.v1430ExportAppData=function(){
-    const d=baseExport?baseExport():{};d.version=VERSION;
-    d.v140Rpg=loadRpg();d.validatedSessions=validatedSnapshot();
-    try{d.v10=typeof window.__levelingV10Export==='function'?window.__levelingV10Export():d.v10}catch(e){}
-    return d;
-  };
-  try{window.exportAppData=window.v1430ExportAppData}catch(e){}
-  const baseImport=typeof window.importAppData==='function'?window.importAppData:null;
-
-  function sbdSnapshot(u){
-    u=u||{};
-    return {
-      squat:Number(u.squat||0),bench:Number(u.bench||0),deadlift:Number(u.deadlift||0),
-      weight:Number(u.weight||0),updatedAt:Number(u.sbdUpdatedAt||0)
-    };
-  }
-  function validSbd(s){return Number(s?.squat)>0&&Number(s?.bench)>0&&Number(s?.deadlift)>0}
-  function sbdSafeKey(){
-    let owner='local';
-    try{owner=(window.cloudUser?.id||localStorage.getItem('leveling_local_owner')||'local')}catch(e){}
-    return 'leveling_sbd_safe_'+owner;
-  }
-  function loadSbdSafe(){try{return JSON.parse(localStorage.getItem(sbdSafeKey())||'null')}catch(e){return null}}
-  function saveSbdSafe(s){
-    if(!validSbd(s))return;
-    try{localStorage.setItem(sbdSafeKey(),JSON.stringify({...s,savedAt:Date.now()}))}catch(e){}
-  }
-  window.v1452SaveSbdSafe=function(){
-    const s=sbdSnapshot(userData);
-    if(validSbd(s))saveSbdSafe(s);
-  };
-  function applySbd(u,s){
-    if(!u||!s)return;
-    u.squat=s.squat;u.bench=s.bench;u.deadlift=s.deadlift;
-    if(Number(s.weight)>0)u.weight=s.weight;
-    u.sbdUpdatedAt=Math.max(Number(u.sbdUpdatedAt||0),Number(s.updatedAt||0),Date.now());
-  }
-
-  window.v1430ImportAppData=function(d){
-    const localBefore=sbdSnapshot(userData);
-    if(validSbd(localBefore))saveSbdSafe(localBefore);
-    const safeBefore=loadSbdSafe();
-    const incoming=sbdSnapshot(d?.userData||{});
-    let winner=null;
-
-    if(validSbd(localBefore) && !validSbd(incoming)){
-      winner=localBefore;
-    }else if(validSbd(localBefore) && validSbd(incoming)){
-      const lt=Number(localBefore.updatedAt||0),ct=Number(incoming.updatedAt||0);
-      winner=(lt>0&&ct>0&&lt>ct)?localBefore:incoming;
-    }else if(validSbd(incoming)){
-      winner=incoming;
-    }else if(validSbd(safeBefore)){
-      winner=safeBefore;
-    }
-
-    let payload=d;
-    if(d&&typeof d==='object'){
-      try{payload=JSON.parse(JSON.stringify(d))}catch(e){payload={...d}}
-      payload.userData={...(d.userData||{})};
-      if(winner)applySbd(payload.userData,winner);
-    }
-
-    const r=baseImport?baseImport(payload):undefined;
-
-    if(winner){
-      applySbd(userData,winner);
-      saveSbdSafe(sbdSnapshot(userData));
-      try{saveToLocalStorage()}catch(e){}
-    }
-    if(payload?.v140Rpg)saveRpg(payload.v140Rpg);
-    if(payload?.validatedSessions)restoreValidated(payload.validatedSessions);
-
-    setTimeout(()=>{
-      try{
-        if(typeof updateProfileUI==='function')updateProfileUI();
-        if(typeof renderGoals==='function')renderGoals();
-        if(typeof renderProfileV2==='function'&&document.getElementById('profile-v2-modal')?.classList.contains('show'))renderProfileV2();
-        if(typeof window.renderPowerRankLive==='function')window.renderPowerRankLive();
-        if(typeof render==='function')render();
-      }catch(e){console.warn('V15.10.0 SBD UI refresh',e)}
-      syncProgressionState();refreshRanks();
-    },0);
     return r;
   };
-  try{window.importAppData=window.v1430ImportAppData}catch(e){}
-  /* ---------- 5. HOOKS CORE — progression uniquement ---------- */
-  const prevSwitch=window.switchTab;
-  if(typeof prevSwitch==='function'&&!prevSwitch.v150core){
-    window.switchTab=function(tab,btn){
-      const r=prevSwitch.apply(this,arguments);
-      if(tab==='profile')setTimeout(()=>{refreshRanks();syncProgressionState()},40);
-      return r;
-    };
-    window.switchTab.v150core=1;
-  }
+  window.clearLevelingAccountLocalData.v15120=1;
+}
 
-  const prevUpdate=window.updateProfileUI;
-  if(typeof prevUpdate==='function'&&!prevUpdate.v150core){
-    window.updateProfileUI=function(){
-      const r=prevUpdate.apply(this,arguments);
-      setTimeout(()=>{refreshRanks();syncProgressionState()},15);
-      return r;
-    };
-    window.updateProfileUI.v150core=1;
-  }
+/* Rank modal : simple pont vers la vitrine moderne. */
+window.openRankShowcaseModal=function(){
+  try{document.getElementById('modal-rank-showcase')?.style.setProperty('display','none')}catch(e){}
+  return window.v135OpenPower?.();
+};
 
-  const prevFinish=window.finishWorkoutFinal;
-  if(typeof prevFinish==='function'&&!prevFinish.v150core){
-    window.finishWorkoutFinal=function(){
-      const r=prevFinish.apply(this,arguments);
-      setTimeout(()=>{
-        syncProgressionState();
-        refreshRanks();
-        if(typeof window.scheduleCloudSaveImmediate==='function')window.scheduleCloudSaveImmediate();
-      },120);
-      return r;
-    };
-    window.finishWorkoutFinal.v150core=1;
-  }
-
-  function bootCore(){refreshRanks();syncProgressionState()}
-  if(document.readyState==='loading'){
-    document.addEventListener('DOMContentLoaded',()=>setTimeout(bootCore,350),{once:true});
-  }else{
-    setTimeout(bootCore,80);
-  }
-  document.addEventListener('visibilitychange',()=>{
-    if(document.visibilityState==='visible')setTimeout(bootCore,80);
-  });
+function boot(){
+  try{saveSafe(sbdSnapshot(userData))}catch(e){}
+  try{window.renderPowerRankLive?.()}catch(e){}
+}
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',()=>setTimeout(boot,220),{once:true});
+else setTimeout(boot,60);
 })();
 </script>
 
-
-
 <style id="v1440-power-rank-clean-css">
-/* V15.10.0 — RANG POWER PROPRE
+/* V15.13.0 — RANG POWER PROPRE
    Une seule logique: total Squat + Bench + Deadlift en KG.
    Une identité visuelle distincte par rang. */
 
@@ -6113,7 +5929,7 @@ body.v1358-settings-open{overflow:hidden!important}
 
 
 <style id="v1451-power-live-neon-css">
-/* V15.10.0 — les cartes visibles utilisent la même identité néon que la vitrine */
+/* V15.13.0 — les cartes visibles utilisent la même identité néon que la vitrine */
 .rank-card.v1451-live-rank{
   --rank:#ff2d55;
   --rank-rgb:255,45,85;
@@ -6263,7 +6079,7 @@ body.v1358-settings-open{overflow:hidden!important}
         mini.classList.add('v1451-live-rank-mini');
         cssVars(mini,r);
       }
-    }catch(e){console.warn('V15.10.0 live rank render',e)}
+    }catch(e){console.warn('V15.13.0 live rank render',e)}
   };
 
   /* Après toute vraie mise à jour de données/UI */
@@ -6288,25 +6104,9 @@ body.v1358-settings-open{overflow:hidden!important}
     window.refreshV11UIAfterCloud.v1451=1;
   }
 
-  /* Garde-fou ciblé : si un vieux renderer écrit encore un ancien rang,
-     on ne laisse pas la mauvaise valeur rester affichée. */
-  function observeRank(){
-    const badge=document.getElementById('rank-name');
-    if(!badge||badge.dataset.v1451Observed)return;
-    badge.dataset.v1451Observed='1';
-    const mo=new MutationObserver(()=>{
-      const r=current(); if(!r)return;
-      const wanted=`${r.icon} ${r.name}`;
-      if(badge.textContent.trim()!==wanted){
-        badge.textContent=wanted;
-        window.renderPowerRankLive();
-      }
-    });
-    mo.observe(badge,{childList:true,characterData:true,subtree:true});
-  }
-
+  /* V15.13: plus de MutationObserver sur le badge Power.
+     Les mises à jour passent par updateProfileUI/cloud + rendu au boot/pageshow. */
   function boot(){
-    observeRank();
     window.renderPowerRankLive();
     setTimeout(window.renderPowerRankLive,120);
     setTimeout(window.renderPowerRankLive,500);
@@ -6324,7 +6124,7 @@ body.v1358-settings-open{overflow:hidden!important}
     try{
       if(typeof window.renderPowerRankLive==='function')window.renderPowerRankLive();
       if(typeof window.v135RenderRankHub==='function')window.v135RenderRankHub();
-    }catch(e){console.warn('V15.10.0 power refresh',e)}
+    }catch(e){console.warn('V15.13.0 power refresh',e)}
   }
 
   const oldLoad=window.loadFromLocalStorage;
@@ -6362,7 +6162,7 @@ body.v1358-settings-open{overflow:hidden!important}
 
 
 <style id="v1454-xp-neon-css">
-/* V15.10.0 — Rang XP : même qualité visuelle néon que le Rang Power */
+/* V15.13.0 — Rang XP : même qualité visuelle néon que le Rang Power */
 #v135-xp-modal .modal-content{
   width:min(620px,96vw)!important;
   max-width:620px!important;
@@ -6487,7 +6287,7 @@ body.v1358-settings-open{overflow:hidden!important}
           bar.style.width=pct+'%';
         }
       }
-    }catch(e){console.warn('V15.10.0 XP live',e)}
+    }catch(e){console.warn('V15.13.0 XP live',e)}
   };
 
   const oldHub=window.v135RenderRankHub;
@@ -6752,7 +6552,7 @@ body.v1358-settings-open{overflow:hidden!important}
     if(!profile)return;
     const target=q('.compact-setting-body',profile);if(!target)return;
 
-    /* V15.10.0 : Profil devient l'unique page pour compte + progression + sauvegarde. */
+    /* V15.13.0 : Profil devient l'unique page pour compte + progression + sauvegarde. */
     const progression=sections.find(s=>/progression/i.test(settingLabel(s)));
     if(progression&&progression!==profile){
       const body=q('.compact-setting-body',progression);
@@ -6955,7 +6755,7 @@ body.v1358-settings-open{overflow:hidden!important}
 
 
 <style id="v1501-vitrines-fix-css">
-/* V15.10.0 — vitrines actuelles, ancien dashboard V10 supprimé physiquement */
+/* V15.13.0 — vitrines actuelles, ancien dashboard V10 supprimé physiquement */
 
 /* Le hub ne sert plus qu'au Rang XP en grand. Le Power garde sa vraie carte dédiée plus bas. */
 #v135-rank-hub{
@@ -7038,7 +6838,7 @@ body.v1358-settings-open{overflow:hidden!important}
       /* Rafraîchit seulement les données/visuels, sans recréer d'anciens modules. */
       try{window.renderXpRankLive?.()}catch(e){}
       try{window.renderPowerRankLive?.()}catch(e){}
-    }catch(e){console.warn('V15.10.0 vitrines',e)}
+    }catch(e){console.warn('V15.13.0 vitrines',e)}
   }
 
   window.v1501FixVitrines=fixVitrines;
@@ -7375,7 +7175,7 @@ window.setV11Timer=function(sec){
 
 window.exportV11Data=function(){
   const data={
-    version:'V15.10.0',exportedAt:new Date().toISOString(),
+    version:'V15.13.0',exportedAt:new Date().toISOString(),
     userData,smartHypertrophyRefs,bodyHistory,inventoryItems,
     workoutHistory,workoutState,customSetData,activeProgramKey,currentBlockIndex,
     v10:exportState()
@@ -7851,7 +7651,7 @@ if(typeof oldDetect==='function'&&!oldDetect.v1570){
   window.detectAutomaticPR.v1570=1;
 }
 
-/* Verrou V15.10.0 : impossible même de rouvrir la validation d'une séance déjà terminée. */
+/* Verrou V15.13.0 : impossible même de rouvrir la validation d'une séance déjà terminée. */
 const previousOpenRating=window.openRatingModal;
 if(typeof previousOpenRating==='function'&&!previousOpenRating.v1571){
   window.openRatingModal=function(){
@@ -7995,10 +7795,10 @@ document.addEventListener('visibilitychange',()=>{
 (function(){
 'use strict';
 function recover(){
-  try{loadFromLocalStorage?.()}catch(e){console.warn('V15.10.0 load local',e)}
-  try{updateProfileUI?.()}catch(e){console.warn('V15.10.0 profile',e)}
-  try{renderHistoryUI?.()}catch(e){console.warn('V15.10.0 history',e)}
-  try{initWorkoutSystem?.()}catch(e){console.warn('V15.10.0 workout',e)}
+  try{loadFromLocalStorage?.()}catch(e){console.warn('V15.13.0 load local',e)}
+  try{updateProfileUI?.()}catch(e){console.warn('V15.13.0 profile',e)}
+  try{renderHistoryUI?.()}catch(e){console.warn('V15.13.0 history',e)}
+  try{initWorkoutSystem?.()}catch(e){console.warn('V15.13.0 workout',e)}
   try{renderPowerHome?.()}catch(e){}
   try{window.v135RenderRankHub?.()}catch(e){}
   try{window.renderXpRankLive?.()}catch(e){}
@@ -8008,7 +7808,7 @@ function recover(){
     if(document.getElementById('panel-settings')?.classList.contains('active')){
       window.v15BuildSettings?.();
     }
-  }catch(e){console.warn('V15.10.0 settings',e)}
+  }catch(e){console.warn('V15.13.0 settings',e)}
 }
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',()=>setTimeout(recover,500),{once:true});
 else setTimeout(recover,250);
@@ -8035,8 +7835,25 @@ document.addEventListener('click',function(e){
  if(!b||!done())return;
  e.preventDefault();e.stopPropagation();e.stopImmediatePropagation();paint();
 },true);
-setInterval(paint,1500);
+/* V15.13: aucun polling permanent. La sécurité réelle reste dans
+   openRatingModal() + finishWorkoutFinal(); ici on ne fait que peindre l'état. */
 window.addEventListener('pageshow',()=>setTimeout(paint,50));
+document.addEventListener('visibilitychange',()=>{
+ if(document.visibilityState==='visible')setTimeout(paint,50);
+});
+const prevSwitch1591=window.switchTab;
+if(typeof prevSwitch1591==='function'&&!prevSwitch1591.v1591paint){
+ window.switchTab=function(){const r=prevSwitch1591.apply(this,arguments);setTimeout(paint,25);return r};
+ window.switchTab.v1591paint=1;
+}
+try{
+ const api=window.LevelingProgramV157;
+ if(api&&typeof api.refreshValidationUI==='function'&&!api.refreshValidationUI.v1591paint){
+   const prev=api.refreshValidationUI;
+   api.refreshValidationUI=function(){const r=prev.apply(this,arguments);setTimeout(paint,0);return r};
+   api.refreshValidationUI.v1591paint=1;
+ }
+}catch(e){}
 setTimeout(paint,100);
 })();
 </script>
