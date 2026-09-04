@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>LEVELING-APP — Powerbuilding Tracker V15.2.0 XP QUEST STREAK CLEAN</title>
+    <title>LEVELING-APP — Powerbuilding Tracker V15.3.0 PROGRAM CYCLE PR FIX</title>
     <meta name="theme-color" content="#09090f">
     <meta name="application-name" content="LEVELING-APP">
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -1512,7 +1512,7 @@ header .hud-stat.v140-clickable:hover{
                         <span class="cloud-badge" id="cloud-live-badge">☁️ CLOUD</span>
                     </div>
                     <div id="cloud-sync-detail" style="margin-top:8px;font-size:.62rem;color:#777;text-align:center">Initialisation du cloud…</div>
-                    <div style="margin-top:5px;font-size:.58rem;color:#555;text-align:center">LEVELING-APP V15.2.0 · Stable</div>
+                    <div style="margin-top:5px;font-size:.58rem;color:#555;text-align:center">LEVELING-APP V15.3.0 · Stable</div>
                     <button class="btn-action" onclick="logoutLeveling()" style="border-color:#ff5555;color:#ff7777">Se déconnecter</button>
                 </div>
 
@@ -1787,7 +1787,7 @@ header .hud-stat.v140-clickable:hover{
             autoProgression: true
         };
 
-        /* V15.2.0 — CANONICAL USER STATE BRIDGE
+        /* V15.3.0 — CANONICAL USER STATE BRIDGE
            `userData` est déclaré avec `let`, donc il n'est pas automatiquement disponible
            via `window.userData`. Plusieurs anciens modules lisaient pourtant window.userData,
            ce qui produisait 0 kg / RECRUE malgré des données correctes.
@@ -2150,16 +2150,23 @@ header .hud-stat.v140-clickable:hover{
                     { dayName: "Jeudi", title: "Jeudi - PUSH B (Bloc 4 - Deload)", exercises: [
                         { name: "Développé Épaules", defaultReps: 8, defaultWeight: 10, sets: 3 },
                         { name: "Écarté Poulie", defaultReps: 12, defaultWeight: 6, sets: 2 },
-                        { name: "Extension Triceps", defaultReps: 12, defaultWeight: 10, sets: 2 }
+                        { name: "Extension Triceps", defaultReps: 12, defaultWeight: 10, sets: 2 },
+                        { name: "Élévations Latérales", defaultReps: 15, defaultWeight: 4, sets: 2 },
+                        { name: "Pompes", defaultReps: 10, defaultWeight: 0, sets: 2 }
                     ]},
                     { dayName: "Vendredi", title: "Vendredi - PULL B (Bloc 4 - Deload)", exercises: [
                         { name: "Tractions", defaultReps: 6, defaultWeight: 0, sets: 3 },
                         { name: "Rowing Haltère", defaultReps: 10, defaultWeight: 12, sets: 2 },
-                        { name: "Facepull", defaultReps: 12, defaultWeight: 10, sets: 3 }
+                        { name: "Facepull", defaultReps: 12, defaultWeight: 10, sets: 3 },
+                        { name: "Tirage Poitrine", defaultReps: 10, defaultWeight: 20, sets: 2 },
+                        { name: "Curl Marteau", defaultReps: 12, defaultWeight: 8, sets: 2 }
                     ]},
                     { dayName: "Samedi", title: "Samedi - LEGS B (Bloc 4 - Deload)", exercises: [
                         { name: "Squat (Léger)", defaultReps: 8, defaultWeight: roundTo25(s * 0.50), sets: 3 },
-                        { name: "Mollets", defaultReps: 12, defaultWeight: 30, sets: 3 }
+                        { name: "Soulevé de Terre Jambes Tendues", defaultReps: 8, defaultWeight: roundTo25(d * 0.45), sets: 2 },
+                        { name: "Leg Extension", defaultReps: 12, defaultWeight: 25, sets: 2 },
+                        { name: "Mollets", defaultReps: 12, defaultWeight: 30, sets: 3 },
+                        { name: "Relevé de jambes", defaultReps: 10, defaultWeight: 0, sets: 2 }
                     ]},
                     { dayName: "Dimanche", title: "Dimanche - REPOS ACTIF (Deload)", exercises: [
                         { name: "Mobilité globale & Récupération", defaultReps: 1, defaultWeight: 0, sets: 1 },
@@ -2820,48 +2827,21 @@ header .hud-stat.v140-clickable:hover{
             if(!currentState && typeof detectAutomaticPR==='function')setTimeout(()=>detectAutomaticPR(exIndex,setIndex),30);
             if(typeof renderTodayDashboard==='function')setTimeout(renderTodayDashboard,50);
            
-            if (currentDayIndex === 6) {
-                checkSundayCompletion();
-            }
-
+            /* V15.3 : cocher la dernière série ne change plus de bloc.
+               Le passage se fait uniquement après "VALIDER LA SÉANCE" + étoiles. */
             initWorkoutSystem();
         }
 
         function checkSundayCompletion() {
-            if (isDayCompleted(currentBlockIndex, 6)) {
-                recordCurrentBlockToHistory();
-                saveToLocalStorage();
-
-                if (currentBlockIndex === 3) {
-                    setTimeout(() => {
-                        document.getElementById('modal-sunday-victory').style.display = 'flex';
-                    }, 300);
-                } else {
-                    setTimeout(() => {
-                        currentBlockIndex++;
-                        currentDayIndex = 0;
-                        saveToLocalStorage();
-                        initWorkoutSystem();
-                        updateProfileUI();
-                        alert(`Félicitations ! Bloc ${currentBlockIndex} validé et enregistré. Passage au Bloc ${currentBlockIndex + 1}.`);
-                    }, 300);
-                }
-            }
+            /* V15.3 : compatibilité uniquement.
+               Aucun passage de bloc automatique au simple cochage des séries. */
+            return false;
         }
 
         function resetCycleAndRestartMonday() {
-            document.getElementById('modal-sunday-victory').style.display = 'none';
-
-            workoutState = {};
-            customSetData = {};
-            currentBlockIndex = 0;
-            currentDayIndex = 0;
-
-            saveToLocalStorage();
-            updateProfileUI();
-            initWorkoutSystem();
-
-            switchTab('workout', document.querySelectorAll('.nav-item')[1]);
+            const modal=document.getElementById('modal-sunday-victory');
+            if(modal)modal.style.display='none';
+            if(typeof window.v153ResetCycleNow==='function')return window.v153ResetCycleNow();
         }
 
         // ==================== POWER : PROGRAMMES ====================
@@ -3273,7 +3253,6 @@ header .hud-stat.v140-clickable:hover{
             userData.workoutsCompleted++;
             if (selectedRating >= 4) {
                 userData.trophies += selectedRating;
-                userData.prCount++;
             }
             userData.level = 1 + Math.floor(userData.workoutsCompleted / 3);
 
@@ -5525,42 +5504,7 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
     window.initWorkoutSystem.v1403=1;
   }
 
-  function mondayAutoReset(){
-    const pending=localStorage.getItem('leveling_cycle_reset_pending')==='1';
-    if(!pending)return false;
-
-    const now=new Date();
-    if(now.getDay()!==1)return false; // lundi uniquement
-
-    /* Historique et stats restent intacts. On remet uniquement le cycle d'entraînement à zéro. */
-    try{
-      workoutState={};
-      customSetData={};
-      programWorkoutStates={};
-      programCustomSetData={};
-      currentBlockIndex=0;
-      currentDayIndex=0;
-
-      /* Nettoyage des marqueurs de validation du cycle précédent. */
-      Object.keys(localStorage).forEach(k=>{
-        if(k.startsWith('leveling_validated_'))localStorage.removeItem(k);
-      });
-      localStorage.removeItem('leveling_cycle_reset_pending');
-      localStorage.removeItem('leveling_cycle_completed_date');
-
-      saveToLocalStorage();
-      if(typeof scheduleCloudSaveImmediate==='function')scheduleCloudSaveImmediate();
-      setTimeout(()=>{
-        if(typeof initWorkoutSystem==='function')initWorkoutSystem();
-        if(typeof updateProfileUI==='function')updateProfileUI();
-        if(typeof updateResumeWorkoutBanner==='function')updateResumeWorkoutBanner();
-      },50);
-      return true;
-    }catch(e){
-      console.warn('Reset cycle lundi:',e);
-      return false;
-    }
-  }
+  function mondayAutoReset(){ return false; }
 
   /* Le bouton manuel de l'ancienne modale ne doit plus effacer le cycle le dimanche.
      On ferme simplement : le reset se fera lundi automatiquement. */
@@ -5568,13 +5512,13 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
     const modal=document.getElementById('modal-sunday-victory');
     if(!modal)return;
     const p=modal.querySelector('.subtitle');
-    if(p)p.textContent="Cycle complet ! Tes performances restent enregistrées. Le nouveau cycle repartira automatiquement au Bloc 1 lundi.";
+    if(p)p.textContent="Cycle complet ! Tes performances restent enregistrées. Confirme pour repartir immédiatement au Bloc 1.";
     const info=modal.querySelector('.modal-content > div');
-    if(info)info.textContent="🔥 Cycle verrouillé jusqu'à lundi. Historique, XP, PR et statistiques sont conservés.";
+    if(info)info.textContent="🔥 Nouveau cycle prêt. Historique, XP, PR et statistiques sont conservés.";
     const btn=modal.querySelector('.btn-action');
     if(btn){
-      btn.textContent='🔥 CYCLE TERMINÉ — FERMER';
-      btn.onclick=()=>{modal.style.display='none'};
+      btn.textContent='🔥 DÉMARRER LE NOUVEAU CYCLE';
+      btn.onclick=()=>window.v153ResetCycleNow?.();
     }
   };
 
@@ -6970,7 +6914,7 @@ html.leveling-ios nav{-webkit-backdrop-filter:none!important;backdrop-filter:non
 
 
 <style id="v1430-stable-ui-css">
-/* ================= V15.2.0 — STABLE SETTINGS / PROGRESSION =================
+/* ================= V15.3.0 — STABLE SETTINGS / PROGRESSION =================
    Réglages: plus aucune sous-page fixed/overlay. Toutes les rubriques restent
    dans le scroll principal de l'app, donc plus de page coupée ni ouverture en bas. */
 #panel-settings{position:relative!important;overflow:visible!important;min-height:0!important}
@@ -7025,7 +6969,7 @@ body.v1358-settings-open{overflow:hidden!important}
 
 <script id="v1430-stable-core-js">
 (function(){
-  const VERSION='15.2.0';
+  const VERSION='15.3.0';
   const q=s=>document.querySelector(s);
   const qa=s=>[...document.querySelectorAll(s)];
   const localDay=(d=new Date())=>`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
@@ -7172,7 +7116,7 @@ body.v1358-settings-open{overflow:hidden!important}
         if(typeof renderProfileV2==='function'&&document.getElementById('profile-v2-modal')?.classList.contains('show'))renderProfileV2();
         if(typeof window.renderPowerRankLive==='function')window.renderPowerRankLive();
         if(typeof render==='function')render();
-      }catch(e){console.warn('V15.2.0 SBD UI refresh',e)}
+      }catch(e){console.warn('V15.3.0 SBD UI refresh',e)}
       syncProgressionState();refreshRanks();
     },0);
     return r;
@@ -7228,7 +7172,7 @@ body.v1358-settings-open{overflow:hidden!important}
 
 
 <style id="v1440-power-rank-clean-css">
-/* V15.2.0 — RANG POWER PROPRE
+/* V15.3.0 — RANG POWER PROPRE
    Une seule logique: total Squat + Bench + Deadlift en KG.
    Une identité visuelle distincte par rang. */
 
@@ -7435,7 +7379,7 @@ body.v1358-settings-open{overflow:hidden!important}
 
 
 <style id="v1451-power-live-neon-css">
-/* V15.2.0 — les cartes visibles utilisent la même identité néon que la vitrine */
+/* V15.3.0 — les cartes visibles utilisent la même identité néon que la vitrine */
 .rank-card.v1451-live-rank{
   --rank:#ff2d55;
   --rank-rgb:255,45,85;
@@ -7585,7 +7529,7 @@ body.v1358-settings-open{overflow:hidden!important}
         mini.classList.add('v1451-live-rank-mini');
         cssVars(mini,r);
       }
-    }catch(e){console.warn('V15.2.0 live rank render',e)}
+    }catch(e){console.warn('V15.3.0 live rank render',e)}
   };
 
   /* Après toute vraie mise à jour de données/UI */
@@ -7646,7 +7590,7 @@ body.v1358-settings-open{overflow:hidden!important}
     try{
       if(typeof window.renderPowerRankLive==='function')window.renderPowerRankLive();
       if(typeof window.v135RenderRankHub==='function')window.v135RenderRankHub();
-    }catch(e){console.warn('V15.2.0 power refresh',e)}
+    }catch(e){console.warn('V15.3.0 power refresh',e)}
   }
 
   const oldLoad=window.loadFromLocalStorage;
@@ -7684,7 +7628,7 @@ body.v1358-settings-open{overflow:hidden!important}
 
 
 <style id="v1454-xp-neon-css">
-/* V15.2.0 — Rang XP : même qualité visuelle néon que le Rang Power */
+/* V15.3.0 — Rang XP : même qualité visuelle néon que le Rang Power */
 #v135-xp-modal .modal-content{
   width:min(620px,96vw)!important;
   max-width:620px!important;
@@ -7809,7 +7753,7 @@ body.v1358-settings-open{overflow:hidden!important}
           bar.style.width=pct+'%';
         }
       }
-    }catch(e){console.warn('V15.2.0 XP live',e)}
+    }catch(e){console.warn('V15.3.0 XP live',e)}
   };
 
   const oldHub=window.v135RenderRankHub;
@@ -8252,7 +8196,7 @@ body.v1358-settings-open{overflow:hidden!important}
 
 
 <style id="v1501-vitrines-fix-css">
-/* V15.2.0 — restaure la présentation propre des vitrines sans réactiver les vieux contrôleurs */
+/* V15.3.0 — restaure la présentation propre des vitrines sans réactiver les vieux contrôleurs */
 
 /* Ancienne carte PLAYER STATUS = doublon historique V10, désormais masquée. */
 #v10-profile-dashboard{display:none!important}
@@ -8343,7 +8287,7 @@ body.v1358-settings-open{overflow:hidden!important}
       /* Rafraîchit seulement les données/visuels, sans recréer d'anciens modules. */
       try{window.renderXpRankLive?.()}catch(e){}
       try{window.renderPowerRankLive?.()}catch(e){}
-    }catch(e){console.warn('V15.2.0 vitrines',e)}
+    }catch(e){console.warn('V15.3.0 vitrines',e)}
   }
 
   window.v1501FixVitrines=fixVitrines;
@@ -8748,6 +8692,144 @@ body.v1358-settings-open{overflow:hidden!important}
   document.addEventListener('visibilitychange',()=>{
     if(document.visibilityState==='visible')setTimeout(boot,80);
   });
+})();
+</script>
+
+
+<script id="v1530-program-cycle-pr-fix">
+(function(){
+'use strict';
+
+const dayKey=(program,block,day)=>`leveling_validated_${program}_${block}_${day}`;
+
+function clearValidationKeys(){
+  const rm=[];
+  for(let i=0;i<localStorage.length;i++){
+    const k=localStorage.key(i);
+    if(k&&k.startsWith('leveling_validated_'))rm.push(k);
+  }
+  rm.forEach(k=>localStorage.removeItem(k));
+}
+
+window.v153ResetCycleNow=function(){
+  try{
+    /* Reset UNIQUEMENT du cycle. Les records, XP, historique, rangs et stats restent. */
+    workoutState={};
+    customSetData={};
+    if(typeof programWorkoutStates!=='undefined')programWorkoutStates={};
+    if(typeof programCustomSetData!=='undefined')programCustomSetData={};
+    currentBlockIndex=0;
+    currentDayIndex=0;
+    clearValidationKeys();
+    localStorage.removeItem('leveling_cycle_reset_pending');
+    localStorage.removeItem('leveling_cycle_completed_date');
+
+    const modal=document.getElementById('modal-sunday-victory');
+    if(modal)modal.style.display='none';
+
+    saveToLocalStorage();
+    try{window.__levelingV10Import?.(window.__levelingV10Export?.()||{})}catch(e){}
+    try{scheduleCloudSaveImmediate?.()}catch(e){}
+    initWorkoutSystem();
+    updateProfileUI();
+    updateResumeWorkoutBanner?.();
+    alert('🔥 Nouveau cycle démarré ! Retour au Bloc 1 — Lundi. Tes XP, PR, historique et statistiques sont conservés.');
+    return true;
+  }catch(e){
+    console.error('V15.3 reset cycle',e);
+    alert('Impossible de réinitialiser le cycle. Tes données ont été conservées.');
+    return false;
+  }
+};
+
+function showCycleModal(){
+  const modal=document.getElementById('modal-sunday-victory');
+  if(!modal)return;
+  const sub=modal.querySelector('.subtitle');
+  if(sub)sub.textContent='Les 4 blocs sont terminés. Tes performances sont enregistrées.';
+  const info=modal.querySelector('.modal-content > div');
+  if(info)info.textContent='🔥 Confirme pour repartir immédiatement au Bloc 1. XP, PR, historique et statistiques seront conservés.';
+  const btn=modal.querySelector('.btn-action');
+  if(btn){
+    btn.textContent='🔥 DÉMARRER LE NOUVEAU CYCLE';
+    btn.onclick=()=>window.v153ResetCycleNow();
+  }
+  modal.style.display='flex';
+}
+
+function advanceAfterValidatedSession(program,block,day){
+  if(day!==6)return;
+  if(block<3){
+    /* On avance seulement APRÈS la vraie validation avec étoiles. */
+    currentBlockIndex=block+1;
+    currentDayIndex=0;
+    saveToLocalStorage();
+    initWorkoutSystem();
+    updateProfileUI();
+    alert(`Félicitations ! Bloc ${block+1} validé et enregistré. Passage au Bloc ${block+2}.`);
+  }else{
+    recordCurrentBlockToHistory?.();
+    saveToLocalStorage();
+    showCycleModal();
+  }
+}
+
+/* PR : un deload/une variante "Léger" n'est jamais autorisé à créer un record.
+   On compare aussi les familles d'exercices afin qu'un "Squat (Léger)" ne crée
+   pas un nouveau record séparé simplement parce que son nom diffère. */
+function normExercise(name){
+  return String(name||'')
+    .toLowerCase()
+    .normalize('NFD').replace(/[\u0300-\u036f]/g,'')
+    .replace(/\((leger|volume|deload|technique|pause|tempo)[^)]*\)/g,'')
+    .replace(/\b(leger|deload|technique)\b/g,'')
+    .replace(/\s+/g,' ').trim();
+}
+const oldDetect=window.detectAutomaticPR;
+window.detectAutomaticPR=function(exIndex,setIndex){
+  const ex=getPrograms()?.[currentBlockIndex]?.[currentDayIndex]?.exercises?.[exIndex];
+  const name=String(ex?.name||'');
+  if(currentBlockIndex===3 || /\b(deload|léger|leger)\b/i.test(name))return false;
+
+  /* Récupère le meilleur record d'une même famille sous le nom courant,
+     pour empêcher un faux "premier PR" dû à un suffixe. */
+  try{
+    ensureV127Data?.();
+    const canonical=normExercise(name);
+    const candidates=Object.entries(userData.prRecords||{}).filter(([k])=>normExercise(k)===canonical);
+    if(candidates.length){
+      const best=candidates.reduce((a,[,v])=>({
+        weight:Math.max(Number(a.weight||0),Number(v.weight||0)),
+        repsAtWeight:Math.max(Number(a.repsAtWeight||0),Number(v.repsAtWeight||0)),
+        e1rm:Math.max(Number(a.e1rm||0),Number(v.e1rm||0)),
+        volume:Math.max(Number(a.volume||0),Number(v.volume||0))
+      }),{weight:0,repsAtWeight:0,e1rm:0,volume:0});
+      userData.prRecords[name]=Object.assign({},userData.prRecords[name]||{},best);
+    }
+  }catch(e){}
+  return oldDetect?.apply(this,arguments);
+};
+
+/* La validation finale est désormais l'unique porte d'entrée du passage bloc/cycle. */
+const prevFinish=window.finishWorkoutFinal;
+if(typeof prevFinish==='function'&&!prevFinish.v1530){
+  window.finishWorkoutFinal=function(){
+    const program=activeProgramKey,block=currentBlockIndex,day=currentDayIndex;
+    const before=Number(userData?.workoutsCompleted||0);
+    const r=prevFinish.apply(this,arguments);
+    if(Number(userData?.workoutsCompleted||0)>before){
+      localStorage.setItem(dayKey(program,block,day),'1');
+      setTimeout(()=>advanceAfterValidatedSession(program,block,day),120);
+    }
+    return r;
+  };
+  window.finishWorkoutFinal.v1530=1;
+}
+
+/* Nettoie les anciens flags "reset lundi" qui auraient pu rester après les tests. */
+localStorage.removeItem('leveling_cycle_reset_pending');
+localStorage.removeItem('leveling_cycle_completed_date');
+
 })();
 </script>
 
