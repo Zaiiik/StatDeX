@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>LEVELING-APP — Powerbuilding Tracker V15.0.3 MOBILE SETTINGS UX</title>
+    <title>LEVELING-APP — Powerbuilding Tracker V15.0.4 MOBILE SETTINGS PAGES</title>
     <meta name="theme-color" content="#09090f">
     <meta name="application-name" content="LEVELING-APP">
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -1512,7 +1512,7 @@ header .hud-stat.v140-clickable:hover{
                         <span class="cloud-badge" id="cloud-live-badge">☁️ CLOUD</span>
                     </div>
                     <div id="cloud-sync-detail" style="margin-top:8px;font-size:.62rem;color:#777;text-align:center">Initialisation du cloud…</div>
-                    <div style="margin-top:5px;font-size:.58rem;color:#555;text-align:center">LEVELING-APP V15.0.3 · Stable</div>
+                    <div style="margin-top:5px;font-size:.58rem;color:#555;text-align:center">LEVELING-APP V15.0.4 · Stable</div>
                     <button class="btn-action" onclick="logoutLeveling()" style="border-color:#ff5555;color:#ff7777">Se déconnecter</button>
                 </div>
 
@@ -1787,7 +1787,7 @@ header .hud-stat.v140-clickable:hover{
             autoProgression: true
         };
 
-        /* V15.0.3 — CANONICAL USER STATE BRIDGE
+        /* V15.0.4 — CANONICAL USER STATE BRIDGE
            `userData` est déclaré avec `let`, donc il n'est pas automatiquement disponible
            via `window.userData`. Plusieurs anciens modules lisaient pourtant window.userData,
            ce qui produisait 0 kg / RECRUE malgré des données correctes.
@@ -7079,7 +7079,7 @@ html.leveling-ios nav{-webkit-backdrop-filter:none!important;backdrop-filter:non
 
 
 <style id="v1430-stable-ui-css">
-/* ================= V15.0.3 — STABLE SETTINGS / PROGRESSION =================
+/* ================= V15.0.4 — STABLE SETTINGS / PROGRESSION =================
    Réglages: plus aucune sous-page fixed/overlay. Toutes les rubriques restent
    dans le scroll principal de l'app, donc plus de page coupée ni ouverture en bas. */
 #panel-settings{position:relative!important;overflow:visible!important;min-height:0!important}
@@ -7134,7 +7134,7 @@ body.v1358-settings-open{overflow:hidden!important}
 
 <script id="v1430-stable-core-js">
 (function(){
-  const VERSION='15.0.3';
+  const VERSION='15.0.4';
   const q=s=>document.querySelector(s);
   const qa=s=>[...document.querySelectorAll(s)];
   const localDay=(d=new Date())=>`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
@@ -7281,7 +7281,7 @@ body.v1358-settings-open{overflow:hidden!important}
         if(typeof renderProfileV2==='function'&&document.getElementById('profile-v2-modal')?.classList.contains('show'))renderProfileV2();
         if(typeof window.renderPowerRankLive==='function')window.renderPowerRankLive();
         if(typeof render==='function')render();
-      }catch(e){console.warn('V15.0.3 SBD UI refresh',e)}
+      }catch(e){console.warn('V15.0.4 SBD UI refresh',e)}
       syncProgressionState();refreshRanks();
     },0);
     return r;
@@ -7337,7 +7337,7 @@ body.v1358-settings-open{overflow:hidden!important}
 
 
 <style id="v1440-power-rank-clean-css">
-/* V15.0.3 — RANG POWER PROPRE
+/* V15.0.4 — RANG POWER PROPRE
    Une seule logique: total Squat + Bench + Deadlift en KG.
    Une identité visuelle distincte par rang. */
 
@@ -7544,7 +7544,7 @@ body.v1358-settings-open{overflow:hidden!important}
 
 
 <style id="v1451-power-live-neon-css">
-/* V15.0.3 — les cartes visibles utilisent la même identité néon que la vitrine */
+/* V15.0.4 — les cartes visibles utilisent la même identité néon que la vitrine */
 .rank-card.v1451-live-rank{
   --rank:#ff2d55;
   --rank-rgb:255,45,85;
@@ -7694,7 +7694,7 @@ body.v1358-settings-open{overflow:hidden!important}
         mini.classList.add('v1451-live-rank-mini');
         cssVars(mini,r);
       }
-    }catch(e){console.warn('V15.0.3 live rank render',e)}
+    }catch(e){console.warn('V15.0.4 live rank render',e)}
   };
 
   /* Après toute vraie mise à jour de données/UI */
@@ -7755,7 +7755,7 @@ body.v1358-settings-open{overflow:hidden!important}
     try{
       if(typeof window.renderPowerRankLive==='function')window.renderPowerRankLive();
       if(typeof window.v135RenderRankHub==='function')window.v135RenderRankHub();
-    }catch(e){console.warn('V15.0.3 power refresh',e)}
+    }catch(e){console.warn('V15.0.4 power refresh',e)}
   }
 
   const oldLoad=window.loadFromLocalStorage;
@@ -7793,7 +7793,7 @@ body.v1358-settings-open{overflow:hidden!important}
 
 
 <style id="v1454-xp-neon-css">
-/* V15.0.3 — Rang XP : même qualité visuelle néon que le Rang Power */
+/* V15.0.4 — Rang XP : même qualité visuelle néon que le Rang Power */
 #v135-xp-modal .modal-content{
   width:min(620px,96vw)!important;
   max-width:620px!important;
@@ -7918,7 +7918,7 @@ body.v1358-settings-open{overflow:hidden!important}
           bar.style.width=pct+'%';
         }
       }
-    }catch(e){console.warn('V15.0.3 XP live',e)}
+    }catch(e){console.warn('V15.0.4 XP live',e)}
   };
 
   const oldHub=window.v135RenderRankHub;
@@ -8213,7 +8213,7 @@ body.v1358-settings-open{overflow:inherit!important}
 
 
 <style id="v1501-vitrines-fix-css">
-/* V15.0.3 — restaure la présentation propre des vitrines sans réactiver les vieux contrôleurs */
+/* V15.0.4 — restaure la présentation propre des vitrines sans réactiver les vieux contrôleurs */
 
 /* Ancienne carte PLAYER STATUS = doublon historique V10, désormais masquée. */
 #v10-profile-dashboard{display:none!important}
@@ -8304,7 +8304,7 @@ body.v1358-settings-open{overflow:inherit!important}
       /* Rafraîchit seulement les données/visuels, sans recréer d'anciens modules. */
       try{window.renderXpRankLive?.()}catch(e){}
       try{window.renderPowerRankLive?.()}catch(e){}
-    }catch(e){console.warn('V15.0.3 vitrines',e)}
+    }catch(e){console.warn('V15.0.4 vitrines',e)}
   }
 
   window.v1501FixVitrines=fixVitrines;
@@ -8329,7 +8329,7 @@ body.v1358-settings-open{overflow:inherit!important}
 
 
 <style id="v1502-settings-profile-clean-css">
-/* V15.0.3 — Réglages > Mon profil : plus aucune mini-fenêtre / modal historique */
+/* V15.0.4 — Réglages > Mon profil : plus aucune mini-fenêtre / modal historique */
 #panel-settings.v15-settings-ready .compact-setting-section.v15-active-setting{
   position:static!important;
   transform:none!important;
@@ -8467,7 +8467,7 @@ body.v1358-settings-open{overflow:inherit!important}
 
 
 <style id="v1503-mobile-settings-ux-css">
-/* V15.0.3 — Réglages mobile : compact, lisible, contenu visible immédiatement */
+/* V15.0.4 — Réglages mobile : compact, lisible, contenu visible immédiatement */
 @media(max-width:600px){
   #panel-settings.v15-settings-ready{
     padding:10px 10px calc(96px + env(safe-area-inset-bottom,0px))!important;
@@ -8654,6 +8654,221 @@ body.v1358-settings-open{overflow:inherit!important}
       try{window.v15BuildSettings?.()}catch(e){}
     },120),{once:true});
   }
+})();
+</script>
+
+
+<style id="v1504-mobile-settings-pages-css">
+/* ============================================================
+   V15.0.4 — RÉGLAGES MOBILE EN VRAIES PAGES
+   Pas de fixed/overlay. On garde un seul flux scrollable :
+   - accueil Réglages = palette + 4 cartes
+   - toucher une carte = page dédiée avec bouton Retour
+   ============================================================ */
+#v1504-settings-pagebar{display:none}
+
+@media(max-width:600px){
+  #panel-settings.v1504-subpage-open .compact-settings-head,
+  #panel-settings.v1504-subpage-open .settings-theme-top,
+  #panel-settings.v1504-subpage-open #v15-settings-tabs{
+    display:none!important;
+  }
+
+  #panel-settings.v1504-subpage-open #v1504-settings-pagebar{
+    display:flex!important;
+    position:sticky!important;
+    top:0!important;
+    z-index:30!important;
+    align-items:center!important;
+    gap:10px!important;
+    min-height:58px!important;
+    margin:-10px -10px 10px!important;
+    padding:calc(10px + env(safe-area-inset-top,0px)) 12px 10px!important;
+    background:linear-gradient(180deg,#0a0a10 82%,rgba(10,10,16,.92))!important;
+    border-bottom:1px solid color-mix(in srgb,var(--accent-purple) 55%,#333)!important;
+    box-shadow:0 6px 18px rgba(0,0,0,.28)!important;
+  }
+  #v1504-settings-back{
+    width:42px!important;height:42px!important;min-width:42px!important;
+    display:grid!important;place-items:center!important;
+    margin:0!important;padding:0!important;
+    border:1px solid #3a3a46!important;border-radius:10px!important;
+    background:#111118!important;color:#fff!important;
+    font-size:1.15rem!important;font-weight:900!important;
+  }
+  #v1504-settings-page-title{
+    min-width:0!important;flex:1!important;
+  }
+  #v1504-settings-page-title b{
+    display:block!important;
+    font-size:.82rem!important;
+    color:#fff!important;
+  }
+  #v1504-settings-page-title small{
+    display:block!important;
+    margin-top:2px!important;
+    font-size:.54rem!important;
+    color:#888!important;
+  }
+
+  /* Une fois dans la page, la section prend toute la largeur et commence en haut. */
+  #panel-settings.v1504-subpage-open .compact-setting-section.v15-active-setting{
+    margin:0!important;
+    border:0!important;
+    background:transparent!important;
+    box-shadow:none!important;
+  }
+  #panel-settings.v1504-subpage-open .compact-setting-body{
+    padding:0!important;
+  }
+  #panel-settings.v1504-subpage-open .compact-setting-body > .profile-card,
+  #panel-settings.v1504-subpage-open .compact-setting-body > .v11-card{
+    margin:0 0 10px!important;
+    border-radius:12px!important;
+  }
+
+  /* Le profil devient visuellement une suite simple de cartes, sans conteneur externe. */
+  #panel-settings.v1504-subpage-open .v1502-profile-clean{
+    border:0!important;
+    background:transparent!important;
+  }
+
+  /* Accueil Réglages : aucun contenu de section affiché tant qu'on n'a pas choisi. */
+  #panel-settings.v15-settings-ready:not(.v1504-subpage-open) .compact-setting-section{
+    display:none!important;
+  }
+}
+</style>
+
+<script id="v1504-mobile-settings-pages-js">
+(function(){
+  'use strict';
+
+  const META={
+    profile:['👤 Mon profil','Compte, identité, cloud et métriques'],
+    ambiance:['✨ Ambiance','Thèmes, effets et animations'],
+    display:['📱 Affichage','Interface, installation et plein écran'],
+    notifications:['🔔 Notifications','Rappels et préférences']
+  };
+
+  function panel(){return document.getElementById('panel-settings')}
+  function main(){return document.querySelector('#app-container > main')}
+  function isMobile(){return matchMedia('(max-width:600px)').matches}
+
+  function scrollTop(){
+    const m=main();
+    if(!m)return;
+    try{m.scrollTo({top:0,left:0,behavior:'auto'})}catch(e){m.scrollTop=0}
+  }
+
+  function ensureBar(){
+    const p=panel();if(!p)return null;
+    let bar=document.getElementById('v1504-settings-pagebar');
+    if(bar)return bar;
+    bar=document.createElement('div');
+    bar.id='v1504-settings-pagebar';
+    bar.innerHTML=`
+      <button id="v1504-settings-back" type="button" aria-label="Retour aux réglages">←</button>
+      <div id="v1504-settings-page-title"><b>Réglages</b><small>Configuration</small></div>
+    `;
+    const first=p.firstElementChild;
+    if(first)p.insertBefore(bar,first);else p.appendChild(bar);
+    bar.querySelector('#v1504-settings-back').onclick=()=>{
+      try{if(typeof playSound==='function')playSound('click')}catch(e){}
+      showHome();
+    };
+    return bar;
+  }
+
+  function updateTitle(key){
+    const [title,sub]=META[key]||['⚙️ Réglages','Configuration'];
+    const t=document.querySelector('#v1504-settings-page-title b');
+    const s=document.querySelector('#v1504-settings-page-title small');
+    if(t)t.textContent=title;
+    if(s)s.textContent=sub;
+  }
+
+  function showHome(){
+    const p=panel();if(!p)return;
+    p.classList.remove('v1504-subpage-open');
+    p.dataset.v15Setting='';
+    document.querySelectorAll('#panel-settings .compact-setting-section')
+      .forEach(s=>s.classList.remove('v15-active-setting'));
+    document.querySelectorAll('#v15-settings-tabs .v15-settings-tab')
+      .forEach(b=>b.classList.remove('active'));
+    scrollTop();
+  }
+
+  function showPage(key){
+    const p=panel();if(!p)return;
+    ensureBar();
+    p.classList.add('v1504-subpage-open');
+    updateTitle(key);
+
+    /* Appelle le contrôleur V15 existant pour choisir la bonne section,
+       mais sans lui laisser gérer un scroll ancien. */
+    if(typeof window.v15SelectSetting==='function'){
+      window.v15SelectSetting(key,false);
+    }
+    if(key==='profile'&&typeof window.v1502NormalizeSettingsProfile==='function'){
+      window.v1502NormalizeSettingsProfile();
+    }
+    scrollTop();
+  }
+
+  window.v1504SettingsHome=showHome;
+  window.v1504SettingsPage=showPage;
+
+  function bind(){
+    const p=panel();if(!p)return;
+    ensureBar();
+
+    document.querySelectorAll('#v15-settings-tabs .v15-settings-tab').forEach(btn=>{
+      btn.onclick=()=>{
+        try{if(typeof playSound==='function')playSound('click')}catch(e){}
+        if(isMobile())showPage(btn.dataset.key);
+        else if(typeof window.v15SelectSetting==='function')window.v15SelectSetting(btn.dataset.key,true);
+      };
+    });
+
+    /* Quand on arrive dans Réglages sur mobile : toujours accueil propre, jamais ancien scroll. */
+    if(isMobile())showHome();
+  }
+
+  const oldBuild=window.v15BuildSettings;
+  if(typeof oldBuild==='function'&&!oldBuild.v1504){
+    window.v15BuildSettings=function(){
+      const r=oldBuild.apply(this,arguments);
+      requestAnimationFrame(bind);
+      return r;
+    };
+    window.v15BuildSettings.v1504=1;
+  }
+
+  const oldSwitch=window.switchTab;
+  if(typeof oldSwitch==='function'&&!oldSwitch.v1504){
+    window.switchTab=function(tab,btn){
+      const r=oldSwitch.apply(this,arguments);
+      if(tab==='settings'&&isMobile()){
+        requestAnimationFrame(()=>{
+          try{window.v15BuildSettings?.()}catch(e){}
+          showHome();
+        });
+      }
+      return r;
+    };
+    window.switchTab.v1504=1;
+  }
+
+  addEventListener('resize',()=>{
+    const p=panel();
+    if(!p)return;
+    if(!isMobile())p.classList.remove('v1504-subpage-open');
+  });
+
+  if(document.readyState==='loading'){
+    document.addEventListener('DOMContentLoaded',()=>setTimeout(bind,180),{once:true});
+  }else setTimeout(bind,60);
 })();
 </script>
 
