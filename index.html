@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>LEVELING-APP — Powerbuilding Tracker V15.4.0 HISTORY STATS CLEAN</title>
+    <title>LEVELING-APP — Powerbuilding Tracker V15.5.0 HISTORY UI COACH CLEAN</title>
     <meta name="theme-color" content="#09090f">
     <meta name="application-name" content="LEVELING-APP">
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -1154,6 +1154,20 @@ header .hud-stat.v140-clickable:hover{
 }
 </style>
 
+
+<style id="v1550-history-ui-coach-css">
+/* V15.5 — historique plus lisible, sans toucher au moteur */
+.history-item .history-title,
+.history-card .history-title,
+.block-history-item .history-title{
+  letter-spacing:.02em;
+}
+#history-detail-modal .history-day-row,
+#history-modal .history-day-row{
+  min-width:0;
+}
+</style>
+
 </head>
 <body data-theme="purple">
 
@@ -1512,7 +1526,7 @@ header .hud-stat.v140-clickable:hover{
                         <span class="cloud-badge" id="cloud-live-badge">☁️ CLOUD</span>
                     </div>
                     <div id="cloud-sync-detail" style="margin-top:8px;font-size:.62rem;color:#777;text-align:center">Initialisation du cloud…</div>
-                    <div style="margin-top:5px;font-size:.58rem;color:#555;text-align:center">LEVELING-APP V15.4.0 · Stable</div>
+                    <div style="margin-top:5px;font-size:.58rem;color:#555;text-align:center">LEVELING-APP V15.5.0 · Stable</div>
                     <button class="btn-action" onclick="logoutLeveling()" style="border-color:#ff5555;color:#ff7777">Se déconnecter</button>
                 </div>
 
@@ -1787,7 +1801,7 @@ header .hud-stat.v140-clickable:hover{
             autoProgression: true
         };
 
-        /* V15.4.0 — CANONICAL USER STATE BRIDGE
+        /* V15.5.0 — CANONICAL USER STATE BRIDGE
            `userData` est déclaré avec `let`, donc il n'est pas automatiquement disponible
            via `window.userData`. Plusieurs anciens modules lisaient pourtant window.userData,
            ce qui produisait 0 kg / RECRUE malgré des données correctes.
@@ -6842,7 +6856,7 @@ html.leveling-ios nav{-webkit-backdrop-filter:none!important;backdrop-filter:non
 
 
 <style id="v1430-stable-ui-css">
-/* ================= V15.4.0 — STABLE SETTINGS / PROGRESSION =================
+/* ================= V15.5.0 — STABLE SETTINGS / PROGRESSION =================
    Réglages: plus aucune sous-page fixed/overlay. Toutes les rubriques restent
    dans le scroll principal de l'app, donc plus de page coupée ni ouverture en bas. */
 #panel-settings{position:relative!important;overflow:visible!important;min-height:0!important}
@@ -6897,7 +6911,7 @@ body.v1358-settings-open{overflow:hidden!important}
 
 <script id="v1430-stable-core-js">
 (function(){
-  const VERSION='15.4.0';
+  const VERSION='15.5.0';
   const q=s=>document.querySelector(s);
   const qa=s=>[...document.querySelectorAll(s)];
   const localDay=(d=new Date())=>`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
@@ -7044,7 +7058,7 @@ body.v1358-settings-open{overflow:hidden!important}
         if(typeof renderProfileV2==='function'&&document.getElementById('profile-v2-modal')?.classList.contains('show'))renderProfileV2();
         if(typeof window.renderPowerRankLive==='function')window.renderPowerRankLive();
         if(typeof render==='function')render();
-      }catch(e){console.warn('V15.4.0 SBD UI refresh',e)}
+      }catch(e){console.warn('V15.5.0 SBD UI refresh',e)}
       syncProgressionState();refreshRanks();
     },0);
     return r;
@@ -7100,7 +7114,7 @@ body.v1358-settings-open{overflow:hidden!important}
 
 
 <style id="v1440-power-rank-clean-css">
-/* V15.4.0 — RANG POWER PROPRE
+/* V15.5.0 — RANG POWER PROPRE
    Une seule logique: total Squat + Bench + Deadlift en KG.
    Une identité visuelle distincte par rang. */
 
@@ -7307,7 +7321,7 @@ body.v1358-settings-open{overflow:hidden!important}
 
 
 <style id="v1451-power-live-neon-css">
-/* V15.4.0 — les cartes visibles utilisent la même identité néon que la vitrine */
+/* V15.5.0 — les cartes visibles utilisent la même identité néon que la vitrine */
 .rank-card.v1451-live-rank{
   --rank:#ff2d55;
   --rank-rgb:255,45,85;
@@ -7457,7 +7471,7 @@ body.v1358-settings-open{overflow:hidden!important}
         mini.classList.add('v1451-live-rank-mini');
         cssVars(mini,r);
       }
-    }catch(e){console.warn('V15.4.0 live rank render',e)}
+    }catch(e){console.warn('V15.5.0 live rank render',e)}
   };
 
   /* Après toute vraie mise à jour de données/UI */
@@ -7518,7 +7532,7 @@ body.v1358-settings-open{overflow:hidden!important}
     try{
       if(typeof window.renderPowerRankLive==='function')window.renderPowerRankLive();
       if(typeof window.v135RenderRankHub==='function')window.v135RenderRankHub();
-    }catch(e){console.warn('V15.4.0 power refresh',e)}
+    }catch(e){console.warn('V15.5.0 power refresh',e)}
   }
 
   const oldLoad=window.loadFromLocalStorage;
@@ -7556,7 +7570,7 @@ body.v1358-settings-open{overflow:hidden!important}
 
 
 <style id="v1454-xp-neon-css">
-/* V15.4.0 — Rang XP : même qualité visuelle néon que le Rang Power */
+/* V15.5.0 — Rang XP : même qualité visuelle néon que le Rang Power */
 #v135-xp-modal .modal-content{
   width:min(620px,96vw)!important;
   max-width:620px!important;
@@ -7681,7 +7695,7 @@ body.v1358-settings-open{overflow:hidden!important}
           bar.style.width=pct+'%';
         }
       }
-    }catch(e){console.warn('V15.4.0 XP live',e)}
+    }catch(e){console.warn('V15.5.0 XP live',e)}
   };
 
   const oldHub=window.v135RenderRankHub;
@@ -8124,7 +8138,7 @@ body.v1358-settings-open{overflow:hidden!important}
 
 
 <style id="v1501-vitrines-fix-css">
-/* V15.4.0 — restaure la présentation propre des vitrines sans réactiver les vieux contrôleurs */
+/* V15.5.0 — restaure la présentation propre des vitrines sans réactiver les vieux contrôleurs */
 
 /* Ancienne carte PLAYER STATUS = doublon historique V10, désormais masquée. */
 #v10-profile-dashboard{display:none!important}
@@ -8215,7 +8229,7 @@ body.v1358-settings-open{overflow:hidden!important}
       /* Rafraîchit seulement les données/visuels, sans recréer d'anciens modules. */
       try{window.renderXpRankLive?.()}catch(e){}
       try{window.renderPowerRankLive?.()}catch(e){}
-    }catch(e){console.warn('V15.4.0 vitrines',e)}
+    }catch(e){console.warn('V15.5.0 vitrines',e)}
   }
 
   window.v1501FixVitrines=fixVitrines;
@@ -8929,6 +8943,182 @@ if(typeof prevFinish==='function'&&!prevFinish.v1540){
 normalizeHistory();
 setTimeout(refreshStats,250);
 document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')setTimeout(refreshStats,80)});
+})();
+</script>
+
+
+<script id="v1550-history-ui-coach-clean">
+(function(){
+'use strict';
+
+const WEEK_ORDER=['Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi','Dimanche'];
+
+function cycleLabel(entry){
+  const c=Math.max(1,Number(entry?.cycle||1));
+  const b=Math.max(1,Number(entry?.blockIndex||0)+1);
+  return `CYCLE ${c} · BLOC ${b}`;
+}
+
+function sortedDayEntries(entry){
+  const src=entry?.dayTonnes||{};
+  return WEEK_ORDER.map(day=>[day,Number(src?.[day]||0)]);
+}
+
+/* Historique principal : labels cycle/bloc plus clairs sans modifier les données. */
+function relabelHistoryCards(){
+  try{
+    const root=document.querySelector('#history-list, #workout-history, .history-list, .history-container');
+    const cards=[...(root?.querySelectorAll?.('[data-history-index], .history-item, .history-card, .block-history-item')||[])];
+    cards.forEach((card,idx)=>{
+      const h=workoutHistory?.[idx];
+      if(!h)return;
+      const title=card.querySelector('.history-title, .block-title, h3, h4, strong, b');
+      if(title)title.textContent=cycleLabel(h);
+    });
+  }catch(e){}
+}
+
+/* Remplace le contenu du popup après ouverture pour forcer l'ordre lundi->dimanche. */
+function restyleOpenHistoryModal(){
+  try{
+    const modal=document.getElementById('history-detail-modal') ||
+                document.getElementById('history-modal') ||
+                document.querySelector('.history-detail-modal, .history-modal');
+    if(!modal || getComputedStyle(modal).display==='none')return;
+
+    const title=modal.querySelector('h2,h3,.modal-title,.history-modal-title');
+    const dateLine=[...modal.querySelectorAll('p,small,div')].find(el=>/Validé le|Total/i.test(el.textContent||''));
+
+    /* Identify entry by total/date/title if possible, fallback most recent visible matching block. */
+    let entry=null;
+    const currentTitle=(title?.textContent||'').toLowerCase();
+    const match=currentTitle.match(/bloc\s*(\d+)/i);
+    if(match){
+      const bi=Number(match[1])-1;
+      const possibles=(workoutHistory||[]).filter(h=>Number(h?.blockIndex)===bi);
+      entry=possibles[possibles.length-1]||null;
+      if(dateLine){
+        const dm=(dateLine.textContent||'').match(/(\d{2}\/\d{2}\/\d{4})/);
+        if(dm){
+          const exact=possibles.find(h=>String(h?.date||'')===dm[1]);
+          if(exact)entry=exact;
+        }
+      }
+    }
+    if(!entry)return;
+
+    if(title)title.textContent=cycleLabel(entry);
+
+    const container=[...modal.querySelectorAll('div')].find(el=>{
+      const txt=el.textContent||'';
+      return WEEK_ORDER.filter(d=>txt.includes(d)).length>=3;
+    });
+    if(!container)return;
+
+    const rows=[...container.children].filter(el=>WEEK_ORDER.some(d=>(el.textContent||'').includes(d)));
+    if(!rows.length)return;
+
+    const rowMap=new Map();
+    rows.forEach(r=>{
+      const d=WEEK_ORDER.find(day=>(r.textContent||'').includes(day));
+      if(d)rowMap.set(d,r);
+    });
+    WEEK_ORDER.forEach(day=>{
+      const row=rowMap.get(day);
+      if(row)container.appendChild(row);
+    });
+  }catch(e){}
+}
+
+/* Coach progression : une seule suggestion utile au lieu de 3 duplications identiques. */
+function cleanCoachProgression(){
+  try{
+    const coach=[...document.querySelectorAll('section,div')].find(el=>{
+      const txt=(el.textContent||'').trim();
+      return /Coach progression/i.test(txt) && txt.length<1500;
+    });
+    if(!coach)return;
+
+    const messages=[...coach.querySelectorAll('div,p,span,li')]
+      .filter(el=>{
+        const txt=(el.textContent||'').trim();
+        return txt && !/Coach progression/i.test(txt) && txt.length<220;
+      });
+
+    const unique=[];
+    const seen=new Set();
+    messages.forEach(el=>{
+      const txt=(el.textContent||'').trim().replace(/\s+/g,' ');
+      if(!txt)return;
+      if(seen.has(txt)){
+        el.style.display='none';
+      }else{
+        seen.add(txt);
+        unique.push(el);
+      }
+    });
+
+    /* Si 3 placeholders identiques historiques existent, on n'en garde qu'un. */
+    const placeholder=unique.filter(el=>/Enregistre quelques séries pour obtenir une suggestion/i.test(el.textContent||''));
+    placeholder.slice(1).forEach(el=>el.style.display='none');
+  }catch(e){}
+}
+
+/* Plus fiable : patch direct du renderer d'historique pour les futures cartes. */
+const oldRenderHistoryUI=window.renderHistoryUI;
+if(typeof oldRenderHistoryUI==='function' && !oldRenderHistoryUI.v1550){
+  window.renderHistoryUI=function(){
+    const r=oldRenderHistoryUI.apply(this,arguments);
+    setTimeout(()=>{
+      relabelHistoryCards();
+      cleanCoachProgression();
+    },0);
+    return r;
+  };
+  window.renderHistoryUI.v1550=1;
+}
+
+/* Patch des fonctions d'ouverture d'historique si elles existent. */
+['showHistoryDetail','openHistoryDetail','showBlockDetails','openBlockHistory'].forEach(name=>{
+  const old=window[name];
+  if(typeof old==='function' && !old.v1550){
+    window[name]=function(){
+      const r=old.apply(this,arguments);
+      setTimeout(restyleOpenHistoryModal,0);
+      return r;
+    };
+    window[name].v1550=1;
+  }
+});
+
+/* MutationObserver uniquement sur historique/coach, pas sur toute l'app en boucle lourde. */
+let scheduled=false;
+const obs=new MutationObserver(()=>{
+  if(scheduled)return;
+  scheduled=true;
+  requestAnimationFrame(()=>{
+    scheduled=false;
+    relabelHistoryCards();
+    restyleOpenHistoryModal();
+    cleanCoachProgression();
+  });
+});
+try{
+  const profile=document.getElementById('profile-section') || document.querySelector('[data-section="profile"]') || document.body;
+  obs.observe(profile,{childList:true,subtree:true});
+}catch(e){}
+
+setTimeout(()=>{
+  relabelHistoryCards();
+  restyleOpenHistoryModal();
+  cleanCoachProgression();
+},220);
+
+window.LevelingHistoryUIV155={
+  relabelHistoryCards,
+  restyleOpenHistoryModal,
+  cleanCoachProgression
+};
 })();
 </script>
 
