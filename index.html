@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>LEVELING-APP — Powerbuilding Tracker V15.9.0 HEADER SESSION UI CLEAN</title>
+    <title>LEVELING-APP — Powerbuilding Tracker V15.9.1 HARD VALIDATION LOCK</title>
     <meta name="theme-color" content="#09090f">
     <meta name="application-name" content="LEVELING-APP">
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -949,7 +949,7 @@ header .hud-stat.v140-clickable:hover{
 </style>
 
 <style id="v1563-settings-controller-clean-css">
-/* V15.9.0 — un seul contrôleur Réglages */
+/* V15.9.1 — un seul contrôleur Réglages */
 #panel-settings.v151-ready > #v135-settings-tabs,
 #panel-settings.v151-ready > .v135-settings-tabs,
 #panel-settings.v151-ready > #v15-settings-tabs,
@@ -1298,7 +1298,7 @@ header .hud-stat.v140-clickable:hover{
                         <span class="cloud-badge" id="cloud-live-badge">☁️ CLOUD</span>
                     </div>
                     <div id="cloud-sync-detail" style="margin-top:8px;font-size:.62rem;color:#777;text-align:center">Initialisation du cloud…</div>
-                    <div style="margin-top:5px;font-size:.58rem;color:#555;text-align:center">LEVELING-APP V15.9.0 · Stable</div>
+                    <div style="margin-top:5px;font-size:.58rem;color:#555;text-align:center">LEVELING-APP V15.9.1 · Stable</div>
                     <button class="btn-action" onclick="logoutLeveling()" style="border-color:#ff5555;color:#ff7777">Se déconnecter</button>
                 </div>
 
@@ -1573,7 +1573,7 @@ header .hud-stat.v140-clickable:hover{
             autoProgression: true
         };
 
-        /* V15.9.0 — CANONICAL USER STATE BRIDGE
+        /* V15.9.1 — CANONICAL USER STATE BRIDGE
            `userData` est déclaré avec `let`, donc il n'est pas automatiquement disponible
            via `window.userData`. Plusieurs anciens modules lisaient pourtant window.userData,
            ce qui produisait 0 kg / RECRUE malgré des données correctes.
@@ -2878,6 +2878,17 @@ header .hud-stat.v140-clickable:hover{
         }
 
         function openRatingModal() {
+            const __validationKey = `leveling_validated_${activeProgramKey}_${currentBlockIndex}_${currentDayIndex}`;
+            if (localStorage.getItem(__validationKey) === '1' || !!userData?.validatedSessions?.[__validationKey]) {
+                const btn = document.getElementById('validate-workout-btn');
+                if (btn) {
+                    btn.disabled = true;
+                    btn.style.pointerEvents = 'none';
+                    btn.textContent = '🔥 SÉANCE DÉJÀ VALIDÉE';
+                }
+                alert('🔥 Cette séance est déjà validée. Passe au jour suivant pour continuer.');
+                return false;
+            }
             selectedRating = 0;
             document.querySelectorAll('.stars-container span').forEach(s => s.classList.remove('active'));
            
@@ -2926,8 +2937,27 @@ header .hud-stat.v140-clickable:hover{
         function finishWorkoutFinal() {
             if (selectedRating === 0) {
                 alert("Veuillez attribuer des étoiles d'intensité !");
-                return;
+                return false;
             }
+
+            /* V15.9.1 HARD LOCK : écrit AVANT toute récompense / compteur. */
+            const __validationKey = `leveling_validated_${activeProgramKey}_${currentBlockIndex}_${currentDayIndex}`;
+            if (localStorage.getItem(__validationKey) === '1' || !!userData?.validatedSessions?.[__validationKey]) {
+                document.getElementById('modal-rating').style.display = 'none';
+                const btn = document.getElementById('validate-workout-btn');
+                if (btn) {
+                    btn.disabled = true;
+                    btn.style.pointerEvents = 'none';
+                    btn.textContent = '🔥 SÉANCE DÉJÀ VALIDÉE';
+                }
+                alert('🔥 Séance déjà enregistrée : aucun XP ni trophée supplémentaire.');
+                return false;
+            }
+            localStorage.setItem(__validationKey, '1');
+            if (!userData.validatedSessions || typeof userData.validatedSessions !== 'object') userData.validatedSessions = {};
+            userData.validatedSessions[__validationKey] = Date.now();
+            saveToLocalStorage();
+
             userData.workoutsCompleted++;
             if (selectedRating >= 4) {
                 userData.trophies += selectedRating;
@@ -2942,6 +2972,7 @@ header .hud-stat.v140-clickable:hover{
             updateProfileUI();
             renderBodyChart();
             document.getElementById('modal-rating').style.display = 'none';
+            try { window.LevelingProgramV157?.refreshValidationUI?.(); } catch(e) {}
 
             if (currentDayIndex !== 6) {
                 switchTab('profile', document.querySelectorAll('.nav-item')[0]);
@@ -4381,7 +4412,7 @@ function v135ProfileNav(){
   const h=panel.querySelector('h2');if(h)h.after(nav);
 }
 function v135Settings(){
-  /* V15.9.0: ancien contrôleur Réglages supprimé.
+  /* V15.9.1: ancien contrôleur Réglages supprimé.
      On conserve seulement la transformation source nécessaire au DOM moderne. */
   try{if(typeof initCompactSettings==='function')initCompactSettings()}catch(e){}
   return false;
@@ -5682,7 +5713,7 @@ html.leveling-ios nav{-webkit-backdrop-filter:none!important;backdrop-filter:non
 
 
 <style id="v1430-stable-ui-css">
-/* ================= V15.9.0 — STABLE SETTINGS / PROGRESSION =================
+/* ================= V15.9.1 — STABLE SETTINGS / PROGRESSION =================
    Réglages: plus aucune sous-page fixed/overlay. Toutes les rubriques restent
    dans le scroll principal de l'app, donc plus de page coupée ni ouverture en bas. */
 #panel-settings{position:relative!important;overflow:visible!important;min-height:0!important}
@@ -5737,7 +5768,7 @@ body.v1358-settings-open{overflow:hidden!important}
 
 <script id="v1430-stable-core-js">
 (function(){
-  const VERSION='15.9.0';
+  const VERSION='15.9.1';
   const q=s=>document.querySelector(s);
   const qa=s=>[...document.querySelectorAll(s)];
   const localDay=(d=new Date())=>`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
@@ -5884,7 +5915,7 @@ body.v1358-settings-open{overflow:hidden!important}
         if(typeof renderProfileV2==='function'&&document.getElementById('profile-v2-modal')?.classList.contains('show'))renderProfileV2();
         if(typeof window.renderPowerRankLive==='function')window.renderPowerRankLive();
         if(typeof render==='function')render();
-      }catch(e){console.warn('V15.9.0 SBD UI refresh',e)}
+      }catch(e){console.warn('V15.9.1 SBD UI refresh',e)}
       syncProgressionState();refreshRanks();
     },0);
     return r;
@@ -5940,7 +5971,7 @@ body.v1358-settings-open{overflow:hidden!important}
 
 
 <style id="v1440-power-rank-clean-css">
-/* V15.9.0 — RANG POWER PROPRE
+/* V15.9.1 — RANG POWER PROPRE
    Une seule logique: total Squat + Bench + Deadlift en KG.
    Une identité visuelle distincte par rang. */
 
@@ -6147,7 +6178,7 @@ body.v1358-settings-open{overflow:hidden!important}
 
 
 <style id="v1451-power-live-neon-css">
-/* V15.9.0 — les cartes visibles utilisent la même identité néon que la vitrine */
+/* V15.9.1 — les cartes visibles utilisent la même identité néon que la vitrine */
 .rank-card.v1451-live-rank{
   --rank:#ff2d55;
   --rank-rgb:255,45,85;
@@ -6297,7 +6328,7 @@ body.v1358-settings-open{overflow:hidden!important}
         mini.classList.add('v1451-live-rank-mini');
         cssVars(mini,r);
       }
-    }catch(e){console.warn('V15.9.0 live rank render',e)}
+    }catch(e){console.warn('V15.9.1 live rank render',e)}
   };
 
   /* Après toute vraie mise à jour de données/UI */
@@ -6358,7 +6389,7 @@ body.v1358-settings-open{overflow:hidden!important}
     try{
       if(typeof window.renderPowerRankLive==='function')window.renderPowerRankLive();
       if(typeof window.v135RenderRankHub==='function')window.v135RenderRankHub();
-    }catch(e){console.warn('V15.9.0 power refresh',e)}
+    }catch(e){console.warn('V15.9.1 power refresh',e)}
   }
 
   const oldLoad=window.loadFromLocalStorage;
@@ -6396,7 +6427,7 @@ body.v1358-settings-open{overflow:hidden!important}
 
 
 <style id="v1454-xp-neon-css">
-/* V15.9.0 — Rang XP : même qualité visuelle néon que le Rang Power */
+/* V15.9.1 — Rang XP : même qualité visuelle néon que le Rang Power */
 #v135-xp-modal .modal-content{
   width:min(620px,96vw)!important;
   max-width:620px!important;
@@ -6521,7 +6552,7 @@ body.v1358-settings-open{overflow:hidden!important}
           bar.style.width=pct+'%';
         }
       }
-    }catch(e){console.warn('V15.9.0 XP live',e)}
+    }catch(e){console.warn('V15.9.1 XP live',e)}
   };
 
   const oldHub=window.v135RenderRankHub;
@@ -6786,7 +6817,7 @@ body.v1358-settings-open{overflow:hidden!important}
     if(!profile)return;
     const target=q('.compact-setting-body',profile);if(!target)return;
 
-    /* V15.9.0 : Profil devient l'unique page pour compte + progression + sauvegarde. */
+    /* V15.9.1 : Profil devient l'unique page pour compte + progression + sauvegarde. */
     const progression=sections.find(s=>/progression/i.test(settingLabel(s)));
     if(progression&&progression!==profile){
       const body=q('.compact-setting-body',progression);
@@ -6989,7 +7020,7 @@ body.v1358-settings-open{overflow:hidden!important}
 
 
 <style id="v1501-vitrines-fix-css">
-/* V15.9.0 — vitrines actuelles, ancien dashboard V10 supprimé physiquement */
+/* V15.9.1 — vitrines actuelles, ancien dashboard V10 supprimé physiquement */
 
 /* Le hub ne sert plus qu'au Rang XP en grand. Le Power garde sa vraie carte dédiée plus bas. */
 #v135-rank-hub{
@@ -7072,7 +7103,7 @@ body.v1358-settings-open{overflow:hidden!important}
       /* Rafraîchit seulement les données/visuels, sans recréer d'anciens modules. */
       try{window.renderXpRankLive?.()}catch(e){}
       try{window.renderPowerRankLive?.()}catch(e){}
-    }catch(e){console.warn('V15.9.0 vitrines',e)}
+    }catch(e){console.warn('V15.9.1 vitrines',e)}
   }
 
   window.v1501FixVitrines=fixVitrines;
@@ -7823,7 +7854,7 @@ if(typeof oldDetect==='function'&&!oldDetect.v1570){
   window.detectAutomaticPR.v1570=1;
 }
 
-/* Verrou V15.9.0 : impossible même de rouvrir la validation d'une séance déjà terminée. */
+/* Verrou V15.9.1 : impossible même de rouvrir la validation d'une séance déjà terminée. */
 const previousOpenRating=window.openRatingModal;
 if(typeof previousOpenRating==='function'&&!previousOpenRating.v1571){
   window.openRatingModal=function(){
@@ -7967,10 +7998,10 @@ document.addEventListener('visibilitychange',()=>{
 (function(){
 'use strict';
 function recover(){
-  try{loadFromLocalStorage?.()}catch(e){console.warn('V15.9.0 load local',e)}
-  try{updateProfileUI?.()}catch(e){console.warn('V15.9.0 profile',e)}
-  try{renderHistoryUI?.()}catch(e){console.warn('V15.9.0 history',e)}
-  try{initWorkoutSystem?.()}catch(e){console.warn('V15.9.0 workout',e)}
+  try{loadFromLocalStorage?.()}catch(e){console.warn('V15.9.1 load local',e)}
+  try{updateProfileUI?.()}catch(e){console.warn('V15.9.1 profile',e)}
+  try{renderHistoryUI?.()}catch(e){console.warn('V15.9.1 history',e)}
+  try{initWorkoutSystem?.()}catch(e){console.warn('V15.9.1 workout',e)}
   try{renderPowerHome?.()}catch(e){}
   try{window.v135RenderRankHub?.()}catch(e){}
   try{window.renderXpRankLive?.()}catch(e){}
@@ -7980,12 +8011,36 @@ function recover(){
     if(document.getElementById('panel-settings')?.classList.contains('active')){
       window.v15BuildSettings?.();
     }
-  }catch(e){console.warn('V15.9.0 settings',e)}
+  }catch(e){console.warn('V15.9.1 settings',e)}
 }
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',()=>setTimeout(recover,500),{once:true});
 else setTimeout(recover,250);
 window.addEventListener('pageshow',()=>setTimeout(recover,120));
 window.v1562RecoverState=recover;
+})();
+</script>
+
+
+<script id="v1591-hard-validation-final-guard">
+(function(){
+'use strict';
+function key(){return `leveling_validated_${activeProgramKey}_${currentBlockIndex}_${currentDayIndex}`}
+function done(){const k=key();try{return localStorage.getItem(k)==='1'||!!userData?.validatedSessions?.[k]}catch(e){return localStorage.getItem(k)==='1'}}
+function paint(){
+ const b=document.getElementById('validate-workout-btn');if(!b)return;
+ if(done()){
+   b.disabled=true;b.setAttribute('aria-disabled','true');b.style.pointerEvents='none';b.style.opacity='.78';
+   b.textContent='🔥 SÉANCE DÉJÀ VALIDÉE';
+ }
+}
+document.addEventListener('click',function(e){
+ const b=e.target.closest?.('#validate-workout-btn');
+ if(!b||!done())return;
+ e.preventDefault();e.stopPropagation();e.stopImmediatePropagation();paint();
+},true);
+setInterval(paint,1500);
+window.addEventListener('pageshow',()=>setTimeout(paint,50));
+setTimeout(paint,100);
 })();
 </script>
 
