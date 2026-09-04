@@ -5776,6 +5776,12 @@ html.leveling-ios main{will-change:auto!important;contain:none!important;transfo
 html.leveling-ios .v1359-pagebar,
 html.leveling-ios header,
 html.leveling-ios nav{-webkit-backdrop-filter:none!important;backdrop-filter:none!important}
+
+/* V16.0.5 — force la vraie hauteur d'écran (calculée en JS) sur iPhone uniquement,
+   pour supprimer la bande noire sous l'indicateur home en mode standalone. */
+html.leveling-ios{height:var(--v1605-real-vh,100dvh)!important}
+html.leveling-ios body{height:var(--v1605-real-vh,100dvh)!important}
+html.leveling-ios #app-container{height:var(--v1605-real-vh,100dvh)!important}
 </style>
 
 <script id="v1421-mobile-unified-fix-js">
@@ -5791,7 +5797,22 @@ html.leveling-ios nav{-webkit-backdrop-filter:none!important;backdrop-filter:non
   document.documentElement.classList.toggle('leveling-android',android);
   document.documentElement.classList.toggle('leveling-standalone',standalone);
 
-  /* Reset only the app scroll container when changing tabs. This fixes random "opens at bottom". */
+  /* V16.0.5 — bande noire sous l'indicateur home sur iPhone en mode standalone :
+     bug connu d'iOS où 100dvh n'atteint pas toujours le vrai bord physique de l'écran
+     une fois l'appli lancée depuis l'écran d'accueil. On calcule la hauteur réelle en JS
+     (window.innerHeight, fiable sur iOS) et on l'impose via une variable CSS, uniquement
+     sur iPhone/iPad — Android et PC gardent 100dvh, qui fonctionne déjà très bien chez eux. */
+  if(ios){
+    const setRealVh=()=>{
+      document.documentElement.style.setProperty('--v1605-real-vh',window.innerHeight+'px');
+    };
+    setRealVh();
+    window.addEventListener('resize',setRealVh);
+    window.addEventListener('orientationchange',()=>setTimeout(setRealVh,50));
+    window.visualViewport?.addEventListener('resize',setRealVh);
+  }
+
+  /* Reset only the app scroll container when changing tabs. This fixes random "opens at bottom".*/
   if(typeof window.switchTab==='function' && !window.switchTab.v1421){
     const previous=window.switchTab;
     window.switchTab=function(tabName,btnElement){
