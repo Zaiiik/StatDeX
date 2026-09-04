@@ -14,7 +14,7 @@
 
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>LEVELING-APP — Powerbuilding Tracker V15.19.1</title>
+    <title>LEVELING-APP — Powerbuilding Tracker V15.19.2</title>
     <meta name="theme-color" content="#09090f">
     <meta name="application-name" content="LEVELING-APP">
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -3421,7 +3421,7 @@ const sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_PUBLISHABLE_KEY,{
   auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true,storage:window.localStorage}
 });
 let cloudUser=null,cloudLicensed=false,cloudLoadedOnce=false,cloudSaveTimer=null,suppressCloudSave=false,licenseWatchTimer=null,lastLicenseStatus='UNKNOWN';
-const APP_VERSION='15.19.1';
+const APP_VERSION='15.19.2';
 const ACCOUNT_LOCAL_KEYS=['solo_leveling_user','solo_leveling_smart_refs','solo_leveling_body_hist','solo_leveling_inv','solo_leveling_block','solo_leveling_day','solo_leveling_state','solo_leveling_custom_sets','solo_leveling_history','solo_leveling_active_program','solo_leveling_program_states','solo_leveling_program_custom_sets','solo_leveling_custom_program','leveling_last_local_save','leveling_last_cloud_sync','leveling_v10'];
 function clearLevelingAccountLocalData(){
   try{ACCOUNT_LOCAL_KEYS.forEach(k=>localStorage.removeItem(k));sessionStorage.removeItem('leveling_pending_license')}catch(e){console.warn('Local account cleanup:',e)}
@@ -5866,7 +5866,7 @@ body.v1358-settings-open{overflow:hidden!important}
    Aucun hook finishWorkoutFinal / updateProfileUI / switchTab.
    ============================================================ */
 
-const VERSION='15.19.1';
+const VERSION='15.19.2';
 const RPG_KEY='leveling_v140_rpg';
 
 function loadRpg(){try{return JSON.parse(localStorage.getItem(RPG_KEY)||'{}')||{}}catch(e){return {}}}
@@ -6995,7 +6995,18 @@ else setTimeout(boot,60);
     const powerHero=q('.rank-card',panel),goals=q('.goal-card',panel);
     if(powerHero&&goals){
       powerHero.classList.add('v1354-power-hero');
-      if(goals.previousElementSibling!==powerHero)goals.before(powerHero);
+
+      /* V15.19.2 — ordre Profil déterministe.
+         Un refresh/updateProfileUI replaçait auparavant Power juste avant Objectifs,
+         ce qui pouvait laisser SBD/Coach AU-DESSUS de Power jusqu'au prochain
+         visibilitychange/reload. On fixe ici l'ordre canonique à chaque rendu :
+         POWER -> SBD -> COACH -> OBJECTIFS. */
+      const sbd=q('#v140-sbd',panel);
+      const coach=q('#v140-coach',panel);
+      panel.insertBefore(powerHero,goals);
+      if(sbd)panel.insertBefore(sbd,goals);
+      if(coach)panel.insertBefore(coach,goals);
+
       let bar=q('.v1354-power-progress',powerHero);
       if(!bar){
         bar=document.createElement('div');
