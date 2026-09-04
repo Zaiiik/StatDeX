@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
 <!-- ============================================================
-     LEVELING-APP V16.0.2 — STABLE PATCH
+     LEVELING-APP V16.0.3 — STABLE PATCH
      Base figée après validation réelle PC + Samsung + iPhone/PWA.
 
      Release V16 :
@@ -20,7 +20,7 @@
 
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>LEVELING-APP — Powerbuilding Tracker V16.0.2 STABLE</title>
+    <title>LEVELING-APP — Powerbuilding Tracker V16.0.3 STABLE</title>
     <meta name="theme-color" content="#09090f">
     <meta name="application-name" content="LEVELING-APP">
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -1134,61 +1134,9 @@ header .hud-stat.v140-clickable:hover{
    - nav absorbe la safe-area du bas
    - body ne réserve aucune safe-area supplémentaire. */
 
-@media (max-width:760px){
-  html.leveling-ios.leveling-standalone,
-  html.leveling-ios.leveling-standalone body{
-    width:100%!important;
-    height:100%!important;
-    min-height:100%!important;
-    margin:0!important;
-    padding:0!important;
-    overflow:hidden!important;
-  }
-
-  html.leveling-ios.leveling-standalone #app-container{
-    /* V16.0.2 — iPhone PWA bottom-gap fix.
-       En standalone, `position:fixed; inset:0` donne déjà les 4 bords exacts
-       du viewport. L'ancien `height:100dvh` sur-contraignait le conteneur sur
-       certains iPhone/iOS et pouvait laisser une bande noire SOUS la nav.
-       On laisse donc top+bottom définir la hauteur réelle. */
-    position:fixed!important;
-    inset:0!important;
-    width:auto!important;
-    height:auto!important;
-    min-height:0!important;
-    max-height:none!important;
-    margin:0!important;
-    padding:0!important;
-  }
-
-  html.leveling-ios.leveling-standalone header{
-    padding-top:max(8px,env(safe-area-inset-top,0px))!important;
-  }
-
-  html.leveling-ios.leveling-standalone nav{
-    left:0!important;
-    right:0!important;
-    bottom:0!important;
-    width:auto!important;
-    min-height:calc(58px + env(safe-area-inset-bottom,0px))!important;
-    padding:6px 0 max(6px,env(safe-area-inset-bottom,0px))!important;
-    background:linear-gradient(to top,#08080d 0%,#0b0b11 62%,rgba(5,5,7,.97) 100%)!important;
-    box-shadow:0 -6px 20px rgba(0,0,0,.42)!important;
-  }
-
-  html.leveling-ios.leveling-standalone main{
-    padding-bottom:calc(82px + env(safe-area-inset-bottom,0px))!important;
-    scroll-padding-bottom:calc(82px + env(safe-area-inset-bottom,0px))!important;
-  }
-
-  html.leveling-ios.leveling-standalone nav .nav-item{
-    min-height:46px!important;
-    padding:3px 3px 4px!important;
-    justify-content:center!important;
-  }
-  html.leveling-ios.leveling-standalone nav .nav-icon{line-height:1!important}
-  html.leveling-ios.leveling-standalone nav .nav-text{margin-top:3px!important}
-}
+/* V16.0.3 — la géométrie iPhone/PWA est désormais gérée uniquement
+   par le bloc MOBILE UNIFIED plus bas dans le fichier. Pas de deuxième
+   autorité concurrente pour le viewport ou la navigation. */
 
 /* Ambiance iOS light conservée telle quelle. */
 html.leveling-ios #ambiance-particles{z-index:8!important;opacity:.72!important}
@@ -3435,7 +3383,7 @@ const sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_PUBLISHABLE_KEY,{
   auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true,storage:window.localStorage}
 });
 let cloudUser=null,cloudLicensed=false,cloudLoadedOnce=false,cloudSaveTimer=null,suppressCloudSave=false,licenseWatchTimer=null,lastLicenseStatus='UNKNOWN';
-const APP_VERSION='16.0.2';
+const APP_VERSION='16.0.3';
 const ACCOUNT_LOCAL_KEYS=['solo_leveling_user','solo_leveling_smart_refs','solo_leveling_body_hist','solo_leveling_inv','solo_leveling_block','solo_leveling_day','solo_leveling_state','solo_leveling_custom_sets','solo_leveling_history','solo_leveling_active_program','solo_leveling_program_states','solo_leveling_program_custom_sets','solo_leveling_custom_program','leveling_last_local_save','leveling_last_cloud_sync','leveling_v10'];
 function clearLevelingAccountLocalData(){
   try{ACCOUNT_LOCAL_KEYS.forEach(k=>localStorage.removeItem(k));sessionStorage.removeItem('leveling_pending_license')}catch(e){console.warn('Local account cleanup:',e)}
@@ -5606,6 +5554,16 @@ window.addEventListener('pageshow',()=>setTimeout(boot,50));
     overflow:hidden!important;
     background:#050507!important;
   }
+
+  /* V16.0.3 — iPhone PWA / safe-area basse.
+     Sur iOS standalone, la zone système située sous le viewport CSS peut être
+     peinte avec le background racine. On lui donne exactement la teinte du bas
+     de la navigation : les boutons restent au-dessus de la safe-area, mais la
+     barre visuelle se prolonge jusqu'au bord physique de l'écran. */
+  html.leveling-ios.leveling-standalone,
+  html.leveling-ios.leveling-standalone body{
+    background:#08080d!important;
+  }
   body{
     position:fixed!important;
     inset:0!important;
@@ -5931,7 +5889,7 @@ body.v1358-settings-open{overflow:hidden!important}
    Aucun hook finishWorkoutFinal / updateProfileUI / switchTab.
    ============================================================ */
 
-const VERSION='16.0.2';
+const VERSION='16.0.3';
 const RPG_KEY='leveling_v140_rpg';
 
 function loadRpg(){try{return JSON.parse(localStorage.getItem(RPG_KEY)||'{}')||{}}catch(e){return {}}}
