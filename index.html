@@ -1,13 +1,20 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-<!-- V15.14 FINAL AUDIT RC
-     Final static audit passed: JS syntax, DOM ids, mobile lifecycle, validation guards,
-     cloud/state hooks, remaining timers classified. No risky cleanup performed here. -->
+<!-- V15.19.1 — Release Metadata & Security Clean
+     - Numéros de version (title / APP_VERSION / VERSION) resynchronisés avec la version réelle du fichier.
+     - Faille XSS corrigée : pseudo utilisateur injecté dans des attributs onclick= (4 sites :
+       liste d'amis ×2, exclusion de membre d'équipe ×2) via une double couche d'échappement cassée.
+       Remplacée par jsAttr() (JSON.stringify + échappement HTML), sûre pour insérer du texte
+       utilisateur comme argument JS dans un attribut inline.
+     - Moteur Power/Rang fusionné (v1451+v1453 → v1600), setTimeout de boot dédupliqués.
+     - Fallback mort v1430Export/ImportAppData retiré (jamais défini, ne s'exécutait jamais).
+     - Référence cassée getUnifiedPowerRank() (inexistante) corrigée dans syncProfileRank(). -->
+
 
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>LEVELING-APP — Powerbuilding Tracker V15.14.0 FINAL AUDIT RC</title>
+    <title>LEVELING-APP — Powerbuilding Tracker V15.19.1</title>
     <meta name="theme-color" content="#09090f">
     <meta name="application-name" content="LEVELING-APP">
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -2589,7 +2596,7 @@ html.leveling-ios .amb-p.spark{
             const programsByBlock = getPrograms();
             const activeProgramDays = programsByBlock[currentBlockIndex];
             const currentDay = activeProgramDays[currentDayIndex];
-            container.innerHTML = `<h3>${currentDay.title}</h3>`;
+            container.innerHTML = `<h3>${escCustom(currentDay.title)}</h3>`;
            
             if (!workoutState[currentBlockIndex]) workoutState[currentBlockIndex] = {};
             if (!workoutState[currentBlockIndex][currentDayIndex]) workoutState[currentBlockIndex][currentDayIndex] = {};
@@ -2648,7 +2655,7 @@ html.leveling-ios .amb-p.spark{
                 }
 
                 card.innerHTML = `
-                    <div class="exercise-title ${v1351HasVariants?'v1351-variant-title':''}" ${v1351HasVariants?`onclick="playSound('click');v1351OpenVariant(${exIndex}, '${v1351BaseName.replace(/'/g,"&#39;")}')"`:''}>${(typeof v1352ExerciseLabel==='function'?v1352ExerciseLabel(v1351DisplayName):v1351DisplayName)} ${v1351HasVariants?'<span class="v1351-variant-chip">🔁 VARIANTES</span>':''} ${isSmartActiveForExo ? '<span style="font-size:0.65rem; color:var(--warning);">⚡ [Paliers Intelligents]</span>' : ''}</div>
+                    <div class="exercise-title ${v1351HasVariants?'v1351-variant-title':''}" ${v1351HasVariants?`onclick="playSound('click');v1351OpenVariant(${exIndex}, ${jsAttr(v1351BaseName)})"`:''}>${escCustom(typeof v1352ExerciseLabel==='function'?v1352ExerciseLabel(v1351DisplayName):v1351DisplayName)} ${v1351HasVariants?'<span class="v1351-variant-chip">🔁 VARIANTES</span>':''} ${isSmartActiveForExo ? '<span style="font-size:0.65rem; color:var(--warning);">⚡ [Paliers Intelligents]</span>' : ''}</div>
                     <div class="exercise-meta">${ex.sets} série(s) prévue(s)</div>
                     ${setsHtml}
                 `;
@@ -2813,7 +2820,7 @@ html.leveling-ios .amb-p.spark{
             const detail = document.getElementById('power-program-detail');
             if (!detail) return;
             const meta = getProgramMeta(activeProgramKey);
-            detail.innerHTML = `<div class="profile-card" style="border-color:${meta.color};box-shadow:0 0 12px ${meta.color}22"><div style="color:${meta.color};font-weight:900">${meta.icon} PROGRAMME ACTIF : ${String(meta.title).toUpperCase()}</div><p style="font-size:.72rem;color:#aaa;margin-bottom:0">Clique sur un programme pour le charger directement dans l’onglet Programme. “Mon programme” ouvre l’éditeur personnalisé.</p></div>`;
+            detail.innerHTML = `<div class="profile-card" style="border-color:${meta.color};box-shadow:0 0 12px ${meta.color}22"><div style="color:${meta.color};font-weight:900">${meta.icon} PROGRAMME ACTIF : ${escCustom(String(meta.title).toUpperCase())}</div><p style="font-size:.72rem;color:#aaa;margin-bottom:0">Clique sur un programme pour le charger directement dans l’onglet Programme. “Mon programme” ouvre l’éditeur personnalisé.</p></div>`;
         }
 
         function escCustom(v){
@@ -2918,7 +2925,7 @@ html.leveling-ios .amb-p.spark{
                 let slot = document.createElement('div');
                 slot.className = `inventory-card ${item.equipped ? 'equipped' : ''} ${rarityClass}`;
                
-                let imageContent = item.image ? `<img src="${item.image}" alt="${item.name}">` : `<span>${item.emoji || '📦'}</span>`;
+                let imageContent = item.image ? `<img src="${escCustom(item.image)}" alt="${escCustom(item.name)}">` : `<span>${item.emoji || '📦'}</span>`;
 
                 slot.innerHTML = `
                     <div class="inv-badge-equipped" onclick="toggleEquip('${item.id}')">${item.equipped ? 'Équipé' : 'Équipier'}</div>
@@ -2926,7 +2933,7 @@ html.leveling-ios .amb-p.spark{
                         <div class="inv-image-container" onclick="triggerImageUpload('${item.id}')" title="Changer l'image">
                             ${imageContent}
                         </div>
-                        <div class="inv-name">${item.name}</div>
+                        <div class="inv-name">${escCustom(item.name)}</div>
                     </div>
                     <div>
                         <div class="inv-rarity ${rarityTextClass}">${item.rarity}</div>
@@ -3083,7 +3090,7 @@ html.leveling-ios .amb-p.spark{
            
             const programsByBlock = getPrograms();
             const currentDay = programsByBlock[currentBlockIndex][currentDayIndex];
-            let recapHTML = `<b>Séance :</b> ${currentDay.title}<br><b>Détail validé :</b><br>`;
+            let recapHTML = `<b>Séance :</b> ${escCustom(currentDay.title)}<br><b>Détail validé :</b><br>`;
             let sessionTonnage = 0;
 
             currentDay.exercises.forEach((ex, exIdx) => {
@@ -3106,7 +3113,7 @@ html.leveling-ios .amb-p.spark{
                     }
                 }
                 if (exDoneCount > 0) {
-                    recapHTML += `- ${ex.name} : ${exDoneCount}/${ex.sets} séries validées<br>`;
+                    recapHTML += `- ${escCustom(ex.name)} : ${exDoneCount}/${ex.sets} séries validées<br>`;
                 }
             });
             recapHTML += `<br><b>Volume total séance :</b> ${sessionTonnage.toLocaleString()} kg`;
@@ -3414,7 +3421,7 @@ const sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_PUBLISHABLE_KEY,{
   auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true,storage:window.localStorage}
 });
 let cloudUser=null,cloudLicensed=false,cloudLoadedOnce=false,cloudSaveTimer=null,suppressCloudSave=false,licenseWatchTimer=null,lastLicenseStatus='UNKNOWN';
-const APP_VERSION='14.5.4';
+const APP_VERSION='15.19.1';
 const ACCOUNT_LOCAL_KEYS=['solo_leveling_user','solo_leveling_smart_refs','solo_leveling_body_hist','solo_leveling_inv','solo_leveling_block','solo_leveling_day','solo_leveling_state','solo_leveling_custom_sets','solo_leveling_history','solo_leveling_active_program','solo_leveling_program_states','solo_leveling_program_custom_sets','solo_leveling_custom_program','leveling_last_local_save','leveling_last_cloud_sync','leveling_v10'];
 function clearLevelingAccountLocalData(){
   try{ACCOUNT_LOCAL_KEYS.forEach(k=>localStorage.removeItem(k));sessionStorage.removeItem('leveling_pending_license')}catch(e){console.warn('Local account cleanup:',e)}
@@ -3753,6 +3760,12 @@ registerLevelingSW();updateInstallUI();initSupabaseGate();
 let communityLoaded=false,leaderboardMetric='xp';
 
 function socialEsc(v){return String(v??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]))}
+/* V15.19.1 — échappement pour texte utilisateur inséré comme argument JS dans un attribut onclick="...".
+   socialEsc() seule ne suffit pas ici : le navigateur décode les entités HTML de l'attribut AVANT
+   d'exécuter le JS qu'il contient, donc un pseudo avec une apostrophe pouvait casser hors de la
+   chaîne et injecter du JS arbitraire (XSS stockée via pseudo/nom d'équipe). jsAttr() sérialise la
+   valeur en JSON (échappement JS correct, guillemets inclus) puis échappe le résultat pour le HTML. */
+function jsAttr(v){return socialEsc(JSON.stringify(String(v??'')))}
 function socialAvatarHTML(p){
   const a=p?.avatar||'';if(a.startsWith('data:image/')||a.startsWith('https://'))return `<div class="social-avatar"><img src="${socialEsc(a)}" alt=""></div>`;
   return `<div class="social-avatar">${socialEsc(a||((p?.username||'L')[0]||'L').toUpperCase())}</div>`;
@@ -3835,7 +3848,7 @@ async function searchCommunityUsers(){
   if(error){box.innerHTML='<div class="community-empty">Community SQL non installé.</div>';return}
   box.innerHTML=(data||[]).map(p=>{
     let action='';
-    if(p.friendship_status==='accepted')action=`<button class="btn-action" onclick="openDirectMessage('${p.user_id}','${socialEsc(p.username).replace("'","&#39;")}','${socialEsc(p.avatar||'')}')">💬 Message</button><button class="btn-action" disabled>✓ Ami</button>`;
+    if(p.friendship_status==='accepted')action=`<button class="btn-action" onclick="openDirectMessage('${p.user_id}',${jsAttr(p.username)},${jsAttr(p.avatar||'')})">💬 Message</button><button class="btn-action" disabled>✓ Ami</button>`;
     else if(p.friendship_status==='pending_out')action='<button class="btn-action" disabled>⏳ Envoyée</button>';
     else if(p.friendship_status==='pending_in')action='<button class="btn-action" disabled>📩 Demande reçue</button>';
     else action=`<button class="btn-action" onclick="sendFriendRequest('${p.user_id}')">➕ Ajouter</button>`;
@@ -3851,7 +3864,7 @@ async function loadCommunityFriends(){
   if(error){fb.innerHTML='<div class="community-empty">Community SQL non installé.</div>';pb.innerHTML='';return}
   const pending=(data||[]).filter(x=>x.status==='pending'&&x.direction==='incoming'),friends=(data||[]).filter(x=>x.status==='accepted');
   pb.innerHTML=pending.map(p=>socialUserCard(p,`<button class="btn-action" onclick="respondFriend('${p.friendship_id}',true)">✅ Accepter</button><button class="btn-action" onclick="respondFriend('${p.friendship_id}',false)">❌ Refuser</button>`)).join('')||'<div class="community-empty">Aucune demande.</div>';
-  fb.innerHTML=friends.map(p=>socialUserCard(p,`<button class="btn-action" onclick="openDirectMessage('${p.user_id}','${socialEsc(p.username).replace("'","&#39;")}','${socialEsc(p.avatar||'')}')">💬 Message</button><button class="btn-action" onclick="removeFriend('${p.friendship_id}')" style="border-color:#555;color:#888">Retirer</button>`)).join('')||'<div class="community-empty">Aucun ami pour le moment.</div>';
+  fb.innerHTML=friends.map(p=>socialUserCard(p,`<button class="btn-action" onclick="openDirectMessage('${p.user_id}',${jsAttr(p.username)},${jsAttr(p.avatar||'')})">💬 Message</button><button class="btn-action" onclick="removeFriend('${p.friendship_id}')" style="border-color:#555;color:#888">Retirer</button>`)).join('')||'<div class="community-empty">Aucun ami pour le moment.</div>';
 }
 
 function v1331RoleLabel(role){
@@ -3902,14 +3915,14 @@ async function loadCommunityTeam(){
     if(p.user_id!==cloudUser?.id && (myRole==='captain'||myRole==='owner')){
       if(role==='guardian')actions+=`<button class="v1331-mini" onclick="setTeamRoleV1331('${p.user_id}','soldier')">⚔️ Soldat</button>`;
       else actions+=`<button class="v1331-mini purple" onclick="setTeamRoleV1331('${p.user_id}','guardian')">🛡️ Gardien</button>`;
-      actions+=`<button class="v1331-mini red" onclick="kickTeamMemberV1331('${p.user_id}','${socialEsc(p.username).replace("'","&#39;")}')">Exclure</button>`;
+      actions+=`<button class="v1331-mini red" onclick="kickTeamMemberV1331('${p.user_id}',${jsAttr(p.username)})">Exclure</button>`;
     }else if(p.user_id!==cloudUser?.id && myRole==='guardian' && role!=='guardian' && role!=='captain'){
-      actions+=`<button class="v1331-mini red" onclick="kickTeamMemberV1331('${p.user_id}','${socialEsc(p.username).replace("'","&#39;")}')">Exclure</button>`;
+      actions+=`<button class="v1331-mini red" onclick="kickTeamMemberV1331('${p.user_id}',${jsAttr(p.username)})">Exclure</button>`;
     }
     return `<div class="v1331-member"><div class="rankno">#${i+1}</div><div><div class="name">${socialEsc(p.username)} <span class="v1331-role ${v1331RoleClass(role)}">${v1331RoleLabel(role)}</span></div><div class="meta">SBD ${socialSBD(p)} kg · ${Number(p.xp||0).toLocaleString()} XP · ${Number(p.weekly_volume||0).toLocaleString()} kg semaine</div></div><div class="actions">${actions}</div></div>`;
   }).join('');
 
-  box.innerHTML=`${incomingHtml}<div class="team-banner"><div style="display:flex;justify-content:space-between;align-items:center;gap:8px"><div><div style="font-size:.9rem;font-weight:1000">${socialEsc(team.team_name)}</div><div style="font-size:.58rem;color:#888;margin-top:4px">Ton grade : <span class="v1331-role ${v1331RoleClass(myRole)}">${v1331RoleLabel(myRole)}</span></div></div><span class="team-code" style="cursor:pointer" onclick="navigator.clipboard?.writeText('${socialEsc(team.join_code)}');showSocialToast('📋 Code copié','${socialEsc(team.join_code)}')">${socialEsc(team.join_code)}</span></div><div style="font-size:.6rem;color:#aaa;margin-top:6px">👥 ${team.member_count} membre(s) · 🏋️ ${Number(team.weekly_volume||0).toLocaleString()} kg cette semaine</div></div>${manage}<h3 style="font-size:.72rem;margin:12px 0 7px;color:#d66cff">Classement interne</h3>${membersHtml||'<div class="community-empty">Aucun membre.</div>'}<button class="btn-action" onclick="leaveCommunityTeam()" style="border-color:#ff5555;color:#ff7777;margin-top:9px">Quitter la Team</button>`;
+  box.innerHTML=`${incomingHtml}<div class="team-banner"><div style="display:flex;justify-content:space-between;align-items:center;gap:8px"><div><div style="font-size:.9rem;font-weight:1000">${socialEsc(team.team_name)}</div><div style="font-size:.58rem;color:#888;margin-top:4px">Ton grade : <span class="v1331-role ${v1331RoleClass(myRole)}">${v1331RoleLabel(myRole)}</span></div></div><span class="team-code" style="cursor:pointer" onclick="navigator.clipboard?.writeText(${jsAttr(team.join_code)});showSocialToast('📋 Code copié',${jsAttr(team.join_code)})">${socialEsc(team.join_code)}</span></div><div style="font-size:.6rem;color:#aaa;margin-top:6px">👥 ${team.member_count} membre(s) · 🏋️ ${Number(team.weekly_volume||0).toLocaleString()} kg cette semaine</div></div>${manage}<h3 style="font-size:.72rem;margin:12px 0 7px;color:#d66cff">Classement interne</h3>${membersHtml||'<div class="community-empty">Aucun membre.</div>'}<button class="btn-action" onclick="leaveCommunityTeam()" style="border-color:#ff5555;color:#ff7777;margin-top:9px">Quitter la Team</button>`;
 }
 
 async function createCommunityTeam(){
@@ -5853,7 +5866,7 @@ body.v1358-settings-open{overflow:hidden!important}
    Aucun hook finishWorkoutFinal / updateProfileUI / switchTab.
    ============================================================ */
 
-const VERSION='15.14.0';
+const VERSION='15.19.1';
 const RPG_KEY='leveling_v140_rpg';
 
 function loadRpg(){try{return JSON.parse(localStorage.getItem(RPG_KEY)||'{}')||{}}catch(e){return {}}}
