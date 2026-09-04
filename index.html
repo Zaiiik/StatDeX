@@ -6018,7 +6018,11 @@ else setTimeout(boot,60);
 }
 </style>
 
-<script id="v1451-power-live-renderer">
+<script id="v1600-power-rank-engine">
+/* V15.15 — moteur Power/Rang unique (fusion de v1451 + v1453).
+   Une seule fonction de rendu, un seul jeu de hooks, un seul filet de sécurité au boot.
+   Avant : 2 scripts, ~7 déclenchements de rendu possibles dans les 1.5s suivant le chargement.
+   Maintenant : 1 script, 4 points de déclenchement réels (voir commentaires ci-dessous). */
 (function(){
   function totals(){
     const u=userData||{};
@@ -6083,84 +6087,66 @@ else setTimeout(boot,60);
         mini.classList.add('v1451-live-rank-mini');
         cssVars(mini,r);
       }
-    }catch(e){console.warn('V15.13.0 live rank render',e)}
+    }catch(e){console.warn('V15.15 live rank render',e)}
   };
 
-  /* Après toute vraie mise à jour de données/UI */
+  /* 1) Après toute vraie mise à jour de données/UI (couvre déjà l'après-chargement cloud,
+        car refreshV11UIAfterCloud appelle updateProfileUI() en interne). */
   const oldUpdate=window.updateProfileUI;
-  if(typeof oldUpdate==='function'&&!oldUpdate.v1451){
+  if(typeof oldUpdate==='function'&&!oldUpdate.v1600){
     window.updateProfileUI=function(){
       const ret=oldUpdate.apply(this,arguments);
       window.renderPowerRankLive();
       return ret;
     };
-    window.updateProfileUI.v1451=1;
+    window.updateProfileUI.v1600=1;
   }
 
-  const oldCloudRefresh=window.refreshV11UIAfterCloud;
-  if(typeof oldCloudRefresh==='function'&&!oldCloudRefresh.v1451){
-    window.refreshV11UIAfterCloud=function(){
-      const ret=oldCloudRefresh.apply(this,arguments);
-      setTimeout(window.renderPowerRankLive,0);
-      setTimeout(window.renderPowerRankLive,80);
-      return ret;
-    };
-    window.refreshV11UIAfterCloud.v1451=1;
-  }
-
-  /* V15.13: plus de MutationObserver sur le badge Power.
-     Les mises à jour passent par updateProfileUI/cloud + rendu au boot/pageshow. */
-  function boot(){
-    window.renderPowerRankLive();
-    setTimeout(window.renderPowerRankLive,120);
-    setTimeout(window.renderPowerRankLive,500);
-    setTimeout(window.renderPowerRankLive,1400);
-  }
-  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot,{once:true});
-  else boot();
-  window.addEventListener('pageshow',()=>setTimeout(window.renderPowerRankLive,20));
-})();
-</script>
-
-<script id="v1453-power-state-refresh">
-(function(){
+  /* 2) Après chaque sauvegarde/chargement local (cas où les données changent sans
+        passer par updateProfileUI, ex: import de données). */
   function refresh(){
     try{
-      if(typeof window.renderPowerRankLive==='function')window.renderPowerRankLive();
+      window.renderPowerRankLive();
       if(typeof window.v135RenderRankHub==='function')window.v135RenderRankHub();
-    }catch(e){console.warn('V15.13.0 power refresh',e)}
+    }catch(e){console.warn('V15.15 power refresh',e)}
   }
-
   const oldLoad=window.loadFromLocalStorage;
-  if(typeof oldLoad==='function'&&!oldLoad.v1453){
+  if(typeof oldLoad==='function'&&!oldLoad.v1600){
     window.loadFromLocalStorage=function(){
       const r=oldLoad.apply(this,arguments);
       queueMicrotask(refresh);
       return r;
     };
-    window.loadFromLocalStorage.v1453=1;
+    window.loadFromLocalStorage.v1600=1;
   }
-
   const oldSave=window.saveToLocalStorage;
-  if(typeof oldSave==='function'&&!oldSave.v1453){
+  if(typeof oldSave==='function'&&!oldSave.v1600){
     window.saveToLocalStorage=function(){
       const r=oldSave.apply(this,arguments);
       queueMicrotask(refresh);
       return r;
     };
-    window.saveToLocalStorage.v1453=1;
+    window.saveToLocalStorage.v1600=1;
   }
 
-  window.addEventListener('pageshow',()=>setTimeout(refresh,30));
+  /* 3) Filet de sécurité au boot : la carte Power vit dans l'onglet Profil, qui peut
+        ne pas encore être dans le DOM au premier rendu. On retente à quelques intervalles
+        (le rendu est un no-op silencieux si la carte n'existe pas encore, donc c'est sans
+        risque) — mais UN SEUL jeu de retries au lieu des deux jeux qui se chevauchaient avant. */
+  function boot(){
+    window.renderPowerRankLive();
+    setTimeout(window.renderPowerRankLive,150);
+    setTimeout(window.renderPowerRankLive,600);
+    setTimeout(window.renderPowerRankLive,1500);
+  }
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot,{once:true});
+  else boot();
+
+  /* 4) Retour au premier plan (iOS relance parfois l'app sans reload complet). */
+  window.addEventListener('pageshow',()=>setTimeout(window.renderPowerRankLive,30));
   document.addEventListener('visibilitychange',()=>{
-    if(document.visibilityState==='visible')setTimeout(refresh,30);
+    if(document.visibilityState==='visible')setTimeout(window.renderPowerRankLive,30);
   });
-
-  if(document.readyState==='loading'){
-    document.addEventListener('DOMContentLoaded',()=>setTimeout(refresh,50),{once:true});
-  }else{
-    setTimeout(refresh,20);
-  }
 })();
 </script>
 
