@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>LEVELING-APP — Powerbuilding Tracker V15.3.0 PROGRAM CYCLE PR FIX</title>
+    <title>LEVELING-APP — Powerbuilding Tracker V15.4.0 HISTORY STATS CLEAN</title>
     <meta name="theme-color" content="#09090f">
     <meta name="application-name" content="LEVELING-APP">
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -1512,7 +1512,7 @@ header .hud-stat.v140-clickable:hover{
                         <span class="cloud-badge" id="cloud-live-badge">☁️ CLOUD</span>
                     </div>
                     <div id="cloud-sync-detail" style="margin-top:8px;font-size:.62rem;color:#777;text-align:center">Initialisation du cloud…</div>
-                    <div style="margin-top:5px;font-size:.58rem;color:#555;text-align:center">LEVELING-APP V15.3.0 · Stable</div>
+                    <div style="margin-top:5px;font-size:.58rem;color:#555;text-align:center">LEVELING-APP V15.4.0 · Stable</div>
                     <button class="btn-action" onclick="logoutLeveling()" style="border-color:#ff5555;color:#ff7777">Se déconnecter</button>
                 </div>
 
@@ -1787,7 +1787,7 @@ header .hud-stat.v140-clickable:hover{
             autoProgression: true
         };
 
-        /* V15.3.0 — CANONICAL USER STATE BRIDGE
+        /* V15.4.0 — CANONICAL USER STATE BRIDGE
            `userData` est déclaré avec `let`, donc il n'est pas automatiquement disponible
            via `window.userData`. Plusieurs anciens modules lisaient pourtant window.userData,
            ce qui produisait 0 kg / RECRUE malgré des données correctes.
@@ -2591,41 +2591,13 @@ header .hud-stat.v140-clickable:hover{
         }
 
         function calculateWeeklyTonnage() {
-            let totalTonnage = 0;
-            const programsByBlock = getPrograms();
-            const blockProg = programsByBlock[currentBlockIndex];
-            if (!blockProg) return;
-
-            blockProg.forEach((day, dIdx) => {
-                day.exercises.forEach((ex, exIdx) => {
-                    for (let s = 0; s < ex.sets; s++) {
-                        if (workoutState[currentBlockIndex] &&
-                            workoutState[currentBlockIndex][dIdx] &&
-                            workoutState[currentBlockIndex][dIdx][exIdx] &&
-                            workoutState[currentBlockIndex][dIdx][exIdx][s]) {
-                           
-                            let reps = ex.defaultReps;
-                            let weight = ex.defaultWeight;
-                           
-                            const isSBD = ['Développé Couché', 'Soulevé de Terre', 'Squat', 'Squat (Volume)', 'Spoto Press'].includes(ex.name);
-                            if (userData.autoProgression && !isSBD && smartHypertrophyRefs[ex.name]) {
-                                reps = smartHypertrophyRefs[ex.name].reps;
-                                weight = smartHypertrophyRefs[ex.name].weight;
-                            }
-
-                            if (customSetData[currentBlockIndex]?.[dIdx]?.[exIdx]?.[s]) {
-                                reps = customSetData[currentBlockIndex][dIdx][exIdx][s].reps ?? reps;
-                                weight = customSetData[currentBlockIndex][dIdx][exIdx][s].weight ?? weight;
-                            }
-                            const v1351Name = (typeof v1351SelectedExerciseName==='function') ? v1351SelectedExerciseName(exIdx, ex.name, dIdx) : ex.name;
-                            if (!(typeof v1351IsBodyweight==='function' && v1351IsBodyweight(v1351Name))) totalTonnage += (reps * weight);
-                        }
-                    }
-                });
-            });
-
-            document.getElementById('val-weekly-tonnage').innerText = totalTonnage.toLocaleString() + " kg";
-            return totalTonnage;
+            if (typeof window.LevelingStatsV154 === 'object') {
+                const total = window.LevelingStatsV154.currentBlockVolume();
+                const el = document.getElementById('val-weekly-tonnage');
+                if (el) el.innerText = Math.round(total).toLocaleString('fr-FR') + " kg";
+                return total;
+            }
+            return 0;
         }
 
         function renderHistoryUI() {
@@ -3271,54 +3243,10 @@ header .hud-stat.v140-clickable:hover{
         }
 
         function recordCurrentBlockToHistory() {
-            const programsByBlock = getPrograms();
-            const blockProg = programsByBlock[currentBlockIndex];
-            if (!blockProg) return;
-
-            let dayTonnes = {};
-            let blockTonnage = 0;
-
-            blockProg.forEach((day, dIdx) => {
-                let daySum = 0;
-                day.exercises.forEach((ex, exIdx) => {
-                    for (let s = 0; s < ex.sets; s++) {
-                        if (workoutState[currentBlockIndex]?.[dIdx]?.[exIdx]?.[s]) {
-                            let reps = ex.defaultReps;
-                            let weight = ex.defaultWeight;
-                            const isSBD = ['Développé Couché', 'Soulevé de Terre', 'Squat', 'Squat (Volume)', 'Spoto Press'].includes(ex.name);
-                            if (userData.autoProgression && !isSBD && smartHypertrophyRefs[ex.name]) {
-                                reps = smartHypertrophyRefs[ex.name].reps;
-                                weight = smartHypertrophyRefs[ex.name].weight;
-                            }
-                            if (customSetData[currentBlockIndex]?.[dIdx]?.[exIdx]?.[s]) {
-                                reps = customSetData[currentBlockIndex][dIdx][exIdx][s].reps ?? reps;
-                                weight = customSetData[currentBlockIndex][dIdx][exIdx][s].weight ?? weight;
-                            }
-                            daySum += (reps * weight);
-                        }
-                    }
-                });
-                dayTonnes[day.dayName] = daySum;
-                blockTonnage += daySum;
-            });
-
-            const blockNameStr = blocksData[currentBlockIndex].name;
-            const todayStr = new Date().toLocaleDateString('fr-FR');
-
-            let existingEntry = workoutHistory.find(h => h.blockIndex === currentBlockIndex);
-            if (existingEntry) {
-                existingEntry.totalTonnage = blockTonnage;
-                existingEntry.dayTonnes = dayTonnes;
-                existingEntry.date = todayStr;
-            } else {
-                workoutHistory.push({
-                    blockIndex: currentBlockIndex,
-                    blockName: blockNameStr,
-                    totalTonnage: blockTonnage,
-                    dayTonnes: dayTonnes,
-                    date: todayStr
-                });
+            if (typeof window.LevelingStatsV154 === 'object') {
+                return window.LevelingStatsV154.recordCurrentBlock();
             }
+            return false;
         }
 
         loadFromLocalStorage();
@@ -3380,7 +3308,7 @@ header .hud-stat.v140-clickable:hover{
           block:currentBlockIndex,
           day:currentDayIndex,
           rating:selectedRating,
-          volume:calculateWeeklyTonnage()||0
+          volume:0
         });
       }
       save();
@@ -6914,7 +6842,7 @@ html.leveling-ios nav{-webkit-backdrop-filter:none!important;backdrop-filter:non
 
 
 <style id="v1430-stable-ui-css">
-/* ================= V15.3.0 — STABLE SETTINGS / PROGRESSION =================
+/* ================= V15.4.0 — STABLE SETTINGS / PROGRESSION =================
    Réglages: plus aucune sous-page fixed/overlay. Toutes les rubriques restent
    dans le scroll principal de l'app, donc plus de page coupée ni ouverture en bas. */
 #panel-settings{position:relative!important;overflow:visible!important;min-height:0!important}
@@ -6969,7 +6897,7 @@ body.v1358-settings-open{overflow:hidden!important}
 
 <script id="v1430-stable-core-js">
 (function(){
-  const VERSION='15.3.0';
+  const VERSION='15.4.0';
   const q=s=>document.querySelector(s);
   const qa=s=>[...document.querySelectorAll(s)];
   const localDay=(d=new Date())=>`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
@@ -7116,7 +7044,7 @@ body.v1358-settings-open{overflow:hidden!important}
         if(typeof renderProfileV2==='function'&&document.getElementById('profile-v2-modal')?.classList.contains('show'))renderProfileV2();
         if(typeof window.renderPowerRankLive==='function')window.renderPowerRankLive();
         if(typeof render==='function')render();
-      }catch(e){console.warn('V15.3.0 SBD UI refresh',e)}
+      }catch(e){console.warn('V15.4.0 SBD UI refresh',e)}
       syncProgressionState();refreshRanks();
     },0);
     return r;
@@ -7172,7 +7100,7 @@ body.v1358-settings-open{overflow:hidden!important}
 
 
 <style id="v1440-power-rank-clean-css">
-/* V15.3.0 — RANG POWER PROPRE
+/* V15.4.0 — RANG POWER PROPRE
    Une seule logique: total Squat + Bench + Deadlift en KG.
    Une identité visuelle distincte par rang. */
 
@@ -7379,7 +7307,7 @@ body.v1358-settings-open{overflow:hidden!important}
 
 
 <style id="v1451-power-live-neon-css">
-/* V15.3.0 — les cartes visibles utilisent la même identité néon que la vitrine */
+/* V15.4.0 — les cartes visibles utilisent la même identité néon que la vitrine */
 .rank-card.v1451-live-rank{
   --rank:#ff2d55;
   --rank-rgb:255,45,85;
@@ -7529,7 +7457,7 @@ body.v1358-settings-open{overflow:hidden!important}
         mini.classList.add('v1451-live-rank-mini');
         cssVars(mini,r);
       }
-    }catch(e){console.warn('V15.3.0 live rank render',e)}
+    }catch(e){console.warn('V15.4.0 live rank render',e)}
   };
 
   /* Après toute vraie mise à jour de données/UI */
@@ -7590,7 +7518,7 @@ body.v1358-settings-open{overflow:hidden!important}
     try{
       if(typeof window.renderPowerRankLive==='function')window.renderPowerRankLive();
       if(typeof window.v135RenderRankHub==='function')window.v135RenderRankHub();
-    }catch(e){console.warn('V15.3.0 power refresh',e)}
+    }catch(e){console.warn('V15.4.0 power refresh',e)}
   }
 
   const oldLoad=window.loadFromLocalStorage;
@@ -7628,7 +7556,7 @@ body.v1358-settings-open{overflow:hidden!important}
 
 
 <style id="v1454-xp-neon-css">
-/* V15.3.0 — Rang XP : même qualité visuelle néon que le Rang Power */
+/* V15.4.0 — Rang XP : même qualité visuelle néon que le Rang Power */
 #v135-xp-modal .modal-content{
   width:min(620px,96vw)!important;
   max-width:620px!important;
@@ -7753,7 +7681,7 @@ body.v1358-settings-open{overflow:hidden!important}
           bar.style.width=pct+'%';
         }
       }
-    }catch(e){console.warn('V15.3.0 XP live',e)}
+    }catch(e){console.warn('V15.4.0 XP live',e)}
   };
 
   const oldHub=window.v135RenderRankHub;
@@ -8196,7 +8124,7 @@ body.v1358-settings-open{overflow:hidden!important}
 
 
 <style id="v1501-vitrines-fix-css">
-/* V15.3.0 — restaure la présentation propre des vitrines sans réactiver les vieux contrôleurs */
+/* V15.4.0 — restaure la présentation propre des vitrines sans réactiver les vieux contrôleurs */
 
 /* Ancienne carte PLAYER STATUS = doublon historique V10, désormais masquée. */
 #v10-profile-dashboard{display:none!important}
@@ -8287,7 +8215,7 @@ body.v1358-settings-open{overflow:hidden!important}
       /* Rafraîchit seulement les données/visuels, sans recréer d'anciens modules. */
       try{window.renderXpRankLive?.()}catch(e){}
       try{window.renderPowerRankLive?.()}catch(e){}
-    }catch(e){console.warn('V15.3.0 vitrines',e)}
+    }catch(e){console.warn('V15.4.0 vitrines',e)}
   }
 
   window.v1501FixVitrines=fixVitrines;
@@ -8713,6 +8641,8 @@ function clearValidationKeys(){
 
 window.v153ResetCycleNow=function(){
   try{
+    const previousCycle=Math.max(1,Number(localStorage.getItem('leveling_cycle_number')||1));
+    localStorage.setItem('leveling_cycle_number',String(previousCycle+1));
     /* Reset UNIQUEMENT du cycle. Les records, XP, historique, rangs et stats restent. */
     workoutState={};
     customSetData={};
@@ -8759,6 +8689,7 @@ function showCycleModal(){
 
 function advanceAfterValidatedSession(program,block,day){
   if(day!==6)return;
+  try{recordCurrentBlockToHistory?.();}catch(e){console.warn('V15.4 block history',e)}
   if(block<3){
     /* On avance seulement APRÈS la vraie validation avec étoiles. */
     currentBlockIndex=block+1;
@@ -8768,7 +8699,6 @@ function advanceAfterValidatedSession(program,block,day){
     updateProfileUI();
     alert(`Félicitations ! Bloc ${block+1} validé et enregistré. Passage au Bloc ${block+2}.`);
   }else{
-    recordCurrentBlockToHistory?.();
     saveToLocalStorage();
     showCycleModal();
   }
@@ -8830,6 +8760,175 @@ if(typeof prevFinish==='function'&&!prevFinish.v1530){
 localStorage.removeItem('leveling_cycle_reset_pending');
 localStorage.removeItem('leveling_cycle_completed_date');
 
+})();
+</script>
+
+
+<script id="v1540-history-stats-core">
+(function(){
+'use strict';
+
+const isoDay=(d=new Date())=>{
+  const y=d.getFullYear(),m=String(d.getMonth()+1).padStart(2,'0'),day=String(d.getDate()).padStart(2,'0');
+  return `${y}-${m}-${day}`;
+};
+const cycleNo=()=>Math.max(1,Number(localStorage.getItem('leveling_cycle_number')||1));
+
+function selectedName(exIdx, fallback, dayIdx=currentDayIndex){
+  try{return typeof v1351SelectedExerciseName==='function'?v1351SelectedExerciseName(exIdx,fallback,dayIdx):fallback}catch(e){return fallback}
+}
+function isBodyweight(name){
+  try{return typeof v1351IsBodyweight==='function'&&v1351IsBodyweight(name)}catch(e){return false}
+}
+function setValues(block,day,exIdx,setIdx){
+  const ex=getPrograms()?.[block]?.[day]?.exercises?.[exIdx];
+  if(!ex)return {reps:0,weight:0,volume:0,name:''};
+  let reps=Number(ex.defaultReps||0),weight=Number(ex.defaultWeight||0);
+  const name=selectedName(exIdx,ex.name,day);
+  const custom=customSetData?.[block]?.[day]?.[exIdx]?.[setIdx];
+  if(custom){
+    if(custom.reps!==undefined&&custom.reps!==null)reps=Number(custom.reps||0);
+    if(custom.weight!==undefined&&custom.weight!==null)weight=Number(custom.weight||0);
+  }
+  /* Smart refs are defaults only when the user has not entered a set override. */
+  const sbd=/^(Développé Couché|Soulevé de Terre|Squat|Squat \(Volume\)|Spoto Press)$/i.test(ex.name);
+  if(!custom && userData.autoProgression && !sbd && smartHypertrophyRefs?.[ex.name]){
+    reps=Number(smartHypertrophyRefs[ex.name].reps??reps);
+    weight=Number(smartHypertrophyRefs[ex.name].weight??weight);
+  }
+  const volume=isBodyweight(name)?0:Math.max(0,reps)*Math.max(0,weight);
+  return {reps,weight,volume,name};
+}
+function setDone(block,day,exIdx,setIdx){return !!workoutState?.[block]?.[day]?.[exIdx]?.[setIdx]}
+function dayVolume(block,day){
+  const p=getPrograms()?.[block]?.[day];if(!p)return 0;
+  let total=0;
+  p.exercises.forEach((ex,ei)=>{for(let si=0;si<ex.sets;si++)if(setDone(block,day,ei,si))total+=setValues(block,day,ei,si).volume});
+  return total;
+}
+function blockVolume(block=currentBlockIndex){
+  const p=getPrograms()?.[block];if(!p)return 0;
+  return p.reduce((sum,_,di)=>sum+dayVolume(block,di),0);
+}
+function currentSessionVolume(block=currentBlockIndex,day=currentDayIndex){return dayVolume(block,day)}
+
+function normalizeHistory(){
+  if(!Array.isArray(workoutHistory))workoutHistory=[];
+  let changed=false;
+  workoutHistory.forEach((h,i)=>{
+    if(!h||typeof h!=='object')return;
+    if(!h.id){h.id=`legacy-${i}-${String(h.blockIndex??0)}-${String(h.date||'unknown')}`;changed=true}
+    if(!h.cycle){h.cycle=1;changed=true}
+    if(!h.isoDate){
+      const m=String(h.date||'').match(/^(\d{2})\/(\d{2})\/(\d{4})$/);
+      if(m)h.isoDate=`${m[3]}-${m[2]}-${m[1]}`;
+      changed=true;
+    }
+  });
+  if(changed)try{saveToLocalStorage()}catch(e){}
+}
+
+function recordCurrentBlock(){
+  normalizeHistory();
+  const block=currentBlockIndex;
+  const prog=getPrograms()?.[block];if(!prog)return false;
+  const cycle=cycleNo();
+  const id=`cycle-${cycle}-block-${block}`;
+  const dayTonnes={};
+  prog.forEach((d,di)=>dayTonnes[d.dayName]=Math.round(dayVolume(block,di)));
+  const totalTonnage=Object.values(dayTonnes).reduce((s,n)=>s+Number(n||0),0);
+  const entry={
+    id,cycle,program:activeProgramKey,blockIndex:block,
+    blockName:(activeProgramKey==='powerbuilding'?(blocksData?.[block]?.name||`Bloc ${block+1}`):(getProgramMeta(activeProgramKey)?.title||'Programme')),
+    totalTonnage,dayTonnes,date:new Date().toLocaleDateString('fr-FR'),isoDate:isoDay(),completedAt:new Date().toISOString()
+  };
+  const idx=workoutHistory.findIndex(h=>h?.id===id);
+  if(idx>=0)workoutHistory[idx]=entry;else workoutHistory.push(entry);
+  saveToLocalStorage();
+  try{renderHistoryUI()}catch(e){}
+  try{window.v11RenderReport?.()}catch(e){}
+  return true;
+}
+
+function patchLatestSession(program,block,day){
+  try{
+    const v=window.__levelingV10Export?.();if(!v)return;
+    v.sessions=Array.isArray(v.sessions)?v.sessions:[];
+    const today=isoDay();
+    const volume=Math.round(currentSessionVolume(block,day));
+    /* Find today's just-created session first; fallback create it. */
+    let s=[...v.sessions].reverse().find(x=>x&&x.date===today&&x.program===program&&Number(x.block)===block&&Number(x.day)===day);
+    if(!s){
+      s={sessionKey:[today,program,block,day].join('|'),date:today,program,block,day,rating:Number(selectedRating||0)};
+      v.sessions.push(s);
+    }
+    s.volume=volume;
+    s.cycle=cycleNo();
+    s.completedAt=s.completedAt||new Date().toISOString();
+    window.__levelingV10Import?.(v);
+  }catch(e){console.warn('V15.4 session stats',e)}
+}
+
+function allSessions(){
+  try{
+    const v=window.__levelingV10Export?.()||{};
+    return (Array.isArray(v.sessions)?v.sessions:[]).map((s,i)=>({
+      id:s.sessionKey||`session-${i}`,
+      name:getPrograms()?.[Number(s.block)]?.[Number(s.day)]?.title || `Séance ${Number(s.day)+1}`,
+      date:s.date||'',isoDate:s.date||'',tonnage:Number(s.volume||0),rating:Number(s.rating||0),cycle:Number(s.cycle||1),program:s.program||''
+    }));
+  }catch(e){return []}
+}
+
+function totalValidatedVolume(){return allSessions().reduce((sum,s)=>sum+Number(s.tonnage||0),0)}
+
+window.LevelingStatsV154={
+  setValues,dayVolume,currentSessionVolume,currentBlockVolume:blockVolume,
+  recordCurrentBlock,allSessions,totalValidatedVolume,cycleNo,normalizeHistory
+};
+
+/* Reports now use validated SESSIONS, not one entry per block. */
+window.v11GetWorkoutEntries=function(){
+  const sessions=allSessions();
+  if(sessions.length)return sessions;
+  normalizeHistory();
+  return (workoutHistory||[]).map((h,i)=>({id:h.id||i,name:h.blockName||'Bloc',date:h.isoDate||h.date||'',isoDate:h.isoDate||'',tonnage:Number(h.totalTonnage||0),days:h.dayTonnes||{}}));
+};
+window.v11DateMs=function(v){
+  if(!v)return 0;
+  const m=String(v).match(/^(\d{2})\/(\d{2})\/(\d{4})$/);
+  const d=m?new Date(Number(m[3]),Number(m[2])-1,Number(m[1])):new Date(v);
+  return Number.isNaN(d.getTime())?0:d.getTime();
+};
+
+/* Keep visible volume stats aligned with the same source. */
+function refreshStats(){
+  try{
+    const current=blockVolume();
+    const a=document.getElementById('val-weekly-tonnage');if(a)a.textContent=Math.round(current).toLocaleString('fr-FR')+' kg';
+    const b=document.getElementById('today-volume');if(b)b.textContent=Math.round(current).toLocaleString('fr-FR')+' kg';
+    const c=document.getElementById('v10-volume');if(c)c.textContent=Math.round(totalValidatedVolume()).toLocaleString('fr-FR')+' kg';
+    window.v11RenderReport?.();
+  }catch(e){}
+}
+
+const prevFinish=window.finishWorkoutFinal;
+if(typeof prevFinish==='function'&&!prevFinish.v1540){
+  window.finishWorkoutFinal=function(){
+    const program=activeProgramKey,block=currentBlockIndex,day=currentDayIndex;
+    const before=Number(userData?.workoutsCompleted||0);
+    const r=prevFinish.apply(this,arguments);
+    if(Number(userData?.workoutsCompleted||0)>before){
+      setTimeout(()=>{patchLatestSession(program,block,day);refreshStats();},180);
+    }
+    return r;
+  };
+  window.finishWorkoutFinal.v1540=1;
+}
+
+normalizeHistory();
+setTimeout(refreshStats,250);
+document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')setTimeout(refreshStats,80)});
 })();
 </script>
 
