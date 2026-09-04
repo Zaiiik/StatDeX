@@ -3348,7 +3348,7 @@ async function loadCloudData(){
   if(!cloudUser||!cloudLicensed)return;
   lastCloudSyncAt=parseInt(localStorage.getItem('leveling_last_cloud_sync')||'0')||0;setCloudStatus(navigator.onLine?'syncing':'offline');
   const {data,error}=await sb.from('profiles').select('app_data,username').eq('id',cloudUser.id).single();
-  if(!error&&data){if(data.username&&!userData.playerName)userData.playerName=data.username;if(data.app_data&&Object.keys(data.app_data).length){if(typeof window.v1430ImportAppData==='function')window.v1430ImportAppData(data.app_data);else importAppData(data.app_data)}else await saveCloudData()}
+  if(!error&&data){if(data.username&&!userData.playerName)userData.playerName=data.username;if(data.app_data&&Object.keys(data.app_data).length){importAppData(data.app_data)}else await saveCloudData()}
   else if(error)console.warn('Cloud load:',error.message);cloudLoadedOnce=true;
 }
 
@@ -3426,7 +3426,7 @@ async function saveCloudData(){
   if(!cloudUser||!cloudLicensed||suppressCloudSave)return;
   if(!navigator.onLine){setCloudStatus('offline');return}
   setCloudStatus('syncing');
-  const updates={app_data:(typeof window.v1430ExportAppData==='function'?window.v1430ExportAppData():exportAppData()),updated_at:new Date().toISOString()};if(userData.playerName)updates.username=userData.playerName;
+  const updates={app_data:exportAppData(),updated_at:new Date().toISOString()};if(userData.playerName)updates.username=userData.playerName;
   const {error}=await sb.from('profiles').update(updates).eq('id',cloudUser.id);
   if(error){console.warn('Cloud save:',error.message);setCloudStatus('error');return}
   lastCloudSyncAt=Date.now();localStorage.setItem('leveling_last_cloud_sync',String(lastCloudSyncAt));setCloudStatus('synced');
@@ -4960,7 +4960,9 @@ function syncProfileRank(){
   try{
     const el=document.getElementById('profile-v2-rank');
     if(!el)return;
-    const rank=typeof getUnifiedPowerRank==='function'?getUnifiedPowerRank():null;
+    const u=userData||{};
+    const total=Number(u.squat||0)+Number(u.bench||0)+Number(u.deadlift||0);
+    const rank=typeof getSBDRank==='function'?getSBDRank(total,Number(u.weight||0)):null;
     if(rank)el.textContent=`${rank.icon||''} ${rank.name||'RECRUE'}`.trim();
   }catch(e){}
 }
