@@ -3580,8 +3580,10 @@ async function syncSocialProfile(){
     if(error)throw error;
     const s=document.getElementById('community-sync-status');if(s)s.textContent='☁ Profil communautaire synchronisé';
   }catch(e){
-    const s=document.getElementById('community-sync-status');if(s)s.textContent='⚠ Exécute le patch SQL V13 Community';
-    console.warn('Social sync:',e.message||e);
+    const msg=String(e?.message||e||'Erreur inconnue');
+    const s=document.getElementById('community-sync-status');
+    if(s){s.textContent='⚠ Sync profil Community à corriger';s.title=msg}
+    console.warn('Social sync / social_sync_profile:',msg,e);
   }
 }
 function switchCommunityPane(name,btn){
@@ -3593,6 +3595,7 @@ function switchCommunityPane(name,btn){
 async function renderCommunityPanel(){
   await syncSocialProfile();
   if(!communityLoaded){communityLoaded=true;await Promise.allSettled([loadCommunityFeed(),loadCommunityLeaderboard(),loadCommunityFriends(),loadCommunityTeam(),renderCommunityHome()])}else{renderCommunityHome()}
+  scheduleTeamChatAutoRefresh(1200);
 }
 async function publishSocialEvent(type,payload){
   if(!cloudUser||!cloudLicensed||!navigator.onLine)return;
@@ -4047,19 +4050,62 @@ async function loadMiniLeaderboard(){
   if(error){box.innerHTML='<div class="community-empty">Patch SQL V13 requis.</div>';return}
   box.innerHTML=(data||[]).map((p,i)=>`<div class="mini-leader-row"><div class="pos">#${i+1}</div><div class="name">${socialEsc(p.username)}</div><div class="value">${Number(p.metric_value||0)} kg</div></div>`).join('')||'<div class="community-empty">Aucun classement.</div>';
 }
-async function loadTeamChat(){
-  const box=document.getElementById('team-chat-box'),status=document.getElementById('team-chat-status');if(!box)return;
-  const {data,error}=await sb.rpc('social_team_chat',{p_limit:80});
-  if(error){box.innerHTML='<div class="community-empty">Chat Team indisponible tant que le patch V13.1 n’est pas installé.</div>';if(status)status.textContent='patch V13.1 requis';return}
-  if(status)status.textContent=(data&&data.length)?'messages récents':'aucun message';
-  box.innerHTML=(data||[]).map(m=>{const me=cloudUser&&m.user_id===cloudUser.id;return `<div class="chat-message"><div class="chat-avatar">${socialAvatarHTML({avatar:m.avatar,username:m.username}).replace('<div class="social-avatar">','').replace('</div>','')}</div><div class="chat-bubble ${me?'me':''}"><div class="chat-user">${socialEsc(m.username)}</div><div class="chat-text">${socialEsc(m.message)}</div><div class="chat-time">${new Date(m.created_at).toLocaleString('fr-FR')}</div></div></div>`}).join('')||'<div class="community-empty">Aucun message pour le moment.</div>';
-  box.scrollTop=box.scrollHeight;
+let teamChatRefreshTimer=null,teamChatLastFingerprint='',teamChatLoading=false;
+
+function teamChatVisible(){
+  const panel=document.getElementById('panel-community');
+  return !!(cloudUser&&cloudLicensed&&navigator.onLine&&document.visibilityState==='visible'&&panel?.classList.contains('active'));
+}
+function stopTeamChatAutoRefresh(){
+  if(teamChatRefreshTimer){clearTimeout(teamChatRefreshTimer);teamChatRefreshTimer=null}
+}
+function scheduleTeamChatAutoRefresh(delay=3000){
+  stopTeamChatAutoRefresh();
+  if(!teamChatVisible())return;
+  teamChatRefreshTimer=setTimeout(async()=>{
+    if(teamChatVisible())await loadTeamChat({silent:true,preserveScroll:true});
+    scheduleTeamChatAutoRefresh(3000);
+  },delay);
+}
+function teamChatFingerprint(rows){
+  const a=Array.isArray(rows)?rows:[];
+  const last=a[a.length-1]||{};
+  return `${a.length}|${last.created_at||''}|${last.user_id||''}|${last.message||''}`;
+}
+async function loadTeamChat(opts={}){
+  const box=document.getElementById('team-chat-box'),status=document.getElementById('team-chat-status');if(!box||teamChatLoading)return;
+  teamChatLoading=true;
+  try{
+    const {data,error}=await sb.rpc('social_team_chat',{p_limit:80});
+    if(error){
+      if(!opts.silent)box.innerHTML='<div class="community-empty">Chat Team indisponible tant que le patch V13.1 n’est pas installé.</div>';
+      if(status)status.textContent='chat indisponible';
+      return;
+    }
+    const rows=data||[],fp=teamChatFingerprint(rows);
+    if(status)status.textContent=rows.length?'messages en direct · auto 3 s':'aucun message · auto 3 s';
+    if(fp===teamChatLastFingerprint&&opts.silent)return;
+
+    const nearBottom=(box.scrollHeight-box.scrollTop-box.clientHeight)<70;
+    teamChatLastFingerprint=fp;
+    box.innerHTML=rows.map(m=>{const me=cloudUser&&m.user_id===cloudUser.id;return `<div class="chat-message"><div class="chat-avatar">${socialAvatarHTML({avatar:m.avatar,username:m.username}).replace('<div class="social-avatar">','').replace('</div>','')}</div><div class="chat-bubble ${me?'me':''}"><div class="chat-user">${socialEsc(m.username)}</div><div class="chat-text">${socialEsc(m.message)}</div><div class="chat-time">${new Date(m.created_at).toLocaleString('fr-FR')}</div></div></div>`}).join('')||'<div class="community-empty">Aucun message pour le moment.</div>';
+
+    if(!opts.preserveScroll||nearBottom)box.scrollTop=box.scrollHeight;
+  }finally{teamChatLoading=false}
 }
 async function sendTeamChatMessage(){
-  const input=document.getElementById('team-chat-input'),msg=input?.value.trim();if(!msg)return;
+  const input=document.getElementById('team-chat-input'),msg=input?.value.trim();if(!msg||input.disabled)return;
+  const original=msg;input.disabled=true;
   const {error}=await sb.rpc('social_send_team_message',{p_message:msg});
-  if(error)return alert(error.message);input.value='';playSound('click');await loadTeamChat();
+  input.disabled=false;
+  if(error){input.value=original;return showSocialToast('❌ Message non envoyé',error.message||'Erreur Supabase')}
+  input.value='';playSound('click');teamChatLastFingerprint='';await loadTeamChat();scheduleTeamChatAutoRefresh(1200);
 }
+document.addEventListener('visibilitychange',()=>{
+  if(document.visibilityState==='visible')scheduleTeamChatAutoRefresh(300);
+  else stopTeamChatAutoRefresh();
+});
+window.addEventListener('pageshow',()=>scheduleTeamChatAutoRefresh(500));
 
 
 let socialNotifyTimer=null,lastFriendRequestIds=new Set(),dmTarget=null,dmRefreshTimer=null;
