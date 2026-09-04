@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>LEVELING-APP — Powerbuilding Tracker V15.6.1 XP HERO FIRST PAINT FIX</title>
+    <title>LEVELING-APP — Powerbuilding Tracker V15.6.2 BOOT STATE RECOVERY</title>
     <meta name="theme-color" content="#09090f">
     <meta name="application-name" content="LEVELING-APP">
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -1454,7 +1454,7 @@ header .hud-stat.v140-clickable:hover{
                         <span class="cloud-badge" id="cloud-live-badge">☁️ CLOUD</span>
                     </div>
                     <div id="cloud-sync-detail" style="margin-top:8px;font-size:.62rem;color:#777;text-align:center">Initialisation du cloud…</div>
-                    <div style="margin-top:5px;font-size:.58rem;color:#555;text-align:center">LEVELING-APP V15.6.1 · Stable</div>
+                    <div style="margin-top:5px;font-size:.58rem;color:#555;text-align:center">LEVELING-APP V15.6.2 · Stable</div>
                     <button class="btn-action" onclick="logoutLeveling()" style="border-color:#ff5555;color:#ff7777">Se déconnecter</button>
                 </div>
 
@@ -1729,7 +1729,7 @@ header .hud-stat.v140-clickable:hover{
             autoProgression: true
         };
 
-        /* V15.6.1 — CANONICAL USER STATE BRIDGE
+        /* V15.6.2 — CANONICAL USER STATE BRIDGE
            `userData` est déclaré avec `let`, donc il n'est pas automatiquement disponible
            via `window.userData`. Plusieurs anciens modules lisaient pourtant window.userData,
            ce qui produisait 0 kg / RECRUE malgré des données correctes.
@@ -2422,40 +2422,44 @@ header .hud-stat.v140-clickable:hover{
         }
 
         function updateProfileUI() {
-            document.getElementById('val-weight').innerText = userData.weight + " kg";
-            document.getElementById('val-height').innerText = userData.height + " cm";
-            document.getElementById('val-bf').innerText = userData.bodyFat + " %";
-            document.getElementById('val-workouts').innerText = userData.workoutsCompleted;
-            document.getElementById('hud-days').innerText = userData.workoutsCompleted + 1;
-            document.getElementById('hud-trophies').innerText = userData.trophies;
-            document.getElementById('hud-level').innerText = userData.level;
+            const setText=(id,value)=>{const el=document.getElementById(id);if(el)el.innerText=value};
+            setText('val-weight', userData.weight + " kg");
+            setText('val-height', userData.height + " cm");
+            setText('val-bf', userData.bodyFat + " %");
+            setText('val-workouts', userData.workoutsCompleted);
+            setText('hud-days', (userData.workoutsCompleted || 0) + 1);
+            setText('hud-trophies', userData.trophies || 0);
+            setText('hud-level', userData.level || 1);
 
-            document.getElementById('val-squat').innerText = userData.squat + " kg";
-            document.getElementById('val-bench').innerText = userData.bench + " kg";
-            document.getElementById('val-deadlift').innerText = userData.deadlift + " kg";
-            document.getElementById('val-pr-count').innerText = userData.prCount;
+            setText('val-squat', userData.squat + " kg");
+            setText('val-bench', userData.bench + " kg");
+            setText('val-deadlift', userData.deadlift + " kg");
+            setText('val-pr-count', userData.prCount || 0);
 
-            const totalSBD = userData.squat + userData.bench + userData.deadlift;
-            const bodyWeight = userData.weight || 85;
-            const ratio = (totalSBD / bodyWeight).toFixed(2);
+            const totalSBD = Number(userData.squat||0) + Number(userData.bench||0) + Number(userData.deadlift||0);
+            const bodyWeight = Number(userData.weight||85);
+            const ratio = bodyWeight > 0 ? (totalSBD / bodyWeight).toFixed(2) : '0.00';
+            setText('val-sbd-total', totalSBD + " kg");
+            setText('val-sbd-ratio', ratio + "x");
 
-            document.getElementById('val-sbd-total').innerText = totalSBD + " kg";
-            document.getElementById('val-sbd-ratio').innerText = ratio + "x";
-           
-            const rank = getSBDRank(totalSBD, bodyWeight);
-            const rankBadge = document.getElementById('rank-name');
-            rankBadge.innerText = `${rank.icon} ${rank.name}`;
-            rankBadge.style.color = rank.color;
-            rankBadge.style.textShadow = `0 0 8px ${rank.color}, 0 0 22px ${rank.color}`;
-            if (typeof window.renderPowerRankLive === 'function') window.renderPowerRankLive();
-
-            calculateWeeklyTonnage();
+            try{
+                const rank = getSBDRank(totalSBD, bodyWeight);
+                const rankBadge = document.getElementById('rank-name');
+                if(rankBadge){
+                    rankBadge.innerText = `${rank.icon} ${rank.name}`;
+                    rankBadge.style.color = rank.color;
+                    rankBadge.style.textShadow = `0 0 8px ${rank.color}, 0 0 22px ${rank.color}`;
+                }
+            }catch(e){}
+            try{if (typeof window.renderPowerRankLive === 'function') window.renderPowerRankLive()}catch(e){}
+            try{calculateWeeklyTonnage()}catch(e){}
         }
 
         function renderBodyChart() { return false; }
 
         function renderHistoryUI() {
             const container = document.getElementById('history-container');
+            if (!container) return;
             if (!workoutHistory || workoutHistory.length === 0) {
                 container.innerHTML = `<p style="font-size:0.75rem; color:#888; text-align:center;">Aucun historique enregistré pour le moment. Validez vos blocs !</p>`;
                 return;
@@ -6714,7 +6718,7 @@ html.leveling-ios nav{-webkit-backdrop-filter:none!important;backdrop-filter:non
 
 
 <style id="v1430-stable-ui-css">
-/* ================= V15.6.1 — STABLE SETTINGS / PROGRESSION =================
+/* ================= V15.6.2 — STABLE SETTINGS / PROGRESSION =================
    Réglages: plus aucune sous-page fixed/overlay. Toutes les rubriques restent
    dans le scroll principal de l'app, donc plus de page coupée ni ouverture en bas. */
 #panel-settings{position:relative!important;overflow:visible!important;min-height:0!important}
@@ -6769,7 +6773,7 @@ body.v1358-settings-open{overflow:hidden!important}
 
 <script id="v1430-stable-core-js">
 (function(){
-  const VERSION='15.6.1';
+  const VERSION='15.6.2';
   const q=s=>document.querySelector(s);
   const qa=s=>[...document.querySelectorAll(s)];
   const localDay=(d=new Date())=>`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
@@ -6916,7 +6920,7 @@ body.v1358-settings-open{overflow:hidden!important}
         if(typeof renderProfileV2==='function'&&document.getElementById('profile-v2-modal')?.classList.contains('show'))renderProfileV2();
         if(typeof window.renderPowerRankLive==='function')window.renderPowerRankLive();
         if(typeof render==='function')render();
-      }catch(e){console.warn('V15.6.1 SBD UI refresh',e)}
+      }catch(e){console.warn('V15.6.2 SBD UI refresh',e)}
       syncProgressionState();refreshRanks();
     },0);
     return r;
@@ -6972,7 +6976,7 @@ body.v1358-settings-open{overflow:hidden!important}
 
 
 <style id="v1440-power-rank-clean-css">
-/* V15.6.1 — RANG POWER PROPRE
+/* V15.6.2 — RANG POWER PROPRE
    Une seule logique: total Squat + Bench + Deadlift en KG.
    Une identité visuelle distincte par rang. */
 
@@ -7179,7 +7183,7 @@ body.v1358-settings-open{overflow:hidden!important}
 
 
 <style id="v1451-power-live-neon-css">
-/* V15.6.1 — les cartes visibles utilisent la même identité néon que la vitrine */
+/* V15.6.2 — les cartes visibles utilisent la même identité néon que la vitrine */
 .rank-card.v1451-live-rank{
   --rank:#ff2d55;
   --rank-rgb:255,45,85;
@@ -7329,7 +7333,7 @@ body.v1358-settings-open{overflow:hidden!important}
         mini.classList.add('v1451-live-rank-mini');
         cssVars(mini,r);
       }
-    }catch(e){console.warn('V15.6.1 live rank render',e)}
+    }catch(e){console.warn('V15.6.2 live rank render',e)}
   };
 
   /* Après toute vraie mise à jour de données/UI */
@@ -7390,7 +7394,7 @@ body.v1358-settings-open{overflow:hidden!important}
     try{
       if(typeof window.renderPowerRankLive==='function')window.renderPowerRankLive();
       if(typeof window.v135RenderRankHub==='function')window.v135RenderRankHub();
-    }catch(e){console.warn('V15.6.1 power refresh',e)}
+    }catch(e){console.warn('V15.6.2 power refresh',e)}
   }
 
   const oldLoad=window.loadFromLocalStorage;
@@ -7428,7 +7432,7 @@ body.v1358-settings-open{overflow:hidden!important}
 
 
 <style id="v1454-xp-neon-css">
-/* V15.6.1 — Rang XP : même qualité visuelle néon que le Rang Power */
+/* V15.6.2 — Rang XP : même qualité visuelle néon que le Rang Power */
 #v135-xp-modal .modal-content{
   width:min(620px,96vw)!important;
   max-width:620px!important;
@@ -7553,7 +7557,7 @@ body.v1358-settings-open{overflow:hidden!important}
           bar.style.width=pct+'%';
         }
       }
-    }catch(e){console.warn('V15.6.1 XP live',e)}
+    }catch(e){console.warn('V15.6.2 XP live',e)}
   };
 
   const oldHub=window.v135RenderRankHub;
@@ -7996,7 +8000,7 @@ body.v1358-settings-open{overflow:hidden!important}
 
 
 <style id="v1501-vitrines-fix-css">
-/* V15.6.1 — vitrines actuelles, ancien dashboard V10 supprimé physiquement */
+/* V15.6.2 — vitrines actuelles, ancien dashboard V10 supprimé physiquement */
 
 /* Le hub ne sert plus qu'au Rang XP en grand. Le Power garde sa vraie carte dédiée plus bas. */
 #v135-rank-hub{
@@ -8079,7 +8083,7 @@ body.v1358-settings-open{overflow:hidden!important}
       /* Rafraîchit seulement les données/visuels, sans recréer d'anciens modules. */
       try{window.renderXpRankLive?.()}catch(e){}
       try{window.renderPowerRankLive?.()}catch(e){}
-    }catch(e){console.warn('V15.6.1 vitrines',e)}
+    }catch(e){console.warn('V15.6.2 vitrines',e)}
   }
 
   window.v1501FixVitrines=fixVitrines;
@@ -8795,5 +8799,32 @@ setTimeout(refreshStats,250);
 document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')setTimeout(refreshStats,80)});
 })();
 </script>
+
+<script id="v1562-boot-state-recovery">
+(function(){
+'use strict';
+function recover(){
+  try{loadFromLocalStorage?.()}catch(e){console.warn('V15.6.2 load local',e)}
+  try{updateProfileUI?.()}catch(e){console.warn('V15.6.2 profile',e)}
+  try{renderHistoryUI?.()}catch(e){console.warn('V15.6.2 history',e)}
+  try{initWorkoutSystem?.()}catch(e){console.warn('V15.6.2 workout',e)}
+  try{renderPowerHome?.()}catch(e){}
+  try{window.v135RenderRankHub?.()}catch(e){}
+  try{window.renderXpRankLive?.()}catch(e){}
+  try{window.v152RenderProgression?.()}catch(e){}
+  try{window.v11RenderReport?.()}catch(e){}
+  try{
+    if(document.getElementById('panel-settings')?.classList.contains('active')){
+      window.buildSettings?.();
+    }
+  }catch(e){console.warn('V15.6.2 settings',e)}
+}
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',()=>setTimeout(recover,500),{once:true});
+else setTimeout(recover,250);
+window.addEventListener('pageshow',()=>setTimeout(recover,120));
+window.v1562RecoverState=recover;
+})();
+</script>
+
 </body>
 </html>
