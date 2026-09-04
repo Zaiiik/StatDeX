@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>LEVELING-APP — Powerbuilding Tracker V14.5.1</title>
+    <title>LEVELING-APP — Powerbuilding Tracker V14.5.2</title>
     <meta name="theme-color" content="#09090f">
     <meta name="application-name" content="LEVELING-APP">
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -1817,7 +1817,7 @@ header .hud-stat.v140-clickable:hover{
                         <span class="cloud-badge" id="cloud-live-badge">☁️ CLOUD</span>
                     </div>
                     <div id="cloud-sync-detail" style="margin-top:8px;font-size:.62rem;color:#777;text-align:center">Initialisation du cloud…</div>
-                    <div style="margin-top:5px;font-size:.58rem;color:#555;text-align:center">LEVELING-APP V14.5.1 · Stable</div>
+                    <div style="margin-top:5px;font-size:.58rem;color:#555;text-align:center">LEVELING-APP V14.5.2 · Stable</div>
                     <button class="btn-action" onclick="logoutLeveling()" style="border-color:#ff5555;color:#ff7777">Se déconnecter</button>
                 </div>
 
@@ -2131,10 +2131,10 @@ header .hud-stat.v140-clickable:hover{
         }
 
         const POWER_RANKS = [
-            { name:'RECRUE',        icon:'🌱', minKg:0,   minRatio:0.0,  color:'#ff2d55', glow:'255,45,85',   motif:'✦' },
-            { name:'APPRENTI',      icon:'🛡️', minKg:225, minRatio:2.5,  color:'#39ff88', glow:'57,255,136',  motif:'◆' },
-            { name:'INTERMÉDIAIRE', icon:'⚔️', minKg:300, minRatio:3.5,  color:'#a855ff', glow:'168,85,255',  motif:'⚔' },
-            { name:'AVANCÉ',        icon:'💎', minKg:400, minRatio:4.5,  color:'#00e5ff', glow:'0,229,255',   motif:'◇' },
+            { name:'RECRUE',        icon:'🌱', minKg:0,   minRatio:0.0,  color:'#39ff88', glow:'57,255,136',   motif:'✦' },
+            { name:'APPRENTI',      icon:'🛡️', minKg:225, minRatio:2.5,  color:'#ff8a00', glow:'255,138,0',  motif:'◆' },
+            { name:'INTERMÉDIAIRE', icon:'⚔️', minKg:300, minRatio:3.5,  color:'#00e5ff', glow:'0,229,255',  motif:'⚔' },
+            { name:'AVANCÉ',        icon:'💎', minKg:400, minRatio:4.5,  color:'#a855ff', glow:'168,85,255',   motif:'◇' },
             { name:'ÉLITE',         icon:'⚡', minKg:500, minRatio:5.5,  color:'#ffe600', glow:'255,230,0',   motif:'ϟ' },
             { name:'LÉGENDE',       icon:'🔥', minKg:575, minRatio:6.25, color:'#ff1744', glow:'255,23,68',   motif:'✹' },
             { name:'MONARQUE',      icon:'👑', minKg:650, minRatio:7.0,  color:'#ff35f2', glow:'255,53,242',  motif:'♛' }
@@ -2862,6 +2862,7 @@ header .hud-stat.v140-clickable:hover{
             userData.squat = parseFloat(document.getElementById('set-squat').value) || userData.squat;
             userData.bench = parseFloat(document.getElementById('set-bench').value) || userData.bench;
             userData.deadlift = parseFloat(document.getElementById('set-deadlift').value) || userData.deadlift;
+            userData.sbdUpdatedAt = Date.now();
            
             saveToLocalStorage();scheduleCloudSaveImmediate();updateResumeWorkoutBanner();
             updateProfileUI();
@@ -3911,7 +3912,7 @@ const sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_PUBLISHABLE_KEY,{
   auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true,storage:window.localStorage}
 });
 let cloudUser=null,cloudLicensed=false,cloudLoadedOnce=false,cloudSaveTimer=null,suppressCloudSave=false,licenseWatchTimer=null,lastLicenseStatus='UNKNOWN';
-const APP_VERSION='14.5.1';
+const APP_VERSION='14.5.2';
 const ACCOUNT_LOCAL_KEYS=['solo_leveling_user','solo_leveling_smart_refs','solo_leveling_body_hist','solo_leveling_inv','solo_leveling_block','solo_leveling_day','solo_leveling_state','solo_leveling_custom_sets','solo_leveling_history','solo_leveling_active_program','solo_leveling_program_states','solo_leveling_program_custom_sets','solo_leveling_custom_program','leveling_last_local_save','leveling_last_cloud_sync','leveling_v10'];
 function clearLevelingAccountLocalData(){
   try{ACCOUNT_LOCAL_KEYS.forEach(k=>localStorage.removeItem(k));sessionStorage.removeItem('leveling_pending_license')}catch(e){console.warn('Local account cleanup:',e)}
@@ -4131,7 +4132,11 @@ function scheduleCloudSave(){
 }
 window.scheduleCloudSave=scheduleCloudSave;
 const __v12LocalSave=window.saveToLocalStorage;
-window.saveToLocalStorage=function(){if(typeof __v12LocalSave==='function')__v12LocalSave();scheduleCloudSave()};
+window.saveToLocalStorage=function(){
+  if(typeof __v12LocalSave==='function')__v12LocalSave();
+  try{if(typeof window.v1452SaveSbdSafe==='function')window.v1452SaveSbdSafe()}catch(e){}
+  scheduleCloudSave()
+};
 function refreshV11UIAfterCloud(){
   try{setTheme(userData.theme);if(typeof applyAmbianceTheme==='function')applyAmbianceTheme(userData.ambianceTheme||'default',false);updateProfileUI();renderBodyChart();initWorkoutSystem();renderPowerHome();renderHistoryUI();if(typeof v11RenderIdentity==='function')v11RenderIdentity();if(typeof v11RenderReport==='function')v11RenderReport();if(typeof v11LoadProfileInputs==='function')v11LoadProfileInputs()}catch(e){console.warn('UI refresh:',e)}
 }
@@ -4835,7 +4840,7 @@ async function saveSBDV1331(){
   const status=document.getElementById('v1331-sbd-status');
   const sq=parseFloat(document.getElementById('set-squat')?.value),bp=parseFloat(document.getElementById('set-bench')?.value),dl=parseFloat(document.getElementById('set-deadlift')?.value);
   if(!Number.isFinite(sq)||sq<=0||!Number.isFinite(bp)||bp<=0||!Number.isFinite(dl)||dl<=0){if(status){status.className='v1331-sbd-status err';status.textContent='❌ Vérifie tes trois valeurs S/B/D.'}return}
-  userData.squat=sq;userData.bench=bp;userData.deadlift=dl;
+  userData.squat=sq;userData.bench=bp;userData.deadlift=dl;userData.sbdUpdatedAt=Date.now();
   if(typeof saveToLocalStorage==='function')saveToLocalStorage();
   if(typeof updateProfileUI==='function')updateProfileUI();
   if(typeof initWorkoutSystem==='function')initWorkoutSystem();
@@ -7887,7 +7892,7 @@ html.leveling-ios nav{-webkit-backdrop-filter:none!important;backdrop-filter:non
 
 
 <style id="v1430-stable-ui-css">
-/* ================= V14.5.1 — STABLE SETTINGS / PROGRESSION =================
+/* ================= V14.5.2 — STABLE SETTINGS / PROGRESSION =================
    Réglages: plus aucune sous-page fixed/overlay. Toutes les rubriques restent
    dans le scroll principal de l'app, donc plus de page coupée ni ouverture en bas. */
 #panel-settings{position:relative!important;overflow:visible!important;min-height:0!important}
@@ -7942,7 +7947,7 @@ body.v1358-settings-open{overflow:hidden!important}
 
 <script id="v1430-stable-core-js">
 (function(){
-  const VERSION='14.5.1';
+  const VERSION='14.5.2';
   const q=s=>document.querySelector(s);
   const qa=s=>[...document.querySelectorAll(s)];
   const localDay=(d=new Date())=>`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
@@ -8073,10 +8078,82 @@ body.v1358-settings-open{overflow:hidden!important}
   };
   try{window.exportAppData=window.v1430ExportAppData}catch(e){}
   const baseImport=typeof window.importAppData==='function'?window.importAppData:null;
+
+  function sbdSnapshot(u){
+    u=u||{};
+    return {
+      squat:Number(u.squat||0),bench:Number(u.bench||0),deadlift:Number(u.deadlift||0),
+      weight:Number(u.weight||0),updatedAt:Number(u.sbdUpdatedAt||0)
+    };
+  }
+  function validSbd(s){return Number(s?.squat)>0&&Number(s?.bench)>0&&Number(s?.deadlift)>0}
+  function sbdSafeKey(){
+    let owner='local';
+    try{owner=(window.cloudUser?.id||localStorage.getItem('leveling_local_owner')||'local')}catch(e){}
+    return 'leveling_sbd_safe_'+owner;
+  }
+  function loadSbdSafe(){try{return JSON.parse(localStorage.getItem(sbdSafeKey())||'null')}catch(e){return null}}
+  function saveSbdSafe(s){
+    if(!validSbd(s))return;
+    try{localStorage.setItem(sbdSafeKey(),JSON.stringify({...s,savedAt:Date.now()}))}catch(e){}
+  }
+  window.v1452SaveSbdSafe=function(){
+    const s=sbdSnapshot(window.userData||userData);
+    if(validSbd(s))saveSbdSafe(s);
+  };
+  function applySbd(u,s){
+    if(!u||!s)return;
+    u.squat=s.squat;u.bench=s.bench;u.deadlift=s.deadlift;
+    if(Number(s.weight)>0)u.weight=s.weight;
+    u.sbdUpdatedAt=Math.max(Number(u.sbdUpdatedAt||0),Number(s.updatedAt||0),Date.now());
+  }
+
   window.v1430ImportAppData=function(d){
-    const r=baseImport?baseImport(d):undefined;
-    if(d?.v140Rpg)saveRpg(d.v140Rpg);if(d?.validatedSessions)restoreValidated(d.validatedSessions);
-    setTimeout(()=>{syncProgressionState();refreshRanks();},0);return r;
+    const localBefore=sbdSnapshot(window.userData||userData);
+    if(validSbd(localBefore))saveSbdSafe(localBefore);
+    const safeBefore=loadSbdSafe();
+    const incoming=sbdSnapshot(d?.userData||{});
+    let winner=null;
+
+    if(validSbd(localBefore) && !validSbd(incoming)){
+      winner=localBefore;
+    }else if(validSbd(localBefore) && validSbd(incoming)){
+      const lt=Number(localBefore.updatedAt||0),ct=Number(incoming.updatedAt||0);
+      winner=(lt>0&&ct>0&&lt>ct)?localBefore:incoming;
+    }else if(validSbd(incoming)){
+      winner=incoming;
+    }else if(validSbd(safeBefore)){
+      winner=safeBefore;
+    }
+
+    let payload=d;
+    if(d&&typeof d==='object'){
+      try{payload=JSON.parse(JSON.stringify(d))}catch(e){payload={...d}}
+      payload.userData={...(d.userData||{})};
+      if(winner)applySbd(payload.userData,winner);
+    }
+
+    const r=baseImport?baseImport(payload):undefined;
+
+    if(winner){
+      applySbd(window.userData||userData,winner);
+      saveSbdSafe(sbdSnapshot(window.userData||userData));
+      try{saveToLocalStorage()}catch(e){}
+    }
+    if(payload?.v140Rpg)saveRpg(payload.v140Rpg);
+    if(payload?.validatedSessions)restoreValidated(payload.validatedSessions);
+
+    setTimeout(()=>{
+      try{
+        if(typeof updateProfileUI==='function')updateProfileUI();
+        if(typeof renderGoals==='function')renderGoals();
+        if(typeof renderProfileV2==='function'&&document.getElementById('profile-v2-modal')?.classList.contains('show'))renderProfileV2();
+        if(typeof window.renderPowerRankLive==='function')window.renderPowerRankLive();
+        if(typeof render==='function')render();
+      }catch(e){console.warn('V14.5.2 SBD UI refresh',e)}
+      syncProgressionState();refreshRanks();
+    },0);
+    return r;
   };
   try{window.importAppData=window.v1430ImportAppData}catch(e){}
 
@@ -8111,7 +8188,7 @@ body.v1358-settings-open{overflow:hidden!important}
 
 
 <style id="v1440-power-rank-clean-css">
-/* V14.5.1 — RANG POWER PROPRE
+/* V14.5.2 — RANG POWER PROPRE
    Une seule logique: total Squat + Bench + Deadlift en KG.
    Une identité visuelle distincte par rang. */
 
@@ -8318,7 +8395,7 @@ body.v1358-settings-open{overflow:hidden!important}
 
 
 <style id="v1451-power-live-neon-css">
-/* V14.5.1 — les cartes visibles utilisent la même identité néon que la vitrine */
+/* V14.5.2 — les cartes visibles utilisent la même identité néon que la vitrine */
 .rank-card.v1451-live-rank{
   --rank:#ff2d55;
   --rank-rgb:255,45,85;
@@ -8468,7 +8545,7 @@ body.v1358-settings-open{overflow:hidden!important}
         mini.classList.add('v1451-live-rank-mini');
         cssVars(mini,r);
       }
-    }catch(e){console.warn('V14.5.1 live rank render',e)}
+    }catch(e){console.warn('V14.5.2 live rank render',e)}
   };
 
   /* Après toute vraie mise à jour de données/UI */
@@ -8520,6 +8597,36 @@ body.v1358-settings-open{overflow:hidden!important}
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot,{once:true});
   else boot();
   window.addEventListener('pageshow',()=>setTimeout(window.renderPowerRankLive,20));
+})();
+</script>
+
+
+<script id="v1452-sbd-recovery-boot">
+(function(){
+  function positive(v){return Number(v)>0}
+  function recover(){
+    try{
+      const u=window.userData;
+      if(!u)return;
+      if(positive(u.squat)&&positive(u.bench)&&positive(u.deadlift)){
+        if(typeof window.v1452SaveSbdSafe==='function')window.v1452SaveSbdSafe();
+        return;
+      }
+      const hist=Array.isArray(u.sbdHistory)?u.sbdHistory:[];
+      let best=null,bestTotal=0;
+      hist.forEach(x=>{
+        const s=Number(x?.squat||0),b=Number(x?.bench||0),d=Number(x?.deadlift||0),t=s+b+d;
+        if(s>0&&b>0&&d>0&&t>bestTotal){best={squat:s,bench:b,deadlift:d,weight:Number(u.weight||0),updatedAt:0};bestTotal=t}
+      });
+      if(best){
+        u.squat=best.squat;u.bench=best.bench;u.deadlift=best.deadlift;u.sbdUpdatedAt=Date.now();
+        try{saveToLocalStorage()}catch(e){}
+        try{updateProfileUI();renderGoals();window.renderPowerRankLive?.()}catch(e){}
+      }
+    }catch(e){console.warn('V14.5.2 recovery',e)}
+  }
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',()=>setTimeout(recover,80),{once:true});
+  else setTimeout(recover,20);
 })();
 </script>
 
