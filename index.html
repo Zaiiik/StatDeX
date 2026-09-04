@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>LEVELING-APP — Powerbuilding Tracker V15.7.1 VALIDATION LOCK FIX</title>
+    <title>LEVELING-APP — Powerbuilding Tracker V15.8.1 VALIDATION PERSIST FIX</title>
     <meta name="theme-color" content="#09090f">
     <meta name="application-name" content="LEVELING-APP">
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -764,13 +764,12 @@ header{padding-top:max(8px,env(safe-area-inset-top,0px))}
 <!-- ==================== V13.5.3 · CLEAN RANKS & SETTINGS ==================== -->
 <style id="v140-rpg-upgrade-css">
 /* ===== V14.0 RPG / POWER PROGRESSION ===== */
-#v140-hud{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin:12px 0}
 .v140-card{background:linear-gradient(145deg,#111119,#09090e);border:1px solid #30303a;border-radius:13px;padding:11px;min-height:66px}
 .v140-card b{display:block;color:#fff;font-size:.78rem}.v140-card small{color:#8e8e99;font-size:.58rem}
 .v140-value{font-size:1rem;font-weight:1000;margin-top:6px;color:var(--accent-rose)}
 .v140-progress{height:8px;background:#24242d;border-radius:999px;overflow:hidden;margin-top:8px}
 .v140-progress i{display:block;height:100%;background:linear-gradient(90deg,var(--accent-purple),var(--accent-rose));border-radius:inherit}
-#v140-quests,#v140-sbd,#v140-achievements,#v140-coach{margin:12px 0;padding:14px;border:1px solid #30303a;border-radius:15px;background:#0c0c12}
+#v140-quests,#v140-sbd,#v140-coach{margin:12px 0;padding:14px;border:1px solid #30303a;border-radius:15px;background:#0c0c12}
 .v140-title{font-weight:1000;font-size:.95rem;color:#fff;margin-bottom:10px}
 .v140-quest,.v140-ach{display:flex;gap:10px;align-items:center;padding:10px;margin:7px 0;background:#111119;border:1px solid #292933;border-radius:11px}
 .v140-quest.done,.v140-ach.done{border-color:#00c853;opacity:.8}
@@ -789,7 +788,7 @@ header{padding-top:max(8px,env(safe-area-inset-top,0px))}
 #v140-streak-trigger{cursor:pointer}
 .v140-coach-row{padding:10px;background:#111119;border:1px solid #292933;border-radius:11px;margin:7px 0;font-size:.68rem}
 .v140-secret{filter:blur(4px);user-select:none}
-@media(max-width:600px){#v140-hud{grid-template-columns:repeat(2,1fr)}.v140-sbd-grid{grid-template-columns:1fr}}
+@media(max-width:600px){.v140-sbd-grid{grid-template-columns:1fr}}
 </style>
 
 
@@ -797,10 +796,8 @@ header{padding-top:max(8px,env(safe-area-inset-top,0px))}
 /* ===== V14.0.1 — PROFIL COMPACT SANS DOUBLONS ===== */
 
 /* Supprime les 4 mini-cartes ajoutées en V14 (XP/Power/Streak/Succès). */
-#v140-hud{display:none!important}
 
 /* Succès V14 ne rallonge plus le profil : ils passent dans une fenêtre via 🏆. */
-#v140-achievements{display:none!important}
 
 /* On masque les anciens doublons V10 : quêtes/succès/analyse SBD.
    Les nouvelles versions intelligentes prennent leur place. */
@@ -1136,7 +1133,7 @@ header .hud-stat.v140-clickable:hover{
 </style>
 
 <style id="v1563-settings-controller-clean-css">
-/* V15.7.1 — un seul contrôleur Réglages */
+/* V15.8.1 — un seul contrôleur Réglages */
 #panel-settings.v151-ready > #v135-settings-tabs,
 #panel-settings.v151-ready > .v135-settings-tabs,
 #panel-settings.v151-ready > #v15-settings-tabs,
@@ -1462,7 +1459,7 @@ header .hud-stat.v140-clickable:hover{
                         <span class="cloud-badge" id="cloud-live-badge">☁️ CLOUD</span>
                     </div>
                     <div id="cloud-sync-detail" style="margin-top:8px;font-size:.62rem;color:#777;text-align:center">Initialisation du cloud…</div>
-                    <div style="margin-top:5px;font-size:.58rem;color:#555;text-align:center">LEVELING-APP V15.7.1 · Stable</div>
+                    <div style="margin-top:5px;font-size:.58rem;color:#555;text-align:center">LEVELING-APP V15.8.1 · Stable</div>
                     <button class="btn-action" onclick="logoutLeveling()" style="border-color:#ff5555;color:#ff7777">Se déconnecter</button>
                 </div>
 
@@ -1737,7 +1734,7 @@ header .hud-stat.v140-clickable:hover{
             autoProgression: true
         };
 
-        /* V15.7.1 — CANONICAL USER STATE BRIDGE
+        /* V15.8.1 — CANONICAL USER STATE BRIDGE
            `userData` est déclaré avec `let`, donc il n'est pas automatiquement disponible
            via `window.userData`. Plusieurs anciens modules lisaient pourtant window.userData,
            ce qui produisait 0 kg / RECRUE malgré des données correctes.
@@ -4545,7 +4542,7 @@ function v135ProfileNav(){
   const h=panel.querySelector('h2');if(h)h.after(nav);
 }
 function v135Settings(){
-  /* V15.7.1: ancien contrôleur Réglages supprimé.
+  /* V15.8.1: ancien contrôleur Réglages supprimé.
      On conserve seulement la transformation source nécessaire au DOM moderne. */
   try{if(typeof initCompactSettings==='function')initCompactSettings()}catch(e){}
   return false;
@@ -4790,155 +4787,161 @@ if(typeof __v1352SendDM==='function')window.sendDirectMessage=async function(){
 
 setTimeout(()=>{v1352CleanProfile();v1352AddNotificationSettings()},1000);
 </script>
-<script id="v140-rpg-upgrade-js">
+
+<script id="v1580-progression-ui-clean">
 (function(){
+'use strict';
 const KEY='leveling_v140_rpg';
-const today=()=>new Date().toISOString().slice(0,10);
-const load=()=>{try{return JSON.parse(localStorage.getItem(KEY)||'{}')}catch(e){return {}}};
-const save=s=>localStorage.setItem(KEY,JSON.stringify(s));
-function state(){
- let s=load();
- s.xp=Number(s.xp||0); s.level=Number(s.level||1); s.claimed=s.claimed||{};
- s.trainingDays=s.trainingDays||[]; s.prCount=Number(s.prCount||0); s.rankHistory=s.rankHistory||[];
- s.lifts=s.lifts||{squat:[],bench:[],deadlift:[]}; s.achievements=s.achievements||{};
- return s;
+
+function load(){
+  try{
+    const s=JSON.parse(localStorage.getItem(KEY)||'{}')||{};
+    s.trainingDays=Array.isArray(s.trainingDays)?s.trainingDays:[];
+    s.lifts=s.lifts&&typeof s.lifts==='object'?s.lifts:{squat:[],bench:[],deadlift:[]};
+    s.lifts.squat=Array.isArray(s.lifts.squat)?s.lifts.squat:[];
+    s.lifts.bench=Array.isArray(s.lifts.bench)?s.lifts.bench:[];
+    s.lifts.deadlift=Array.isArray(s.lifts.deadlift)?s.lifts.deadlift:[];
+    return s;
+  }catch(e){return {trainingDays:[],lifts:{squat:[],bench:[],deadlift:[]}}}
 }
-function xpNeed(l){return Math.round(100+Math.pow(l,1.55)*38)}
-function xpRank(l){
- const r=v135XpRank(Number(l||1));
- return [r.icon,r.name]
-}
-function addXP(n,reason){
- if(typeof window.LevelingProgressionV15==='object'&&typeof window.LevelingProgressionV15.addXP==='function'){
-   return window.LevelingProgressionV15.addXP(Number(n||0),reason||'Progression','legacy-v140:'+String(reason||'xp'));
- }
- return false;
-}
-function showLevel(l,reason){
- let m=document.getElementById('v140-levelup'); if(!m)return;
- m.querySelector('.v140-levelbig').textContent='NIVEAU '+l;
- m.querySelector('.why').textContent=reason||'Progression validée';
- m.style.display='flex'; try{playSound('level')}catch(e){}
+function save(s){try{localStorage.setItem(KEY,JSON.stringify(s))}catch(e){}}
+function today(){
+  const d=new Date();
+  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
 }
 function totals(){
- const squat=Number(window.userData?.squat||0),bench=Number(window.userData?.bench||0),dead=Number(window.userData?.deadlift||0);
- return {squat,bench,dead,total:squat+bench+dead};
-}
-function powerRank(t){
- const r=getSBDRank(Number(t||0),Number(userData?.weight||0)),n=getNextSBDRank(r);
- return [r.icon,r.name,n?n.minKg:9999]
-}
-function currentProgram(){return window.userData?.activeProgram||window.userData?.program||'Programme'}
-function currentDay(){return window.userData?.currentDay||window.userData?.day||'Séance du jour'}
-function sessions(){let s=state();return s.trainingDays.length}
-function quests(){
- const s=state(), td=today(), day=currentDay(), ses=sessions();
- return [
-  {id:td+'-session',icon:'⚔️',title:'Terminer '+day,sub:'Valide la séance prévue aujourd’hui',xp:120,done:s.trainingDays.includes(td)},
-  {id:td+'-sets',icon:'🎯',title:'Valider 15 séries',sub:'Objectif volume de la séance',xp:60,done:Number(window.userData?.todaySets||0)>=15},
-  {id:td+'-load',icon:'📈',title:'Égale ou dépasse une référence',sub:'Au moins une performance au niveau de ta dernière séance',xp:80,done:false}
- ]}
-function claimDoneQuests(){
- let s=state(), changed=false;
- quests().forEach(q=>{if(q.done&&!s.claimed[q.id]){s.claimed[q.id]=1;s.xp+=q.xp;changed=true}});
- if(changed){save(s)}
-}
-function achievements(){
- const s=state(),t=totals(),ses=sessions();
- return [
- ['first','🎖️','Premier entraînement',ses>=1,false],
- ['s10','🔥','10 séances',ses>=10,false],['s50','⚔️','50 séances',ses>=50,false],['s100','👑','100 séances',ses>=100,false],
- ['sq100','🏋️','Squat 100 kg',t.squat>=100,false],['sq140','🏋️','Squat 140 kg',t.squat>=140,false],['sq180','🏋️','Squat 180 kg',t.squat>=180,true],
- ['b100','💪','Bench 100 kg',t.bench>=100,false],['d200','☠️','Deadlift 200 kg',t.dead>=200,true],
- ['t400','⚡','Total SBD 400 kg',t.total>=400,false],['t500','💎','Total SBD 500 kg',t.total>=500,false],['t600','👑','Total SBD 600 kg',t.total>=600,true],
- ['pr10','🏆','10 records personnels',s.prCount>=10,true]
- ]}
-function syncAchievements(){
- let s=state(),newOnes=[];
- achievements().forEach(a=>{if(a[3]&&!s.achievements[a[0]]){s.achievements[a[0]]=today();s.xp+=75;newOnes.push(a[2])}});
- save(s); return newOnes;
-}
-function spark(vals){
- if(!vals.length)return '<svg class="v140-spark" viewBox="0 0 100 40"><polyline points="0,35 100,35"/></svg>';
- let a=vals.slice(-12).map(x=>Number(x.value||x.weight||x||0)),mn=Math.min(...a),mx=Math.max(...a),r=Math.max(1,mx-mn);
- let pts=a.map((v,i)=>`${a.length===1?50:i*100/(a.length-1)},${35-(v-mn)*30/r}`).join(' ');
- return `<svg class="v140-spark" viewBox="0 0 100 40" preserveAspectRatio="none"><polyline points="${pts}"/></svg>`
+  return {
+    squat:Number(userData?.squat||0),
+    bench:Number(userData?.bench||0),
+    deadlift:Number(userData?.deadlift||0)
+  };
 }
 function delta(arr,days){
- if(!arr.length)return 0; let now=Number(arr[arr.length-1].value||arr[arr.length-1].weight||0),cut=Date.now()-days*864e5;
- let old=arr.find(x=>new Date(x.date||0).getTime()>=cut)||arr[0]; return now-Number(old.value||old.weight||0)
+  if(!arr.length)return 0;
+  const cutoff=Date.now()-days*86400000;
+  const recent=arr.filter(x=>new Date(x.date||0).getTime()>=cutoff);
+  if(recent.length<2)return 0;
+  return Number(recent[recent.length-1]?.value??recent[recent.length-1]?.weight??0)-Number(recent[0]?.value??recent[0]?.weight??0);
+}
+function spark(arr){
+  const a=(arr||[]).slice(-12);
+  if(a.length<2)return '<div class="v140-spark"></div>';
+  const vals=a.map(x=>Number(x.value??x.weight??0));
+  const min=Math.min(...vals),max=Math.max(...vals),range=Math.max(1,max-min);
+  const pts=vals.map((v,i)=>`${(i/(vals.length-1))*100},${32-((v-min)/range)*26}`).join(' ');
+  return `<svg class="v140-spark" viewBox="0 0 100 36" preserveAspectRatio="none"><polyline points="${pts}" fill="none" stroke="currentColor" stroke-width="2"/></svg>`;
 }
 function suggestion(name,arr){
- if(!arr.length)return 'Enregistre quelques séries pour obtenir une suggestion.';
- let x=arr[arr.length-1],w=Number(x.weight||x.value||0),rpe=Number(x.rpe||8),reps=Number(x.reps||5),miss=Number(x.failed||0);
- if(miss||rpe>=9.5)return `${name}: maintiens ${w} kg ou baisse de 2,5–5 % pour consolider.`;
- if(rpe<=7.5&&reps>=3)return `${name}: tente ${Math.round((w+2.5)*2)/2} kg la prochaine fois.`;
- return `${name}: garde ${w} kg et cherche une répétition plus propre / plus facile.`
+  if(!arr.length)return `${name}: enregistre quelques séries pour obtenir une suggestion.`;
+  const x=arr[arr.length-1],w=Number(x.weight??x.value??0),rpe=Number(x.rpe||8),reps=Number(x.reps||5),miss=Number(x.failed||0);
+  if(miss||rpe>=9.5)return `${name}: maintiens ${w} kg ou baisse légèrement pour consolider.`;
+  if(rpe<=7.5&&reps>=3)return `${name}: tente ${Math.round((w+2.5)*2)/2} kg la prochaine fois.`;
+  return `${name}: garde ${w} kg et cherche une répétition plus propre.`;
 }
-function render(){
- claimDoneQuests(); let s=state(),t=totals(),xr=xpRank(s.level),pr=powerRank(t.total),need=xpNeed(s.level);
- let hub=document.getElementById('v140-hud');
- if(hub)hub.innerHTML=`
- <div class="v140-card"><b>${xr[0]} Rang XP</b><div class="v140-value">${xr[1]} · Niv. ${s.level}</div><div class="v140-progress"><i style="width:${Math.min(100,s.xp/need*100)}%"></i></div><small>${s.xp}/${need} XP</small></div>
- <div class="v140-card"><b>🏆 Rang Power</b><div class="v140-value">${pr[0]} ${pr[1]}</div><small>${t.total} kg SBD · prochain ${pr[2]} kg</small></div>
- <div class="v140-card" id="v140-streak-trigger"><b>🔥 Streak</b><div class="v140-value">${streak()} jours</div><small>Cliquer pour le calendrier</small></div>
- <div class="v140-card"><b>🎖️ Succès</b><div class="v140-value">${Object.keys(s.achievements).length}</div><small>${sessions()} séances enregistrées</small></div>`;
- let q=document.getElementById('v140-quests'); if(q)q.innerHTML='<div class="v140-title">🎯 Quêtes du jour</div>'+quests().map(x=>`<div class="v140-quest ${x.done?'done':''}"><span>${x.icon}</span><div class="v140-quest-main"><b>${x.title}</b><small>${x.sub}</small></div><span class="v140-xp">${x.done?'✓ ':''}+${x.xp} XP</span></div>`).join('');
- let sd=document.getElementById('v140-sbd'); if(sd)sd.innerHTML='<div class="v140-title">📈 Progression SBD</div><div class="v140-sbd-grid">'+[['Squat','squat'],['Bench','bench'],['Deadlift','deadlift']].map(([n,k])=>{let a=s.lifts[k]||[],best=Math.max(Number(t[k==='deadlift'?'dead':k]||0),...a.map(x=>Number(x.value||x.weight||0)),0);return `<div class="v140-lift"><b>${n}</b><div class="big">${best} kg</div><small>30j ${delta(a,30)>=0?'+':''}${delta(a,30).toFixed(1)} kg · 90j ${delta(a,90)>=0?'+':''}${delta(a,90).toFixed(1)} kg</small>${spark(a)}</div>`}).join('')+'</div>';
- let c=document.getElementById('v140-coach');
- if(c){
-   const coachLifts=[['Squat','squat'],['Bench','bench'],['Deadlift','deadlift']];
-   const hasData=coachLifts.some(([,k])=>Array.isArray(s.lifts[k])&&s.lifts[k].length);
-   c.innerHTML='<div class="v140-title">🧠 Coach progression</div>'+
-     (hasData
-       ? coachLifts.filter(([,k])=>Array.isArray(s.lifts[k])&&s.lifts[k].length).map(([n,k])=>`<div class="v140-coach-row">${suggestion(n,s.lifts[k])}</div>`).join('')
+
+function ensureDom(){
+  const panel=document.getElementById('panel-profile');
+  if(!panel)return false;
+
+  let sbd=document.getElementById('v140-sbd');
+  let coach=document.getElementById('v140-coach');
+  let quests=document.getElementById('v140-quests');
+  if(!quests||!sbd||!coach){
+    const wrap=document.createElement('div');
+    wrap.id='v1580-progression-wrap';
+    wrap.innerHTML=`<div id="v140-quests"></div><div id="v140-sbd"></div><div id="v140-coach"></div>`;
+    const rank=document.getElementById('v135-rank-hub');
+    if(rank&&rank.parentNode===panel)rank.after(wrap);
+    else panel.prepend(wrap);
+  }
+
+  if(!document.getElementById('v140-levelup')){
+    document.body.insertAdjacentHTML('beforeend',`
+      <div id="v140-levelup"><div class="v140-modalbox"><div>⚔️ SYSTEM</div><div class="v140-levelbig"></div><p class="why"></p><button class="v140-close" onclick="this.closest('#v140-levelup').style.display='none'">CONTINUER</button></div></div>`);
+  }
+  if(!document.getElementById('v140-streak-modal')){
+    document.body.insertAdjacentHTML('beforeend',`
+      <div id="v140-streak-modal"><div class="v140-modalbox"><div class="v140-title">🔥 CALENDRIER D'ENTRAÎNEMENT</div><div class="v140-week"></div><div class="stats"></div><button class="v140-close" onclick="this.closest('#v140-streak-modal').style.display='none'">FERMER</button></div></div>`);
+  }
+  return true;
+}
+
+function renderSbdCoach(){
+  if(!ensureDom())return;
+  const s=load(),t=totals();
+  const sbd=document.getElementById('v140-sbd');
+  if(sbd){
+    sbd.innerHTML='<div class="v140-title">📈 Progression SBD</div><div class="v140-sbd-grid">'+
+      [['Squat','squat'],['Bench','bench'],['Deadlift','deadlift']].map(([name,key])=>{
+        const arr=s.lifts[key]||[];
+        const base=key==='deadlift'?t.deadlift:t[key];
+        const best=Math.max(Number(base||0),...arr.map(x=>Number(x.value??x.weight??0)),0);
+        const d30=delta(arr,30),d90=delta(arr,90);
+        return `<div class="v140-lift"><b>${name}</b><div class="big">${best} kg</div><small>30j ${d30>=0?'+':''}${d30.toFixed(1)} kg · 90j ${d90>=0?'+':''}${d90.toFixed(1)} kg</small>${spark(arr)}</div>`;
+      }).join('')+'</div>';
+  }
+
+  const coach=document.getElementById('v140-coach');
+  if(coach){
+    const lifts=[['Squat','squat'],['Bench','bench'],['Deadlift','deadlift']];
+    const available=lifts.filter(([,k])=>(s.lifts[k]||[]).length);
+    coach.innerHTML='<div class="v140-title">🧠 Coach progression</div>'+
+      (available.length
+       ? available.map(([name,key])=>`<div class="v140-coach-row">${suggestion(name,s.lifts[key])}</div>`).join('')
        : '<div class="v140-coach-row">Enregistre quelques séries pour obtenir une suggestion.</div>');
- }
- let a=document.getElementById('v140-achievements');if(a)a.innerHTML='<div class="v140-title">🏅 Succès</div>'+achievements().map(x=>{let done=!!s.achievements[x[0]];return `<div class="v140-ach ${done?'done':''}"><span>${done?x[1]:'🔒'}</span><div class="v140-quest-main"><b class="${x[4]&&!done?'v140-secret':''}">${x[4]&&!done?'Succès secret':x[2]}</b><small>${done?'Débloqué le '+s.achievements[x[0]]:'À débloquer'}</small></div></div>`}).join('');
- document.getElementById('v140-streak-trigger')?.addEventListener('click',showStreak);
+  }
 }
-function streak(){
- let a=[...new Set(state().trainingDays)].sort().reverse(),n=0,d=new Date();
- for(let i=0;i<60;i++){let k=d.toISOString().slice(0,10);if(a.includes(k))n++;else if(i>0)break;d.setDate(d.getDate()-1)} return n
-}
+
 function showStreak(){
- let s=state(),m=document.getElementById('v140-streak-modal');if(!m)return;
- let d=new Date(),mon=new Date(d);mon.setDate(d.getDate()-((d.getDay()+6)%7));
- let days=[];for(let i=0;i<7;i++){let x=new Date(mon);x.setDate(mon.getDate()+i);let k=x.toISOString().slice(0,10);days.push(`<div class="v140-day ${s.trainingDays.includes(k)?'hit':''}">${['L','M','M','J','V','S','D'][i]}<br>${x.getDate()}</div>`)}
- let month=s.trainingDays.filter(x=>x.slice(0,7)===today().slice(0,7)).length;
- m.querySelector('.v140-week').innerHTML=days.join('');m.querySelector('.stats').textContent=`Série actuelle : ${streak()} j · ${month} séances ce mois`;m.style.display='flex'
+  const s=load(),m=document.getElementById('v140-streak-modal');
+  if(!m)return;
+  const d=new Date(),mon=new Date(d);
+  mon.setDate(d.getDate()-((d.getDay()+6)%7));
+  const hit=new Set(s.trainingDays);
+  const days=[];
+  for(let i=0;i<7;i++){
+    const x=new Date(mon);x.setDate(mon.getDate()+i);
+    const k=`${x.getFullYear()}-${String(x.getMonth()+1).padStart(2,'0')}-${String(x.getDate()).padStart(2,'0')}`;
+    days.push(`<div class="v140-day ${hit.has(k)?'hit':''}">${['L','M','M','J','V','S','D'][i]}<br>${x.getDate()}</div>`);
+  }
+  const month=today().slice(0,7);
+  const monthCount=s.trainingDays.filter(x=>String(x).slice(0,7)===month).length;
+  const streak=window.LevelingProgressionV15?.getStreak?.()||0;
+  const week=m.querySelector('.v140-week'),stats=m.querySelector('.stats');
+  if(week)week.innerHTML=days.join('');
+  if(stats)stats.textContent=`Série actuelle : ${streak} j · ${monthCount} séances ce mois`;
+  m.style.display='flex';
+}
+
+function logLift(kind,weight,reps,rpe,failed){
+  const s=load();
+  if(!s.lifts[kind])s.lifts[kind]=[];
+  s.lifts[kind].push({date:today(),weight:Number(weight),value:Number(weight),reps:Number(reps||1),rpe:Number(rpe||8),failed:Number(failed||0)});
+  save(s);renderSbdCoach();
 }
 function recordTraining(){
- let s=state(),k=today();
- if(!s.trainingDays.includes(k)){s.trainingDays.push(k);save(s)}
+  const s=load(),k=today();
+  if(!s.trainingDays.includes(k)){s.trainingDays.push(k);s.trainingDays.sort();save(s)}
 }
 function recordPR(){
- let s=state();
- s.prCount=Math.max(Number(s.prCount||0),Number(userData?.prCount||0));
- save(s);
+  const s=load();s.prCount=Math.max(Number(s.prCount||0),Number(userData?.prCount||0));save(s);
 }
-function logLift(kind,weight,reps,rpe,failed){
- let s=state(); if(!s.lifts[kind])s.lifts[kind]=[];
- s.lifts[kind].push({date:today(),weight:Number(weight),value:Number(weight),reps:Number(reps||1),rpe:Number(rpe||8),failed:Number(failed||0)});save(s);render()
-}
-window.LevelingRPG={addXP,recordTraining,recordPR,logLift,render};
+function addXP(n,reason){return window.LevelingProgressionV15?.addXP?.(Number(n||0),reason||'Progression','legacy-ui:'+String(reason||'xp'))||false}
 
-function mount(){
- let panel=document.getElementById('panel-profile');if(!panel||document.getElementById('v140-hud'))return;
- let anchor=document.getElementById('v135-rank-hub')||panel.firstElementChild;
- let wrap=document.createElement('div');wrap.innerHTML=`<div id="v140-hud"></div><div id="v140-quests"></div><div id="v140-sbd"></div><div id="v140-coach"></div><div id="v140-achievements"></div>`;anchor?.after(wrap);
- document.body.insertAdjacentHTML('beforeend',`
- <div id="v140-levelup"><div class="v140-modalbox"><div>⚔️ SYSTEM</div><div class="v140-levelbig"></div><p class="why"></p><button class="v140-close" onclick="this.closest('#v140-levelup').style.display='none'">CONTINUER</button></div></div>
- <div id="v140-streak-modal"><div class="v140-modalbox"><div class="v140-title">🔥 CALENDRIER D'ENTRAÎNEMENT</div><div class="v140-week"></div><div class="stats"></div><button class="v140-close" onclick="this.closest('#v140-streak-modal').style.display='none'">FERMER</button></div></div>`);
- syncAchievements();render();
- // Hook common validation functions without breaking existing app
- ['completeWorkout','finishWorkout','validateWorkout','completeSession','finishSession'].forEach(n=>{if(typeof window[n]==='function'&&!window[n].v140){let old=window[n];window[n]=function(){let r=old.apply(this,arguments);recordTraining();return r};window[n].v140=1}});
- ['savePR','addPR','recordPR'].forEach(n=>{if(typeof window[n]==='function'&&!window[n].v140&&window[n]!==recordPR){let old=window[n];window[n]=function(){let r=old.apply(this,arguments);recordPR();return r};window[n].v140=1}});
+window.LevelingRPG={addXP,recordTraining,recordPR,logLift,render:renderSbdCoach};
+window.v1580ShowStreak=showStreak;
+
+function boot(){
+  ensureDom();
+  renderSbdCoach();
+  try{window.v152RenderProgression?.()}catch(e){}
 }
-if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',()=>setTimeout(mount,1700));else setTimeout(mount,1700);
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',()=>setTimeout(boot,300),{once:true});
+else setTimeout(boot,80);
+
+document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')setTimeout(boot,80)});
 })();
 </script>
-
 
 <script id="v1401-profile-clean-js">
 (function(){
@@ -4974,7 +4977,6 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
     }
 
     /* Les énormes blocs V14 ne restent jamais ailleurs dans le profil. */
-    document.getElementById('v140-hud')?.remove();
   }
 
   function state140(){
@@ -5113,7 +5115,7 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
     }
   };
 
-  /* V15.7.1 : une séance validée reste verrouillée.
+  /* V15.8.1 : une séance validée reste verrouillée.
      Modifier/cliquer une série ne doit plus effacer son marqueur de validation. */
 
   /* Après la vraie validation avec étoiles, mémorise que cette séance est terminée. */
@@ -6549,7 +6551,7 @@ html.leveling-ios nav{-webkit-backdrop-filter:none!important;backdrop-filter:non
 
 
 <style id="v1430-stable-ui-css">
-/* ================= V15.7.1 — STABLE SETTINGS / PROGRESSION =================
+/* ================= V15.8.1 — STABLE SETTINGS / PROGRESSION =================
    Réglages: plus aucune sous-page fixed/overlay. Toutes les rubriques restent
    dans le scroll principal de l'app, donc plus de page coupée ni ouverture en bas. */
 #panel-settings{position:relative!important;overflow:visible!important;min-height:0!important}
@@ -6604,7 +6606,7 @@ body.v1358-settings-open{overflow:hidden!important}
 
 <script id="v1430-stable-core-js">
 (function(){
-  const VERSION='15.7.1';
+  const VERSION='15.8.1';
   const q=s=>document.querySelector(s);
   const qa=s=>[...document.querySelectorAll(s)];
   const localDay=(d=new Date())=>`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
@@ -6751,7 +6753,7 @@ body.v1358-settings-open{overflow:hidden!important}
         if(typeof renderProfileV2==='function'&&document.getElementById('profile-v2-modal')?.classList.contains('show'))renderProfileV2();
         if(typeof window.renderPowerRankLive==='function')window.renderPowerRankLive();
         if(typeof render==='function')render();
-      }catch(e){console.warn('V15.7.1 SBD UI refresh',e)}
+      }catch(e){console.warn('V15.8.1 SBD UI refresh',e)}
       syncProgressionState();refreshRanks();
     },0);
     return r;
@@ -6807,7 +6809,7 @@ body.v1358-settings-open{overflow:hidden!important}
 
 
 <style id="v1440-power-rank-clean-css">
-/* V15.7.1 — RANG POWER PROPRE
+/* V15.8.1 — RANG POWER PROPRE
    Une seule logique: total Squat + Bench + Deadlift en KG.
    Une identité visuelle distincte par rang. */
 
@@ -7014,7 +7016,7 @@ body.v1358-settings-open{overflow:hidden!important}
 
 
 <style id="v1451-power-live-neon-css">
-/* V15.7.1 — les cartes visibles utilisent la même identité néon que la vitrine */
+/* V15.8.1 — les cartes visibles utilisent la même identité néon que la vitrine */
 .rank-card.v1451-live-rank{
   --rank:#ff2d55;
   --rank-rgb:255,45,85;
@@ -7164,7 +7166,7 @@ body.v1358-settings-open{overflow:hidden!important}
         mini.classList.add('v1451-live-rank-mini');
         cssVars(mini,r);
       }
-    }catch(e){console.warn('V15.7.1 live rank render',e)}
+    }catch(e){console.warn('V15.8.1 live rank render',e)}
   };
 
   /* Après toute vraie mise à jour de données/UI */
@@ -7225,7 +7227,7 @@ body.v1358-settings-open{overflow:hidden!important}
     try{
       if(typeof window.renderPowerRankLive==='function')window.renderPowerRankLive();
       if(typeof window.v135RenderRankHub==='function')window.v135RenderRankHub();
-    }catch(e){console.warn('V15.7.1 power refresh',e)}
+    }catch(e){console.warn('V15.8.1 power refresh',e)}
   }
 
   const oldLoad=window.loadFromLocalStorage;
@@ -7263,7 +7265,7 @@ body.v1358-settings-open{overflow:hidden!important}
 
 
 <style id="v1454-xp-neon-css">
-/* V15.7.1 — Rang XP : même qualité visuelle néon que le Rang Power */
+/* V15.8.1 — Rang XP : même qualité visuelle néon que le Rang Power */
 #v135-xp-modal .modal-content{
   width:min(620px,96vw)!important;
   max-width:620px!important;
@@ -7388,7 +7390,7 @@ body.v1358-settings-open{overflow:hidden!important}
           bar.style.width=pct+'%';
         }
       }
-    }catch(e){console.warn('V15.7.1 XP live',e)}
+    }catch(e){console.warn('V15.8.1 XP live',e)}
   };
 
   const oldHub=window.v135RenderRankHub;
@@ -7653,7 +7655,7 @@ body.v1358-settings-open{overflow:hidden!important}
     if(!profile)return;
     const target=q('.compact-setting-body',profile);if(!target)return;
 
-    /* V15.7.1 : Profil devient l'unique page pour compte + progression + sauvegarde. */
+    /* V15.8.1 : Profil devient l'unique page pour compte + progression + sauvegarde. */
     const progression=sections.find(s=>/progression/i.test(settingLabel(s)));
     if(progression&&progression!==profile){
       const body=q('.compact-setting-body',progression);
@@ -7856,7 +7858,7 @@ body.v1358-settings-open{overflow:hidden!important}
 
 
 <style id="v1501-vitrines-fix-css">
-/* V15.7.1 — vitrines actuelles, ancien dashboard V10 supprimé physiquement */
+/* V15.8.1 — vitrines actuelles, ancien dashboard V10 supprimé physiquement */
 
 /* Le hub ne sert plus qu'au Rang XP en grand. Le Power garde sa vraie carte dédiée plus bas. */
 #v135-rank-hub{
@@ -7939,7 +7941,7 @@ body.v1358-settings-open{overflow:hidden!important}
       /* Rafraîchit seulement les données/visuels, sans recréer d'anciens modules. */
       try{window.renderXpRankLive?.()}catch(e){}
       try{window.renderPowerRankLive?.()}catch(e){}
-    }catch(e){console.warn('V15.7.1 vitrines',e)}
+    }catch(e){console.warn('V15.8.1 vitrines',e)}
   }
 
   window.v1501FixVitrines=fixVitrines;
@@ -8372,10 +8374,21 @@ const cycleNo=()=>Math.max(1,Number(localStorage.getItem('leveling_cycle_number'
 const validationKey=(program=activeProgramKey,block=currentBlockIndex,day=currentDayIndex)=>
   `leveling_validated_${program}_${block}_${day}`;
 
-function isValidated(program=activeProgramKey,block=currentBlockIndex,day=currentDayIndex){
-  return localStorage.getItem(validationKey(program,block,day))==='1';
+function validationMap(){
+  if(!userData.validatedSessions || typeof userData.validatedSessions!=='object') userData.validatedSessions={};
+  return userData.validatedSessions;
 }
-
+function isValidated(program=activeProgramKey,block=currentBlockIndex,day=currentDayIndex){
+  const key=validationKey(program,block,day);
+  return localStorage.getItem(key)==='1' || !!validationMap()[key];
+}
+function markValidated(program=activeProgramKey,block=currentBlockIndex,day=currentDayIndex){
+  const key=validationKey(program,block,day);
+  localStorage.setItem(key,'1');
+  validationMap()[key]=Date.now();
+  try{saveToLocalStorage()}catch(e){}
+  return key;
+}
 function clearValidationKeys(){
   const keys=[];
   for(let i=0;i<localStorage.length;i++){
@@ -8383,6 +8396,7 @@ function clearValidationKeys(){
     if(k&&k.startsWith('leveling_validated_'))keys.push(k);
   }
   keys.forEach(k=>localStorage.removeItem(k));
+  userData.validatedSessions={};
 }
 
 function refreshValidationUI(){
@@ -8398,8 +8412,14 @@ function refreshValidationUI(){
     if(done){
       btn.style.display='block';
       btn.textContent='🔥 SÉANCE DÉJÀ VALIDÉE';
+      btn.onclick=function(e){e?.preventDefault?.();return false;};
     }else{
       btn.textContent='VALIDER LA SÉANCE';
+      btn.onclick=function(){
+        try{playSound('success')}catch(e){}
+        if(isValidated())return false;
+        return window.openRatingModal?.();
+      };
     }
   }
   document.querySelectorAll('#day-tabs .day-tab').forEach((tab,i)=>{
@@ -8672,7 +8692,7 @@ if(typeof oldDetect==='function'&&!oldDetect.v1570){
   window.detectAutomaticPR.v1570=1;
 }
 
-/* Verrou V15.7.1 : impossible même de rouvrir la validation d'une séance déjà terminée. */
+/* Verrou V15.8.1 : impossible même de rouvrir la validation d'une séance déjà terminée. */
 const previousOpenRating=window.openRatingModal;
 if(typeof previousOpenRating==='function'&&!previousOpenRating.v1571){
   window.openRatingModal=function(){
@@ -8704,7 +8724,7 @@ if(typeof previousFinish==='function'&&!previousFinish.v1570){
     const program=activeProgramKey,block=currentBlockIndex,day=currentDayIndex;
     const key=validationKey(program,block,day);
 
-    if(localStorage.getItem(key)==='1'){
+    if(isValidated(program,block,day)){
       document.getElementById('modal-rating')?.style.setProperty('display','none');
       refreshValidationUI();
       alert('🔥 Cette séance est déjà validée. Aucun XP supplémentaire ne peut être gagné.');
@@ -8717,7 +8737,7 @@ if(typeof previousFinish==='function'&&!previousFinish.v1570){
     const completed=Number(userData?.workoutsCompleted||0)>before;
 
     if(completed || ratingBefore>0){
-      localStorage.setItem(key,'1');
+      markValidated(program,block,day);
       patchSession(program,block,day);
       refreshValidationUI();
 
@@ -8774,7 +8794,7 @@ window.v11DateMs=function(v){
 
 /* API canonique + alias de compatibilité temporaire pour les quelques anciens appels restants. */
 window.LevelingProgramV157={
-  isValidated,refreshValidationUI,
+  isValidated,markValidated,refreshValidationUI,
   setValues,dayVolume,currentBlockVolume:blockVolume,
   recordCurrentBlock,allSessions,totalValidatedVolume,
   cycleNo,resetCycle,refreshStats
@@ -8782,8 +8802,22 @@ window.LevelingProgramV157={
 window.LevelingStatsV154=window.LevelingProgramV157;
 window.v153ResetCycleNow=resetCycle;
 
+function migrateValidationState(){
+  const map=validationMap();
+  let changed=false;
+  try{
+    for(let i=0;i<localStorage.length;i++){
+      const k=localStorage.key(i);
+      if(k?.startsWith('leveling_validated_') && localStorage.getItem(k)==='1' && !map[k]){
+        map[k]=Date.now();changed=true;
+      }
+    }
+  }catch(e){}
+  if(changed)try{saveToLocalStorage()}catch(e){}
+}
 function boot(){
   normalizeHistory();
+  migrateValidationState();
   syncAvatar();
   refreshValidationUI();
   refreshStats();
@@ -8802,10 +8836,10 @@ document.addEventListener('visibilitychange',()=>{
 (function(){
 'use strict';
 function recover(){
-  try{loadFromLocalStorage?.()}catch(e){console.warn('V15.7.1 load local',e)}
-  try{updateProfileUI?.()}catch(e){console.warn('V15.7.1 profile',e)}
-  try{renderHistoryUI?.()}catch(e){console.warn('V15.7.1 history',e)}
-  try{initWorkoutSystem?.()}catch(e){console.warn('V15.7.1 workout',e)}
+  try{loadFromLocalStorage?.()}catch(e){console.warn('V15.8.1 load local',e)}
+  try{updateProfileUI?.()}catch(e){console.warn('V15.8.1 profile',e)}
+  try{renderHistoryUI?.()}catch(e){console.warn('V15.8.1 history',e)}
+  try{initWorkoutSystem?.()}catch(e){console.warn('V15.8.1 workout',e)}
   try{renderPowerHome?.()}catch(e){}
   try{window.v135RenderRankHub?.()}catch(e){}
   try{window.renderXpRankLive?.()}catch(e){}
@@ -8815,7 +8849,7 @@ function recover(){
     if(document.getElementById('panel-settings')?.classList.contains('active')){
       window.v15BuildSettings?.();
     }
-  }catch(e){console.warn('V15.7.1 settings',e)}
+  }catch(e){console.warn('V15.8.1 settings',e)}
 }
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',()=>setTimeout(recover,500),{once:true});
 else setTimeout(recover,250);
