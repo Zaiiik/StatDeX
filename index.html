@@ -1,9 +1,13 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
+<!-- V15.14 FINAL AUDIT RC
+     Final static audit passed: JS syntax, DOM ids, mobile lifecycle, validation guards,
+     cloud/state hooks, remaining timers classified. No risky cleanup performed here. -->
+
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>LEVELING-APP — Powerbuilding Tracker V15.13.0 CLOUD STATE CLEAN</title>
+    <title>LEVELING-APP — Powerbuilding Tracker V15.14.0 FINAL AUDIT RC</title>
     <meta name="theme-color" content="#09090f">
     <meta name="application-name" content="LEVELING-APP">
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -5557,7 +5561,7 @@ body.v1358-settings-open{overflow:hidden!important}
    Aucun hook finishWorkoutFinal / updateProfileUI / switchTab.
    ============================================================ */
 
-const VERSION='15.13.0';
+const VERSION='15.14.0';
 const RPG_KEY='leveling_v140_rpg';
 
 function loadRpg(){try{return JSON.parse(localStorage.getItem(RPG_KEY)||'{}')||{}}catch(e){return {}}}
