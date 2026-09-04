@@ -3569,7 +3569,19 @@ async function syncSocialProfile(){
     const total=Number(userData.squat||0)+Number(userData.bench||0)+Number(userData.deadlift||0);
     const rank=(typeof window.getGamificationRank==='function'?window.getGamificationRank(Number(userData.xp||0)):(typeof getSBDRank==='function'?getSBDRank(total,Number(userData.weight||0)):{name:'NOVICE'}));
     const avatar=userData.playerAvatarImage||userData.playerAvatar||'⚔️';
-    const weekly=Number(calculateWeeklyTonnage?.()||0);
+    const weekly=(()=>{
+      try{
+        if(typeof window.calculateWeeklyTonnage==='function')return Number(window.calculateWeeklyTonnage()||0);
+        if(typeof window.totalValidatedVolume==='function')return Number(window.totalValidatedVolume()||0);
+        const v=window.__levelingV10Export?.()||{};
+        const rows=Array.isArray(v.sessions)?v.sessions:[];
+        const cutoff=Date.now()-7*24*60*60*1000;
+        return Math.round(rows.reduce((sum,s)=>{
+          const ts=Date.parse(s?.date||'');
+          return sum+((Number.isFinite(ts)&&ts>=cutoff)?Number(s?.volume||0):0);
+        },0));
+      }catch(e){return 0}
+    })();
     const {error}=await sb.rpc('social_sync_profile',{
       p_username:(userData.playerName||userData.name||'Joueur').slice(0,24),
       p_avatar:avatar,p_level:Number(userData.level||1),p_rank:String(rank?.name||'NOVICE'),
@@ -4102,13 +4114,21 @@ async function sendTeamChatMessage(){
   input.value='';playSound('click');teamChatLastFingerprint='';await loadTeamChat();scheduleTeamChatAutoRefresh(1200);
 }
 document.addEventListener('visibilitychange',()=>{
-  if(document.visibilityState==='visible')scheduleTeamChatAutoRefresh(300);
-  else stopTeamChatAutoRefresh();
+  if(document.visibilityState==='visible'){
+    scheduleTeamChatAutoRefresh(300);
+    scheduleDmAutoRefresh(300);
+  }else{
+    stopTeamChatAutoRefresh();
+    stopDmAutoRefresh();
+  }
 });
-window.addEventListener('pageshow',()=>scheduleTeamChatAutoRefresh(500));
+window.addEventListener('pageshow',()=>{
+  scheduleTeamChatAutoRefresh(500);
+  scheduleDmAutoRefresh(500);
+});
 
 
-let socialNotifyTimer=null,lastFriendRequestIds=new Set(),dmTarget=null,dmRefreshTimer=null;
+let socialNotifyTimer=null,lastFriendRequestIds=new Set(),dmTarget=null,dmRefreshTimer=null,dmLastFingerprint='';
 
 function ensureSocialToast(){
   let t=document.getElementById('social-toast');
@@ -4159,22 +4179,41 @@ function ensureDMModal(){
   m.innerHTML=`<div class="dm-box"><div class="dm-head"><div id="dm-avatar-wrap"></div><div class="dm-head-main"><div id="dm-name" class="dm-head-name">Message</div><div class="dm-head-meta">Conversation privée · amis uniquement</div></div><button class="dm-close" onclick="closeDirectMessage()">Fermer</button></div><div id="dm-messages" class="dm-messages"></div><div class="dm-compose"><input id="dm-input" maxlength="500" placeholder="Écrire un message…" onkeydown="if(event.key==='Enter')sendDirectMessage()"><button class="btn-action" onclick="sendDirectMessage()">Envoyer</button></div></div>`;
   m.onclick=e=>{if(e.target===m)closeDirectMessage()};document.body.appendChild(m);return m;
 }
+function dmIsVisible(){
+  return !!(dmTarget&&document.visibilityState==='visible'&&document.getElementById('dm-overlay')?.classList.contains('show'));
+}
+function stopDmAutoRefresh(){
+  if(dmRefreshTimer){clearTimeout(dmRefreshTimer);dmRefreshTimer=null}
+}
+function scheduleDmAutoRefresh(delay=3000){
+  stopDmAutoRefresh();
+  if(!dmIsVisible())return;
+  dmRefreshTimer=setTimeout(async()=>{
+    if(dmIsVisible())await loadDirectMessages({silent:true,preserveScroll:true});
+    scheduleDmAutoRefresh(3000);
+  },delay);
+}
 async function openDirectMessage(userId,username,avatar){
-  dmTarget={userId,username,avatar};const m=ensureDMModal();
+  dmTarget={userId,username,avatar};dmLastFingerprint='';const m=ensureDMModal();
   document.getElementById('dm-name').textContent=username||'Chasseur';
   document.getElementById('dm-avatar-wrap').innerHTML=socialAvatarHTML({username,avatar});
-  m.classList.add('show');await loadDirectMessages();
-  if(dmRefreshTimer)clearInterval(dmRefreshTimer);dmRefreshTimer=setInterval(loadDirectMessages,5000);
+  m.classList.add('show');await loadDirectMessages();scheduleDmAutoRefresh(1200);
 }
 function closeDirectMessage(){
-  document.getElementById('dm-overlay')?.classList.remove('show');if(dmRefreshTimer)clearInterval(dmRefreshTimer);dmRefreshTimer=null;dmTarget=null;refreshSocialNotifications(false)
+  document.getElementById('dm-overlay')?.classList.remove('show');stopDmAutoRefresh();dmRefreshTimer=null;dmTarget=null;dmLastFingerprint='';refreshSocialNotifications(false)
 }
-async function loadDirectMessages(){
+async function loadDirectMessages(opts={}){
   if(!dmTarget)return;const box=document.getElementById('dm-messages');if(!box)return;
   const {data,error}=await sb.rpc('social_direct_chat',{p_target:dmTarget.userId,p_limit:120});
-  if(error){box.innerHTML=`<div class="v1331-error">⚠️ Messages privés indisponibles : ${socialEsc(error.message||'Erreur Supabase')}</div>`;return}
-  box.innerHTML=(data||[]).map(m=>`<div class="dm-row ${m.sender_id===cloudUser.id?'me':''}"><div class="dm-bubble">${socialEsc(m.message)}<div class="dm-time">${new Date(m.created_at).toLocaleString('fr-FR')}</div></div></div>`).join('')||'<div class="community-empty">Commence la conversation 👋</div>';
-  box.scrollTop=box.scrollHeight;refreshSocialNotifications(false);
+  if(error){if(!opts.silent)box.innerHTML=`<div class="v1331-error">⚠️ Messages privés indisponibles : ${socialEsc(error.message||'Erreur Supabase')}</div>`;return}
+  const rows=data||[],last=rows[rows.length-1]||{};
+  const fp=`${rows.length}|${last.created_at||''}|${last.sender_id||''}|${last.message||''}`;
+  if(fp===dmLastFingerprint&&opts.silent)return;
+  const nearBottom=(box.scrollHeight-box.scrollTop-box.clientHeight)<70;
+  dmLastFingerprint=fp;
+  box.innerHTML=rows.map(m=>`<div class="dm-row ${m.sender_id===cloudUser.id?'me':''}"><div class="dm-bubble">${socialEsc(m.message)}<div class="dm-time">${new Date(m.created_at).toLocaleString('fr-FR')}</div></div></div>`).join('')||'<div class="community-empty">Commence la conversation 👋</div>';
+  if(!opts.preserveScroll||nearBottom)box.scrollTop=box.scrollHeight;
+  refreshSocialNotifications(false);
 }
 async function sendDirectMessage(){
   if(!dmTarget)return;const input=document.getElementById('dm-input'),msg=input?.value.trim();if(!msg)return;
@@ -4182,7 +4221,7 @@ async function sendDirectMessage(){
   const {error}=await sb.rpc('social_send_direct_message',{p_target:dmTarget.userId,p_message:msg});
   input.disabled=false;
   if(error){input.value=original;showSocialToast('❌ Message non envoyé',error.message||'Erreur Supabase');return}
-  input.value='';playSound('success');await loadDirectMessages();refreshSocialNotifications(false)
+  input.value='';playSound('success');dmLastFingerprint='';await loadDirectMessages();refreshSocialNotifications(false);scheduleDmAutoRefresh(1200)
 }
 
 
