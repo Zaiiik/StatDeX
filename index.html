@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>LEVELING-APP — Powerbuilding Tracker V14.2.1</title>
+    <title>LEVELING-APP — Powerbuilding Tracker V14.2.3</title>
     <meta name="theme-color" content="#09090f">
     <meta name="application-name" content="LEVELING-APP">
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -397,7 +397,11 @@
 
 
 /* ==================== V12.4 AUTH / CLOUD ==================== */
-#app-container.auth-locked{visibility:hidden}
+/* V1423 — display:none (et non plus juste invisible) : l'appli entière n'est plus
+   calculée/affichée en arrière-plan pendant l'écran de connexion. Gros gain de fluidité
+   au moment de taper sur iPhone, car le clavier ne force plus le recalcul de toute
+   l'appli cachée derrière le formulaire. */
+#app-container.auth-locked{display:none}
 #auth-gate{position:fixed;inset:0;z-index:5000;display:flex;align-items:center;justify-content:center;padding:22px;background:radial-gradient(circle at top,rgba(189,0,255,.18),#050507 45%);color:var(--main-text);font-family:var(--font-family)}
 #auth-gate.hidden{display:none}.auth-card{width:100%;max-width:390px;background:#101015;border:1px solid #333;border-radius:18px;padding:22px;box-shadow:0 0 28px rgba(189,0,255,.25)}
 .auth-brand{text-align:center;font-weight:1000;letter-spacing:1.6px;color:var(--accent-purple);text-shadow:0 0 12px var(--glow-purple);font-size:1.2rem}.auth-title{text-align:center;margin:10px 0 5px;font-size:1rem;color:#fff;text-transform:uppercase}.auth-sub{text-align:center;color:#999;font-size:.72rem;line-height:1.45;margin-bottom:16px}
@@ -984,101 +988,50 @@ body[data-ambiance="sakura"] .ambiance-particle-layer,body[data-ambiance="sakura
 </style>
 
 
-<style id="v1358-settings-overlay">
-/* V14.0 — chaque réglage s'ouvre comme une vraie grande page */
+<style id="v1423-settings-subpage-clean">
+/* V14.2.3 — Fusion propre des anciens blocs v1358 + v1359, qui définissaient
+   des top/bottom/height contradictoires pour la sous-page Réglages et ne se
+   "départageaient" que grâce à leur ordre d'apparition dans le fichier.
+   Il n'y a plus ici qu'une seule définition par écran :
+   - ci-dessous : l'affichage par défaut (PC/tablette large, > 760px)
+   - plus bas dans le fichier, @media(max-width:760px) : le plein écran mobile,
+     seule et unique règle qui gère iPhone/Android. */
 #panel-settings .compact-setting-section.v1358-overlay{
   display:block!important;
   position:fixed!important;
   z-index:9990!important;
-  top:0!important;
+  top:58px!important;
   left:0!important;
   right:0!important;
-  bottom:0!important;
-  width:100%!important;
-  height:100dvh!important;
+  bottom:54px!important;
+  width:auto!important;
+  height:auto!important;
   margin:0!important;
   padding:0!important;
   border:0!important;
   border-radius:0!important;
-  background:#07070b!important;
-  overflow-y:auto!important;
-  overscroll-behavior:contain!important;
-}
-#panel-settings .compact-setting-section.v1358-overlay > .compact-setting-header,
-#panel-settings .compact-setting-section.v1358-overlay > .compact-setting-head{
-  display:flex!important;
-  position:sticky!important;
-  top:0!important;
-  z-index:3!important;
-  min-height:62px!important;
-  align-items:center!important;
-  padding:12px 16px!important;
-  background:rgba(7,7,11,.96)!important;
-  backdrop-filter:blur(12px)!important;
-  border-bottom:1px solid color-mix(in srgb,var(--accent-rose) 65%,#282832)!important;
-}
-#panel-settings .compact-setting-section.v1358-overlay > .compact-setting-body{
-  display:block!important;
-  padding:16px 16px 110px!important;
-  max-width:900px!important;
-  margin:0 auto!important;
-}
-.v1358-close{
-  position:sticky;
-  top:10px;
-  float:right;
-  z-index:10;
-  width:42px;
-  height:42px;
-  margin:10px 12px -52px 0;
-  border:1px solid #3a3a45;
-  border-radius:12px;
-  background:#111119;
-  color:#fff;
-  font-size:1.45rem;
-  font-weight:900;
-  cursor:pointer;
-  box-shadow:0 0 14px rgba(0,0,0,.4);
-}
-.v1358-close:active{transform:scale(.95)}
-body.v1358-settings-open{overflow:hidden!important}
-
-/* Sur téléphone, la page part sous la barre système proprement */
-@media(max-width:600px){
-  #panel-settings .compact-setting-section.v1358-overlay > .compact-setting-body{
-    padding:14px 12px 100px!important;
-  }
-}
-</style>
-
-
-<style id="v1359-settings-subpage">
-/* V14.0 — vraie sous-page intégrée à l'app, pas un mini site au milieu */
-#panel-settings .compact-setting-section.v1358-overlay{
-  top:58px!important;
-  bottom:54px!important;
-  height:auto!important;
-  left:0!important;
-  right:0!important;
-  width:auto!important;
-  padding:0!important;
   background:
     radial-gradient(circle at 50% 0,color-mix(in srgb,var(--accent-purple) 8%,transparent),transparent 35%),
     #07070b!important;
+  overflow-y:auto!important;
+  overscroll-behavior:contain!important;
 }
-
-#panel-settings .compact-setting-section.v1358-overlay > .compact-setting-body{
-  width:100%!important;
-  max-width:none!important;
-  margin:0!important;
-  padding:16px 18px 90px!important;
-  box-sizing:border-box!important;
-}
-
-/* On remplace l'ancienne flèche flottante bizarre */
-#panel-settings .compact-setting-section.v1358-overlay > .v1358-close{
+/* L'ancien en-tête interne ne sert plus de titre : remplacé par .v1359-pagebar. */
+#panel-settings .compact-setting-section.v1358-overlay > .compact-setting-header,
+#panel-settings .compact-setting-section.v1358-overlay > .compact-setting-head{
   display:none!important;
 }
+#panel-settings .compact-setting-section.v1358-overlay > .compact-setting-body{
+  display:block!important;
+  width:100%!important;
+  max-width:900px!important;
+  margin:0 auto!important;
+  padding:16px 18px 110px!important;
+  box-sizing:border-box!important;
+}
+/* L'ancienne flèche flottante ne sert plus, remplacée par .v1359-pageback */
+.v1358-close{display:none!important}
+body.v1358-settings-open{overflow:hidden!important}
 
 .v1359-pagebar{
   position:sticky;
@@ -1105,28 +1058,11 @@ body.v1358-settings-open{overflow:hidden!important}
   font-size:1.25rem;
   font-weight:900;
 }
-.v1359-pagetitle{
-  min-width:0;
-}
-.v1359-pagetitle b{
-  display:block;
-  font-size:.9rem;
-  color:#fff;
-}
-.v1359-pagetitle small{
-  display:block;
-  margin-top:2px;
-  font-size:.58rem;
-  color:#8d8d98;
-}
+.v1359-pagetitle{min-width:0}
+.v1359-pagetitle b{display:block;font-size:.9rem;color:#fff}
+.v1359-pagetitle small{display:block;margin-top:2px;font-size:.58rem;color:#8d8d98}
 
-/* Les anciens en-têtes internes ne servent plus de deuxième titre */
-#panel-settings .compact-setting-section.v1358-overlay > .compact-setting-header,
-#panel-settings .compact-setting-section.v1358-overlay > .compact-setting-head{
-  display:none!important;
-}
-
-/* Contenu vraiment large et lisible sur PC/tablette */
+/* Contenu large et lisible sur PC/tablette */
 #panel-settings .compact-setting-section.v1358-overlay .profile-card,
 #panel-settings .compact-setting-section.v1358-overlay .v11-card,
 #panel-settings .compact-setting-section.v1358-overlay .v1352-toggle,
@@ -1136,8 +1072,6 @@ body.v1358-settings-open{overflow:hidden!important}
   max-width:none!important;
   box-sizing:border-box!important;
 }
-
-/* Collections de thèmes : plus de mini bande étroite */
 #panel-settings .compact-setting-section.v1358-overlay #v134-theme-gallery{
   display:grid!important;
   grid-template-columns:repeat(auto-fit,minmax(220px,1fr))!important;
@@ -1148,21 +1082,6 @@ body.v1358-settings-open{overflow:hidden!important}
   min-width:0!important;
   width:auto!important;
   flex:none!important;
-}
-
-/* Mobile : sous-page plein écran entre header et nav */
-@media(max-width:600px){
-  #panel-settings .compact-setting-section.v1358-overlay{
-    top:58px!important;
-    bottom:calc(54px + env(safe-area-inset-bottom,0px))!important;
-  }
-  #panel-settings .compact-setting-section.v1358-overlay > .compact-setting-body{
-    padding:12px 12px 80px!important;
-  }
-  .v1359-pagebar{
-    padding:8px 12px;
-    min-height:54px;
-  }
 }
 </style>
 
@@ -1898,7 +1817,7 @@ header .hud-stat.v140-clickable:hover{
                         <span class="cloud-badge" id="cloud-live-badge">☁️ CLOUD</span>
                     </div>
                     <div id="cloud-sync-detail" style="margin-top:8px;font-size:.62rem;color:#777;text-align:center">Initialisation du cloud…</div>
-                    <div style="margin-top:5px;font-size:.58rem;color:#555;text-align:center">LEVELING-APP V14.2.1 · Social UX</div>
+                    <div style="margin-top:5px;font-size:.58rem;color:#555;text-align:center">LEVELING-APP V14.2.3 · Social UX</div>
                     <button class="btn-action" onclick="logoutLeveling()" style="border-color:#ff5555;color:#ff7777">Se déconnecter</button>
                 </div>
 
@@ -3992,7 +3911,7 @@ const sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_PUBLISHABLE_KEY,{
   auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true,storage:window.localStorage}
 });
 let cloudUser=null,cloudLicensed=false,cloudLoadedOnce=false,cloudSaveTimer=null,suppressCloudSave=false,licenseWatchTimer=null,lastLicenseStatus='UNKNOWN';
-const APP_VERSION='14.2.0';
+const APP_VERSION='14.2.3';
 const ACCOUNT_LOCAL_KEYS=['solo_leveling_user','solo_leveling_smart_refs','solo_leveling_body_hist','solo_leveling_inv','solo_leveling_block','solo_leveling_day','solo_leveling_state','solo_leveling_custom_sets','solo_leveling_history','solo_leveling_active_program','solo_leveling_program_states','solo_leveling_program_custom_sets','solo_leveling_custom_program','leveling_last_local_save','leveling_last_cloud_sync','leveling_v10'];
 function clearLevelingAccountLocalData(){
   try{ACCOUNT_LOCAL_KEYS.forEach(k=>localStorage.removeItem(k));sessionStorage.removeItem('leveling_pending_license')}catch(e){console.warn('Local account cleanup:',e)}
@@ -5875,7 +5794,8 @@ setTimeout(()=>{v1352CleanProfile();v1352AddNotificationSettings()},1000);
   const observer=new MutationObserver(()=>{
     document.querySelectorAll('#panel-settings .compact-setting-section.v1358-overlay').forEach(decorate);
   });
-  observer.observe(document.documentElement,{subtree:true,attributes:true,attributeFilter:['class'],childList:true});
+  const v1359Root=document.getElementById('panel-settings')||document.documentElement;
+  observer.observe(v1359Root,{subtree:true,attributes:true,attributeFilter:['class'],childList:true});
 
   document.addEventListener('click',()=>{
     setTimeout(()=>{
@@ -6139,8 +6059,12 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',()=>setTimeout(run,1900));
   else setTimeout(run,1900);
 
-  const obs=new MutationObserver(()=>setTimeout(run,20));
-  obs.observe(document.documentElement,{childList:true,subtree:true});
+  const obs=new MutationObserver(()=>{
+    if(obs.v1422Pending)return;
+    obs.v1422Pending=true;
+    setTimeout(()=>{obs.v1422Pending=false;run()},20);
+  });
+  obs.observe(document.getElementById('app-container')||document.documentElement,{childList:true,subtree:true});
 
   document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')setTimeout(run,80)});
 })();
@@ -6259,8 +6183,12 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',()=>setTimeout(clean,1900));
   else setTimeout(clean,1900);
 
-  const obs=new MutationObserver(()=>setTimeout(syncAccountButton,30));
-  obs.observe(document.documentElement,{childList:true,subtree:true,attributes:true,attributeFilter:['style','class']});
+  const obs=new MutationObserver(()=>{
+    if(obs.v1422Pending)return;
+    obs.v1422Pending=true;
+    setTimeout(()=>{obs.v1422Pending=false;syncAccountButton()},30);
+  });
+  obs.observe(document.getElementById('app-container')||document.documentElement,{childList:true,subtree:true,attributes:true,attributeFilter:['style','class']});
 
   document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')setTimeout(clean,100)});
 })();
@@ -6433,11 +6361,16 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
   else setTimeout(boot,2100);
 
   const obs=new MutationObserver(()=>{
-    setTimeout(syncAvatarDirect,20);
-    setTimeout(refreshValidationUI,20);
-    setTimeout(v1403PrepareSundayModal,20);
+    if(obs.v1422Pending)return;
+    obs.v1422Pending=true;
+    setTimeout(()=>{
+      obs.v1422Pending=false;
+      syncAvatarDirect();
+      refreshValidationUI();
+      v1403PrepareSundayModal();
+    },20);
   });
-  obs.observe(document.documentElement,{subtree:true,childList:true,attributes:true,attributeFilter:['style','class']});
+  obs.observe(document.getElementById('app-container')||document.documentElement,{subtree:true,childList:true,attributes:true,attributeFilter:['style','class']});
 
   document.addEventListener('visibilitychange',()=>{
     if(document.visibilityState==='visible'){
@@ -7775,7 +7708,7 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
     border:0!important;
     border-radius:0!important;
     background:#08080d!important;
-    z-index:9000!important;
+    z-index:9990!important;
     overflow:hidden!important;
     display:flex!important;
     flex-direction:column!important;
@@ -7807,7 +7740,7 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
     -webkit-overflow-scrolling:touch!important;
     overscroll-behavior-y:contain!important;
   }
-  #panel-settings .compact-setting-section.v1358-overlay > .v1358-close{display:none!important}
+  /* .v1358-close est déjà display:none!important dans la règle de base (plus besoin de le répéter ici). */
 
   /* Prevent previous page scroll position from making a newly opened tab look "stuck at the bottom". */
   .panel.active{transform:none!important}
