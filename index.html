@@ -16,6 +16,7 @@
     <meta name="mobile-web-app-capable" content="yes">
     <link rel="manifest" href="./manifest.webmanifest">
     <link rel="apple-touch-icon" href="./icon-192.png">
+    <link rel="icon" href="./icon-192.png" type="image/png">
 
     <style>
         :root {
@@ -1084,6 +1085,46 @@ header .hud-stat.v140-clickable:hover{
   }
   #app-container > header .hud-stats:first-child .hud-stat{min-width:62px!important}
   #app-container > header .hud-stats:last-child .hud-stat{min-width:42px!important}
+}
+</style>
+
+
+<style id="v15180-ios-bottom-ambiance-polish">
+/* V15.18 — iPhone bottom safe-area + ambiance light.
+   CSS uniquement côté layout ; aucune logique métier modifiée. */
+html.leveling-ios{
+  --ios-nav-content-h:58px;
+}
+
+@media (max-width:760px){
+  html.leveling-ios nav{
+    min-height:calc(var(--ios-nav-content-h) + env(safe-area-inset-bottom,0px))!important;
+    padding:6px 0 max(6px,env(safe-area-inset-bottom,0px))!important;
+    background:linear-gradient(to top,#08080d 0%,#0b0b11 62%,rgba(5,5,7,.97) 100%)!important;
+    box-shadow:0 -6px 20px rgba(0,0,0,.42)!important;
+  }
+  html.leveling-ios main{
+    padding-bottom:calc(var(--ios-nav-content-h) + 24px + env(safe-area-inset-bottom,0px))!important;
+    scroll-padding-bottom:calc(var(--ios-nav-content-h) + 24px + env(safe-area-inset-bottom,0px))!important;
+  }
+  html.leveling-ios nav .nav-item{
+    min-height:46px!important;
+    padding:3px 3px 4px!important;
+    justify-content:center!important;
+  }
+  html.leveling-ios nav .nav-icon{line-height:1!important}
+  html.leveling-ios nav .nav-text{margin-top:3px!important}
+}
+
+/* Les particules iOS sont volontairement plus légères que sur Android. */
+html.leveling-ios #ambiance-particles{z-index:8!important;opacity:.72!important}
+html.leveling-ios .amb-p{
+  opacity:.48!important;
+  will-change:auto!important;
+  filter:none!important;
+}
+html.leveling-ios .amb-p.spark{
+  box-shadow:0 0 5px var(--amb-particle)!important;
 }
 </style>
 
@@ -2342,7 +2383,6 @@ header .hud-stat.v140-clickable:hover{
             document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
             document.getElementById('panel-' + tabName).classList.add('active');
             if (btnElement) btnElement.classList.add('active');
-            if (tabName === 'settings') loadSettingsToInputs();
             if (tabName === 'profile') { updateProfileUI(); renderBodyChart(); renderHistoryUI(); if(typeof renderTodayDashboard==='function')renderTodayDashboard(); if(typeof renderGoals==='function')renderGoals(); }
             if (tabName === 'power') renderPowerHome();
         }
@@ -3960,21 +4000,30 @@ function renderAmbianceParticles(id){
  const ua=navigator.userAgent||'', platform=navigator.platform||'';
  const ios=/iPhone|iPad|iPod/i.test(ua)||(platform==='MacIntel'&&Number(navigator.maxTouchPoints||0)>1);
  let layer=document.getElementById('ambiance-particles');
- if(ios){ if(layer)layer.replaceChildren(); return; }
  if(!layer){layer=document.createElement('div');layer.id='ambiance-particles';document.body.appendChild(layer)}
- layer.innerHTML='';
+ layer.replaceChildren();
  if(id==='default'||window.matchMedia?.('(prefers-reduced-motion: reduce)').matches)return;
  const cfg={
   sakura:['emoji','🌸',15],halloween:['spark','',18],christmas:['emoji','❄',18],
   glacial:['emoji','❄',16],berserker:['spark','',20],thunder:['spark','',12],
   elite:['spark','',12],monarch:['spark','',15],shadow:['spark','',17]
  }[id]||['spark','',10];
- for(let i=0;i<cfg[2];i++){
+
+ /* iOS V15.18 : ambiance réactivée, mais charge divisée environ par 2.5.
+    Pas de MutationObserver, pas de boucle JS : uniquement animations CSS. */
+ const count=ios?Math.max(4,Math.min(8,Math.round(cfg[2]*0.42))):cfg[2];
+ for(let i=0;i<count;i++){
    const p=document.createElement('i');p.className='amb-p '+cfg[0];
    if(cfg[0]==='emoji')p.textContent=cfg[1];
-   p.style.left=(Math.random()*100)+'vw';p.style.animationDuration=(5+Math.random()*8)+'s';p.style.animationDelay=(-Math.random()*10)+'s';
-   p.style.setProperty('--drift',(-50+Math.random()*100)+'px');p.style.setProperty('--size',(10+Math.random()*11)+'px');
-   if(cfg[0]==='spark'){const z=2+Math.random()*4;p.style.width=z+'px';p.style.height=z+'px'}
+   p.style.left=(Math.random()*100)+'vw';
+   p.style.animationDuration=((ios?10:5)+Math.random()*(ios?10:8))+'s';
+   p.style.animationDelay=(-Math.random()*(ios?14:10))+'s';
+   p.style.setProperty('--drift',((ios?-28:-50)+Math.random()*(ios?56:100))+'px');
+   p.style.setProperty('--size',((ios?9:10)+Math.random()*(ios?7:11))+'px');
+   if(cfg[0]==='spark'){
+     const z=(ios?1.5:2)+Math.random()*(ios?2.5:4);
+     p.style.width=z+'px';p.style.height=z+'px';
+   }
    layer.appendChild(p)
  }
 }
@@ -4516,11 +4565,7 @@ function v135CheckRankUp(){
   if(newI>oldI){document.getElementById('v135-rankup-name').textContent=`${r.icon} ${r.name}`;document.getElementById('v135-rankup').classList.add('show');try{playSound('success')}catch(e){}}
   localStorage.setItem(key,r.name);
 }
-function v135ApplyRankSystems(){
-  try{
-    hunterRanks.splice(0,hunterRanks.length,...V135_XP_RANKS.map(r=>[`${r.icon} ${r.name}`,r.min]));
-  }catch(e){console.warn('V13.5 ranks',e)}
-}
+function v135ApplyRankSystems(){ /* V15.18: ancien tableau hunterRanks supprimé ; moteur XP V15 canonique. */ }
 function v135ProfileNav(){
   const panel=document.getElementById('panel-profile');if(!panel||document.getElementById('v135-profile-nav'))return;
   const nav=document.createElement('div');nav.id='v135-profile-nav';nav.className='v135-profile-nav';
