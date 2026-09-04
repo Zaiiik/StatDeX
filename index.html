@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>LEVELING-APP — Powerbuilding Tracker V14.2.3</title>
+    <title>LEVELING-APP — Powerbuilding Tracker V14.3.0</title>
     <meta name="theme-color" content="#09090f">
     <meta name="application-name" content="LEVELING-APP">
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -1817,7 +1817,7 @@ header .hud-stat.v140-clickable:hover{
                         <span class="cloud-badge" id="cloud-live-badge">☁️ CLOUD</span>
                     </div>
                     <div id="cloud-sync-detail" style="margin-top:8px;font-size:.62rem;color:#777;text-align:center">Initialisation du cloud…</div>
-                    <div style="margin-top:5px;font-size:.58rem;color:#555;text-align:center">LEVELING-APP V14.2.3 · Social UX</div>
+                    <div style="margin-top:5px;font-size:.58rem;color:#555;text-align:center">LEVELING-APP V14.3.0 · Stable</div>
                     <button class="btn-action" onclick="logoutLeveling()" style="border-color:#ff5555;color:#ff7777">Se déconnecter</button>
                 </div>
 
@@ -3911,7 +3911,7 @@ const sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_PUBLISHABLE_KEY,{
   auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true,storage:window.localStorage}
 });
 let cloudUser=null,cloudLicensed=false,cloudLoadedOnce=false,cloudSaveTimer=null,suppressCloudSave=false,licenseWatchTimer=null,lastLicenseStatus='UNKNOWN';
-const APP_VERSION='14.2.3';
+const APP_VERSION='14.3.0';
 const ACCOUNT_LOCAL_KEYS=['solo_leveling_user','solo_leveling_smart_refs','solo_leveling_body_hist','solo_leveling_inv','solo_leveling_block','solo_leveling_day','solo_leveling_state','solo_leveling_custom_sets','solo_leveling_history','solo_leveling_active_program','solo_leveling_program_states','solo_leveling_program_custom_sets','solo_leveling_custom_program','leveling_last_local_save','leveling_last_cloud_sync','leveling_v10'];
 function clearLevelingAccountLocalData(){
   try{ACCOUNT_LOCAL_KEYS.forEach(k=>localStorage.removeItem(k));sessionStorage.removeItem('leveling_pending_license')}catch(e){console.warn('Local account cleanup:',e)}
@@ -4043,7 +4043,7 @@ async function loadCloudData(){
   if(!cloudUser||!cloudLicensed)return;
   lastCloudSyncAt=parseInt(localStorage.getItem('leveling_last_cloud_sync')||'0')||0;setCloudStatus(navigator.onLine?'syncing':'offline');
   const {data,error}=await sb.from('profiles').select('app_data,username').eq('id',cloudUser.id).single();
-  if(!error&&data){if(data.username&&!userData.playerName)userData.playerName=data.username;if(data.app_data&&Object.keys(data.app_data).length)importAppData(data.app_data);else await saveCloudData()}
+  if(!error&&data){if(data.username&&!userData.playerName)userData.playerName=data.username;if(data.app_data&&Object.keys(data.app_data).length){if(typeof window.v1430ImportAppData==='function')window.v1430ImportAppData(data.app_data);else importAppData(data.app_data)}else await saveCloudData()}
   else if(error)console.warn('Cloud load:',error.message);cloudLoadedOnce=true;
 }
 
@@ -4121,7 +4121,7 @@ async function saveCloudData(){
   if(!cloudUser||!cloudLicensed||suppressCloudSave)return;
   if(!navigator.onLine){setCloudStatus('offline');return}
   setCloudStatus('syncing');
-  const updates={app_data:exportAppData(),updated_at:new Date().toISOString()};if(userData.playerName)updates.username=userData.playerName;
+  const updates={app_data:(typeof window.v1430ExportAppData==='function'?window.v1430ExportAppData():exportAppData()),updated_at:new Date().toISOString()};if(userData.playerName)updates.username=userData.playerName;
   const {error}=await sb.from('profiles').update(updates).eq('id',cloudUser.id);
   if(error){console.warn('Cloud save:',error.message);setCloudStatus('error');return}
   lastCloudSyncAt=Date.now();localStorage.setItem('leveling_last_cloud_sync',String(lastCloudSyncAt));setCloudStatus('synced');
@@ -7872,6 +7872,239 @@ html.leveling-ios nav{-webkit-backdrop-filter:none!important;backdrop-filter:non
   const isIOS=/iPhone|iPad|iPod/i.test(ua)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);
   const isStandalone=(window.matchMedia&&window.matchMedia('(display-mode: standalone)').matches)||navigator.standalone===true;
   document.documentElement.classList.toggle('v1422-ios-needs-install', !!(isIOS && !isStandalone));
+})();
+</script>
+
+
+
+<style id="v1430-stable-ui-css">
+/* ================= V14.3.0 — STABLE SETTINGS / PROGRESSION =================
+   Réglages: plus aucune sous-page fixed/overlay. Toutes les rubriques restent
+   dans le scroll principal de l'app, donc plus de page coupée ni ouverture en bas. */
+#panel-settings{position:relative!important;overflow:visible!important;min-height:0!important}
+#panel-settings .compact-settings-head{margin:0 0 10px!important}
+#panel-settings .settings-theme-top{margin-bottom:10px!important}
+#panel-settings #v135-settings-tabs{
+  position:sticky!important;top:0!important;z-index:40!important;
+  display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;
+  gap:8px!important;margin:0 0 12px!important;padding:8px 0!important;
+  background:linear-gradient(180deg,rgba(5,5,7,.98),rgba(5,5,7,.94))!important;
+  backdrop-filter:blur(12px)!important;
+}
+#panel-settings #v135-settings-tabs button{
+  min-height:46px!important;padding:9px 7px!important;border-radius:11px!important;
+  border:1px solid #30303a!important;background:#0e0e15!important;color:#a7a7b2!important;
+  font-size:.62rem!important;font-weight:900!important;line-height:1.15!important;
+}
+#panel-settings #v135-settings-tabs button.active{
+  color:#fff!important;border-color:var(--accent-rose)!important;
+  background:linear-gradient(135deg,rgba(255,0,127,.13),rgba(189,0,255,.11))!important;
+  box-shadow:0 0 14px color-mix(in srgb,var(--accent-rose) 20%,transparent)!important;
+}
+#panel-settings.compact-ready .compact-settings-grid{display:block!important;width:100%!important;overflow:visible!important}
+#panel-settings.compact-ready .compact-setting-section{
+  display:none!important;position:relative!important;inset:auto!important;top:auto!important;right:auto!important;
+  bottom:auto!important;left:auto!important;width:100%!important;height:auto!important;min-height:0!important;
+  max-height:none!important;margin:0!important;padding:0!important;border:1px solid #292934!important;
+  border-radius:13px!important;background:#0d0d13!important;overflow:visible!important;transform:none!important;
+}
+#panel-settings.compact-ready .compact-setting-section.v135-selected{
+  display:block!important;
+}
+#panel-settings .compact-setting-section.v1358-overlay{
+  position:relative!important;inset:auto!important;top:auto!important;right:auto!important;bottom:auto!important;left:auto!important;
+  width:100%!important;height:auto!important;min-height:0!important;max-height:none!important;z-index:auto!important;
+  overflow:visible!important;display:block!important;transform:none!important;
+}
+#panel-settings .compact-setting-section.v135-selected>.compact-setting-body,
+#panel-settings .compact-setting-section.v1358-overlay>.compact-setting-body{
+  display:block!important;position:relative!important;width:100%!important;height:auto!important;max-height:none!important;
+  overflow:visible!important;padding:10px!important;margin:0!important;
+}
+#panel-settings .v1358-close,#panel-settings .v1359-pagebar{display:none!important}
+body.v1358-settings-open{overflow:hidden!important}
+#panel-settings .profile-card,#panel-settings .v11-card{width:100%!important;max-width:none!important}
+#panel-settings .v1355-backup-note{line-height:1.45!important}
+@media(max-width:420px){
+  #panel-settings #v135-settings-tabs{gap:6px!important}
+  #panel-settings #v135-settings-tabs button{font-size:.57rem!important;padding:8px 5px!important}
+}
+</style>
+
+<script id="v1430-stable-core-js">
+(function(){
+  const VERSION='14.3.0';
+  const q=s=>document.querySelector(s);
+  const qa=s=>[...document.querySelectorAll(s)];
+  const localDay=(d=new Date())=>`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+
+  /* ---------- 1. RANG POWER : UNE SEULE SOURCE ---------- */
+  const POWER_RANKS=[
+    {name:'RECRUE',icon:'🌱',min:0,color:'#aaaaaa'},
+    {name:'APPRENTI',icon:'🛡️',min:250,color:'#00ff66'},
+    {name:'INTERMÉDIAIRE',icon:'⚔️',min:350,color:'#bd00ff'},
+    {name:'AVANCÉ',icon:'💎',min:425,color:'#00d2ff'},
+    {name:'ÉLITE',icon:'⚡',min:500,color:'#ffea00'},
+    {name:'LÉGENDE',icon:'🔥',min:535,color:'#ff5b6e'},
+    {name:'MONARQUE',icon:'👑',min:569,color:'#ffcc33'}
+  ];
+  function unifiedPowerRank(total){
+    total=Number(total||0);let r=POWER_RANKS[0];for(const x of POWER_RANKS)if(total>=x.min)r=x;return r;
+  }
+  window.getUnifiedPowerRankV1430=unifiedPowerRank;
+  /* Toutes les anciennes zones qui demandaient getSBDRank récupèrent désormais le même rang. */
+  try{window.getSBDRank=function(total){return unifiedPowerRank(total)}}catch(e){}
+  try{getSBDRank=function(total){return unifiedPowerRank(total)}}catch(e){}
+  /* L'ancienne "Vitrine des rangs" ratio/PDC était la cause INTERMÉDIAIRE vs AVANCÉ. */
+  window.openRankShowcaseModal=function(){
+    try{q('#modal-rank-showcase')?.style.setProperty('display','none') }catch(e){}
+    if(typeof window.v135OpenPower==='function') return window.v135OpenPower();
+    if(typeof v135OpenPower==='function') return v135OpenPower();
+  };
+
+  function refreshRanks(){
+    const total=Number(window.userData?.squat||0)+Number(window.userData?.bench||0)+Number(window.userData?.deadlift||0);
+    const r=unifiedPowerRank(total);
+    const legacy=q('#rank-name');if(legacy){legacy.textContent=`${r.icon} ${r.name}`;legacy.style.color=r.color}
+    const pv=q('#profile-v2-rank');if(pv)pv.textContent=`${r.icon} ${r.name}`;
+    try{if(typeof window.v135RenderRankHub==='function')window.v135RenderRankHub()}catch(e){}
+  }
+
+  /* ---------- 2. RÉGLAGES : PAS D'OVERLAY, PAS DE SCROLL ALÉATOIRE ---------- */
+  function sectionLabel(sec){return (sec?.querySelector('.compact-setting-title')?.textContent||sec?.textContent||'').toLowerCase()}
+  function findSettingSection(label){
+    const sections=qa('#panel-settings .compact-setting-section');
+    const s=String(label||'').toLowerCase();
+    if(s.includes('profil'))return sections.find(x=>/mon profil|compte & profil/i.test(sectionLabel(x)));
+    if(s.includes('ambiance'))return sections.find(x=>/ambiance/i.test(sectionLabel(x)));
+    if(s.includes('affichage'))return sections.find(x=>/affichage/i.test(sectionLabel(x)));
+    if(s.includes('notification'))return q('#v1352-notifications')||sections.find(x=>/notification/i.test(sectionLabel(x)));
+    return null;
+  }
+  function selectSetting(sec,btn){
+    const panel=q('#panel-settings'),main=q('#app-container > main');if(!panel||!sec)return;
+    qa('#panel-settings .compact-setting-section').forEach(x=>{
+      x.classList.remove('v1358-overlay','open','v135-selected');
+      x.style.removeProperty('display');x.style.removeProperty('top');x.style.removeProperty('bottom');x.style.removeProperty('height');
+      x.querySelector(':scope > .v1358-close')?.remove();
+    });
+    document.body.classList.remove('v1358-settings-open');
+    sec.classList.add('v135-selected');
+    qa('#v135-settings-tabs button').forEach(x=>x.classList.toggle('active',x===btn));
+    if(main){try{main.scrollTo({top:0,left:0,behavior:'auto'})}catch(e){main.scrollTop=0}}
+    sec.scrollTop=0;const body=sec.querySelector(':scope > .compact-setting-body');if(body)body.scrollTop=0;
+  }
+  function stabilizeSettings(){
+    const panel=q('#panel-settings');if(!panel)return;
+    try{if(typeof window.v1358CloseSettingsPage==='function')window.v1358CloseSettingsPage()}catch(e){}
+    document.body.classList.remove('v1358-settings-open');
+    qa('#panel-settings .compact-setting-section').forEach(x=>{
+      x.classList.remove('v1358-overlay','open');x.querySelector(':scope > .v1358-close')?.remove();
+    });
+    const tabs=q('#v135-settings-tabs');if(!tabs)return;
+    const old=[...tabs.querySelectorAll('button')];
+    if(!old.length)return;
+    old.forEach((btn,i)=>{
+      if(btn.dataset.v1430==='1')return;
+      const clone=btn.cloneNode(true);clone.dataset.v1430='1';clone.removeAttribute('onclick');
+      clone.onclick=(e)=>{
+        e.preventDefault();e.stopPropagation();
+        try{if(typeof playSound==='function')playSound('click')}catch(_){}
+        const sec=findSettingSection(clone.textContent);
+        selectSetting(sec,clone);
+      };
+      btn.replaceWith(clone);
+    });
+    const buttons=[...tabs.querySelectorAll('button')];
+    let selected=q('#panel-settings .compact-setting-section.v135-selected');
+    if(!selected){selected=findSettingSection(buttons[0]?.textContent);if(selected)selected.classList.add('v135-selected')}
+    buttons.forEach(b=>b.classList.toggle('active',findSettingSection(b.textContent)===selected));
+  }
+  window.v1430StabilizeSettings=stabilizeSettings;
+  window.v1358CloseSettingsPage=function(){
+    qa('#panel-settings .compact-setting-section').forEach(x=>{x.classList.remove('v1358-overlay','open');x.querySelector(':scope > .v1358-close')?.remove()});
+    document.body.classList.remove('v1358-settings-open');
+  };
+
+  /* ---------- 3. STREAK + QUÊTES : SYNCHRO ET MIGRATION ---------- */
+  function loadRpg(){try{return JSON.parse(localStorage.getItem('leveling_v140_rpg')||'{}')||{}}catch(e){return {}}}
+  function saveRpg(s){try{localStorage.setItem('leveling_v140_rpg',JSON.stringify(s))}catch(e){}}
+  function normalizeDate(v){
+    if(!v)return null;const m=String(v).match(/(20\d{2})[-\/]([01]\d)[-\/]([0-3]\d)/);if(m)return `${m[1]}-${m[2]}-${m[3]}`;
+    const d=new Date(v);return Number.isNaN(d.getTime())?null:localDay(d);
+  }
+  function currentStreak(days){
+    const set=new Set(days),d=new Date();let n=0,started=false;
+    for(let i=0;i<366;i++){const k=localDay(d);if(set.has(k)){n++;started=true}else if(started)break;d.setDate(d.getDate()-1)}return n;
+  }
+  function syncProgressionState(){
+    const s=loadRpg();s.trainingDays=Array.isArray(s.trainingDays)?s.trainingDays:[];
+    const merged=new Set(s.trainingDays.map(normalizeDate).filter(Boolean));
+    try{
+      const v=typeof window.__levelingV10Export==='function'?window.__levelingV10Export():null;
+      (v?.sessions||[]).forEach(x=>{const d=normalizeDate(x?.date);if(d)merged.add(d)});
+      /* Si la séance courante est validée, aujourd'hui doit forcément compter dans le streak. */
+      const key=`leveling_validated_${window.activeProgramKey??activeProgramKey}_${window.currentBlockIndex??currentBlockIndex}_${window.currentDayIndex??currentDayIndex}`;
+      if(localStorage.getItem(key)==='1')merged.add(localDay());
+      const streak=currentStreak([...merged]);
+      if(v){v.streak=streak;if(typeof window.__levelingV10Import==='function')window.__levelingV10Import(v)}
+      const el=q('#v10-streak');if(el)el.textContent=`${streak} 🔥`;
+    }catch(e){}
+    try{(window.workoutHistory||workoutHistory||[]).forEach(x=>{const d=normalizeDate(x?.date);if(d)merged.add(d)})}catch(e){}
+    s.trainingDays=[...merged].sort();saveRpg(s);
+    try{if(typeof window.v1412RenderSmartQuests==='function')window.v1412RenderSmartQuests()}catch(e){}
+    return currentStreak(s.trainingDays);
+  }
+  window.v1430SyncProgressionState=syncProgressionState;
+
+  /* ---------- 4. CLOUD : RPG, STREAK, QUÊTES ET VALIDATIONS DANS LE BACKUP ---------- */
+  function validatedSnapshot(){
+    const o={};try{for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(k?.startsWith('leveling_validated_')&&localStorage.getItem(k)==='1')o[k]='1'}}catch(e){}return o;
+  }
+  function restoreValidated(o){
+    if(!o||typeof o!=='object')return;try{Object.entries(o).forEach(([k,v])=>{if(k.startsWith('leveling_validated_')&&v==='1')localStorage.setItem(k,'1')})}catch(e){}
+  }
+  const baseExport=typeof window.exportAppData==='function'?window.exportAppData:null;
+  window.v1430ExportAppData=function(){
+    const d=baseExport?baseExport():{};d.version=VERSION;
+    d.v140Rpg=loadRpg();d.validatedSessions=validatedSnapshot();
+    try{d.v10=typeof window.__levelingV10Export==='function'?window.__levelingV10Export():d.v10}catch(e){}
+    return d;
+  };
+  try{window.exportAppData=window.v1430ExportAppData}catch(e){}
+  const baseImport=typeof window.importAppData==='function'?window.importAppData:null;
+  window.v1430ImportAppData=function(d){
+    const r=baseImport?baseImport(d):undefined;
+    if(d?.v140Rpg)saveRpg(d.v140Rpg);if(d?.validatedSessions)restoreValidated(d.validatedSessions);
+    setTimeout(()=>{syncProgressionState();refreshRanks();},0);return r;
+  };
+  try{window.importAppData=window.v1430ImportAppData}catch(e){}
+
+  /* ---------- 5. HOOKS ---------- */
+  const prevSwitch=window.switchTab;
+  if(typeof prevSwitch==='function'&&!prevSwitch.v1430){
+    window.switchTab=function(tab,btn){
+      const r=prevSwitch.apply(this,arguments);
+      if(tab==='settings')setTimeout(()=>{stabilizeSettings();const m=q('#app-container > main');if(m)m.scrollTop=0},90);
+      if(tab==='profile')setTimeout(()=>{refreshRanks();syncProgressionState()},60);
+      return r;
+    };window.switchTab.v1430=1;
+  }
+  const prevUpdate=window.updateProfileUI;
+  if(typeof prevUpdate==='function'&&!prevUpdate.v1430){
+    window.updateProfileUI=function(){const r=prevUpdate.apply(this,arguments);setTimeout(()=>{refreshRanks();syncProgressionState()},20);return r};window.updateProfileUI.v1430=1;
+  }
+  const prevFinish=window.finishWorkoutFinal;
+  if(typeof prevFinish==='function'&&!prevFinish.v1430){
+    window.finishWorkoutFinal=function(){const r=prevFinish.apply(this,arguments);setTimeout(()=>{syncProgressionState();refreshRanks();if(typeof window.scheduleCloudSaveImmediate==='function')window.scheduleCloudSaveImmediate()},160);return r};window.finishWorkoutFinal.v1430=1;
+  }
+
+  function boot(){stabilizeSettings();refreshRanks();syncProgressionState()}
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',()=>{setTimeout(boot,2400);setTimeout(boot,3400)});
+  else {setTimeout(boot,700);setTimeout(boot,1800)}
+  const obs=new MutationObserver(()=>{clearTimeout(obs.t);obs.t=setTimeout(()=>{const tabs=q('#v135-settings-tabs');if(tabs&&[...tabs.querySelectorAll('button')].some(b=>b.dataset.v1430!=='1'))stabilizeSettings()},40)});
+  const root=q('#panel-settings');if(root)obs.observe(root,{subtree:true,childList:true});
+  document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')setTimeout(boot,120)});
 })();
 </script>
 
