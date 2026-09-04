@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>LEVELING-APP — Powerbuilding Tracker V15.6.2 BOOT STATE RECOVERY</title>
+    <title>LEVELING-APP — Powerbuilding Tracker V15.6.3 SETTINGS CONTROLLER CLEAN</title>
     <meta name="theme-color" content="#09090f">
     <meta name="application-name" content="LEVELING-APP">
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -726,19 +726,6 @@ header{padding-top:max(8px,env(safe-area-inset-top,0px))}
 #panel-settings.compact-ready .compact-settings-grid{grid-template-columns:1fr!important}
 #panel-settings.compact-ready .compact-setting-section{display:none}
 #panel-settings.compact-ready .compact-setting-section.v135-selected{display:block}
-.v135-settings-tabs{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin:10px 0}
-.v135-settings-tabs button{padding:8px 4px;min-height:44px;font-size:.54rem}
-.v135-settings-tabs button.active{border-color:var(--accent-rose);color:#fff;box-shadow:0 0 10px rgba(255,0,127,.16)}
-#v134-theme-gallery{display:flex!important;overflow-x:auto!important;scroll-snap-type:x mandatory;gap:10px!important;padding-bottom:8px}
-#v134-theme-gallery>*{flex:0 0 min(82vw,300px);scroll-snap-align:center}
-body[data-ambiance="sakura"] .ambiance-particle-layer,body[data-ambiance="sakura"] #ambiance-particles{z-index:0!important;pointer-events:none!important;opacity:.58}
-@media(max-width:480px){
-  .v135-rank-hub{grid-template-columns:1fr}
-  .v135-settings-tabs{grid-template-columns:repeat(2,1fr)}
-  .v10-timer,.rest-timer{max-width:100%;overflow:hidden}
-  .v10-preset{padding-left:6px!important;padding-right:6px!important}
-}
-@media(max-width:360px){.v135-rank-card{padding:10px}.v135-settings-tabs button{font-size:.5rem}}
 @media(prefers-reduced-motion:reduce){.v135-rankup{animation:none!important}}
 
 
@@ -1147,6 +1134,27 @@ header .hud-stat.v140-clickable:hover{
   .v1409-stats{gap:5px}
 }
 </style>
+
+<style id="v1563-settings-controller-clean-css">
+/* V15.6.3 — un seul contrôleur Réglages */
+#panel-settings.v151-ready > #v135-settings-tabs,
+#panel-settings.v151-ready > .v135-settings-tabs,
+#panel-settings.v151-ready > #v15-settings-tabs,
+#panel-settings.v151-ready > #v1504-settings-pagebar{display:none!important}
+#panel-settings.v151-ready:not(.v151-page-open) > .compact-setting-section{display:none!important}
+#panel-settings.v151-ready:not(.v151-page-open) > #v151-settings-pagebar{display:none!important}
+#panel-settings.v151-ready.v151-page-open > #v151-settings-pagebar{display:flex!important}
+#panel-settings.v151-ready.v151-page-open > .compact-setting-section:not(.v151-active){display:none!important}
+#panel-settings.v151-ready.v151-page-open > .compact-setting-section.v151-active{display:block!important}
+#panel-settings .v1563-settings-sep{
+  margin:13px 0 8px!important;padding-top:10px!important;
+  border-top:1px solid #292934!important;color:var(--accent-rose)!important;
+  font-size:.58rem!important;font-weight:1000!important;letter-spacing:.06em!important;
+}
+/* Aucun contenu Ambiance ne doit flotter sur l'accueil. */
+#v134-theme-collection{max-width:100%;min-width:0}
+</style>
+
 </head>
 <body data-theme="purple">
 
@@ -1454,7 +1462,7 @@ header .hud-stat.v140-clickable:hover{
                         <span class="cloud-badge" id="cloud-live-badge">☁️ CLOUD</span>
                     </div>
                     <div id="cloud-sync-detail" style="margin-top:8px;font-size:.62rem;color:#777;text-align:center">Initialisation du cloud…</div>
-                    <div style="margin-top:5px;font-size:.58rem;color:#555;text-align:center">LEVELING-APP V15.6.2 · Stable</div>
+                    <div style="margin-top:5px;font-size:.58rem;color:#555;text-align:center">LEVELING-APP V15.6.3 · Stable</div>
                     <button class="btn-action" onclick="logoutLeveling()" style="border-color:#ff5555;color:#ff7777">Se déconnecter</button>
                 </div>
 
@@ -1729,7 +1737,7 @@ header .hud-stat.v140-clickable:hover{
             autoProgression: true
         };
 
-        /* V15.6.2 — CANONICAL USER STATE BRIDGE
+        /* V15.6.3 — CANONICAL USER STATE BRIDGE
            `userData` est déclaré avec `let`, donc il n'est pas automatiquement disponible
            via `window.userData`. Plusieurs anciens modules lisaient pourtant window.userData,
            ce qui produisait 0 kg / RECRUE malgré des données correctes.
@@ -4536,28 +4544,10 @@ function v135ProfileNav(){
   const h=panel.querySelector('h2');if(h)h.after(nav);
 }
 function v135Settings(){
-  const panel=document.getElementById('panel-settings');if(!panel)return;
-  if(typeof initCompactSettings==='function')initCompactSettings();
-  if(document.getElementById('v135-settings-tabs'))return;
-  const sections=[...panel.querySelectorAll('.compact-setting-section')];
-  if(!sections.length)return;
-  const account=sections.find(x=>x.textContent.includes('Compte & profil'));
-  const progression=sections.find(x=>x.textContent.includes('Progression'));
-  const ambiance=sections.find(x=>x.textContent.includes('Ambiance'));
-  const save=sections.find(x=>x.textContent.includes('Sauvegarde'));
-  const display=sections.find(x=>x.textContent.includes('Affichage'));
-  if(account){
-    const title=account.querySelector('.compact-setting-title');if(title)title.textContent='👤 Mon profil';
-    if(progression){
-      const body=account.querySelector('.compact-setting-body'),pbody=progression.querySelector('.compact-setting-body');
-      if(body&&pbody){const sep=document.createElement('div');sep.className='v10-muted';sep.style.cssText='margin:12px 0 7px;font-weight:900';sep.textContent='PERFORMANCES & PROGRESSION';body.appendChild(sep);while(pbody.firstChild)body.appendChild(pbody.firstChild)}
-      progression.remove();
-    }
-  }
-  const tabs=document.createElement('div');tabs.id='v135-settings-tabs';tabs.className='v135-settings-tabs';
-  const cfg=[['👤 Mon profil',account],['✨ Ambiance',ambiance],['💾 Sauvegarde',save],['📱 Affichage',display]].filter(x=>x[1]);
-  cfg.forEach(([label,sec],i)=>{sec.classList.toggle('v135-selected',i===0);const b=document.createElement('button');b.textContent=label;b.className=i===0?'active':'';b.onclick=()=>{cfg.forEach(x=>x[1].classList.remove('v135-selected'));sec.classList.add('v135-selected');tabs.querySelectorAll('button').forEach(x=>x.classList.remove('active'));b.classList.add('active')};tabs.appendChild(b)});
-  const palette=panel.querySelector('.settings-theme-palette');(palette||panel.querySelector('.compact-settings-head'))?.after(tabs);
+  /* V15.6.3: ancien contrôleur Réglages supprimé.
+     On conserve seulement la transformation source nécessaire au DOM moderne. */
+  try{if(typeof initCompactSettings==='function')initCompactSettings()}catch(e){}
+  return false;
 }
 const __v135UpdateProfile=window.updateProfileUI;
 if(typeof __v135UpdateProfile==='function')window.updateProfileUI=function(){const r=__v135UpdateProfile.apply(this,arguments);setTimeout(()=>{v135RenderRankHub();v135CheckRankUp()},0);return r};
@@ -6718,7 +6708,7 @@ html.leveling-ios nav{-webkit-backdrop-filter:none!important;backdrop-filter:non
 
 
 <style id="v1430-stable-ui-css">
-/* ================= V15.6.2 — STABLE SETTINGS / PROGRESSION =================
+/* ================= V15.6.3 — STABLE SETTINGS / PROGRESSION =================
    Réglages: plus aucune sous-page fixed/overlay. Toutes les rubriques restent
    dans le scroll principal de l'app, donc plus de page coupée ni ouverture en bas. */
 #panel-settings{position:relative!important;overflow:visible!important;min-height:0!important}
@@ -6773,7 +6763,7 @@ body.v1358-settings-open{overflow:hidden!important}
 
 <script id="v1430-stable-core-js">
 (function(){
-  const VERSION='15.6.2';
+  const VERSION='15.6.3';
   const q=s=>document.querySelector(s);
   const qa=s=>[...document.querySelectorAll(s)];
   const localDay=(d=new Date())=>`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
@@ -6920,7 +6910,7 @@ body.v1358-settings-open{overflow:hidden!important}
         if(typeof renderProfileV2==='function'&&document.getElementById('profile-v2-modal')?.classList.contains('show'))renderProfileV2();
         if(typeof window.renderPowerRankLive==='function')window.renderPowerRankLive();
         if(typeof render==='function')render();
-      }catch(e){console.warn('V15.6.2 SBD UI refresh',e)}
+      }catch(e){console.warn('V15.6.3 SBD UI refresh',e)}
       syncProgressionState();refreshRanks();
     },0);
     return r;
@@ -6976,7 +6966,7 @@ body.v1358-settings-open{overflow:hidden!important}
 
 
 <style id="v1440-power-rank-clean-css">
-/* V15.6.2 — RANG POWER PROPRE
+/* V15.6.3 — RANG POWER PROPRE
    Une seule logique: total Squat + Bench + Deadlift en KG.
    Une identité visuelle distincte par rang. */
 
@@ -7183,7 +7173,7 @@ body.v1358-settings-open{overflow:hidden!important}
 
 
 <style id="v1451-power-live-neon-css">
-/* V15.6.2 — les cartes visibles utilisent la même identité néon que la vitrine */
+/* V15.6.3 — les cartes visibles utilisent la même identité néon que la vitrine */
 .rank-card.v1451-live-rank{
   --rank:#ff2d55;
   --rank-rgb:255,45,85;
@@ -7333,7 +7323,7 @@ body.v1358-settings-open{overflow:hidden!important}
         mini.classList.add('v1451-live-rank-mini');
         cssVars(mini,r);
       }
-    }catch(e){console.warn('V15.6.2 live rank render',e)}
+    }catch(e){console.warn('V15.6.3 live rank render',e)}
   };
 
   /* Après toute vraie mise à jour de données/UI */
@@ -7394,7 +7384,7 @@ body.v1358-settings-open{overflow:hidden!important}
     try{
       if(typeof window.renderPowerRankLive==='function')window.renderPowerRankLive();
       if(typeof window.v135RenderRankHub==='function')window.v135RenderRankHub();
-    }catch(e){console.warn('V15.6.2 power refresh',e)}
+    }catch(e){console.warn('V15.6.3 power refresh',e)}
   }
 
   const oldLoad=window.loadFromLocalStorage;
@@ -7432,7 +7422,7 @@ body.v1358-settings-open{overflow:hidden!important}
 
 
 <style id="v1454-xp-neon-css">
-/* V15.6.2 — Rang XP : même qualité visuelle néon que le Rang Power */
+/* V15.6.3 — Rang XP : même qualité visuelle néon que le Rang Power */
 #v135-xp-modal .modal-content{
   width:min(620px,96vw)!important;
   max-width:620px!important;
@@ -7557,7 +7547,7 @@ body.v1358-settings-open{overflow:hidden!important}
           bar.style.width=pct+'%';
         }
       }
-    }catch(e){console.warn('V15.6.2 XP live',e)}
+    }catch(e){console.warn('V15.6.3 XP live',e)}
   };
 
   const oldHub=window.v135RenderRankHub;
@@ -7807,7 +7797,6 @@ body.v1358-settings-open{overflow:hidden!important}
 
   function ensureSettingsSource(){
     try{if(typeof initCompactSettings==='function')initCompactSettings()}catch(e){}
-    try{if(typeof v135Settings==='function')v135Settings()}catch(e){}
     try{if(typeof v1352AddNotificationSettings==='function')v1352AddNotificationSettings()}catch(e){}
   }
 
@@ -7823,11 +7812,29 @@ body.v1358-settings-open{overflow:hidden!important}
     if(!profile)return;
     const target=q('.compact-setting-body',profile);if(!target)return;
 
-    /* Sauvegarde rejoint Profil. On déplace seulement les enfants, jamais de modal. */
+    /* V15.6.3 : Profil devient l'unique page pour compte + progression + sauvegarde. */
+    const progression=sections.find(s=>/progression/i.test(settingLabel(s)));
+    if(progression&&progression!==profile){
+      const body=q('.compact-setting-body',progression);
+      if(body){
+        const sep=document.createElement('div');
+        sep.className='v10-muted v1563-settings-sep';
+        sep.textContent='PERFORMANCES & PROGRESSION';
+        target.appendChild(sep);
+        while(body.firstChild)target.appendChild(body.firstChild);
+      }
+      progression.remove();
+    }
     const backup=sections.find(s=>/sauvegarde/i.test(settingLabel(s)));
     if(backup&&backup!==profile){
       const body=q('.compact-setting-body',backup);
-      if(body)while(body.firstChild)target.appendChild(body.firstChild);
+      if(body){
+        const sep=document.createElement('div');
+        sep.className='v10-muted v1563-settings-sep';
+        sep.textContent='SAUVEGARDE';
+        target.appendChild(sep);
+        while(body.firstChild)target.appendChild(body.firstChild);
+      }
       backup.remove();
     }
   }
@@ -7867,6 +7874,7 @@ body.v1358-settings-open{overflow:hidden!important}
     q('#v135-settings-tabs',panel)?.remove();
     q('#v15-settings-tabs',panel)?.remove();
     q('#v1504-settings-pagebar',panel)?.remove();
+    qa('.v135-settings-tabs',panel).forEach(x=>x.remove());
     qa('.v1358-close,.v1359-pagebar',panel).forEach(x=>x.remove());
     qa('.compact-setting-section',panel).forEach(s=>{
       s.classList.remove('v1358-overlay','v135-selected','open','v15-active-setting','v151-active');
@@ -7874,6 +7882,13 @@ body.v1358-settings-open{overflow:hidden!important}
         .forEach(p=>s.style.removeProperty(p));
     });
     document.body.classList.remove('v1358-settings-open');
+
+    /* Collection de thèmes : propriétaire unique = page Ambiance. */
+    const ambiance=findSettingSection('ambiance',panel);
+    const ambianceBody=ambiance&&q('.compact-setting-body',ambiance);
+    const themes=q('#v134-theme-collection');
+    if(ambianceBody&&themes&&themes.parentNode!==ambianceBody)ambianceBody.prepend(themes);
+    else if(ambianceBody&&!themes){try{window.mountThemeCollection?.(ambianceBody)}catch(e){}}
 
     let menu=q('#v151-settings-menu',panel);
     if(!menu){
@@ -8000,7 +8015,7 @@ body.v1358-settings-open{overflow:hidden!important}
 
 
 <style id="v1501-vitrines-fix-css">
-/* V15.6.2 — vitrines actuelles, ancien dashboard V10 supprimé physiquement */
+/* V15.6.3 — vitrines actuelles, ancien dashboard V10 supprimé physiquement */
 
 /* Le hub ne sert plus qu'au Rang XP en grand. Le Power garde sa vraie carte dédiée plus bas. */
 #v135-rank-hub{
@@ -8083,7 +8098,7 @@ body.v1358-settings-open{overflow:hidden!important}
       /* Rafraîchit seulement les données/visuels, sans recréer d'anciens modules. */
       try{window.renderXpRankLive?.()}catch(e){}
       try{window.renderPowerRankLive?.()}catch(e){}
-    }catch(e){console.warn('V15.6.2 vitrines',e)}
+    }catch(e){console.warn('V15.6.3 vitrines',e)}
   }
 
   window.v1501FixVitrines=fixVitrines;
@@ -8804,10 +8819,10 @@ document.addEventListener('visibilitychange',()=>{if(document.visibilityState===
 (function(){
 'use strict';
 function recover(){
-  try{loadFromLocalStorage?.()}catch(e){console.warn('V15.6.2 load local',e)}
-  try{updateProfileUI?.()}catch(e){console.warn('V15.6.2 profile',e)}
-  try{renderHistoryUI?.()}catch(e){console.warn('V15.6.2 history',e)}
-  try{initWorkoutSystem?.()}catch(e){console.warn('V15.6.2 workout',e)}
+  try{loadFromLocalStorage?.()}catch(e){console.warn('V15.6.3 load local',e)}
+  try{updateProfileUI?.()}catch(e){console.warn('V15.6.3 profile',e)}
+  try{renderHistoryUI?.()}catch(e){console.warn('V15.6.3 history',e)}
+  try{initWorkoutSystem?.()}catch(e){console.warn('V15.6.3 workout',e)}
   try{renderPowerHome?.()}catch(e){}
   try{window.v135RenderRankHub?.()}catch(e){}
   try{window.renderXpRankLive?.()}catch(e){}
@@ -8815,9 +8830,9 @@ function recover(){
   try{window.v11RenderReport?.()}catch(e){}
   try{
     if(document.getElementById('panel-settings')?.classList.contains('active')){
-      window.buildSettings?.();
+      window.v15BuildSettings?.();
     }
-  }catch(e){console.warn('V15.6.2 settings',e)}
+  }catch(e){console.warn('V15.6.3 settings',e)}
 }
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',()=>setTimeout(recover,500),{once:true});
 else setTimeout(recover,250);
