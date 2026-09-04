@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
 <!-- ============================================================
-     LEVELING-APP V16.0.3 — STABLE PATCH
+     LEVELING-APP V16.0.4 — STABLE PATCH
      Base figée après validation réelle PC + Samsung + iPhone/PWA.
 
      Release V16 :
@@ -20,7 +20,7 @@
 
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>LEVELING-APP — Powerbuilding Tracker V16.0.3 STABLE</title>
+    <title>LEVELING-APP — Powerbuilding Tracker V16.0.4 STABLE</title>
     <meta name="theme-color" content="#09090f">
     <meta name="application-name" content="LEVELING-APP">
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -2377,6 +2377,97 @@ html.leveling-ios .amb-p.spark{
             } catch (e) { console.log(e); }
         }
 
+        /* ==================== V16.0.4 PROFILE DATA SAVE FIX ====================
+           Le bouton "Sauvegarder & Recalculer Rang" appelait encore saveSettingsData()
+           alors que cette fonction avait été supprimée pendant un ancien nettoyage du
+           contrôleur Réglages. Résultat : poids / taille / body fat / SBD saisis dans
+           Réglages n'étaient plus persistés.
+
+           On restaure UNE fonction canonique de sauvegarde, sans réintroduire l'ancien
+           loadSettingsToInputs() supprimé en V15.18. Le contrôleur V15 appelle désormais
+           populateProfileMetricInputs() quand la page Profil des réglages est ouverte.
+        ========================================================================== */
+        function populateProfileMetricInputs() {
+            const put = (id, value) => {
+                const el = document.getElementById(id);
+                if (el && document.activeElement !== el) el.value = value ?? '';
+            };
+            put('set-weight', userData?.weight);
+            put('set-height', userData?.height);
+            put('set-bf', userData?.bodyFat);
+            put('set-squat', userData?.squat);
+            put('set-bench', userData?.bench);
+            put('set-deadlift', userData?.deadlift);
+
+            const block = document.getElementById('set-default-block');
+            if (block && document.activeElement !== block) block.value = String(currentBlockIndex ?? 0);
+
+            const auto = document.getElementById('setting-auto-progression');
+            if (auto) auto.checked = !!userData?.autoProgression;
+        }
+        window.populateProfileMetricInputs = populateProfileMetricInputs;
+
+        function saveSettingsData() {
+            const readPositive = (id, fallback, integer=false) => {
+                const el = document.getElementById(id);
+                const n = integer ? parseInt(el?.value, 10) : parseFloat(el?.value);
+                return Number.isFinite(n) && n > 0 ? n : Number(fallback || 0);
+            };
+            const readNonNegative = (id, fallback) => {
+                const n = parseFloat(document.getElementById(id)?.value);
+                return Number.isFinite(n) && n >= 0 ? n : Number(fallback || 0);
+            };
+
+            const oldWeight = Number(userData.weight || 0);
+            const oldBF = Number(userData.bodyFat || 0);
+
+            const newWeight = readPositive('set-weight', userData.weight);
+            const newHeight = readPositive('set-height', userData.height, true);
+            const newBF = readNonNegative('set-bf', userData.bodyFat);
+            const newSquat = readPositive('set-squat', userData.squat);
+            const newBench = readPositive('set-bench', userData.bench);
+            const newDeadlift = readPositive('set-deadlift', userData.deadlift);
+
+            userData.weight = newWeight;
+            userData.height = newHeight;
+            userData.bodyFat = newBF;
+            userData.squat = newSquat;
+            userData.bench = newBench;
+            userData.deadlift = newDeadlift;
+            userData.sbdUpdatedAt = Date.now();
+
+            if (newWeight !== oldWeight || newBF !== oldBF) {
+                if (!Array.isArray(bodyHistory)) bodyHistory = [];
+                bodyHistory.push({
+                    date: `S${bodyHistory.length + 1}`,
+                    weight: newWeight,
+                    bodyFat: newBF
+                });
+                bodyHistory = bodyHistory.slice(-120);
+            }
+
+            saveToLocalStorage();
+
+            try { if (typeof scheduleCloudSaveImmediate === 'function') scheduleCloudSaveImmediate(); } catch(e) {}
+            try { if (typeof updateResumeWorkoutBanner === 'function') updateResumeWorkoutBanner(); } catch(e) {}
+            try { updateProfileUI(); } catch(e) {}
+            try { renderBodyChart(); } catch(e) {}
+            try { initWorkoutSystem(); } catch(e) {}
+            try { if (typeof v135RenderRankHub === 'function') v135RenderRankHub(); } catch(e) {}
+            try {
+                if (typeof syncSocialProfile === 'function' && window.cloudUser && window.cloudLicensed) {
+                    Promise.resolve(syncSocialProfile()).catch(()=>{});
+                }
+            } catch(e) {}
+
+            populateProfileMetricInputs();
+            alert("Informations sauvegardées & Rang recalculé !");
+            const profileBtn = document.querySelectorAll('.nav-item')[0];
+            switchTab('profile', profileBtn);
+            return true;
+        }
+        window.saveSettingsData = saveSettingsData;
+
         function initAutoDateAndBlock() {
             const savedDay = localStorage.getItem('solo_leveling_day');
             if (savedDay !== null && !Number.isNaN(parseInt(savedDay))) {
@@ -3383,7 +3474,7 @@ const sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_PUBLISHABLE_KEY,{
   auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true,storage:window.localStorage}
 });
 let cloudUser=null,cloudLicensed=false,cloudLoadedOnce=false,cloudSaveTimer=null,suppressCloudSave=false,licenseWatchTimer=null,lastLicenseStatus='UNKNOWN';
-const APP_VERSION='16.0.3';
+const APP_VERSION='16.0.4';
 const ACCOUNT_LOCAL_KEYS=['solo_leveling_user','solo_leveling_smart_refs','solo_leveling_body_hist','solo_leveling_inv','solo_leveling_block','solo_leveling_day','solo_leveling_state','solo_leveling_custom_sets','solo_leveling_history','solo_leveling_active_program','solo_leveling_program_states','solo_leveling_program_custom_sets','solo_leveling_custom_program','leveling_last_local_save','leveling_last_cloud_sync','leveling_v10'];
 function clearLevelingAccountLocalData(){
   try{ACCOUNT_LOCAL_KEYS.forEach(k=>localStorage.removeItem(k));sessionStorage.removeItem('leveling_pending_license')}catch(e){console.warn('Local account cleanup:',e)}
@@ -5889,7 +5980,7 @@ body.v1358-settings-open{overflow:hidden!important}
    Aucun hook finishWorkoutFinal / updateProfileUI / switchTab.
    ============================================================ */
 
-const VERSION='16.0.3';
+const VERSION='16.0.4';
 const RPG_KEY='leveling_v140_rpg';
 
 function loadRpg(){try{return JSON.parse(localStorage.getItem(RPG_KEY)||'{}')||{}}catch(e){return {}}}
@@ -6920,6 +7011,9 @@ else setTimeout(boot,60);
     const title=q('#v151-settings-title b',panel),sub=q('#v151-settings-title small',panel);
     if(title)title.textContent=`${cfg?.icon||'⚙️'} ${cfg?.title||'Réglages'}`;
     if(sub)sub.textContent=cfg?.sub||'Configuration';
+    if(key==='profile'){
+      try{window.populateProfileMetricInputs?.()}catch(e){}
+    }
     scrollSettingsTop();
   }
 
@@ -6940,6 +7034,7 @@ else setTimeout(boot,60);
         .forEach(p=>s.style.removeProperty(p));
     });
     document.body.classList.remove('v1358-settings-open');
+    try{window.populateProfileMetricInputs?.()}catch(e){}
 
     /* Collection de thèmes : propriétaire unique = page Ambiance. */
     const ambiance=findSettingSection('ambiance',panel);
