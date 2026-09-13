@@ -30,7 +30,7 @@
 
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>LEVELING-APP — V17.9.4 HEADER PROFILE SQUARE</title>
+    <title>LEVELING-APP — V17.10 ADMIN COACH + ABSENCE</title>
     <meta name="theme-color" content="#09090f">
     <meta name="application-name" content="LEVELING-APP">
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -3082,6 +3082,59 @@ main{padding-bottom:calc(72px + env(safe-area-inset-bottom,0px))!important}
 }
 </style>
 
+
+<style id="v1710-auth-language-polish">
+#v1610-auth-lang{
+  position:absolute;top:14px;left:14px;z-index:8;
+  display:inline-flex;align-items:center;gap:3px;
+  padding:4px;border:1px solid rgba(173,74,255,.36);
+  border-radius:999px;background:rgba(7,6,12,.82);
+  box-shadow:0 0 20px rgba(157,0,255,.12);
+  backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)
+}
+#v1610-auth-lang .v1610-lang-btn{
+  min-width:42px!important;width:auto!important;height:32px!important;min-height:32px!important;
+  padding:0 12px!important;margin:0!important;border:0!important;border-radius:999px!important;
+  background:transparent!important;color:#777383!important;
+  font:900 .68rem/1 var(--font-family)!important;letter-spacing:.08em!important;
+  box-shadow:none!important;appearance:none!important;-webkit-appearance:none!important
+}
+#v1610-auth-lang .v1610-lang-btn.active{
+  color:#fff!important;
+  background:linear-gradient(90deg,rgba(129,0,255,.95),rgba(255,0,139,.92))!important;
+  box-shadow:0 0 14px rgba(189,0,255,.28)!important
+}
+@media(max-width:420px){
+  #v1610-auth-lang{top:11px;left:11px;padding:3px}
+  #v1610-auth-lang .v1610-lang-btn{min-width:38px!important;height:30px!important;min-height:30px!important;padding:0 10px!important;font-size:.62rem!important}
+}
+</style>
+
+
+<style id="v1710-absence-css">
+#validate-workout-container{display:grid;gap:8px}
+#v1710-absent-btn.v1710-absent-btn{
+  width:100%;min-height:42px;border-radius:10px;border:1px solid rgba(255,63,91,.48);
+  background:rgba(255,35,70,.08);color:#ff657d;font-size:.72rem;font-weight:1000;letter-spacing:.055em;
+  cursor:pointer
+}
+#v1710-absent-btn.v1710-absent-btn.active{
+  background:linear-gradient(90deg,rgba(126,10,28,.88),rgba(218,24,55,.84));
+  color:#fff;border-color:#ff536d;box-shadow:0 0 16px rgba(255,45,78,.20)
+}
+#day-tabs .day-tab.v1710-absent{
+  border-color:#ff4564!important;background:rgba(255,45,74,.14)!important;color:#ff7c90!important;
+  box-shadow:inset 0 0 0 1px rgba(255,69,100,.10),0 0 10px rgba(255,45,74,.12)!important
+}
+#day-tabs .day-tab.v1710-absent::after{
+  content:'ABS';display:block;margin-top:3px;font-size:.44rem;font-weight:1000;letter-spacing:.06em;color:#ff657d
+}
+#validate-workout-btn.v1710-absent-lock{
+  background:rgba(255,45,74,.10)!important;color:#ff657d!important;border:1px solid rgba(255,69,100,.42)!important;
+  box-shadow:none!important
+}
+</style>
+
 </head>
 <body data-theme="purple" class="auth-restoring">
 <svg id="premium-icon-sprite" width="0" height="0" aria-hidden="true" focusable="false" style="position:absolute;width:0;height:0;overflow:hidden">
@@ -5977,7 +6030,7 @@ function setAppUnlockedShell(){
   document.getElementById('app-container')?.classList.remove('auth-locked');
 }
 
-const APP_VERSION='17.3.0-AUTH-I18N-TEST';
+const APP_VERSION='17.10.0-ADMIN-COACH-ABSENCE';
 const ACCOUNT_LOCAL_KEYS=['solo_leveling_user','solo_leveling_smart_refs','solo_leveling_body_hist','solo_leveling_inv','solo_leveling_block','solo_leveling_day','solo_leveling_state','solo_leveling_custom_sets','solo_leveling_history','solo_leveling_active_program','solo_leveling_program_states','solo_leveling_program_custom_sets','solo_leveling_custom_program','leveling_last_local_save','leveling_last_cloud_sync','leveling_v10'];
 function clearLevelingAccountLocalData(){
   try{ACCOUNT_LOCAL_KEYS.forEach(k=>localStorage.removeItem(k));sessionStorage.removeItem('leveling_pending_license')}catch(e){console.warn('Local account cleanup:',e)}
@@ -10841,7 +10894,39 @@ if(status){
 window.v1612RenderSubscription();
 };
 
-window.v1648ActivateAccessKey=async function(){try{showSocialToast?.('STRIPE TEST','Les clés Lifetime réelles sont désactivées dans cette version de test.')}catch(e){}};
+window.v1648ActivateAccessKey=async function(){
+  const input=document.getElementById('v1648-access-key-input');
+  const status=document.getElementById('v1648-access-key-status');
+  const btn=document.getElementById('v1648-access-key-btn');
+  const en=lang()==='en';
+  const code=String(input?.value||'').trim().toUpperCase();
+  if(!code){if(status){status.className='v1648-key-status bad';status.textContent=en?'Enter an access key.':'Entre une clé d’accès.'}return}
+  if(btn)btn.disabled=true;
+  if(status){status.className='v1648-key-status wait';status.textContent=en?'Checking key…':'Vérification de la clé…'}
+  try{
+    if(!cloudUser)throw new Error(en?'Sign in first.':'Connecte-toi d’abord.');
+    const {data,error}=await sb.rpc('activate_access_key',{p_license_key:code});
+    if(error)throw error;
+    const plan=String(data?.plan_code||'').toUpperCase();
+    if(status){status.className='v1648-key-status ok';status.textContent=(en?'Access activated: ':'Accès activé : ')+(plan||'OK')}
+    localStorage.removeItem('leveling_trial_mode');v1630TrialAccess=false;
+    const info=await getCurrentLicenseStatus();
+    if(info?.access_state==='SUBSCRIBED'){
+      cloudLicensed=true;currentSubscriptionPlan=String(info.plan_code||data?.plan_code||'');cacheActiveLicense();
+      try{await loadCloudData?.()}catch(e){}
+      try{window.LevelingAccessV1634?.applyState?.()}catch(e){}
+      window.v1612RenderSubscription();
+      try{showSocialToast?.('ACCÈS',en?'Key activated successfully.':'Clé activée avec succès.')}catch(e){}
+    }
+  }catch(e){
+    const raw=String(e?.message||e||'');
+    let msg=en?'Invalid or unavailable key.':'Clé invalide ou indisponible.';
+    if(raw.includes('LICENSE_ALREADY_USED'))msg=en?'This key is already linked to another account.':'Cette clé est déjà liée à un autre compte.';
+    if(raw.includes('LICENSE_DISABLED'))msg=en?'This key has been disabled.':'Cette clé a été désactivée.';
+    if(raw.includes('USER_ALREADY_LICENSED'))msg=en?'This account already has an access key.':'Ce compte possède déjà une clé d’accès.';
+    if(status){status.className='v1648-key-status bad';status.textContent=msg}
+  }finally{if(btn)btn.disabled=false}
+};
 
 window.v1612ViewPlan=function(id){
 localStorage.setItem('leveling_plan_view',id);
@@ -10937,6 +11022,18 @@ ${!current?`<details class="v1612-promo">
 <div class="v1612-promo-body">
 <div class="v1612-promo-row"><input id="v1612-promo-input" placeholder="${c.promo_placeholder}" value="${promo?'MONARQUE':''}"><button type="button" onclick="v1610ApplyPromo()">${c.apply}</button></div>
 <div id="v1612-promo-status" class="v1612-promo-status ${promo?'ok':''}">${promo?c.promo_ok:c.promo_hint}</div>
+</div>
+</details>`:''}
+
+${!current?`<details class="v1648-key">
+<summary>${lang()==='fr'?'J’ai une clé d’accès':'I have an access key'}<span>${lang()==='fr'?'1 mois · 1 an · Lifetime':'1 month · 1 year · Lifetime'}</span></summary>
+<div class="v1648-key-body">
+  <p class="v1648-key-copy">${lang()==='fr'?'Entre ici une clé fournie par LEVELING-APP. Elle sera liée définitivement à ce compte.':'Enter a key provided by LEVELING-APP. It will be permanently linked to this account.'}</p>
+  <div class="v1648-key-row">
+    <input id="v1648-access-key-input" autocomplete="off" autocapitalize="characters" placeholder="LVL-XXXX-XXXX-XXXX">
+    <button id="v1648-access-key-btn" type="button" onclick="v1648ActivateAccessKey()">${lang()==='fr'?'ACTIVER':'ACTIVATE'}</button>
+  </div>
+  <div id="v1648-access-key-status" class="v1648-key-status"></div>
 </div>
 </details>`:''}
 
@@ -11134,29 +11231,52 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
   'use strict';
   const icon=(name,cls='sm')=>window.premiumIconHTML?premiumIconHTML(name,cls):'';
   const lang=()=>localStorage.getItem('leveling_language')==='en'?'en':'fr';
+  const esc=v=>String(v??'').replace(/[<>&"]/g,c=>({'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;'}[c]));
+  let broadcasts=[];
   function section(id,title,body){const d=document.createElement('div');d.id=id;d.className='compact-setting-section';d.innerHTML=`<div class="compact-setting-header"><span class="compact-setting-title">${title}</span><span class="compact-setting-arrow">›</span></div><div class="compact-setting-body">${body}</div>`;return d}
-  function patchBody(){const en=lang()==='en';return `<div class="v172-feed">
-    <div class="v172-feed-card"><div class="v172-feed-top"><span class="v172-title-icon v172-purple">${icon('note')}</span><div><div class="v172-feed-title">V17.2 · PREMIUM POLISH</div><div class="v172-feed-meta">${en?'Interface test build':'Version test interface'}</div></div></div><div class="v172-feed-list">
-      <div class="v172-feed-item">${icon('spark')}<span>${en?'Longer crystal intro with LEVELING APP forged from shards.':'Intro cristaux plus longue avec LEVELING APP forgé par les fragments.'}</span></div>
-      <div class="v172-feed-item">${icon('program')}<span>${en?'New premium icon system and cleaner navigation.':'Nouveau système d’icônes premium et navigation plus lisible.'}</span></div>
-      <div class="v172-feed-item">${icon('brain')}<span>${en?'More visual hierarchy for Coach, goals and progression.':'Hiérarchie visuelle renforcée pour le Coach, les objectifs et la progression.'}</span></div>
-    </div></div>
-    <div class="v172-feed-card"><div class="v172-feed-top"><span class="v172-title-icon v172-blue">${icon('bolt')}</span><div><div class="v172-feed-title">${en?'COMING NEXT':'PROCHAINEMENT'}</div><div class="v172-feed-meta">Roadmap</div></div></div><div class="v172-feed-list">
-      <div class="v172-feed-item">${icon('message')}<span>${en?'Cloud-synced personal developer messages.':'Messages personnels du développeur synchronisés dans le cloud.'}</span></div>
-      <div class="v172-feed-item">${icon('chart')}<span>${en?'More detailed progression cards and analytics.':'Cartes de progression et analyses encore plus détaillées.'}</span></div>
-      <div class="v172-feed-item">${icon('volume')}<span>${en?'Richer interface sound packs.':'Packs sonores d’interface plus riches.'}</span></div>
-    </div><span class="v172-feed-badge">${en?'ROADMAP ACTIVE':'ROADMAP ACTIVE'}</span></div></div>`}
-  function currentUserKey(){try{return window.supabaseClient?.auth?.getUser?localStorage.getItem('leveling_user_id')||'default':'default'}catch(e){return'default'}}
+  function cloudCards(kind){
+    const rows=broadcasts.filter(x=>x.kind===kind);
+    if(!rows.length)return '';
+    return rows.map(x=>`<div class="v172-feed-card"><div class="v172-feed-top"><span class="v172-title-icon ${kind==='developer'?'v172-pink':'v172-purple'}">${icon(kind==='developer'?'message':'note')}</span><div><div class="v172-feed-title">${esc(x.title)}</div><div class="v172-feed-meta">${new Date(x.created_at).toLocaleDateString(lang()==='en'?'en-GB':'fr-FR')}</div></div></div><div class="v172-feed-copy">${esc(x.message).replace(/\n/g,'<br>')}</div><span class="v172-feed-badge">LEVELING APP</span></div>`).join('');
+  }
+  function patchBody(){
+    const en=lang()==='en',cloud=cloudCards('patch_note');
+    return `<div class="v172-feed">${cloud||`<div class="v172-feed-card"><div class="v172-feed-copy">${en?'No new cloud patch note right now.':'Aucune nouvelle note de mise à jour pour le moment.'}</div></div>`}
+    <div class="v172-feed-card"><div class="v172-feed-top"><span class="v172-title-icon v172-blue">${icon('bolt')}</span><div><div class="v172-feed-title">${en?'CURRENT BUILD':'VERSION ACTUELLE'}</div><div class="v172-feed-meta">V17.10</div></div></div><div class="v172-feed-list">
+      <div class="v172-feed-item">${icon('program')}<span>${en?'Power days can now be marked absent without awarding XP.':'Les jours Power peuvent maintenant être marqués absents sans donner d’XP.'}</span></div>
+      <div class="v172-feed-item">${icon('message')}<span>${en?'Cloud patch notes and developer messages are active.':'Patch notes et messages développeur sont maintenant synchronisés dans le cloud.'}</span></div>
+    </div></div></div>`;
+  }
   function readLocalMessage(){try{const raw=localStorage.getItem('leveling_developer_message_v172');return raw?JSON.parse(raw):null}catch(e){return null}}
-  function developerBody(){const en=lang()==='en',m=readLocalMessage();return `<div class="v172-feed"><div class="v172-feed-card"><div class="v172-feed-top"><span class="v172-title-icon v172-pink">${icon('message')}</span><div><div class="v172-feed-title">${en?'DEVELOPER MESSAGE':'MESSAGE DU DÉVELOPPEUR'}</div><div class="v172-feed-meta">LEVELING APP</div></div></div>${m?`<div class="v172-feed-copy">${String(m.text||'').replace(/[<>&]/g,c=>({'<':'&lt;','>':'&gt;','&':'&amp;'}[c]))}</div><span class="v172-feed-badge">${m.date||''}</span>`:`<div class="v172-dev-empty">${en?'No personal message for your account right now.':'Aucun message personnel pour ton compte pour le moment.'}</div>`}</div><div class="v172-feed-card"><div class="v172-feed-copy">${en?'This screen is ready for individual messages. The production version will read messages assigned to the signed-in account from Supabase.':'Cet écran est prêt pour les messages individuels. La version production lira depuis Supabase les messages attribués au compte connecté.'}</div></div></div>`}
-  function ensure(){const panel=document.getElementById('panel-settings');if(!panel)return;let pn=document.getElementById('v172-patchnotes-settings');if(!pn){pn=section('v172-patchnotes-settings','Patch notes',patchBody());panel.appendChild(pn)}else{const b=pn.querySelector('.compact-setting-body');if(b)b.innerHTML=patchBody()}let dm=document.getElementById('v172-developer-settings');if(!dm){dm=section('v172-developer-settings',lang()==='en'?'Developer message':'Message du développeur',developerBody());panel.appendChild(dm)}else{const b=dm.querySelector('.compact-setting-body');if(b)b.innerHTML=developerBody()}}
+  function developerBody(){
+    const en=lang()==='en',cloud=cloudCards('developer'),m=readLocalMessage();
+    return `<div class="v172-feed">${cloud|| (m?`<div class="v172-feed-card"><div class="v172-feed-copy">${esc(m.text||'')}</div><span class="v172-feed-badge">${esc(m.date||'')}</span></div>`:`<div class="v172-feed-card"><div class="v172-dev-empty">${en?'No developer message for your account right now.':'Aucun message développeur pour ton compte pour le moment.'}</div></div>`)}</div>`;
+  }
+  function ensure(){
+    const panel=document.getElementById('panel-settings');if(!panel)return;
+    let pn=document.getElementById('v172-patchnotes-settings');
+    if(!pn){pn=section('v172-patchnotes-settings','Patch notes',patchBody());panel.appendChild(pn)}else{const b=pn.querySelector('.compact-setting-body');if(b)b.innerHTML=patchBody()}
+    let dm=document.getElementById('v172-developer-settings');
+    if(!dm){dm=section('v172-developer-settings',lang()==='en'?'Developer message':'Message du développeur',developerBody());panel.appendChild(dm)}else{const b=dm.querySelector('.compact-setting-body');if(b)b.innerHTML=developerBody()}
+  }
+  async function refreshCloud(){
+    try{
+      if(!window.sb||!window.cloudUser){broadcasts=[];ensure();return}
+      const {data,error}=await sb.rpc('get_my_broadcasts',{p_limit:20});
+      if(error)throw error;
+      broadcasts=Array.isArray(data)?data:[];
+    }catch(e){console.warn('Broadcasts:',e)}
+    ensure();
+  }
   window.v172EnsureNewsSections=ensure;
   window.LevelingDeveloperMessagesV172={
     setLocalMessage(text){localStorage.setItem('leveling_developer_message_v172',JSON.stringify({text:String(text||''),date:new Date().toLocaleDateString(lang()==='en'?'en-GB':'fr-FR')}));ensure()},
     clearLocalMessage(){localStorage.removeItem('leveling_developer_message_v172');ensure()},
-    refresh:ensure,currentUserKey
+    refresh(){ensure();refreshCloud()},refreshCloud
   };
-  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',ensure,{once:true});else ensure();
+  window.addEventListener('leveling-language-changed',ensure);
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',()=>{ensure();setTimeout(refreshCloud,900)},{once:true});else{ensure();setTimeout(refreshCloud,500)}
+  window.addEventListener('pageshow',()=>setTimeout(refreshCloud,500));
 })();
 </script>
 
@@ -12225,6 +12345,33 @@ function validationMap(){
   if(!userData.validatedSessions || typeof userData.validatedSessions!=='object') userData.validatedSessions={};
   return userData.validatedSessions;
 }
+function absenceMap(){
+  if(!userData.absentSessions || typeof userData.absentSessions!=='object') userData.absentSessions={};
+  return userData.absentSessions;
+}
+function isAbsent(program=activeProgramKey,block=currentBlockIndex,day=currentDayIndex){
+  return !!absenceMap()[validationKey(program,block,day)];
+}
+function markAbsent(program=activeProgramKey,block=currentBlockIndex,day=currentDayIndex){
+  if(program!=='powerbuilding' || isValidated(program,block,day))return false;
+  const key=validationKey(program,block,day);
+  absenceMap()[key]=Date.now();
+  try{saveToLocalStorage()}catch(e){}
+  return true;
+}
+function clearAbsent(program=activeProgramKey,block=currentBlockIndex,day=currentDayIndex){
+  const key=validationKey(program,block,day);
+  if(absenceMap()[key])delete absenceMap()[key];
+  try{saveToLocalStorage()}catch(e){}
+}
+function isResolved(program=activeProgramKey,block=currentBlockIndex,day=currentDayIndex){
+  return isValidated(program,block,day)||isAbsent(program,block,day);
+}
+function blockResolved(block=currentBlockIndex,program=activeProgramKey){
+  const days=getPrograms()?.[block]||[];
+  if(!days.length)return false;
+  return days.every((_,di)=>isResolved(program,block,di));
+}
 function isValidated(program=activeProgramKey,block=currentBlockIndex,day=currentDayIndex){
   const key=validationKey(program,block,day);
   return localStorage.getItem(key)==='1' || !!validationMap()[key];
@@ -12244,45 +12391,70 @@ function clearValidationKeys(){
   }
   keys.forEach(k=>localStorage.removeItem(k));
   userData.validatedSessions={};
+  userData.absentSessions={};
 }
 
 function refreshValidationUI(){
   const btn=document.getElementById('validate-workout-btn');
+  const absent=isAbsent();
   if(btn){
     const done=isValidated();
-    btn.disabled=done;
-    btn.setAttribute('aria-disabled',done?'true':'false');
+    btn.disabled=done||absent;
+    btn.setAttribute('aria-disabled',(done||absent)?'true':'false');
     btn.classList.toggle('v1403-validated',done);
-    btn.style.pointerEvents=done?'none':'auto';
-    btn.style.opacity=done?'0.78':'1';
-    btn.style.cursor=done?'default':'pointer';
+    btn.classList.toggle('v1710-absent-lock',absent);
+    btn.style.pointerEvents=(done||absent)?'none':'auto';
+    btn.style.opacity=(done||absent)?'0.78':'1';
+    btn.style.cursor=(done||absent)?'default':'pointer';
     if(done){
       btn.style.display='block';
-      btn.textContent=' SÉANCE DÉJÀ VALIDÉE';
+      btn.textContent='SÉANCE DÉJÀ VALIDÉE';
+      btn.onclick=function(e){e?.preventDefault?.();return false;};
+    }else if(absent){
+      btn.style.display='block';
+      btn.textContent='JOUR MARQUÉ ABSENT';
       btn.onclick=function(e){e?.preventDefault?.();return false;};
     }else{
       btn.textContent='VALIDER LA SÉANCE';
       btn.onclick=function(){
         try{playSound('success')}catch(e){}
-        if(isValidated())return false;
+        if(isValidated()||isAbsent())return false;
         return window.openRatingModal?.();
       };
     }
   }
+
+  let absentBtn=document.getElementById('v1710-absent-btn');
+  const wrap=document.getElementById('validate-workout-container');
+  if(activeProgramKey==='powerbuilding'&&wrap){
+    if(!absentBtn){
+      absentBtn=document.createElement('button');
+      absentBtn.id='v1710-absent-btn';
+      absentBtn.type='button';
+      absentBtn.className='v1710-absent-btn';
+      wrap.appendChild(absentBtn);
+    }
+    absentBtn.style.display=isValidated()?'none':'block';
+    absentBtn.classList.toggle('active',absent);
+    absentBtn.textContent=absent?'ANNULER ABSENCE':'MARQUER ABSENT';
+    absentBtn.onclick=()=>window.LevelingProgramV157?.toggleAbsent?.();
+  }else if(absentBtn){
+    absentBtn.style.display='none';
+  }
+
   document.querySelectorAll('#day-tabs .day-tab').forEach((tab,i)=>{
     const done=isValidated(activeProgramKey,currentBlockIndex,i);
+    const away=isAbsent(activeProgramKey,currentBlockIndex,i);
     tab.classList.toggle('v1403-validated',done);
-    if(done){
-      tab.classList.remove('v1590-inprogress','v1404-inprogress');
-    }
+    tab.classList.toggle('v1710-absent',away);
+    if(done||away)tab.classList.remove('v1590-inprogress','v1404-inprogress');
   });
-  if(isValidated()){
+  if(isValidated()||isAbsent()){
     document.getElementById('resume-workout-banner')?.classList.remove('show');
   }else{
     try{window.updateResumeWorkoutBanner?.()}catch(e){}
   }
 }
-
 function syncAvatar(){
   const target=document.querySelector('#v1402-account-btn .v1402-avatar');
   if(!target)return;
@@ -12496,7 +12668,11 @@ function resetCycle(){
 }
 
 function advanceAfterValidation(block,day){
-  if(day!==6)return;
+  if(activeProgramKey==='powerbuilding'){
+    if(!blockResolved(block,activeProgramKey))return false;
+  }else if(day!==6){
+    return false;
+  }
   recordCurrentBlock();
 
   if(block<3){
@@ -12506,11 +12682,47 @@ function advanceAfterValidation(block,day){
     initWorkoutSystem();
     updateProfileUI();
     refreshValidationUI();
-    alert(`Félicitations ! Bloc ${block+1} validé et enregistré. Passage au Bloc ${block+2}.`);
+    alert(`Bloc ${block+1} terminé. Les jours validés et les absences sont enregistrés. Passage au Bloc ${block+2}.`);
   }else{
     saveToLocalStorage();
     showCycleModal();
   }
+  return true;
+}
+
+
+function toggleAbsent(){
+  if(activeProgramKey!=='powerbuilding')return false;
+  const program=activeProgramKey,block=currentBlockIndex,day=currentDayIndex;
+  if(isValidated(program,block,day))return false;
+  if(isAbsent(program,block,day)){
+    clearAbsent(program,block,day);
+    refreshValidationUI();
+    try{scheduleCloudSaveImmediate?.()}catch(e){}
+    return true;
+  }
+  const dayName=getPrograms()?.[block]?.[day]?.dayName||WEEK[day]||`Jour ${day+1}`;
+  if(!confirm(`Marquer ${dayName} ABSENT ?\n\nAucun XP, aucune séance et aucun tonnage ne seront ajoutés. Le jour comptera uniquement pour pouvoir terminer le bloc.`))return false;
+  markAbsent(program,block,day);
+  try{
+    if(workoutState?.[block]?.[day])workoutState[block][day]={};
+    if(customSetData?.[block]?.[day])customSetData[block][day]={};
+  }catch(e){}
+  saveToLocalStorage();
+  refreshValidationUI();
+  try{scheduleCloudSaveImmediate?.()}catch(e){}
+  setTimeout(()=>{
+    if(advanceAfterValidation(block,day))return;
+    const next=(getPrograms()?.[block]||[]).findIndex((_,i)=>i>day&&!isResolved(program,block,i));
+    if(next>=0){
+      currentDayIndex=next;
+      localStorage.setItem('solo_leveling_day',String(next));
+      saveToLocalStorage();
+      initWorkoutSystem();
+      refreshValidationUI();
+    }
+  },80);
+  return true;
 }
 
 /* PR deload : un Bloc 4 ou une variante explicitement légère ne crée jamais de PR. */
@@ -12655,7 +12867,7 @@ window.v11DateMs=function(v){
 
 /* API canonique + alias de compatibilité temporaire pour les quelques anciens appels restants. */
 window.LevelingProgramV157={
-  isValidated,markValidated,refreshValidationUI,
+  isValidated,markValidated,isAbsent,markAbsent,clearAbsent,isResolved,blockResolved,toggleAbsent,refreshValidationUI,
   setValues,dayVolume,currentBlockVolume:blockVolume,
   recordCurrentBlock,allSessions,totalValidatedVolume,
   cycleNo,resetCycle,refreshStats
