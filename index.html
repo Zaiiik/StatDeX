@@ -30,7 +30,7 @@
 
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>LEVELING-APP — V17.10 ADMIN COACH + ABSENCE</title>
+    <title>LEVELING-APP — V17.10.1 ADMIN COACH + ABSENCE</title>
     <meta name="theme-color" content="#09090f">
     <meta name="application-name" content="LEVELING-APP">
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -5977,6 +5977,14 @@ const sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_PUBLISHABLE_KEY,{
   auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true,storage:window.localStorage}
 });
 let cloudUser=null,cloudLicensed=false,cloudLoadedOnce=false,cloudSaveTimer=null,suppressCloudSave=false,licenseWatchTimer=null,lastLicenseStatus='UNKNOWN';
+/* V17.10.1 — expose live getters for legacy modules loaded in separate script blocks.
+   Top-level const/let are not properties of window, which previously made modules
+   such as cloud messages and ideas believe Supabase/auth were unavailable. */
+try{
+  Object.defineProperty(window,'sb',{configurable:true,get:()=>sb});
+  Object.defineProperty(window,'cloudUser',{configurable:true,get:()=>cloudUser});
+  Object.defineProperty(window,'cloudLicensed',{configurable:true,get:()=>cloudLicensed});
+}catch(e){}
 window.getLevelingCloudAccessState=()=>({user:cloudUser,licensed:cloudLicensed});
 let authRecoveryPromise=null,authResumeTimer=null,authExplicitSignOut=false;
 const LICENSE_CACHE_KEY='leveling_license_active_cache';
@@ -6030,7 +6038,7 @@ function setAppUnlockedShell(){
   document.getElementById('app-container')?.classList.remove('auth-locked');
 }
 
-const APP_VERSION='17.10.0-ADMIN-COACH-ABSENCE';
+const APP_VERSION='17.10.1-MESSAGES-RELEASE-ONBOARDING';
 const ACCOUNT_LOCAL_KEYS=['solo_leveling_user','solo_leveling_smart_refs','solo_leveling_body_hist','solo_leveling_inv','solo_leveling_block','solo_leveling_day','solo_leveling_state','solo_leveling_custom_sets','solo_leveling_history','solo_leveling_active_program','solo_leveling_program_states','solo_leveling_program_custom_sets','solo_leveling_custom_program','leveling_last_local_save','leveling_last_cloud_sync','leveling_v10'];
 function clearLevelingAccountLocalData(){
   try{ACCOUNT_LOCAL_KEYS.forEach(k=>localStorage.removeItem(k));sessionStorage.removeItem('leveling_pending_license')}catch(e){console.warn('Local account cleanup:',e)}
@@ -6548,7 +6556,13 @@ async function unlockLevelingApp(forceTrial=false){
   const emailEl=document.getElementById('cloud-account-email');if(emailEl&&cloudUser)emailEl.textContent=cloudUser.email||'Compte connecté';
   refreshV11UIAfterCloud();updateResumeWorkoutBanner();updateInstallUI();
   try{window.v15ArrangeProfile?.()}catch(e){}
-  if(trial){document.body.classList.add('v1630-trial');stopLicenseWatch();setCloudStatus('synced')}else{document.body.classList.remove('v1630-trial');startLicenseWatch();checkAppRelease();if(navigator.onLine)scheduleCloudSave();else setCloudStatus('offline')};
+  /* V17.10.1 — cloud announcements were previously fetched before auth existed.
+     Refresh them only after the account is actually unlocked. */
+  try{setTimeout(()=>window.LevelingDeveloperMessagesV172?.refreshCloud?.(),120)}catch(e){}
+  /* Release announcements are useful for every authenticated access state,
+     including preview/test accounts. */
+  try{setTimeout(()=>checkAppRelease(),180)}catch(e){}
+  if(trial){document.body.classList.add('v1630-trial');stopLicenseWatch();setCloudStatus('synced')}else{document.body.classList.remove('v1630-trial');startLicenseWatch();if(navigator.onLine)scheduleCloudSave();else setCloudStatus('offline')};
   return true;
 }
 async function logoutLeveling(){
@@ -6558,6 +6572,11 @@ async function logoutLeveling(){
   cloudUser=null;cloudLicensed=false;cloudLoadedOnce=false;
   clearLevelingAccountLocalData();
   localStorage.removeItem('leveling_local_owner');
+  /* V17.10.1 — signing out intentionally restores the complete first-run
+     discovery (language + 3 presentation pages) for the next account. */
+  localStorage.removeItem('leveling_discovery_v1620_language_done');
+  localStorage.removeItem('leveling_discovery_v1621_intro_done');
+  sessionStorage.removeItem('leveling_manual_onboarding_replay');
   location.reload();
 }
 
@@ -11265,6 +11284,7 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
       const {data,error}=await sb.rpc('get_my_broadcasts',{p_limit:20});
       if(error)throw error;
       broadcasts=Array.isArray(data)?data:[];
+      try{window.v17101ShowBroadcastInbox?.(broadcasts)}catch(e){}
     }catch(e){console.warn('Broadcasts:',e)}
     ensure();
   }
@@ -13606,6 +13626,56 @@ window.addEventListener('pageshow',()=>setTimeout(finalize,80));
 
 let timer;
 new MutationObserver(()=>{clearTimeout(timer);timer=setTimeout(finalize,75)}).observe(document.documentElement,{subtree:true,childList:true,characterData:true});
+})();
+</script>
+
+
+<style id="v17101-broadcast-inbox-style">
+#v17101-broadcast-inbox{display:none;position:fixed;inset:0;z-index:2147483300;background:rgba(0,0,0,.78);backdrop-filter:blur(8px);padding:18px;align-items:center;justify-content:center}
+#v17101-broadcast-inbox.show{display:flex}
+#v17101-broadcast-inbox .box{width:min(440px,100%);border:1px solid rgba(185,61,255,.58);border-radius:22px;background:radial-gradient(circle at 50% 0,rgba(133,0,255,.14),transparent 38%),#08080d;box-shadow:0 24px 80px rgba(0,0,0,.72),0 0 34px rgba(177,0,255,.14);padding:20px}
+#v17101-broadcast-inbox .eyebrow{font-size:.58rem;letter-spacing:.16em;font-weight:1000;color:#ff5fc8;text-transform:uppercase}
+#v17101-broadcast-inbox h3{margin:8px 0 8px;font-size:1.2rem;line-height:1.08;color:#fff}
+#v17101-broadcast-inbox .copy{font-size:.82rem;line-height:1.55;color:#c9c3d2;white-space:pre-wrap}
+#v17101-broadcast-inbox .meta{margin-top:12px;font-size:.6rem;color:#77717f}
+#v17101-broadcast-inbox button{width:100%;min-height:44px;margin-top:16px;border:1px solid rgba(198,57,255,.66);border-radius:13px;background:linear-gradient(90deg,#7800db,#b000e8,#ef008c);color:#fff;font-weight:1000;letter-spacing:.04em}
+</style>
+<div id="v17101-broadcast-inbox" role="dialog" aria-modal="true" aria-label="Message LEVELING-APP">
+  <div class="box"><div class="eyebrow" id="v17101-broadcast-kind">LEVELING-APP</div><h3 id="v17101-broadcast-title"></h3><div class="copy" id="v17101-broadcast-copy"></div><div class="meta" id="v17101-broadcast-meta"></div><button type="button" onclick="v17101CloseBroadcastInbox()">FERMER</button></div>
+</div>
+<script id="v17101-broadcast-inbox-runtime">
+(function(){
+'use strict';
+let queue=[];
+function uid(){try{return window.cloudUser?.id||'anon'}catch(e){return'anon'}}
+function seenKey(){return 'leveling_seen_broadcasts_'+uid()}
+function seen(){try{return new Set(JSON.parse(localStorage.getItem(seenKey())||'[]').map(String))}catch(e){return new Set()}}
+function saveSeen(set){try{localStorage.setItem(seenKey(),JSON.stringify([...set].slice(-100)))}catch(e){}}
+function escText(v){return String(v??'')}
+function renderNext(){
+  const item=queue.shift();if(!item)return;
+  const root=document.getElementById('v17101-broadcast-inbox');if(!root)return;
+  const en=localStorage.getItem('leveling_language')==='en';
+  const kind=String(item.kind||'developer');
+  document.getElementById('v17101-broadcast-kind').textContent=kind==='patch_note'?(en?'PATCH NOTE':'PATCH NOTE'):(en?'DEVELOPER MESSAGE':'MESSAGE DÉVELOPPEUR');
+  document.getElementById('v17101-broadcast-title').textContent=escText(item.title||'LEVELING-APP');
+  document.getElementById('v17101-broadcast-copy').textContent=escText(item.message||'');
+  document.getElementById('v17101-broadcast-meta').textContent=item.created_at?new Date(item.created_at).toLocaleString(en?'en-GB':'fr-FR'):'';
+  root.dataset.broadcastId=String(item.id||'');root.classList.add('show');
+}
+window.v17101ShowBroadcastInbox=function(rows){
+  if(!window.cloudUser||!Array.isArray(rows)||!rows.length)return;
+  const s=seen();
+  const fresh=rows.filter(x=>x&&x.id!=null&&!s.has(String(x.id))).sort((a,b)=>new Date(a.created_at)-new Date(b.created_at));
+  if(!fresh.length)return;
+  queue.push(...fresh);
+  if(!document.getElementById('v17101-broadcast-inbox')?.classList.contains('show'))renderNext();
+};
+window.v17101CloseBroadcastInbox=function(){
+  const root=document.getElementById('v17101-broadcast-inbox');if(!root)return;
+  const id=root.dataset.broadcastId;if(id){const s=seen();s.add(String(id));saveSeen(s)}
+  root.classList.remove('show');root.dataset.broadcastId='';setTimeout(renderNext,120);
+};
 })();
 </script>
 
