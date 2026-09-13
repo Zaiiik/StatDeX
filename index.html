@@ -30,7 +30,7 @@
 
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>LEVELING-APP — V17.9.3 HEADER PROFILE SQUARE</title>
+    <title>LEVELING-APP — V17.9.4 HEADER PROFILE SQUARE</title>
     <meta name="theme-color" content="#09090f">
     <meta name="application-name" content="LEVELING-APP">
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -6217,12 +6217,9 @@ async function loginLevelingAccount(){
 }
 async function getCurrentLicenseStatus(){
   if(!cloudUser)return{status:'NO_SESSION',has_license:false,enabled:false,access_state:'NONE'};
-  try{
-    const {data,error}=await sb.rpc('get_my_test_access');
-    if(error)throw error;
-    const row=Array.isArray(data)?data[0]:data;
-    const state=String(row?.access_state||'none').toUpperCase();
 
+  const normalizeAccess=(row,testMode)=>{
+    const state=String(row?.access_state||'none').toUpperCase();
     if(state==='SUBSCRIBED'){
       currentSubscriptionPlan=String(row?.plan_code||'');
       return{
@@ -6234,9 +6231,42 @@ async function getCurrentLicenseStatus(){
         subscription_status:row?.status||'active',
         current_period_end:row?.current_period_end||null,
         lifetime:row?.lifetime===true,
-        test_mode:true
+        test_mode:testMode===true
       };
     }
+    if(state==='TRIAL'){
+      currentSubscriptionPlan=String(row?.plan_code||'');
+      return{
+        status:'TRIAL',
+        has_license:false,
+        enabled:true,
+        access_state:'TRIAL',
+        plan_code:row?.plan_code||null,
+        subscription_status:row?.status||'trialing',
+        current_period_end:row?.current_period_end||null,
+        lifetime:false,
+        test_mode:testMode===true
+      };
+    }
+    return null;
+  };
+
+  try{
+    // 1. Toujours vérifier l'accès réel en premier.
+    // Les comptes Lifetime / abonnés réels ne doivent jamais retomber en mode essai
+    // simplement parce que Stripe est encore configuré en environnement TEST.
+    const live=await sb.rpc('get_my_access');
+    if(live.error)throw live.error;
+    const liveRow=Array.isArray(live.data)?live.data[0]:live.data;
+    const liveAccess=normalizeAccess(liveRow,false);
+    if(liveAccess)return liveAccess;
+
+    // 2. Seulement s'il n'existe aucun accès réel, accepter un achat Stripe TEST.
+    const test=await sb.rpc('get_my_test_access');
+    if(test.error)throw test.error;
+    const testRow=Array.isArray(test.data)?test.data[0]:test.data;
+    const testAccess=normalizeAccess(testRow,true);
+    if(testAccess)return testAccess;
 
     currentSubscriptionPlan='';
     return{
@@ -6248,12 +6278,12 @@ async function getCurrentLicenseStatus(){
       subscription_status:null,
       current_period_end:null,
       lifetime:false,
-      test_mode:true
+      test_mode:false
     };
   }catch(e){
-    console.warn('Stripe TEST access:',e?.message||e);
+    console.warn('Access check:',e?.message||e);
     currentSubscriptionPlan='';
-    return{status:'ERROR',has_license:false,enabled:false,access_state:'NONE',test_mode:true,error:e?.message||String(e)};
+    return{status:'ERROR',has_license:false,enabled:false,access_state:'NONE',test_mode:false,error:e?.message||String(e)};
   }
 }
 function stopLicenseWatch(){if(licenseWatchTimer)clearInterval(licenseWatchTimer);licenseWatchTimer=null}
@@ -12855,7 +12885,7 @@ body.v1634-access-trial .nav-item:nth-child(2)::after,body.v1634-access-trial .n
     const email=(typeof window.getLevelingCloudAccessState==='function'?window.getLevelingCloudAccessState()?.user?.email:null)||'Compte LEVELING-APP';
     const paidLabel=String(currentSubscriptionPlan||'')==='month'?'1 MOIS':String(currentSubscriptionPlan||'')==='1y'?'1 AN':String(currentSubscriptionPlan||'')==='lifetime'?'LIFETIME':'ACTIF';
     const data=s==='SUBSCRIBED'
-      ?['ABONNEMENT ACTIF',`${email} · accès complet à LEVELING-APP`,paidLabel]
+      ?['ACCÈS PREMIUM ACTIF',`${email} · accès complet à LEVELING-APP`,paidLabel]
       :s==='TRIAL'
       ?['MODE ESSAI',`${email} · aperçu des fonctions, actions premium verrouillées`,'ESSAI']
       :['AUCUN ACCÈS',`${email} · choisis une offre pour déverrouiller toutes les fonctions`,'À ACTIVER'];
