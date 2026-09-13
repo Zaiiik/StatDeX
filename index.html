@@ -5636,8 +5636,8 @@ function setAppUnlockedShell(){
   document.getElementById('app-container')?.classList.remove('auth-locked');
 }
 
-const APP_VERSION='16.5.5';
-const LEVELING_PRODUCTION_URL='https://zaiik.github.io/StatDeX/';
+const APP_VERSION='16.5.6';
+const LEVELING_PRODUCTION_URL='https://zaiiik.github.io/StatDeX/';
 const ACCOUNT_LOCAL_KEYS=['solo_leveling_user','solo_leveling_smart_refs','solo_leveling_body_hist','solo_leveling_inv','solo_leveling_block','solo_leveling_day','solo_leveling_state','solo_leveling_custom_sets','solo_leveling_history','solo_leveling_active_program','solo_leveling_program_states','solo_leveling_program_custom_sets','solo_leveling_custom_program','leveling_last_local_save','leveling_last_cloud_sync','leveling_v10'];
 function clearLevelingAccountLocalData(){
   try{ACCOUNT_LOCAL_KEYS.forEach(k=>localStorage.removeItem(k));sessionStorage.removeItem('leveling_pending_license')}catch(e){console.warn('Local account cleanup:',e)}
@@ -5898,8 +5898,8 @@ document.addEventListener('visibilitychange',()=>{
 
 /* V16.5.5 — retour Stripe direct vers GitHub Pages.
    Le backend LIVE sera basculé vers:
-   https://zaiik.github.io/StatDeX/?payment=success
-   https://zaiik.github.io/StatDeX/?payment=cancel
+   https://zaiiik.github.io/StatDeX/?payment=success
+   https://zaiiik.github.io/StatDeX/?payment=cancel
    Cette logique est déjà prête, sans dépendre d'une page HTML intermédiaire Supabase. */
 let v1655StripeReturnHandled=false;
 
