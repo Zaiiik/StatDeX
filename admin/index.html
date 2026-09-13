@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>LEVELING-APP — Admin Mobile V3.1</title>
-<meta name="theme-color" content="#09090e">
+<title>LEVELING-APP — Admin Coach V4</title>
+<meta name="theme-color" content="#07070b">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="LEVELING ADMIN">
@@ -12,253 +12,280 @@
 <link rel="apple-touch-icon" href="admin-icon-192.png">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
-:root{--bg:#050507;--card:#111118;--text:#eee;--muted:#8e8e9a;--purple:#bd00ff;--green:#00e676;--yellow:#ffea00;--red:#ff365f}
-*{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at top,#171020 0,#050507 40%);color:var(--text);font-family:Segoe UI,Arial,sans-serif;min-height:100vh}
-.wrap{max-width:1100px;margin:auto;padding:24px 16px 60px}h1{margin:0;color:var(--purple);text-shadow:0 0 18px rgba(189,0,255,.45);font-size:1.55rem}.sub{color:var(--muted);font-size:.86rem;margin:6px 0 22px}
-.card{background:rgba(17,17,24,.92);border:1px solid #292932;border-radius:16px;padding:16px;box-shadow:0 10px 30px rgba(0,0,0,.28);margin-bottom:14px}.login{max-width:430px;margin:11vh auto}
-label{display:block;font-size:.72rem;color:#bbb;margin:10px 0 5px;text-transform:uppercase;font-weight:800}input{width:100%;background:#09090e;border:1px solid #34343d;color:#fff;border-radius:10px;padding:12px;outline:none}
-button{border:0;border-radius:10px;padding:11px 14px;font-weight:900;cursor:pointer}.primary{background:var(--purple);color:#fff;width:100%;margin-top:14px}.secondary{background:#23232d;color:#fff}.green{background:var(--green);color:#001c0c}.red{background:rgba(255,54,95,.17);border:1px solid rgba(255,54,95,.45);color:#ff718d}.yellow{background:rgba(255,234,0,.12);border:1px solid rgba(255,234,0,.35);color:var(--yellow)}
-.topbar{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:18px}.top-actions{display:flex;gap:8px}.stats{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-bottom:14px}
-.stat{background:#0c0c12;border:1px solid #292932;border-radius:13px;padding:13px}.stat b{display:block;font-size:1.45rem;margin-top:5px}.stat span{font-size:.66rem;color:var(--muted);text-transform:uppercase}
-.generate{display:grid;grid-template-columns:150px 1fr;gap:10px;align-items:end}.table-wrap{overflow:auto;border-radius:12px;border:1px solid #292932}table{width:100%;border-collapse:collapse;min-width:850px;background:#0a0a0f}
-th,td{padding:11px 10px;border-bottom:1px solid #24242d;text-align:left;font-size:.76rem}th{font-size:.62rem;color:#999;text-transform:uppercase;background:#101017}.key{font-family:Consolas,monospace;color:#fff;font-weight:800}
-.badge{display:inline-block;border-radius:999px;padding:4px 8px;font-size:.62rem;font-weight:900}.b-active{color:var(--green);background:rgba(0,230,118,.1)}.b-unused{color:var(--yellow);background:rgba(255,234,0,.1)}.b-disabled{color:#ff718d;background:rgba(255,54,95,.1)}
-.actions{display:flex;gap:6px}.actions button{padding:7px 9px;font-size:.65rem}.msg{font-size:.8rem;margin-top:10px;min-height:18px}.err{color:#ff718d}.ok{color:var(--green)}.hidden{display:none!important}
-.created-box{margin-top:12px;background:#08080c;border:1px dashed #3b3b45;border-radius:10px;padding:10px;max-height:160px;overflow:auto}.created-key{display:flex;justify-content:space-between;gap:10px;align-items:center;padding:7px 0;border-bottom:1px solid #202027;font-family:Consolas,monospace;font-size:.76rem}.small{font-size:.68rem;color:var(--muted)}
-@media(max-width:800px){.stats{grid-template-columns:repeat(2,1fr)}.generate{grid-template-columns:1fr}.topbar{align-items:flex-start;flex-direction:column}}
-
-.client-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
-.client-card{background:#0b0b11;border:1px solid #292932;border-radius:12px;padding:12px}
-.client-card h3{margin:0 0 5px;font-size:.88rem}.client-meta{font-size:.66rem;color:#8b8b98;line-height:1.5}
-.modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.78);z-index:999;align-items:center;justify-content:center;padding:18px}.modal.show{display:flex}
-.modalbox{width:100%;max-width:620px;background:#101017;border:1px solid #3a3a46;border-radius:16px;padding:18px;box-shadow:0 20px 60px rgba(0,0,0,.55);max-height:86vh;overflow:auto}
-.detail-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}.detail{background:#0a0a0f;border:1px solid #262630;border-radius:10px;padding:10px}.detail span{display:block;color:#777;font-size:.58rem;text-transform:uppercase}.detail b{display:block;margin-top:4px;font-size:.76rem;word-break:break-word}
-.release-grid{display:grid;grid-template-columns:150px 1fr auto;gap:10px;align-items:end}
-@media(max-width:800px){.client-grid,.detail-grid{grid-template-columns:1fr}.release-grid{grid-template-columns:1fr}}
-
-
-/* ===== ADMIN MOBILE V3.1 ===== */
-html,body{width:100%;min-height:100%;min-height:100dvh}
-body{padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);overscroll-behavior:none}
-.wrap{padding:14px 10px calc(24px + env(safe-area-inset-bottom));max-width:980px}
-.admin-mobile-brand{font-size:.58rem;color:#777;letter-spacing:.08em;margin-top:4px}
-.mobile-tabs{display:none}
-.mobile-license-list{display:none}
-.install-admin-btn{display:none}
-button,input{min-height:44px}
-button{touch-action:manipulation}
-input{font-size:16px}
-@media(max-width:700px){
-  body{background:linear-gradient(180deg,#100916 0,#050507 230px)}
-  .wrap{padding:10px 8px calc(20px + env(safe-area-inset-bottom))}
-  .login{margin:8vh auto 0;padding:18px;border-radius:18px}
-  h1{font-size:1.18rem}
-  .sub{font-size:.72rem;margin:5px 0 12px}
-  .topbar{position:sticky;top:0;z-index:30;margin:-10px -8px 10px;padding:calc(10px + env(safe-area-inset-top)) 10px 10px;background:rgba(5,5,7,.94);backdrop-filter:blur(14px);border-bottom:1px solid #23232d}
-  .topbar h1{font-size:1.02rem}
-  .top-actions{width:100%;display:grid;grid-template-columns:1fr 1fr}
-  .top-actions button{width:100%;padding:9px}
-  .stats{grid-template-columns:repeat(3,1fr);gap:6px;overflow:visible}
-  .stat{padding:9px 7px;border-radius:11px;min-width:0}
-  .stat b{font-size:1.1rem}.stat span{font-size:.52rem;white-space:nowrap}
-  .stats .stat:nth-child(4),.stats .stat:nth-child(5){grid-column:span 1}
-  .card{padding:12px;border-radius:14px;margin-bottom:10px}
-  .generate{grid-template-columns:1fr 1fr;gap:7px}
-  .generate label{margin-top:0}
-  .client-grid{grid-template-columns:1fr}
-  .client-card{padding:11px}
-  .release-grid{grid-template-columns:1fr}
-  .release-grid button{width:100%}
-  .detail-grid{grid-template-columns:1fr}
-  .modal{align-items:flex-end;padding:0}
-  .modalbox{max-width:none;border-radius:18px 18px 0 0;padding:14px 12px calc(18px + env(safe-area-inset-bottom));max-height:88dvh}
-  .table-wrap{display:none}
-  .mobile-license-list{display:grid;gap:7px}
-  .m-license{background:#0a0a0f;border:1px solid #292932;border-radius:12px;padding:10px}
-  .m-license-top{display:flex;justify-content:space-between;align-items:center;gap:8px}
-  .m-license-key{font:800 .72rem Consolas,monospace;word-break:break-all}
-  .m-license-meta{font-size:.59rem;color:#8e8e9a;line-height:1.55;margin-top:6px}
-  .m-license-actions{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:8px}
-  .m-license-actions button{width:100%;padding:8px;font-size:.64rem}
-  #search{margin-top:8px}
-  .install-admin-btn{display:inline-block}
+:root{--bg:#050507;--card:#0e0e15;--card2:#08080d;--text:#f4f2f8;--muted:#85818f;--purple:#a900ff;--pink:#ff168d;--green:#39f5a6;--yellow:#ffd85d;--red:#ff4866;--blue:#55c8ff;--line:#262631}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;min-height:100%;background:radial-gradient(circle at 50% 0,#1d0928 0,#08070c 28%,#050507 62%);color:var(--text);font-family:Inter,Segoe UI,Arial,sans-serif}
+body{padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left)}
+button,input,select,textarea{font:inherit}
+button{cursor:pointer}
+.hidden{display:none!important}
+.wrap{width:min(1240px,100%);margin:auto;padding:18px 14px 50px}
+.login{width:min(430px,calc(100% - 24px));margin:10vh auto 0;padding:24px;border:1px solid rgba(169,0,255,.38);border-radius:24px;background:rgba(10,9,15,.96);box-shadow:0 25px 80px rgba(0,0,0,.5)}
+.brand{font-size:.7rem;font-weight:1000;letter-spacing:.22em;color:#fff}.brand strong{color:var(--yellow)}
+.login h1{font-size:1.7rem;margin:12px 0 4px}.sub{font-size:.72rem;color:var(--muted);line-height:1.45}
+label{display:block;margin:14px 0 6px;font-size:.58rem;color:#a7a3b0;text-transform:uppercase;font-weight:900;letter-spacing:.06em}
+input,select,textarea{width:100%;min-height:44px;border:1px solid #30303b;border-radius:11px;background:#08080d;color:#fff;padding:10px 12px;outline:none}
+textarea{min-height:110px;resize:vertical}
+input:focus,select:focus,textarea:focus{border-color:#8e2cff;box-shadow:0 0 0 3px rgba(142,44,255,.08)}
+.btn{min-height:42px;border:1px solid transparent;border-radius:11px;padding:9px 13px;font-weight:1000;font-size:.7rem;letter-spacing:.035em;color:#fff;background:#22222d}
+.btn.primary{background:linear-gradient(90deg,#7b00e9,#eb008e)}
+.btn.green{background:linear-gradient(90deg,#16bf78,#39f5a6);color:#042414}
+.btn.red{border-color:rgba(255,72,102,.4);background:rgba(255,72,102,.1);color:#ff7188}
+.btn.yellow{border-color:rgba(255,216,93,.4);background:rgba(255,216,93,.1);color:#ffe07c}
+.btn.blue{border-color:rgba(85,200,255,.38);background:rgba(85,200,255,.08);color:#83d8ff}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.topbar{position:sticky;top:0;z-index:40;display:flex;align-items:center;justify-content:space-between;gap:12px;margin:-18px -14px 14px;padding:calc(12px + env(safe-area-inset-top)) 14px 12px;background:rgba(5,5,7,.90);backdrop-filter:blur(16px);border-bottom:1px solid #20202a}
+.topbar h1{font-size:1rem;margin:0}.topbar .identity{font-size:.57rem;color:var(--muted);margin-top:3px}
+.actions{display:flex;gap:7px;flex-wrap:wrap}
+.tabs{display:grid;grid-template-columns:repeat(5,1fr);gap:7px;margin:0 0 13px}
+.tab{min-height:45px;border:1px solid #252530;border-radius:12px;background:#0b0b11;color:#7f7b89;font-weight:900;font-size:.62rem}
+.tab.active{color:#fff;border-color:rgba(169,0,255,.5);background:linear-gradient(180deg,rgba(169,0,255,.18),rgba(11,11,17,.96));box-shadow:0 0 18px rgba(169,0,255,.08)}
+.panel{display:none}.panel.active{display:block}
+.stats{display:grid;grid-template-columns:repeat(6,1fr);gap:8px;margin-bottom:12px}
+.stat{border:1px solid #23232d;border-radius:14px;background:rgba(10,10,15,.92);padding:12px}
+.stat span{font-size:.52rem;color:var(--muted);font-weight:900;text-transform:uppercase}.stat b{display:block;margin-top:5px;font-size:1.3rem}
+.card{border:1px solid #24242e;border-radius:16px;background:rgba(13,13,20,.94);padding:14px;margin-bottom:11px;box-shadow:0 14px 35px rgba(0,0,0,.16)}
+.card h2{margin:0 0 5px;font-size:.87rem}.card p{margin:0;color:var(--muted);font-size:.62rem;line-height:1.5}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}.form-row{display:grid;grid-template-columns:1fr 1fr auto;gap:8px;align-items:end}
+.list{display:grid;gap:8px;margin-top:10px}
+.item{border:1px solid #24242f;border-radius:13px;background:#09090e;padding:11px}
+.item-head{display:flex;justify-content:space-between;align-items:flex-start;gap:8px}.item-title{font-size:.75rem;font-weight:1000}.item-meta{font-size:.55rem;color:#77717f;margin-top:3px;line-height:1.45}
+.badge{display:inline-flex;align-items:center;min-height:24px;padding:3px 8px;border-radius:999px;font-size:.5rem;font-weight:1000;letter-spacing:.045em;border:1px solid #30303a}
+.b-green{color:var(--green);border-color:rgba(57,245,166,.3);background:rgba(57,245,166,.08)}.b-yellow{color:var(--yellow);border-color:rgba(255,216,93,.28);background:rgba(255,216,93,.08)}.b-red{color:#ff7188;border-color:rgba(255,72,102,.3);background:rgba(255,72,102,.08)}.b-blue{color:var(--blue);border-color:rgba(85,200,255,.28);background:rgba(85,200,255,.08)}
+.key{font:900 .69rem/1.4 Consolas,monospace;word-break:break-all}
+.row-actions{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}.row-actions .btn{min-height:34px;padding:6px 9px;font-size:.57rem}
+.clients{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px}
+.client{border:1px solid #252530;border-radius:15px;background:#0a0a10;padding:12px;cursor:pointer;transition:.15s}.client:active{transform:scale(.99)}.client:hover{border-color:#5b2d76}
+.client-top{display:flex;justify-content:space-between;gap:8px}.client h3{font-size:.8rem;margin:0}.client .email{font-size:.53rem;color:#77717f;margin-top:2px;word-break:break-all}
+.metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-top:10px}.metric{background:#07070b;border:1px solid #202029;border-radius:10px;padding:8px;text-align:center}.metric b{font-size:.72rem;display:block}.metric span{font-size:.44rem;color:#76717f;text-transform:uppercase}
+.progressbar{height:6px;border-radius:999px;background:#17171f;overflow:hidden;margin-top:8px}.progressbar i{display:block;height:100%;background:linear-gradient(90deg,#7d00ee,#ff138a)}
+.idea-message,.broadcast-message{margin-top:8px;font-size:.68rem;line-height:1.5;color:#d9d6df;white-space:pre-wrap}.idea-controls{display:grid;grid-template-columns:150px 1fr auto;gap:7px;margin-top:9px}
+.msg{min-height:18px;margin-top:8px;font-size:.62rem;color:#8d8795}.msg.ok{color:var(--green)}.msg.err{color:#ff7188}
+.modal{position:fixed;inset:0;z-index:100;background:rgba(0,0,0,.78);display:none;align-items:center;justify-content:center;padding:16px}.modal.show{display:flex}.modalbox{width:min(820px,100%);max-height:88dvh;overflow:auto;border:1px solid #32323e;border-radius:19px;background:#0b0b11;padding:15px;box-shadow:0 30px 90px rgba(0,0,0,.55)}
+.modalhead{display:flex;justify-content:space-between;gap:10px;align-items:center;position:sticky;top:-15px;background:#0b0b11;padding:5px 0 10px;z-index:2}.modalhead h2{margin:0;font-size:1rem}
+.coach-summary{border:1px solid rgba(57,245,166,.2);background:linear-gradient(135deg,rgba(57,245,166,.05),rgba(169,0,255,.04));border-radius:14px;padding:12px;margin-bottom:10px}.coach-summary b{font-size:.68rem;color:var(--green)}.coach-summary div{font-size:.64rem;color:#c7c3cf;line-height:1.55;margin-top:4px}
+.detailgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:7px}.detail{border:1px solid #22222b;border-radius:11px;background:#08080c;padding:9px}.detail span{font-size:.47rem;color:#777;text-transform:uppercase}.detail b{display:block;margin-top:4px;font-size:.68rem;word-break:break-word}
+.section-title{margin:13px 0 7px;font-size:.62rem;color:#aaa4b3;text-transform:uppercase;font-weight:1000;letter-spacing:.06em}
+.timeline{display:grid;gap:6px}.timeline .item{padding:9px}.empty{padding:18px;text-align:center;border:1px dashed #292934;border-radius:13px;color:#77717f;font-size:.64rem}
+@media(max-width:900px){.stats{grid-template-columns:repeat(3,1fr)}.clients{grid-template-columns:repeat(2,1fr)}.detailgrid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:620px){
+  .wrap{padding:10px 8px 30px}.topbar{margin:-10px -8px 10px;padding:calc(10px + env(safe-area-inset-top)) 9px 9px;align-items:flex-start;flex-direction:column}.topbar .actions{width:100%;display:grid;grid-template-columns:1fr 1fr}.topbar .btn{width:100%}
+  .tabs{grid-template-columns:repeat(5,minmax(64px,1fr));overflow-x:auto;padding-bottom:3px}.tab{font-size:.54rem;padding:6px}
+  .stats{grid-template-columns:repeat(3,1fr);gap:6px}.stat{padding:9px}.stat b{font-size:1rem}
+  .grid2,.grid3,.clients,.form-row,.idea-controls{grid-template-columns:1fr}.metrics{grid-template-columns:repeat(4,1fr)}.card{padding:11px}.detailgrid{grid-template-columns:repeat(2,1fr)}
+  .modal{align-items:flex-end;padding:0}.modalbox{border-radius:18px 18px 0 0;max-height:91dvh;padding:12px 10px calc(16px + env(safe-area-inset-bottom))}
 }
-@media(max-width:380px){
-  .stats{grid-template-columns:repeat(2,1fr)}
-  .generate{grid-template-columns:1fr}
-  .top-actions{grid-template-columns:1fr}
-}
-
 </style>
 </head>
 <body>
 <div class="wrap">
-<section id="loginView" class="card login">
-  <h1>⚡ LEVELING ADMIN</h1><p class="sub">Connexion administrateur privée</p>
+<section id="loginView" class="login">
+  <div class="brand">LEVELING-<strong>ADMIN</strong></div>
+  <h1>Centre de contrôle</h1>
+  <div class="sub">Accès privé administrateur · abonnements · coach · idées · annonces</div>
   <label>Email</label><input id="email" type="email" autocomplete="username">
   <label>Mot de passe</label><input id="password" type="password" autocomplete="current-password">
-  <button class="primary" onclick="login()">SE CONNECTER</button><div id="loginMsg" class="msg"></div>
+  <button class="btn primary" style="width:100%;margin-top:14px" onclick="login()">SE CONNECTER</button>
+  <div id="loginMsg" class="msg"></div>
 </section>
+
 <section id="adminView" class="hidden">
-  <div class="topbar"><div><h1>⚡ LEVELING-APP ADMIN</h1><div class="admin-mobile-brand">MOBILE CONTROL · V3.1</div><div id="adminIdentity" class="sub"></div></div>
-  <div class="top-actions"><button id="installAdminBtn" class="secondary install-admin-btn" onclick="installAdminPWA()">📲 Installer</button><button class="secondary" onclick="refreshAll()">↻ Actualiser</button><button class="red" onclick="logout()">Déconnexion</button></div></div>
+  <header class="topbar">
+    <div><div class="brand">LEVELING-<strong>ADMIN</strong></div><h1>CONTROL CENTER V4</h1><div id="identity" class="identity"></div></div>
+    <div class="actions"><button class="btn blue" onclick="refreshAll()">ACTUALISER</button><button class="btn red" onclick="logout()">DÉCONNEXION</button></div>
+  </header>
 
-  <div class="stats">
-    <div class="stat"><span>Total clés</span><b id="sTotal">—</b></div>
-    <div class="stat"><span>Disponibles</span><b id="sUnused">—</b></div>
-    <div class="stat"><span>Actives</span><b id="sActive">—</b></div>
-    <div class="stat"><span>Désactivées</span><b id="sDisabled">—</b></div>
-    <div class="stat"><span>Profils</span><b id="sProfiles">—</b></div>
-  </div>
+  <nav class="tabs">
+    <button class="tab active" data-tab="dashboard" onclick="showTab('dashboard',this)">TABLEAU</button>
+    <button class="tab" data-tab="keys" onclick="showTab('keys',this)">CLÉS</button>
+    <button class="tab" data-tab="hunters" onclick="showTab('hunters',this)">COACH</button>
+    <button class="tab" data-tab="ideas" onclick="showTab('ideas',this)">IDÉES</button>
+    <button class="tab" data-tab="messages" onclick="showTab('messages',this)">MESSAGES</button>
+  </nav>
 
-  <div class="card">
-    <h2 style="margin:0 0 5px;font-size:1rem;color:var(--yellow)">🔑 Générer des licences Lifetime</h2>
-    <div class="small">1 à 50 clés par génération.</div>
-    <div class="generate"><div><label>Nombre de clés</label><input id="keyCount" type="number" min="1" max="50" value="1"></div>
-    <button class="green" onclick="generateKeys()">➕ GÉNÉRER</button></div>
-    <div id="generateMsg" class="msg"></div><div id="createdKeys" class="created-box hidden"></div>
-  </div>
-
-  <div class="card">
-    <div style="display:flex;gap:10px;justify-content:space-between;align-items:end;flex-wrap:wrap;margin-bottom:10px">
-      <div><h2 style="margin:0;font-size:1rem">Licences</h2><div class="small">Copie une clé et envoie-la au client en MP.</div></div>
-      <div style="min-width:220px"><input id="search" placeholder="Rechercher clé, pseudo, email…" oninput="renderLicenses()"></div>
+  <section id="tab-dashboard" class="panel active">
+    <div class="stats">
+      <div class="stat"><span>Chasseurs</span><b id="stClients">0</b></div>
+      <div class="stat"><span>Lifetime</span><b id="stLifetime">0</b></div>
+      <div class="stat"><span>Clés libres</span><b id="stKeys">0</b></div>
+      <div class="stat"><span>Idées nouvelles</span><b id="stIdeas">0</b></div>
+      <div class="stat"><span>Messages actifs</span><b id="stMessages">0</b></div>
+      <div class="stat"><span>Séances</span><b id="stWorkouts">0</b></div>
     </div>
-    <div class="table-wrap"><table><thead><tr><th>Clé</th><th>Statut</th><th>Client</th><th>Email</th><th>Activation</th><th>Création</th><th>Actions</th></tr></thead><tbody id="licenseRows"></tbody></table></div><div id="mobileLicenseList" class="mobile-license-list"></div>
-    <div id="tableMsg" class="msg"></div>
-  </div>
-
-  <div class="card">
-    <h2 style="margin:0 0 8px;font-size:1rem">👥 Clients</h2>
-    <div class="small">Profils clients en lecture seule : compte, activité, programme, version et licence.</div>
-    <div id="clientGrid" class="client-grid" style="margin-top:10px"></div>
-    <div id="clientMsg" class="msg"></div>
-  </div>
-
-  <div class="card">
-    <h2 style="margin:0 0 6px;font-size:1rem;color:#8feaff">🚀 Mise à jour clients</h2>
-    <div class="small">Le bandeau n'apparaît que lorsque TU publies volontairement une annonce ici. Une version plus ancienne que l'application du client ne sera jamais affichée.</div>
-    <div class="release-grid">
-      <div><label>Nouvelle version</label><input id="releaseVersion" placeholder="12.8"></div>
-      <div><label>Message</label><input id="releaseMessage" placeholder="Nouvelle mise à jour disponible"></div>
-      <button class="green" onclick="saveRelease()">📣 PUBLIER</button>
+    <div class="grid2">
+      <div class="card"><h2>État des chasseurs</h2><p>Vue rapide des comptes qui ont le plus avancé.</p><div id="dashboardClients" class="list"></div></div>
+      <div class="card"><h2>Dernières idées</h2><p>Les retours les plus récents envoyés depuis l’application.</p><div id="dashboardIdeas" class="list"></div></div>
     </div>
-    <div style="display:flex;gap:8px;margin-top:10px;align-items:center;flex-wrap:wrap">
-      <span class="badge b-disabled" id="releaseStateBadge">ANNONCE INACTIVE</span>
-      <button class="red" onclick="clearRelease()">RETIRER LE BANDEAU</button>
+  </section>
+
+  <section id="tab-keys" class="panel">
+    <div class="card">
+      <h2>Créer des clés d’accès</h2><p>Trois types : 1 mois, 1 an ou Lifetime. Une clé est liée à un seul compte après activation.</p>
+      <div class="form-row">
+        <div><label>Type</label><select id="keyPlan"><option value="month">1 MOIS</option><option value="1y">1 AN</option><option value="lifetime">LIFETIME</option></select></div>
+        <div><label>Nombre</label><input id="keyCount" type="number" min="1" max="50" value="1"></div>
+        <button class="btn green" onclick="generateKeys()">GÉNÉRER</button>
+      </div>
+      <div id="keyMsg" class="msg"></div><div id="createdKeys" class="list"></div>
     </div>
-    <div id="releaseMsg" class="msg"></div>
-  </div>
+    <div class="card"><h2>Licences</h2><p>Recherche, statut, type, client et activation.</p><label>Recherche</label><input id="keySearch" placeholder="Clé, pseudo, email…" oninput="renderLicenses()"><div id="licenseList" class="list"></div></div>
+  </section>
+
+  <section id="tab-hunters" class="panel">
+    <div class="card"><h2>Vue Coach</h2><p>Ouvre un chasseur pour voir son bilan : SBD, séances, streak, absences, récupération, progression et historique.</p><label>Recherche</label><input id="clientSearch" placeholder="Pseudo ou email…" oninput="renderClients()"></div>
+    <div id="clientGrid" class="clients"></div>
+  </section>
+
+  <section id="tab-ideas" class="panel">
+    <div class="card"><h2>Boîte à idées</h2><p>Messages envoyés depuis Réglages → Mon idée. Tu peux les classer et ajouter une note admin.</p><div id="ideaList" class="list"></div></div>
+  </section>
+
+  <section id="tab-messages" class="panel">
+    <div class="grid2">
+      <div class="card">
+        <h2>Publier dans l’application</h2><p>Patch note ou message développeur, pour tout le monde ou un compte précis.</p>
+        <label>Type</label><select id="broadcastKind"><option value="patch_note">PATCH NOTE</option><option value="developer">MESSAGE DÉVELOPPEUR</option></select>
+        <label>Destinataire</label><select id="broadcastTarget"><option value="">TOUS LES COMPTES</option></select>
+        <label>Titre</label><input id="broadcastTitle" maxlength="120" placeholder="Titre">
+        <label>Message</label><textarea id="broadcastMessage" maxlength="2000" placeholder="Ton message…"></textarea>
+        <button class="btn primary" style="width:100%;margin-top:10px" onclick="publishBroadcast()">PUBLIER</button><div id="broadcastMsg" class="msg"></div>
+      </div>
+      <div class="card">
+        <h2>Bandeau de mise à jour</h2><p>Annonce une nouvelle version directement aux clients.</p>
+        <label>Version</label><input id="releaseVersion" placeholder="17.10.0">
+        <label>Message</label><textarea id="releaseMessage" placeholder="Nouvelle mise à jour disponible"></textarea>
+        <div class="row-actions"><button class="btn green" onclick="saveRelease(true)">ACTIVER LE BANDEAU</button><button class="btn red" onclick="saveRelease(false)">RETIRER</button></div><div id="releaseMsg" class="msg"></div>
+      </div>
+    </div>
+    <div class="card"><h2>Messages publiés</h2><div id="broadcastList" class="list"></div></div>
+  </section>
 </section>
 </div>
 
-<div id="clientModal" class="modal" onclick="if(event.target===this)closeClientModal()">
-  <div class="modalbox">
-    <div style="display:flex;justify-content:space-between;gap:10px;align-items:center"><h2 style="margin:0">👤 Fiche client</h2><button class="secondary" onclick="closeClientModal()">Fermer</button></div>
-    <div id="clientDetail" class="detail-grid" style="margin-top:12px"></div>
-  </div>
-</div>
+<div id="clientModal" class="modal" onclick="if(event.target===this)closeClient()"><div class="modalbox"><div class="modalhead"><h2 id="modalTitle">Bilan chasseur</h2><button class="btn" onclick="closeClient()">FERMER</button></div><div id="clientDetail"></div></div></div>
 
 <script>
-const SUPABASE_URL = 'https://jmejktyindxzzsqwthsk.supabase.co';
-const SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_2eS6-xR0i4DZ4H4YI4Uj2w_FXSC_yUP';
-const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
-let licenses = [];
-let clients = [];
-function esc(v){return String(v??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]))}
-function fmtDate(v){if(!v)return'—';try{return new Date(v).toLocaleString('fr-FR')}catch{return v}}
-function setMsg(id,text,ok=false){const el=document.getElementById(id);el.textContent=text||'';el.className='msg '+(text?(ok?'ok':'err'):'')}
+const SUPABASE_URL='https://jmejktyindxzzsqwthsk.supabase.co';
+const SUPABASE_KEY='sb_publishable_2eS6-xR0i4DZ4H4YI4Uj2w_FXSC_yUP';
+const sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}});
+let licenses=[],clients=[],ideas=[],broadcasts=[],currentUser=null;
+const $=id=>document.getElementById(id);
+const esc=v=>String(v??'').replace(/[<>&"]/g,c=>({'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;'}[c]));
+const fmtDate=v=>v?new Date(v).toLocaleString('fr-FR',{dateStyle:'short',timeStyle:'short'}):'—';
+const planLabel=p=>({month:'1 MOIS','1y':'1 AN',lifetime:'LIFETIME'}[p]||String(p||'AUCUN').toUpperCase());
+const statusBadge=s=>{s=String(s||'').toUpperCase();const c=s==='ACTIVE'||s==='LIFETIME'?'b-green':s==='UNUSED'?'b-yellow':s==='DISABLED'||s==='EXPIRED'?'b-red':'b-blue';return `<span class="badge ${c}">${esc(s||'—')}</span>`};
+
+function showTab(name,btn){document.querySelectorAll('.panel').forEach(x=>x.classList.toggle('active',x.id==='tab-'+name));document.querySelectorAll('.tab').forEach(x=>x.classList.toggle('active',x===btn))}
+function setMsg(id,text,type=''){const e=$(id);if(!e)return;e.textContent=text;e.className='msg '+type}
+
 async function login(){
-  setMsg('loginMsg','');const email=document.getElementById('email').value.trim();const password=document.getElementById('password').value;
-  if(!email||!password)return setMsg('loginMsg','Entre ton email et ton mot de passe.');
-  const {data,error}=await sb.auth.signInWithPassword({email,password});if(error)return setMsg('loginMsg',error.message);await enterAdmin(data.user);
+  setMsg('loginMsg','Connexion…');
+  const {data,error}=await sb.auth.signInWithPassword({email:$('email').value.trim(),password:$('password').value});
+  if(error)return setMsg('loginMsg',error.message,'err');
+  currentUser=data.user;
+  const {data:isAdmin,error:aerr}=await sb.rpc('is_leveling_admin');
+  if(aerr||isAdmin!==true){await sb.auth.signOut();currentUser=null;return setMsg('loginMsg','Accès administrateur refusé.','err')}
+  await enterAdmin();
 }
-async function enterAdmin(user){
-  const {data:isAdmin,error}=await sb.rpc('is_leveling_admin');
-  if(error||!isAdmin){await sb.auth.signOut();document.getElementById('adminView').classList.add('hidden');document.getElementById('loginView').classList.remove('hidden');return setMsg('loginMsg',"Ce compte n'est pas autorisé comme administrateur.");}
-  document.getElementById('loginView').classList.add('hidden');document.getElementById('adminView').classList.remove('hidden');document.getElementById('adminIdentity').textContent='Connecté : '+(user?.email||'');await refreshAll();
+async function enterAdmin(){
+  $('loginView').classList.add('hidden');$('adminView').classList.remove('hidden');$('identity').textContent=currentUser?.email||'Administrateur';await refreshAll();
 }
 async function logout(){await sb.auth.signOut();location.reload()}
-async function refreshAll(){await Promise.all([loadStats(),loadLicenses(),loadClients(),loadRelease()])}
-async function loadStats(){const {data,error}=await sb.rpc('admin_license_stats');if(error)return;const s=Array.isArray(data)?data[0]:data;if(!s)return;document.getElementById('sTotal').textContent=s.total;document.getElementById('sUnused').textContent=s.unused;document.getElementById('sActive').textContent=s.active;document.getElementById('sDisabled').textContent=s.disabled;document.getElementById('sProfiles').textContent=s.total_profiles}
-async function loadLicenses(){setMsg('tableMsg','');const {data,error}=await sb.rpc('admin_list_licenses');if(error){setMsg('tableMsg',error.message);return}licenses=data||[];renderLicenses()}
-function renderLicenses(){
-  const q=document.getElementById('search').value.toLowerCase().trim();const rows=licenses.filter(x=>!q||[x.license_key,x.username,x.email,x.status].some(v=>String(v||'').toLowerCase().includes(q)));const body=document.getElementById('licenseRows');
-  if(!rows.length){body.innerHTML='<tr><td colspan="7" style="text-align:center;color:#777">Aucune licence</td></tr>';const m=document.getElementById('mobileLicenseList');if(m)m.innerHTML='<div class="small">Aucune licence.</div>';return}
-  body.innerHTML=rows.map(x=>{const cls=x.status==='ACTIVE'?'b-active':x.status==='UNUSED'?'b-unused':'b-disabled';const toggle=x.enabled?`<button class="red" onclick="setEnabled('${x.id}',false)">Désactiver</button>`:`<button class="yellow" onclick="setEnabled('${x.id}',true)">Réactiver</button>`;
-  return `<tr><td><span class="key">${esc(x.license_key)}</span></td><td><span class="badge ${cls}">${esc(x.status)}</span></td><td>${esc(x.username||'—')}</td><td>${esc(x.email||'—')}</td><td>${fmtDate(x.activated_at)}</td><td>${fmtDate(x.created_at)}</td><td><div class="actions"><button class="secondary" onclick="copyKey('${esc(x.license_key)}')">Copier</button>${toggle}</div></td></tr>`}).join('');
-  const mobile=document.getElementById('mobileLicenseList');
-  if(mobile){
-    mobile.innerHTML=rows.map(x=>{const cls=x.status==='ACTIVE'?'b-active':x.status==='UNUSED'?'b-unused':'b-disabled';const toggle=x.enabled?`<button class="red" onclick="setEnabled('${x.id}',false)">Désactiver</button>`:`<button class="yellow" onclick="setEnabled('${x.id}',true)">Réactiver</button>`;
-      return `<div class="m-license"><div class="m-license-top"><span class="m-license-key">${esc(x.license_key)}</span><span class="badge ${cls}">${esc(x.status)}</span></div><div class="m-license-meta">👤 ${esc(x.username||'—')} · ${esc(x.email||'—')}<br>Activation : ${fmtDate(x.activated_at)}<br>Création : ${fmtDate(x.created_at)}</div><div class="m-license-actions"><button class="secondary" onclick="copyKey('${esc(x.license_key)}')">📋 Copier</button>${toggle}</div></div>`;
-    }).join('');
-  }
+async function refreshAll(){
+  await Promise.all([loadLicenses(),loadClients(),loadIdeas(),loadBroadcasts(),loadRelease()]);
+  renderStats();renderLicenses();renderClients();renderIdeas();renderBroadcasts();renderDashboard();fillTargets();
 }
+
+async function loadLicenses(){const {data,error}=await sb.rpc('admin_list_licenses');if(error)console.warn(error);licenses=data||[]}
 async function generateKeys(){
-  setMsg('generateMsg','');const count=Number(document.getElementById('keyCount').value);if(!Number.isInteger(count)||count<1||count>50)return setMsg('generateMsg','Choisis un nombre entre 1 et 50.');
-  const {data,error}=await sb.rpc('admin_generate_lifetime_licenses',{p_count:count});if(error)return setMsg('generateMsg',error.message);
-  const box=document.getElementById('createdKeys');const arr=data||[];box.innerHTML=arr.map(x=>`<div class="created-key"><span>${esc(x.license_key)}</span><button class="secondary" onclick="copyKey('${esc(x.license_key)}')">Copier</button></div>`).join('');box.classList.toggle('hidden',!arr.length);setMsg('generateMsg',`${arr.length} clé(s) générée(s).`,true);await refreshAll()
+  const plan=$('keyPlan').value,count=Math.max(1,Math.min(50,Number($('keyCount').value||1)));setMsg('keyMsg','Génération…');
+  const {data,error}=await sb.rpc('admin_generate_access_keys',{p_plan_code:plan,p_count:count});
+  if(error)return setMsg('keyMsg',error.message,'err');
+  $('createdKeys').innerHTML=(data||[]).map(k=>`<div class="item"><div class="item-head"><div><div class="key">${esc(k.license_key)}</div><div class="item-meta">${planLabel(k.plan_code)}</div></div><button class="btn blue" onclick="copyText('${esc(k.license_key)}')">COPIER</button></div></div>`).join('');
+  setMsg('keyMsg',`${(data||[]).length} clé(s) créée(s).`,'ok');await loadLicenses();renderLicenses();renderStats();
 }
-async function setEnabled(id,enabled){const action=enabled?'réactiver':'désactiver';if(!confirm(`Tu veux vraiment ${action} cette licence ?`))return;const {error}=await sb.rpc('admin_set_license_enabled',{p_license_id:id,p_enabled:enabled});if(error)return alert(error.message);await refreshAll()}
+async function toggleLicense(id,enabled){const {error}=await sb.rpc('admin_set_license_enabled',{p_license_id:id,p_enabled:enabled});if(error)return alert(error.message);await loadLicenses();renderLicenses();renderStats()}
+function renderLicenses(){
+  const q=String($('keySearch')?.value||'').toLowerCase();
+  const rows=licenses.filter(x=>[x.license_key,x.username,x.email,x.plan_code].some(v=>String(v||'').toLowerCase().includes(q)));
+  $('licenseList').innerHTML=rows.length?rows.map(x=>`<div class="item"><div class="item-head"><div><div class="key">${esc(x.license_key)}</div><div class="item-meta">${planLabel(x.plan_code)} · ${esc(x.username||'Non attribuée')} · ${esc(x.email||'')}</div></div>${statusBadge(x.status)}</div><div class="item-meta">Créée ${fmtDate(x.created_at)} · Activée ${fmtDate(x.activated_at)}</div><div class="row-actions"><button class="btn blue" onclick="copyText('${esc(x.license_key)}')">COPIER</button><button class="btn ${x.enabled?'red':'green'}" onclick="toggleLicense('${x.id}',${!x.enabled})">${x.enabled?'DÉSACTIVER':'RÉACTIVER'}</button></div></div>`).join(''):`<div class="empty">Aucune licence.</div>`;
+}
 
-async function loadClients(){
-  setMsg('clientMsg','');
-  const {data,error}=await sb.rpc('admin_list_clients');
-  if(error){setMsg('clientMsg',error.message);return}
-  clients=data||[];renderClients();
-}
+async function loadClients(){const {data,error}=await sb.rpc('admin_list_clients_coach');if(error)console.warn(error);clients=data||[]}
 function renderClients(){
-  const box=document.getElementById('clientGrid');
-  if(!clients.length){box.innerHTML='<div class="small">Aucun client.</div>';return}
-  box.innerHTML=clients.map((x,i)=>`<div class="client-card">
-    <h3>${esc(x.username||'Sans pseudo')}</h3>
-    <div class="client-meta">${esc(x.email||'—')}<br>Programme : <b>${esc(x.active_program||'—')}</b> · Séances : <b>${esc(x.workouts||0)}</b><br>Version : <b>${esc(x.app_version||'—')}</b> · Licence : <b>${esc(x.license_status||'—')}</b></div>
-    <button class="secondary" style="margin-top:9px;width:100%" onclick="viewClient(${i})">Voir profil</button>
-  </div>`).join('');
+  const q=String($('clientSearch')?.value||'').toLowerCase();
+  const rows=clients.filter(x=>`${x.username||''} ${x.email||''}`.toLowerCase().includes(q));
+  $('clientGrid').innerHTML=rows.length?rows.map(x=>{
+    const total=Number(x.squat||0)+Number(x.bench||0)+Number(x.deadlift||0);
+    return `<article class="client" onclick="openClient('${x.user_id}')"><div class="client-top"><div><h3>${esc(x.username||'Chasseur')}</h3><div class="email">${esc(x.email||'')}</div></div><span class="badge ${x.plan_code==='lifetime'?'b-green':'b-blue'}">${planLabel(x.plan_code)}</span></div><div class="metrics"><div class="metric"><b>${Number(x.level||1)}</b><span>Niveau</span></div><div class="metric"><b>${Number(x.streak||0)}</b><span>Série</span></div><div class="metric"><b>${Number(x.workouts||0)}</b><span>Séances</span></div><div class="metric"><b>${total}</b><span>SBD</span></div></div><div class="item-meta" style="margin-top:8px">${esc(x.active_program||'—')} · Bloc ${Number(x.current_block||0)+1} · Jour ${Number(x.current_day||0)+1}</div></article>`;
+  }).join(''):`<div class="empty">Aucun chasseur.</div>`;
 }
-function viewClient(i){
-  const x=clients[i];if(!x)return;
-  const fields=[
-    ['Pseudo',x.username],['Email',x.email],['Inscription',fmtDate(x.created_at)],['Dernière connexion',fmtDate(x.last_sign_in_at)],
-    ['Programme actif',x.active_program],['Séances validées',x.workouts],['Version app',x.app_version],['Licence',x.license_status],
-    ['Clé',x.license_key||'—'],['Dernière sauvegarde',fmtDate(x.updated_at)]
-  ];
-  document.getElementById('clientDetail').innerHTML=fields.map(([k,v])=>`<div class="detail"><span>${esc(k)}</span><b>${esc(v??'—')}</b></div>`).join('');
-  document.getElementById('clientModal').classList.add('show');
+function recoveryScore(entry){const sleep=Number(entry?.sleep),feel=Number(entry?.fatigue);if(!(sleep>=1&&sleep<=10&&feel>=1&&feel<=10))return null;return Math.round((((sleep-1)/9)*.55+((feel-1)/9)*.45)*100)}
+function openClient(id){
+  const x=clients.find(c=>c.user_id===id);if(!x)return;const d=x.app_data||{},u=d.userData||{},v=d.v10||{},recovery=v.recovery||{};
+  const rec=Object.keys(recovery).sort().reverse().slice(0,7).map(day=>({day,...recovery[day],score:recoveryScore(recovery[day])}));
+  const validCount=Object.keys(u.validatedSessions||{}).length,absentCount=Object.keys(u.absentSessions||{}).length;
+  const attendance=validCount+absentCount?Math.round(validCount/(validCount+absentCount)*100):0;
+  const total=Number(x.squat||0)+Number(x.bench||0)+Number(x.deadlift||0);
+  const recScores=rec.map(r=>r.score).filter(Number.isFinite),recAvg=recScores.length?Math.round(recScores.reduce((a,b)=>a+b,0)/recScores.length):null;
+  const sessions=(v.sessions||[]).slice(-6).reverse();
+  const hist=(d.workoutHistory||[]).slice(-5).reverse();
+  let coach=[];
+  if(Number(x.streak||0)>=3)coach.push(`Série solide de ${x.streak} jours.`);
+  if(recAvg!==null)coach.push(`Récupération moyenne récente : ${recAvg}/100.`);
+  if(absentCount)coach.push(`${absentCount} jour(s) marqué(s) absent dans les blocs.`);
+  coach.push(`Total SBD actuel : ${total} kg.`);
+  $('modalTitle').textContent=`Bilan · ${x.username||'Chasseur'}`;
+  $('clientDetail').innerHTML=`<div class="coach-summary"><b>LECTURE COACH</b><div>${esc(coach.join(' '))}</div></div>
+  <div class="detailgrid">
+    <div class="detail"><span>Niveau</span><b>${Number(x.level||1)}</b></div><div class="detail"><span>XP</span><b>${Number(x.xp||0).toLocaleString('fr-FR')}</b></div><div class="detail"><span>Série</span><b>${Number(x.streak||0)} j</b></div><div class="detail"><span>Séances</span><b>${Number(x.workouts||0)}</b></div>
+    <div class="detail"><span>Poids</span><b>${Number(x.weight||0)} kg</b></div><div class="detail"><span>Taille</span><b>${Number(u.height||0)} cm</b></div><div class="detail"><span>Body fat</span><b>${Number(u.bodyFat||0)||'—'} %</b></div><div class="detail"><span>Assiduité bloc</span><b>${attendance}%</b></div>
+    <div class="detail"><span>Squat</span><b>${Number(x.squat||0)} kg</b></div><div class="detail"><span>Bench</span><b>${Number(x.bench||0)} kg</b></div><div class="detail"><span>Deadlift</span><b>${Number(x.deadlift||0)} kg</b></div><div class="detail"><span>Total SBD</span><b>${total} kg</b></div>
+    <div class="detail"><span>Programme</span><b>${esc(x.active_program||'—')}</b></div><div class="detail"><span>Bloc</span><b>${Number(x.current_block||0)+1}</b></div><div class="detail"><span>Jour</span><b>${Number(x.current_day||0)+1}</b></div><div class="detail"><span>Volume semaine</span><b>${Number(x.weekly_volume||0).toLocaleString('fr-FR')} kg</b></div>
+    <div class="detail"><span>Validés</span><b>${validCount}</b></div><div class="detail"><span>Absences</span><b style="color:var(--red)">${absentCount}</b></div><div class="detail"><span>PR</span><b>${Number(u.prCount||0)}</b></div><div class="detail"><span>Dernière sync</span><b>${fmtDate(x.updated_at)}</b></div>
+  </div>
+  <div class="section-title">Récupération récente</div><div class="timeline">${rec.length?rec.map(r=>`<div class="item"><div class="item-head"><div class="item-title">${esc(r.day)}</div><span class="badge ${r.score>=70?'b-green':r.score>=45?'b-yellow':'b-red'}">${r.score===null?'—':r.score+'/100'}</span></div><div class="item-meta">Sommeil ${r.sleep||'—'}/10 · Ressenti ${r.fatigue||'—'}/10</div></div>`).join(''):'<div class="empty">Pas encore de bilan récupération.</div>'}</div>
+  <div class="section-title">Dernières séances</div><div class="timeline">${sessions.length?sessions.map(z=>`<div class="item"><div class="item-title">${esc(z.date||'Séance')}</div><div class="item-meta">${esc(z.program||'')} · Bloc ${Number(z.block||0)+1} · Jour ${Number(z.day||0)+1} · ${Number(z.volume||0).toLocaleString('fr-FR')} kg · Intensité ${Number(z.rating||0)}/5</div></div>`).join(''):'<div class="empty">Aucune séance cloud enregistrée.</div>'}</div>
+  <div class="section-title">Historique blocs</div><div class="timeline">${hist.length?hist.map(h=>`<div class="item"><div class="item-title">${esc(h.blockName||'Bloc')}</div><div class="item-meta">${esc(h.date||'')} · ${Number(h.totalTonnage||0).toLocaleString('fr-FR')} kg</div></div>`).join(''):'<div class="empty">Aucun bloc archivé.</div>'}</div>`;
+  $('clientModal').classList.add('show');
 }
-function closeClientModal(){document.getElementById('clientModal').classList.remove('show')}
-async function loadRelease(){
-  const {data,error}=await sb.rpc('admin_get_app_release');if(error)return;
-  const r=Array.isArray(data)?data[0]:data;if(!r)return;
-  document.getElementById('releaseVersion').value=r.latest_version||'';
-  document.getElementById('releaseMessage').value=r.message||'';
-  const b=document.getElementById('releaseStateBadge');if(b){b.textContent=r.is_active?'ANNONCE ACTIVE':'ANNONCE INACTIVE';b.className='badge '+(r.is_active?'b-active':'b-disabled')}
+function closeClient(){$('clientModal').classList.remove('show')}
+
+async function loadIdeas(){const {data,error}=await sb.rpc('admin_list_ideas');if(error)console.warn(error);ideas=data||[]}
+function renderIdeas(){
+  $('ideaList').innerHTML=ideas.length?ideas.map(x=>`<div class="item"><div class="item-head"><div><div class="item-title">${esc(x.username||x.email||'Utilisateur')} · ${esc(x.category)}</div><div class="item-meta">${fmtDate(x.created_at)} · V${esc(x.app_version||'—')}</div></div>${statusBadge(x.status)}</div><div class="idea-message">${esc(x.message)}</div><div class="idea-controls"><select id="ideaStatus-${x.id}"><option value="new" ${x.status==='new'?'selected':''}>NOUVEAU</option><option value="read" ${x.status==='read'?'selected':''}>LU</option><option value="planned" ${x.status==='planned'?'selected':''}>PRÉVU</option><option value="done" ${x.status==='done'?'selected':''}>FAIT</option><option value="rejected" ${x.status==='rejected'?'selected':''}>REFUSÉ</option></select><input id="ideaNote-${x.id}" value="${esc(x.admin_note||'')}" placeholder="Note admin"><button class="btn blue" onclick="saveIdea(${x.id})">ENREGISTRER</button></div></div>`).join(''):`<div class="empty">Aucune idée reçue pour le moment.</div>`;
 }
-async function saveRelease(){
-  const version=document.getElementById('releaseVersion').value.trim(),message=document.getElementById('releaseMessage').value.trim();
-  if(!version)return setMsg('releaseMsg','Entre un numéro de version.');
-  const {error}=await sb.rpc('admin_set_app_release_v2',{p_version:version,p_message:message,p_active:true});
-  if(error)return setMsg('releaseMsg',error.message);
-  setMsg('releaseMsg','Annonce publiée. Seuls les clients avec une version plus ancienne verront le bandeau.',true);await loadRelease();
+async function saveIdea(id){const {error}=await sb.rpc('admin_update_idea',{p_id:id,p_status:$('ideaStatus-'+id).value,p_admin_note:$('ideaNote-'+id).value||null});if(error)return alert(error.message);await loadIdeas();renderIdeas();renderStats();renderDashboard()}
+
+async function loadBroadcasts(){const {data,error}=await sb.rpc('admin_list_broadcasts');if(error)console.warn(error);broadcasts=data||[]}
+function fillTargets(){const sel=$('broadcastTarget'),current=sel?.value||'';if(!sel)return;sel.innerHTML='<option value="">TOUS LES COMPTES</option>'+clients.map(x=>`<option value="${x.user_id}">${esc(x.username||'Chasseur')} · ${esc(x.email||'')}</option>`).join('');sel.value=current}
+async function publishBroadcast(){
+  const kind=$('broadcastKind').value,title=$('broadcastTitle').value.trim(),message=$('broadcastMessage').value.trim(),target=$('broadcastTarget').value||null;
+  if(!title||!message)return setMsg('broadcastMsg','Titre et message requis.','err');setMsg('broadcastMsg','Publication…');
+  const {error}=await sb.rpc('admin_publish_broadcast',{p_kind:kind,p_title:title,p_message:message,p_target_user_id:target});
+  if(error)return setMsg('broadcastMsg',error.message,'err');$('broadcastTitle').value='';$('broadcastMessage').value='';setMsg('broadcastMsg','Message publié dans l’application.','ok');await loadBroadcasts();renderBroadcasts();renderStats();
 }
-async function clearRelease(){
-  const version=document.getElementById('releaseVersion').value.trim()||'12.7',message=document.getElementById('releaseMessage').value.trim();
-  const {error}=await sb.rpc('admin_set_app_release_v2',{p_version:version,p_message:message,p_active:false});
-  if(error)return setMsg('releaseMsg',error.message);
-  setMsg('releaseMsg','Bandeau retiré chez les clients.',true);await loadRelease();
+async function toggleBroadcast(id,active){const {error}=await sb.rpc('admin_set_broadcast_active',{p_id:id,p_active:active});if(error)return alert(error.message);await loadBroadcasts();renderBroadcasts();renderStats()}
+function renderBroadcasts(){
+  $('broadcastList').innerHTML=broadcasts.length?broadcasts.map(x=>`<div class="item"><div class="item-head"><div><div class="item-title">${x.kind==='patch_note'?'PATCH NOTE':'MESSAGE DÉVELOPPEUR'} · ${esc(x.title)}</div><div class="item-meta">${fmtDate(x.created_at)} · ${x.target_user_id?'Ciblé':'Tous les comptes'}</div></div><span class="badge ${x.active?'b-green':'b-red'}">${x.active?'ACTIF':'COUPÉ'}</span></div><div class="broadcast-message">${esc(x.message)}</div><div class="row-actions"><button class="btn ${x.active?'red':'green'}" onclick="toggleBroadcast(${x.id},${!x.active})">${x.active?'DÉSACTIVER':'RÉACTIVER'}</button></div></div>`).join(''):`<div class="empty">Aucun message publié.</div>`;
 }
 
-async function copyKey(key){try{await navigator.clipboard.writeText(key);alert('Clé copiée : '+key)}catch{prompt('Copie la clé :',key)}}
+async function loadRelease(){const {data,error}=await sb.rpc('admin_get_app_release');if(!error&&data){const r=Array.isArray(data)?data[0]:data;if(r){$('releaseVersion').value=r.latest_version||'';$('releaseMessage').value=r.message||''}}}
+async function saveRelease(active){const version=$('releaseVersion').value.trim(),message=$('releaseMessage').value.trim();if(active&&(!version||!message))return setMsg('releaseMsg','Version et message requis.','err');const {error}=await sb.rpc('admin_set_app_release_v2',{p_version:version||'17.10.0',p_message:message||'',p_active:active});if(error)return setMsg('releaseMsg',error.message,'err');setMsg('releaseMsg',active?'Bandeau activé.':'Bandeau retiré.','ok')}
 
-let deferredAdminInstall=null;
-window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();deferredAdminInstall=e;document.getElementById('installAdminBtn')?.classList.add('install-admin-btn')});
-async function installAdminPWA(){
-  if(deferredAdminInstall){deferredAdminInstall.prompt();await deferredAdminInstall.userChoice;deferredAdminInstall=null;return}
-  alert("Sur iPhone/iPad : Partager → Ajouter à l’écran d’accueil. Sur Android : menu du navigateur → Installer l’application / Ajouter à l’écran d’accueil.");
+function renderStats(){
+  $('stClients').textContent=clients.length;$('stLifetime').textContent=clients.filter(x=>x.plan_code==='lifetime').length;$('stKeys').textContent=licenses.filter(x=>x.status==='UNUSED').length;$('stIdeas').textContent=ideas.filter(x=>x.status==='new').length;$('stMessages').textContent=broadcasts.filter(x=>x.active).length;$('stWorkouts').textContent=clients.reduce((s,x)=>s+Number(x.workouts||0),0);
 }
-if('serviceWorker' in navigator){window.addEventListener('load',()=>navigator.serviceWorker.register('./service-worker.js').catch(()=>{}))}
+function renderDashboard(){
+  $('dashboardClients').innerHTML=clients.slice().sort((a,b)=>Number(b.workouts||0)-Number(a.workouts||0)).slice(0,5).map(x=>`<div class="item" onclick="openClient('${x.user_id}')" style="cursor:pointer"><div class="item-head"><div><div class="item-title">${esc(x.username||'Chasseur')}</div><div class="item-meta">${Number(x.workouts||0)} séances · série ${Number(x.streak||0)} j · niv. ${Number(x.level||1)}</div></div><span class="badge b-blue">${planLabel(x.plan_code)}</span></div></div>`).join('')||'<div class="empty">Aucun client.</div>';
+  $('dashboardIdeas').innerHTML=ideas.slice(0,5).map(x=>`<div class="item"><div class="item-title">${esc(x.username||'Utilisateur')} · ${esc(x.category)}</div><div class="item-meta">${fmtDate(x.created_at)}</div><div class="idea-message">${esc(x.message).slice(0,180)}</div></div>`).join('')||'<div class="empty">Aucune idée.</div>';
+}
+async function copyText(t){try{await navigator.clipboard.writeText(t)}catch(e){const a=document.createElement('textarea');a.value=t;document.body.appendChild(a);a.select();document.execCommand('copy');a.remove()}}
 
-(async function boot(){const {data:{session}}=await sb.auth.getSession();if(session?.user)await enterAdmin(session.user)})();
+(async function boot(){
+  const {data}=await sb.auth.getSession();if(!data?.session?.user)return;
+  currentUser=data.session.user;const {data:isAdmin}=await sb.rpc('is_leveling_admin');if(isAdmin===true)enterAdmin();
+})();
 </script>
 </body>
 </html>
