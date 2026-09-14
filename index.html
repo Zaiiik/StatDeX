@@ -30,7 +30,7 @@
 
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>LEVELING-APP — V17.11 HARDENING & PERFORMANCE</title>
+    <title>LEVELING-APP — V17.11.1 LIVE PAYMENTS</title>
     <meta name="theme-color" content="#09090f">
     <meta name="application-name" content="LEVELING-APP">
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -2729,6 +2729,14 @@ body.v162-onboarding-lock #session-restore-splash{display:none!important}
 .v1653-test-card b{color:#fff}
 </style>
 
+
+<style id="v17111-live-version-css">
+.v17111-live-banner{border-color:rgba(57,245,166,.50)!important;background:linear-gradient(90deg,rgba(57,245,166,.08),rgba(0,210,255,.055))!important;box-shadow:0 0 20px rgba(57,245,166,.04)!important}
+.v17111-live-banner .v1653-test-title{color:#39f5a6!important}
+.v17111-version-card{margin:10px 0 0;padding:13px;border:1px solid rgba(85,200,255,.25);border-radius:14px;background:linear-gradient(145deg,rgba(85,200,255,.06),rgba(169,0,255,.05))}
+.v17111-version-top{display:flex;align-items:center;justify-content:space-between;gap:10px}.v17111-version-top b{font-size:.74rem;color:#fff}.v17111-version-badge{padding:5px 9px;border-radius:999px;border:1px solid rgba(57,245,166,.35);color:#62f7b5;background:rgba(57,245,166,.07);font-size:.55rem;font-weight:1000;letter-spacing:.06em}
+.v17111-version-copy{margin-top:6px;color:#85818f;font-size:.61rem;line-height:1.45}.v17111-refresh-btn{width:100%;min-height:42px;margin-top:10px;border:1px solid rgba(85,200,255,.35);border-radius:11px;background:rgba(85,200,255,.08);color:#83d8ff;font-weight:1000;font-size:.68rem;letter-spacing:.035em}.v17111-refresh-btn:disabled{opacity:.55}
+</style>
 
 <style id="v1700-premium-ui-css">
 /* ===== V17.1.0 · PREMIUM SYSTEM INTRO ===== */
@@ -6048,7 +6056,7 @@ function setAppUnlockedShell(){
   document.getElementById('app-container')?.classList.remove('auth-locked');
 }
 
-const APP_VERSION='17.11.0-HARDENING-PERFORMANCE';
+const APP_VERSION='17.11.1-LIVE-PAYMENTS';
 const ACCOUNT_LOCAL_KEYS=['solo_leveling_user','solo_leveling_smart_refs','solo_leveling_body_hist','solo_leveling_inv','solo_leveling_block','solo_leveling_day','solo_leveling_state','solo_leveling_custom_sets','solo_leveling_history','solo_leveling_active_program','solo_leveling_program_states','solo_leveling_program_custom_sets','solo_leveling_custom_program','leveling_last_local_save','leveling_last_cloud_sync','leveling_v10'];
 function clearLevelingAccountLocalData(){
   try{ACCOUNT_LOCAL_KEYS.forEach(k=>localStorage.removeItem(k));sessionStorage.removeItem('leveling_pending_license')}catch(e){console.warn('Local account cleanup:',e)}
@@ -6135,18 +6143,10 @@ async function routeNoSubscriptionToSettings(){
 }
 window.routeNoSubscriptionToSettings=routeNoSubscriptionToSettings;
 
-/* V17.11 — Stripe environments are now isolated. LIVE stays disabled until
-   real Payment Links + LIVE webhook are configured and validated server-side. */
-const LEVELING_STRIPE_ENV='test';
-const LEVELING_STRIPE_LINKS={
-  test:{
-    '4w':'https://buy.stripe.com/test_9B6bJ11co0kIeNp6ZH3Ru00',
-    '1y':'https://buy.stripe.com/test_dRmfZh6wI5F2bBdbfX3Ru01',
-    'life':'https://buy.stripe.com/test_28EeVd6wI6J6eNp3Nv3Ru02'
-  },
-  live:{'4w':'','1y':'','life':''}
-};
-const V1653_TEST_PAYMENT_LINKS=LEVELING_STRIPE_LINKS.test;
+/* V17.11.1 — Stripe LIVE. Checkout and customer portal are created server-side
+   by authenticated Supabase Edge Functions. No Stripe secret is exposed here. */
+const LEVELING_STRIPE_ENV='live';
+const LEVELING_STRIPE_PLAN_MAP=Object.freeze({'4w':'month','1y':'1y','life':'lifetime'});
 
 function v1654TestLang(){
   return localStorage.getItem('leveling_language')==='en'?'en':'fr';
@@ -6154,50 +6154,56 @@ function v1654TestLang(){
 function v1654TestPromoActive(){
   return localStorage.getItem('leveling_promo_code')==='MONARQUE';
 }
-
+async function v17111StripeSession(){
+  const {data,error}=await sb.auth.getSession();
+  if(error)throw error;
+  if(!data?.session?.access_token)throw new Error(v1654TestLang()==='fr'?'Connecte-toi à ton compte avant de payer.':'Sign in before starting payment.');
+  return data.session;
+}
+async function v17111CallStripeFunction(slug,payload){
+  const session=await v17111StripeSession();
+  const res=await fetch(`${SUPABASE_URL}/functions/v1/${slug}`,{
+    method:'POST',
+    headers:{
+      'Content-Type':'application/json',
+      'Authorization':`Bearer ${session.access_token}`,
+      'apikey':SUPABASE_PUBLISHABLE_KEY
+    },
+    body:JSON.stringify(payload||{})
+  });
+  let data={};try{data=await res.json()}catch(e){}
+  if(!res.ok||!data?.url)throw new Error(data?.error||(v1654TestLang()==='fr'?'Stripe est momentanément indisponible.':'Stripe is temporarily unavailable.'));
+  return data;
+}
 async function startStripeCheckout(planId){
   try{
-    if(!cloudUser) throw new Error('Connecte-toi à ton compte avant de lancer le paiement test.');
-    const links=LEVELING_STRIPE_LINKS[LEVELING_STRIPE_ENV]||{};
-    const base=links[planId];
-    if(!base) throw new Error(LEVELING_STRIPE_ENV==='live'?'Paiement LIVE non configuré.':'Plan test invalide.');
-
-    const url=new URL(base);
-    url.searchParams.set('client_reference_id',String(cloudUser.id||''));
-    if(cloudUser.email) url.searchParams.set('locked_prefilled_email',String(cloudUser.email));
-    url.searchParams.set('locale',v1654TestLang()==='fr'?'fr':'en');
-    if(v1654TestPromoActive()) url.searchParams.set('prefilled_promo_code','MONARQUE');
-
-    try{
-      showSocialToast?.(
-        'STRIPE TEST',
-        v1654TestLang()==='fr'
-          ?'Ouverture du paiement test · aucun débit réel'
-          :'Opening Stripe test checkout · no real charge'
-      );
-    }catch(e){}
-
-    location.href=url.toString();
+    if(!cloudUser)throw new Error(v1654TestLang()==='fr'?'Connecte-toi à ton compte avant de lancer le paiement.':'Sign in before starting payment.');
+    const plan=LEVELING_STRIPE_PLAN_MAP[planId];
+    if(!plan)throw new Error(v1654TestLang()==='fr'?'Offre invalide.':'Invalid plan.');
+    try{showSocialToast?.('STRIPE',v1654TestLang()==='fr'?'Ouverture du paiement sécurisé Stripe…':'Opening secure Stripe checkout…')}catch(e){}
+    const data=await v17111CallStripeFunction('create-checkout',{plan,promo_code:v1654TestPromoActive()?'MONARQUE':''});
+    location.href=data.url;
     return true;
   }catch(err){
-    console.error('Stripe TEST checkout:',err);
-    try{showSocialToast?.('STRIPE TEST',err?.message||'Erreur du paiement test.')}catch(e){}
+    console.error('Stripe LIVE checkout:',err);
+    try{showSocialToast?.('STRIPE',err?.message||(v1654TestLang()==='fr'?'Erreur de paiement.':'Payment error.'))}catch(e){}
     return false;
   }
 }
 window.startStripeCheckout=startStripeCheckout;
 
 async function manageStripeSubscription(action='manage'){
-  const cancel=action==='cancel';
-  const msg=v1654TestLang()==='fr'
-    ?(cancel
-      ?'MODE TEST : aucune résiliation LIVE ne sera lancée. Une fois ton abonnement test créé, je pourrai déclencher sa résiliation Stripe TEST pour vérifier tout le cycle.'
-      :'MODE TEST : la gestion LIVE est volontairement désactivée dans cette version.')
-    :(cancel
-      ?'TEST MODE: no LIVE cancellation will be triggered. The Stripe TEST subscription can be cancelled separately to validate the full cycle.'
-      :'TEST MODE: LIVE subscription management is intentionally disabled in this build.');
-  try{showSocialToast?.('STRIPE TEST',msg)}catch(e){}
-  return false;
+  try{
+    const cancel=action==='cancel';
+    try{showSocialToast?.('STRIPE',v1654TestLang()==='fr'?(cancel?'Ouverture de la résiliation sécurisée…':'Ouverture du portail Stripe…'):(cancel?'Opening secure cancellation…':'Opening Stripe portal…'))}catch(e){}
+    const data=await v17111CallStripeFunction('create-billing-portal',{action:cancel?'cancel':'manage'});
+    location.href=data.url;
+    return true;
+  }catch(err){
+    console.error('Stripe billing portal:',err);
+    try{showSocialToast?.('STRIPE',err?.message||(v1654TestLang()==='fr'?'Gestion de l’abonnement indisponible.':'Subscription management unavailable.'))}catch(e){}
+    return false;
+  }
 }
 window.manageStripeSubscription=manageStripeSubscription;
 window.cancelStripeSubscription=()=>manageStripeSubscription('cancel');
@@ -6340,12 +6346,14 @@ async function getCurrentLicenseStatus(){
     const liveAccess=normalizeAccess(liveRow,false);
     if(liveAccess)return liveAccess;
 
-    // 2. Seulement s'il n'existe aucun accès réel, accepter un achat Stripe TEST.
-    const test=await sb.rpc('get_my_test_access');
-    if(test.error)throw test.error;
-    const testRow=Array.isArray(test.data)?test.data[0]:test.data;
-    const testAccess=normalizeAccess(testRow,true);
-    if(testAccess)return testAccess;
+    // 2. Les données Stripe TEST restent isolées et ne donnent jamais accès dans un build LIVE.
+    if(LEVELING_STRIPE_ENV==='test') {
+      const test=await sb.rpc('get_my_test_access');
+      if(test.error)throw test.error;
+      const testRow=Array.isArray(test.data)?test.data[0]:test.data;
+      const testAccess=normalizeAccess(testRow,true);
+      if(testAccess)return testAccess;
+    }
 
     currentSubscriptionPlan='';
     return{
@@ -7350,6 +7358,7 @@ function initCompactSettings(){
 
   if(backup)save.querySelector('.compact-setting-body').appendChild(backup);
   if(install)display.querySelector('.compact-setting-body').appendChild(install);
+  try{window.v17111MountVersionTools?.(display.querySelector('.compact-setting-body'))}catch(e){}
   const grid=document.createElement('div');grid.className='compact-settings-grid';
   [account,language,subscription,progress,appearance,save,display,legal].forEach(x=>grid.appendChild(x));
   const oldH=direct.filter(x=>x.tagName==='H2'||x.classList?.contains('subtitle'));oldH.forEach(x=>x.remove());
@@ -11014,10 +11023,10 @@ const p=plans.find(x=>x.id===view),isCurrent=current===p.id,isSelected=!isCurren
 const final=promo?p.base*.70:p.base;
 const benefits=[...c.benefits,...(p.lifetime?[c.life_extra]:[])];
 root.innerHTML=`<div class="v1612-shell">
-<div class="v1653-test-banner">
-  <div class="v1653-test-title">STRIPE TEST · AUCUN DÉBIT RÉEL</div>
-  <div class="v1653-test-copy">Cette version utilise uniquement l’environnement TEST Stripe. Les paiements sont fictifs et séparés de tes vrais clients.</div>
-  <div class="v1653-test-card"><b>Carte test :</b> 4242 4242 4242 4242 · date future · CVC 123</div>
+<div class="v1653-test-banner v17111-live-banner">
+  <div class="v1653-test-title">${lang()==='fr'?'PAIEMENT SÉCURISÉ · STRIPE LIVE':'SECURE PAYMENT · STRIPE LIVE'}</div>
+  <div class="v1653-test-copy">${lang()==='fr'?'Les paiements sont désormais réels. Le montant et l’offre sont confirmés sur la page sécurisée Stripe avant validation.':'Payments are now real. The amount and plan are confirmed on Stripe’s secure page before payment.'}</div>
+  <div class="v1653-test-card"><b>${lang()==='fr'?'Sécurisé par Stripe':'Secured by Stripe'}</b> · ${lang()==='fr'?'LEVELING-APP ne stocke pas tes données complètes de carte bancaire.':'LEVELING-APP does not store your full card details.'}</div>
 </div>
 <section class="v1612-box">
 <div class="v1612-box-head"><b>${c.offers}</b><small>${c.offers_sub}</small></div>
@@ -11121,7 +11130,7 @@ window.v1648RenderLegal=function(){
       <h4>Service changes</h4><p>The application may evolve, receive updates or change features to improve the service, security or compatibility. Material changes affecting user rights will be communicated appropriately.</p>
     </div></details>
     <details class="v1648-legal-doc"><summary>3. Terms of Sale · subscriptions</summary><div class="v1648-legal-body">
-      <p>The currently planned offers are:</p><div class="v1648-legal-price-grid"><div class="v1648-legal-price"><b>€6.99</b><span>1 month · monthly renewal</span></div><div class="v1648-legal-price"><b>€49.99</b><span>1 year · annual renewal</span></div><div class="v1648-legal-price"><b>€149.99</b><span>Lifetime · one-time payment</span></div></div>
+      <p>The currently available offers are:</p><div class="v1648-legal-price-grid"><div class="v1648-legal-price"><b>€6.99</b><span>1 month · monthly renewal</span></div><div class="v1648-legal-price"><b>€49.99</b><span>1 year · annual renewal</span></div><div class="v1648-legal-price"><b>€149.99</b><span>Lifetime · one-time payment</span></div></div>
       <p><strong>Order and payment.</strong> Payments are processed through Stripe. Paid access is activated after payment confirmation. The price and plan features are displayed before the order is confirmed.</p>
       <p><strong>Renewal.</strong> The 1-month and 1-year plans renew automatically at the end of each billing period until cancelled. Lifetime is a one-time payment with no automatic renewal.</p>
       <p><strong>Cancellation.</strong> For recurring plans, users can go to Settings → Subscription → <em>Manage / cancel my subscription</em> at any time. Management is handled through the Stripe portal. Cancellation takes effect at the end of the period already paid for, unless the law provides otherwise.</p>
@@ -11196,7 +11205,7 @@ Date: [date].</div>
     <details class="v1648-legal-doc">
       <summary>3. Conditions générales de vente (CGV) · abonnements</summary>
       <div class="v1648-legal-body">
-        <p>Les offres actuellement prévues sont :</p>
+        <p>Les offres actuellement disponibles sont :</p>
         <div class="v1648-legal-price-grid"><div class="v1648-legal-price"><b>6,99 €</b><span>1 mois · renouvellement mensuel</span></div><div class="v1648-legal-price"><b>49,99 €</b><span>1 an · renouvellement annuel</span></div><div class="v1648-legal-price"><b>149,99 €</b><span>Lifetime · paiement unique</span></div></div>
         <p><strong>Commande et paiement.</strong> Le paiement est traité via Stripe. L’accès payant est activé après confirmation du paiement. Le prix et les caractéristiques de l’offre sont affichés avant validation de la commande.</p>
         <p><strong>Renouvellement.</strong> Les offres 1 mois et 1 an sont renouvelées automatiquement à leur échéance jusqu’à résiliation. L’offre Lifetime est un paiement unique sans renouvellement automatique.</p>
@@ -11317,6 +11326,28 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',()=>{ensure();setTimeout(refreshCloud,900)},{once:true});else{ensure();setTimeout(refreshCloud,500)}
   window.addEventListener('pageshow',()=>setTimeout(refreshCloud,500));
 })();
+</script>
+
+<script id="v17111-version-tools">
+const V17111_PUBLIC_VERSION='17.11.1';
+function v17111MountVersionTools(target){
+  if(!target||target.querySelector('#v17111-version-card'))return;
+  const en=localStorage.getItem('leveling_language')==='en';
+  const box=document.createElement('div');box.id='v17111-version-card';box.className='v17111-version-card';
+  box.innerHTML=`<div class="v17111-version-top"><b>${en?'APP VERSION':'VERSION DE L’APP'}</b><span class="v17111-version-badge">V${V17111_PUBLIC_VERSION}</span></div><div class="v17111-version-copy">${en?'Force a fresh download of the latest LEVELING-APP files if an update seems stuck.':'Force le téléchargement des derniers fichiers LEVELING-APP si une mise à jour semble bloquée.'}</div><button id="v17111-refresh-btn" class="v17111-refresh-btn" type="button">${en?'CHECK / REFRESH APP':'VÉRIFIER / ACTUALISER L’APP'}</button>`;
+  target.appendChild(box);
+  box.querySelector('#v17111-refresh-btn')?.addEventListener('click',window.v17111ForceRefresh);
+}
+window.v17111MountVersionTools=v17111MountVersionTools;
+window.v17111ForceRefresh=async function(){
+  const btn=document.getElementById('v17111-refresh-btn');if(btn){btn.disabled=true;btn.textContent=localStorage.getItem('leveling_language')==='en'?'REFRESHING…':'ACTUALISATION…'}
+  try{showSocialToast?.('LEVELING-APP',localStorage.getItem('leveling_language')==='en'?'Checking the latest version…':'Vérification de la dernière version…')}catch(e){}
+  try{navigator.serviceWorker?.controller?.postMessage({type:'SKIP_WAITING'})}catch(e){}
+  try{const regs=await navigator.serviceWorker?.getRegistrations?.();if(regs)await Promise.all(regs.map(r=>r.update().catch(()=>null)))}catch(e){}
+  try{if(window.caches){const keys=await caches.keys();await Promise.all(keys.filter(k=>k.startsWith('leveling-app-')).map(k=>caches.delete(k)))}}catch(e){}
+  const u=new URL(location.href);u.searchParams.set('_refresh',String(Date.now()));u.searchParams.delete('payment');u.searchParams.delete('session_id');
+  setTimeout(()=>location.replace(u.toString()),120);
+};
 </script>
 
 <script id="v151-clean-core-runtime">
@@ -13703,7 +13734,7 @@ window.v17101CloseBroadcastInbox=function(){
 
 
 <script id="v1711-build-marker">
-window.LEVELING_BUILD_INFO=Object.freeze({version:'17.11.0',codename:'Hardening & Performance',assets:'external-lossless',stripe:'test-isolated'});
+window.LEVELING_BUILD_INFO=Object.freeze({version:'17.11.1',codename:'Hardening & Performance',assets:'external-lossless',stripe:'live'});
 </script>
 </body>
 </html>
