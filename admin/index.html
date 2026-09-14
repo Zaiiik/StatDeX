@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>LEVELING-APP — Admin Coach V4.2</title>
+<title>LEVELING-APP — Admin Coach V4.3</title>
 <meta name="theme-color" content="#07070b">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -91,7 +91,7 @@ input:focus,select:focus,textarea:focus{border-color:#8e2cff;box-shadow:0 0 0 3p
 
 <section id="adminView" class="hidden">
   <header class="topbar">
-    <div><div class="brand">LEVELING-<strong>ADMIN</strong></div><h1>CONTROL CENTER V4.2</h1><div id="identity" class="identity"></div></div>
+    <div><div class="brand">LEVELING-<strong>ADMIN</strong></div><h1>CONTROL CENTER V4.3</h1><div id="identity" class="identity"></div></div>
     <div class="actions"><button class="btn blue" onclick="refreshAll()">ACTUALISER</button><button class="btn red" onclick="logout()">DÉCONNEXION</button></div>
   </header>
 
@@ -152,7 +152,7 @@ input:focus,select:focus,textarea:focus{border-color:#8e2cff;box-shadow:0 0 0 3p
       </div>
       <div class="card">
         <h2>Bandeau de mise à jour</h2><p>Annonce une nouvelle version directement aux clients.</p>
-        <label>Version</label><input id="releaseVersion" placeholder="17.12"><div class="hint" id="releaseVersionHint">La version du bandeau doit être supérieure à la version actuellement installée (17.11.0).</div>
+        <label>Version</label><input id="releaseVersion" placeholder="17.12"><div class="hint" id="releaseVersionHint">La version du bandeau doit être supérieure à la version actuellement installée (17.11.1).</div>
         <label>Message</label><textarea id="releaseMessage" placeholder="Nouvelle mise à jour disponible"></textarea>
         <div class="row-actions"><button class="btn green" onclick="saveRelease(true)">ACTIVER LE BANDEAU</button><button class="btn red" onclick="saveRelease(false)">RETIRER</button></div><div id="releaseMsg" class="msg"></div>
       </div>
@@ -271,13 +271,13 @@ function renderBroadcasts(){
 }
 
 async function loadRelease(){const {data,error}=await sb.rpc('admin_get_app_release');if(!error&&data){const r=Array.isArray(data)?data[0]:data;if(r){$('releaseVersion').value=r.latest_version||'';$('releaseMessage').value=r.message||''}}}
-const ADMIN_CURRENT_APP_VERSION='17.11.0';
+const ADMIN_CURRENT_APP_VERSION='17.11.1';
 function versionParts(v){return String(v||'0').match(/\d+/g)?.map(Number)||[0]}
 function versionNewer(a,b){const x=versionParts(a),y=versionParts(b),n=Math.max(x.length,y.length);for(let i=0;i<n;i++){const A=x[i]||0,B=y[i]||0;if(A>B)return true;if(A<B)return false}return false}
 async function saveRelease(active){
   const version=$('releaseVersion').value.trim(),message=$('releaseMessage').value.trim();
   if(active&&(!version||!message))return setMsg('releaseMsg','Version et message requis.','err');
-  if(active&&!versionNewer(version,ADMIN_CURRENT_APP_VERSION))return setMsg('releaseMsg',`Entre une version supérieure à ${ADMIN_CURRENT_APP_VERSION} (exemple : 17.11). Sinon les clients sont déjà à jour et le bandeau ne doit pas apparaître.`,'err');
+  if(active&&!versionNewer(version,ADMIN_CURRENT_APP_VERSION))return setMsg('releaseMsg',`Entre une version supérieure à ${ADMIN_CURRENT_APP_VERSION} (exemple : 17.12). Sinon les clients sont déjà à jour et le bandeau ne doit pas apparaître.`,'err');
   const {error}=await sb.rpc('admin_set_app_release_v2',{p_version:version||ADMIN_CURRENT_APP_VERSION,p_message:message||'',p_active:active});
   if(error)return setMsg('releaseMsg',error.message,'err');
   setMsg('releaseMsg',active?`Bandeau V${version} activé. Il apparaîtra sur les versions plus anciennes.`:'Bandeau retiré.','ok')
