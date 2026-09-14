@@ -8,7 +8,7 @@
 <!-- LEVELING-APP V16.4.1 — Stripe Checkout wired -->
 <!-- LEVELING-APP V16.4.0 — subscription backend foundation -->
 <!-- LEVELING-APP V16.3.3 — account-aware onboarding skip -->
-<!-- V17.12.1 — Intelligence + récupération : coach contextualisé, RIR, PV dynamiques, quêtes adaptatives, validation de série visuelle. -->
+<!-- V17.12.2 — Intelligence + récupération : coach contextualisé, RIR, PV dynamiques, quêtes adaptatives, validation de série visuelle. -->
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -224,12 +224,12 @@
             flex-shrink: 0; transition: 0.2s;
         }
         .btn-check.active { background: var(--success); color: white; box-shadow: 0 0 8px var(--success); }
-        .btn-check::after {
-            content: ''; width: 8px; height: 14px; border-right: 3px solid #07140d; border-bottom: 3px solid #07140d;
-            transform: rotate(45deg) scale(.55); opacity: 0; margin-top: -3px;
-            transition: opacity .15s ease, transform .15s ease; pointer-events: none;
+        .btn-check .v1712-checkmark{
+            display:block!important; opacity:0; transform:scale(.55); color:#06150d!important;
+            font-size:20px!important; line-height:1!important; font-weight:1000!important; font-family:Arial,sans-serif!important;
+            transition:opacity .12s ease,transform .12s ease; pointer-events:none;
         }
-        .btn-check.active::after { opacity: 1; transform: rotate(45deg) scale(1); }
+        .btn-check.active .v1712-checkmark{opacity:1!important;transform:scale(1)!important;}
         .v1712-rir-wrap{display:inline-flex;align-items:center;gap:4px;margin-left:7px;color:#898995;font-size:.56rem;white-space:nowrap}
         .set-input-mini.v1712-rir{width:42px!important;min-width:42px!important;text-align:center}
         @keyframes v1712HeartPulse{0%,100%{transform:scale(1)}45%{transform:scale(1.14)}55%{transform:scale(1.05)}}
@@ -5024,7 +5024,7 @@ btn.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDef
                                 ${v1351Bodyweight ? '<span class="v1351-bodyweight-note">· poids du corps</span>' : `@ <input type="number" class="set-input-mini ${isSmartActiveForExo ? 'smart-adjusted' : ''}" value="${currentWeight}" step="0.5" onchange="updateSetVal(${exIndex}, ${s}, 'weight', this.value)" title="Poids en kg"> kg`}
                                 <span class="v1712-rir-wrap">RIR <input type="number" min="0" max="5" step="1" class="set-input-mini v1712-rir" value="${currentRir}" placeholder="—" onchange="updateSetVal(${exIndex}, ${s}, 'rir', this.value)" title="Répétitions en réserve (0 à 5)"></span>
                             </div>
-                            <button class="btn-check ${isDone ? 'active' : ''}" onclick="toggleSet(${exIndex}, ${s})" aria-label="${isDone ? 'Série validée' : 'Valider la série'}"></button>
+                            <button class="btn-check ${isDone ? 'active' : ''}" onclick="toggleSet(${exIndex}, ${s})" aria-label="${isDone ? 'Série validée' : 'Valider la série'}"><span class="v1712-checkmark" aria-hidden="true">&#10003;</span></button>
                         </div>
                     `;
                 }
@@ -6081,7 +6081,7 @@ function setAppUnlockedShell(){
   document.getElementById('app-container')?.classList.remove('auth-locked');
 }
 
-const APP_VERSION='17.12.1-INTELLIGENCE-RECOVERY';
+const APP_VERSION='17.12.2-INTELLIGENCE-RECOVERY';
 const ACCOUNT_LOCAL_KEYS=['solo_leveling_user','solo_leveling_smart_refs','solo_leveling_body_hist','solo_leveling_inv','solo_leveling_block','solo_leveling_day','solo_leveling_state','solo_leveling_custom_sets','solo_leveling_history','solo_leveling_active_program','solo_leveling_program_states','solo_leveling_program_custom_sets','solo_leveling_custom_program','leveling_last_local_save','leveling_last_cloud_sync','leveling_v10'];
 function clearLevelingAccountLocalData(){
   try{ACCOUNT_LOCAL_KEYS.forEach(k=>localStorage.removeItem(k));sessionStorage.removeItem('leveling_pending_license')}catch(e){console.warn('Local account cleanup:',e)}
@@ -11329,7 +11329,7 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
   function patchBody(){
     const en=lang()==='en',cloud=cloudCards('patch_note');
     return `<div class="v172-feed">${cloud||`<div class="v172-feed-card"><div class="v172-feed-copy">${en?'No new cloud patch note right now.':'Aucune nouvelle note de mise à jour pour le moment.'}</div></div>`}
-    <div class="v172-feed-card"><div class="v172-feed-top"><span class="v172-title-icon v172-blue">${icon('bolt')}</span><div><div class="v172-feed-title">${en?'CURRENT BUILD':'VERSION ACTUELLE'}</div><div class="v172-feed-meta">V17.12.1</div></div></div><div class="v172-feed-list">
+    <div class="v172-feed-card"><div class="v172-feed-top"><span class="v172-title-icon v172-blue">${icon('bolt')}</span><div><div class="v172-feed-title">${en?'CURRENT BUILD':'VERSION ACTUELLE'}</div><div class="v172-feed-meta">V17.12.2</div></div></div><div class="v172-feed-list">
       <div class="v172-feed-item">${icon('program')}<span>${en?'Power days can now be marked absent without awarding XP.':'Les jours Power peuvent maintenant être marqués absents sans donner d’XP.'}</span></div>
       <div class="v172-feed-item">${icon('message')}<span>${en?'Cloud patch notes and developer messages are active.':'Patch notes et messages développeur sont maintenant synchronisés dans le cloud.'}</span></div>
     </div></div></div>`;
@@ -12461,18 +12461,29 @@ window.LevelingRecoveryV1622={
   applyWorkoutDrain:v1712ApplyWorkoutDrain
 };
 window.LevelingCoachV1712={
-  version:'17.12.1',
+  version:'17.12.2',
   refresh:()=>{renderQuests();renderRecovery();recommendation();try{window.LevelingRPG?.render?.()}catch(e){}},
   rirStats:v1712RirStats
 };
 
-function boot(){renderAll()}
+function boot(){
+  try{typeof ensureDom==='function'&&ensureDom()}catch(e){}
+  renderAll();
+  try{window.v15ArrangeProfile?.()}catch(e){}
+}
+function bootReliable(){
+  boot();
+  [350,900,1800].forEach(ms=>setTimeout(boot,ms));
+}
 if(document.readyState==='loading'){
-  document.addEventListener('DOMContentLoaded',()=>setTimeout(boot,360),{once:true});
-}else setTimeout(boot,100);
+  document.addEventListener('DOMContentLoaded',bootReliable,{once:true});
+}else bootReliable();
 document.addEventListener('visibilitychange',()=>{
   if(document.visibilityState==='visible')setTimeout(boot,80);
 });
+document.addEventListener('click',e=>{
+  if(e.target.closest('[data-panel=\"profile\"], [data-target=\"profile\"], [onclick*=\"profile\"]'))setTimeout(boot,80);
+},{passive:true});
 })();
 </script>
 
@@ -13062,6 +13073,9 @@ if(document.readyState==='loading'){
 document.addEventListener('visibilitychange',()=>{
   if(document.visibilityState==='visible')setTimeout(boot,80);
 });
+document.addEventListener('click',e=>{
+  if(e.target.closest('[data-panel=\"profile\"], [data-target=\"profile\"], [onclick*=\"profile\"]'))setTimeout(boot,80);
+},{passive:true});
 })();
 </script>
 
@@ -13824,7 +13838,7 @@ window.v17101CloseBroadcastInbox=function(){
 
 
 <script id="v1711-build-marker">
-window.LEVELING_BUILD_INFO=Object.freeze({version:'17.12.1',codename:'Intelligence + Recovery',assets:'external-lossless',stripe:'live'});
+window.LEVELING_BUILD_INFO=Object.freeze({version:'17.12.2',codename:'Intelligence + Recovery',assets:'external-lossless',stripe:'live'});
 </script>
 </body>
 </html>
