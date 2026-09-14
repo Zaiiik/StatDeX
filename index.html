@@ -8,7 +8,7 @@
 <!-- LEVELING-APP V16.4.1 — Stripe Checkout wired -->
 <!-- LEVELING-APP V16.4.0 — subscription backend foundation -->
 <!-- LEVELING-APP V16.3.3 — account-aware onboarding skip -->
-<!-- V17.12.7 — Intelligence + récupération : coach contextualisé, RIR, PV dynamiques, quêtes adaptatives, validation de série visuelle. -->
+<!-- V17.13.0 — Progression + gamification : historique avancé, courbes SBD, comparaison 30j, Rank Up, cadres cosmétiques, classements semaine/saison, profils communauté enrichis et transitions de page fluides. -->
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -31,7 +31,7 @@
 
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>LEVELING-APP — V17.12.7 INTELLIGENCE + RECOVERY</title>
+    <title>LEVELING-APP — V17.13.0 PROGRESSION + GAMIFICATION</title>
     <meta name="theme-color" content="#09090f">
     <meta name="application-name" content="LEVELING-APP">
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -3169,6 +3169,34 @@ main{padding-bottom:calc(72px + env(safe-area-inset-bottom,0px))!important}
 }
 </style>
 
+
+<style id="v173-progression-gamification-css">
+/* V17.13 — Progression + gamification */
+.panel.active{view-transition-name:leveling-panel}
+::view-transition-old(leveling-panel){animation:v173PageOld .20s ease both}
+::view-transition-new(leveling-panel){animation:v173PageNew .30s cubic-bezier(.2,.8,.2,1) both}
+@keyframes v173PageOld{to{opacity:0;transform:translateX(-12px) scale(.992);filter:blur(2px)}}
+@keyframes v173PageNew{from{opacity:0;transform:translateX(16px) scale(.992);filter:blur(2px)}to{opacity:1;transform:none;filter:none}}
+.v173-page-enter{animation:v173PageNew .30s cubic-bezier(.2,.8,.2,1) both!important}
+.v173-period-row{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin:0 0 8px}
+.v173-period-btn{border:1px solid #2d2d39;background:#09090f;color:#7f7f8d;border-radius:9px;padding:8px 5px;font-size:.54rem;font-weight:1000;text-transform:uppercase;letter-spacing:.04em}
+.v173-period-btn.active{color:#fff;border-color:#00d2ff;background:linear-gradient(135deg,rgba(0,210,255,.12),rgba(189,0,255,.10));box-shadow:0 0 12px rgba(0,210,255,.14)}
+.v173-leader-row .v16019-leader-value{display:flex;flex-direction:column;align-items:flex-end}.v173-leader-row .v16019-leader-value small{font-size:.38rem;color:#777;text-transform:uppercase;margin-top:2px}
+#history-container.v173-history-host{padding:10px!important;overflow:hidden}
+.v173-history-head{display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:9px}.v173-history-head b{font-size:.76rem;color:#fff}.v173-history-head small{display:block;color:#777;font-size:.48rem;margin-top:2px}
+.v173-history-range{display:flex;gap:4px}.v173-range-btn{border:1px solid #343440;background:#101017;color:#777;border-radius:7px;padding:5px 7px;font-size:.45rem;font-weight:1000}.v173-range-btn.active{border-color:#00d2ff;color:#dffaff}
+.v173-kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin:8px 0}.v173-kpi{padding:8px 6px;border:1px solid #292934;border-radius:10px;background:linear-gradient(145deg,#111119,#09090e);min-width:0}.v173-kpi span{display:block;color:#727280;font-size:.42rem;text-transform:uppercase}.v173-kpi b{display:block;color:#fff;font-size:.72rem;margin-top:3px}.v173-kpi em{display:block;font-style:normal;font-size:.42rem;margin-top:2px}.v173-up{color:#00e676!important}.v173-down{color:#ff5078!important}.v173-flat{color:#8e8e99!important}
+.v173-chart-card{border:1px solid rgba(0,210,255,.3);border-radius:11px;background:#09090f;padding:8px;margin:8px 0}.v173-chart-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:5px}.v173-chart-head b{font-size:.62rem}.v173-chart-head small{font-size:.42rem;color:#777}.v173-chart{width:100%;height:118px;display:block;overflow:visible}.v173-chart-grid{stroke:#222430;stroke-width:1}.v173-chart-squat{stroke:#ff2f92}.v173-chart-bench{stroke:#4a8cff}.v173-chart-dead{stroke:#ff3159}.v173-chart-weight{stroke:#00e6b8}.v173-chart path{fill:none;stroke-width:2.4;vector-effect:non-scaling-stroke}.v173-legend{display:flex;gap:10px;flex-wrap:wrap;font-size:.43rem;color:#8f8f9c}.v173-legend i{display:inline-block;width:8px;height:2px;vertical-align:middle;margin-right:4px;background:currentColor}
+.v173-compare{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:8px}.v173-compare-card{padding:8px;border:1px solid #292934;border-radius:10px;background:#101017}.v173-compare-card span{font-size:.43rem;color:#777;text-transform:uppercase}.v173-compare-card b{display:block;font-size:.68rem;margin-top:3px}.v173-compare-card small{font-size:.43rem;color:#8c8c98}
+.v173-recent-title{margin:10px 0 5px;font-size:.58rem;color:#dffaff;font-weight:1000;text-transform:uppercase;letter-spacing:.06em}
+.v173-cosmetics{margin:10px 0;padding:11px;border:1px solid rgba(189,0,255,.38);border-radius:13px;background:linear-gradient(145deg,rgba(189,0,255,.08),#09090e)}.v173-cosmetics-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}.v173-cosmetics-head b{font-size:.68rem}.v173-cosmetics-head small{font-size:.44rem;color:#777}.v173-frame-list{display:grid;grid-template-columns:repeat(4,1fr);gap:5px}.v173-frame-chip{padding:7px 4px;border:1px solid #2a2a35;border-radius:9px;text-align:center;font-size:.45rem;color:#777;background:#0d0d13}.v173-frame-chip.unlocked{color:#fff;border-color:var(--accent-purple);box-shadow:0 0 9px rgba(189,0,255,.12)}
+.v173-profile-frame{display:inline-grid;place-items:center;border-radius:16px;padding:3px;position:relative}.v173-profile-frame .social-avatar{margin:0!important}.v173-frame-awakened{background:linear-gradient(135deg,#00d2ff,#1848ff)}.v173-frame-hunter{background:linear-gradient(135deg,#00f0c8,#1671ff)}.v173-frame-spartan{background:linear-gradient(135deg,#ff1744,#7b102e)}.v173-frame-shadow{background:linear-gradient(135deg,#8d37ff,#ff2f92)}.v173-frame-sentinel{background:linear-gradient(135deg,#001d4d,#00a3ff)}.v173-frame-eclipse{background:linear-gradient(135deg,#151515,#d4af37,#777)}.v173-frame-emperor{background:linear-gradient(135deg,#ff49c7,#d4af37,#f7f7ff)}
+.v173-hunter-rich{overflow:hidden}.v173-hunter-sub{font-size:.5rem;color:#888;margin-top:4px}.v173-achievements{margin-top:10px;border-top:1px solid #272731;padding-top:9px}.v173-achievements-title{font-size:.58rem;font-weight:1000;color:#dffaff;margin-bottom:6px}.v173-achievement-row{display:flex;justify-content:space-between;gap:8px;padding:7px 8px;border:1px solid #262630;background:#0c0c12;border-radius:8px;margin:5px 0;font-size:.5rem}.v173-achievement-row small{color:#70707c;white-space:nowrap}
+.v135-rankup-box{position:relative;overflow:hidden}.v135-rankup-box:before,.v135-rankup-box:after{content:'';position:absolute;width:160px;height:160px;border:1px solid rgba(255,255,255,.18);transform:rotate(45deg);animation:v173Crystal 1.4s ease-in-out infinite alternate;pointer-events:none}.v135-rankup-box:before{left:-100px;top:-85px}.v135-rankup-box:after{right:-105px;bottom:-95px;animation-delay:.18s}@keyframes v173Crystal{to{transform:rotate(58deg) scale(1.15);opacity:.28}}.v173-rankup-reward{font-size:.56rem;color:#00e6b8;font-weight:1000;letter-spacing:.09em;text-transform:uppercase;text-shadow:0 0 12px rgba(0,230,184,.5)}
+@media(max-width:600px){.v173-kpi-grid{grid-template-columns:repeat(2,1fr)}.v173-chart{height:102px}.v173-frame-list{grid-template-columns:repeat(3,1fr)}}
+@media(prefers-reduced-motion:reduce){::view-transition-old(leveling-panel),::view-transition-new(leveling-panel),.v173-page-enter,.v135-rankup-box:before,.v135-rankup-box:after{animation:none!important}}
+</style>
+
 </head>
 <body data-theme="purple" class="auth-restoring">
 <svg id="premium-icon-sprite" width="0" height="0" aria-hidden="true" focusable="false" style="position:absolute;width:0;height:0;overflow:hidden">
@@ -3654,14 +3682,19 @@ btn.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDef
 
                     <div id="community-pane-leaderboard" class="community-pane">
                         <section class="community-box v16019-pane-card">
-                            <div class="community-box-title"><div><h3>Classement global</h3><small>choisis une statistique</small></div></div>
+                            <div class="community-box-title"><div><h3 id="v173-leaderboard-title">Classement global</h3><small id="v173-leaderboard-sub">choisis une période et une statistique</small></div></div>
+                            <div class="v173-period-row" id="v173-leaderboard-periods">
+                                <button class="v173-period-btn active" data-period="global" onclick="setLeaderboardPeriod('global',this)">Global</button>
+                                <button class="v173-period-btn" data-period="week" onclick="setLeaderboardPeriod('week',this)">Cette semaine</button>
+                                <button class="v173-period-btn" data-period="season" onclick="setLeaderboardPeriod('season',this)">Saison</button>
+                            </div>
                             <div class="metric-row" id="leaderboard-metrics">
                                 <button class="metric-btn active" data-metric="xp" onclick="setLeaderboardMetric('xp',this)">XP</button>
                                 <button class="metric-btn" data-metric="sbd" onclick="setLeaderboardMetric('sbd',this)">SBD</button>
                                 <button class="metric-btn" data-metric="squat" onclick="setLeaderboardMetric('squat',this)">Squat</button>
                                 <button class="metric-btn" data-metric="bench" onclick="setLeaderboardMetric('bench',this)">Bench</button>
                                 <button class="metric-btn" data-metric="deadlift" onclick="setLeaderboardMetric('deadlift',this)">Deadlift</button>
-                                <button class="metric-btn" data-metric="volume" onclick="setLeaderboardMetric('volume',this)">Volume semaine</button>
+                                <button class="metric-btn" data-metric="volume" onclick="setLeaderboardMetric('volume',this)">Volume</button>
                             </div>
                             <div id="community-leaderboard" class="v16019-scroll v16019-leaderboard-scroll"></div>
                         </section>
@@ -4889,6 +4922,7 @@ btn.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDef
         };
         function renderHistoryUI() {
             const container=document.getElementById('history-container'); if(!container)return;
+            if(typeof window.v173RenderAdvancedHistory==='function'){window.v173RenderAdvancedHistory(container);return}
             if(!workoutHistory||workoutHistory.length===0){container.innerHTML=`<p style="font-size:0.68rem;color:#888;text-align:center;padding:5px 0">Aucun bloc enregistré pour le moment.</p>`;return}
             const rows=workoutHistory.map((entry,originalIndex)=>({entry,originalIndex})).sort((a,b)=>v1617HistoryDateMs(b.entry,b.originalIndex)-v1617HistoryDateMs(a.entry,a.originalIndex));
             const recent=rows.slice(0,3);
@@ -6081,7 +6115,7 @@ function setAppUnlockedShell(){
   document.getElementById('app-container')?.classList.remove('auth-locked');
 }
 
-const APP_VERSION='17.12.7-INTELLIGENCE-RECOVERY';
+const APP_VERSION='17.13.0-PROGRESSION-GAMIFICATION';
 const ACCOUNT_LOCAL_KEYS=['solo_leveling_user','solo_leveling_smart_refs','solo_leveling_body_hist','solo_leveling_inv','solo_leveling_block','solo_leveling_day','solo_leveling_state','solo_leveling_custom_sets','solo_leveling_history','solo_leveling_active_program','solo_leveling_program_states','solo_leveling_program_custom_sets','solo_leveling_custom_program','leveling_last_local_save','leveling_last_cloud_sync','leveling_v10'];
 function clearLevelingAccountLocalData(){
   try{ACCOUNT_LOCAL_KEYS.forEach(k=>localStorage.removeItem(k));sessionStorage.removeItem('leveling_pending_license')}catch(e){console.warn('Local account cleanup:',e)}
@@ -6788,7 +6822,7 @@ restoreSupabaseSession('startup');
 
 <script>
 /* ================= LEVELING-APP V13 COMMUNITY ================= */
-let communityLoaded=false,leaderboardMetric='xp';
+let communityLoaded=false,leaderboardMetric='xp',leaderboardPeriod='global';
 
 function socialEsc(v){return String(v??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]))}
 /* V15.19.1 — échappement pour texte utilisateur inséré comme argument JS dans un attribut onclick="...".
@@ -6833,11 +6867,23 @@ function v16019EnsureHunterModal(){
   modal=document.createElement('div');modal.id='v16019-hunter-modal';modal.className='v16019-hunter-modal';
   modal.addEventListener('click',e=>{if(e.target===modal)modal.classList.remove('show')});document.body.appendChild(modal);return modal;
 }
-function openSocialHunterProfile(userId){
+async function openSocialHunterProfile(userId){
   const p=v16019HunterCache.get(String(userId));if(!p)return;
-  const modal=v16019EnsureHunterModal(),xp=socialDisplayXp(p),sbd=socialSBD(p);
-  modal.innerHTML=`<div class="v16019-hunter-card"><div class="v16019-hunter-head">${socialAvatarHTML(p)}<div class="v16019-hunter-main"><div class="v16019-hunter-name">${socialEsc(p.username||'Chasseur')}</div><div class="v16019-hunter-rank">${socialEsc(p.rank||'NOVICE')} · Niv. ${Number(p.level||1)} · ${xp.toLocaleString()} XP</div></div><button class="v16019-hunter-close" onclick="document.getElementById('v16019-hunter-modal')?.classList.remove('show')"></button></div><div class="v16019-hunter-stats"><div class="v16019-hunter-stat"><span>Squat</span><b>${Number(p.squat||0)} kg</b></div><div class="v16019-hunter-stat"><span>Bench</span><b>${Number(p.bench||0)} kg</b></div><div class="v16019-hunter-stat"><span>Deadlift</span><b>${Number(p.deadlift||0)} kg</b></div><div class="v16019-hunter-stat"><span>Total SBD</span><b>${sbd} kg</b></div></div><div class="v16019-hunter-actions"><button class="btn-action" onclick="v16019FindHunter(${jsAttr(p.username||'')})"> Voir dans Amis</button><button class="btn-action" onclick="openCommunityLeaderboard('xp');document.getElementById('v16019-hunter-modal')?.classList.remove('show')">Classement XP</button></div></div>`;
+  const modal=v16019EnsureHunterModal(),xp=socialDisplayXp(p),sbd=socialSBD(p),ratio=Number(p.weight||0)>0?sbd/Number(p.weight||1):0;
+  const frame=window.v173CosmeticFrameForRank?.(p.rank)||'v173-frame-awakened';
+  modal.innerHTML=`<div class="v16019-hunter-card v173-hunter-rich"><div class="v16019-hunter-head"><div class="v173-profile-frame ${frame}">${socialAvatarHTML(p)}</div><div class="v16019-hunter-main"><div class="v16019-hunter-name">${socialEsc(p.username||'Chasseur')}</div><div class="v16019-hunter-rank">${socialEsc(p.rank||'NOVICE')} · Niv. ${Number(p.level||1)} · ${xp.toLocaleString()} XP</div><div class="v173-hunter-sub">SBD ${sbd} kg · ${ratio.toFixed(2)}× PDC · Volume semaine ${Number(p.weekly_volume||0).toLocaleString()} kg</div></div><button class="v16019-hunter-close" onclick="document.getElementById('v16019-hunter-modal')?.classList.remove('show')"></button></div><div class="v16019-hunter-stats"><div class="v16019-hunter-stat"><span>Squat</span><b>${Number(p.squat||0)} kg</b></div><div class="v16019-hunter-stat"><span>Bench</span><b>${Number(p.bench||0)} kg</b></div><div class="v16019-hunter-stat"><span>Deadlift</span><b>${Number(p.deadlift||0)} kg</b></div><div class="v16019-hunter-stat"><span>Total SBD</span><b>${sbd} kg</b></div></div><div class="v173-achievements"><div class="v173-achievements-title">Activité récente</div><div id="v173-hunter-achievements"><div class="community-empty">Chargement…</div></div></div><div class="v16019-hunter-actions"><button class="btn-action" onclick="v16019FindHunter(${jsAttr(p.username||'')})">Voir dans Amis</button><button class="btn-action" onclick="openCommunityLeaderboard('xp');document.getElementById('v16019-hunter-modal')?.classList.remove('show')">Classement</button></div></div>`;
   modal.classList.add('show');
+  try{
+    const {data,error}=await sb.rpc('social_recent_achievements',{p_user:userId,p_limit:5});
+    const box=document.getElementById('v173-hunter-achievements');if(!box)return;
+    if(error){box.innerHTML='<div class="community-empty">Activité indisponible.</div>';return}
+    const rows=data||[];
+    box.innerHTML=rows.map(a=>{
+      const payload=a.payload||{};
+      const label=a.event_type==='pr'?`PR · ${socialEsc(payload.exercise||'Exercice')} · ${Number(payload.weight||0)} kg × ${Number(payload.reps||0)}`:a.event_type==='rank_up'?`Nouveau rang · ${socialEsc(payload.rank||'')}`:a.event_type==='level_up'?`Niveau ${Number(payload.level||0)}`:'Séance validée';
+      return `<div class="v173-achievement-row"><span>${label}</span><small>${new Date(a.created_at).toLocaleDateString('fr-FR')}</small></div>`;
+    }).join('')||'<div class="community-empty">Aucune activité récente.</div>';
+  }catch(e){}
 }
 function v16019FindHunter(username){
   document.getElementById('v16019-hunter-modal')?.classList.remove('show');
@@ -6873,6 +6919,15 @@ async function syncSocialProfile(){
       p_weekly_volume:weekly
     });
     if(error)throw error;
+    try{
+      const cumulativeVolume=Math.round(Number(window.LevelingProgramV157?.totalValidatedVolume?.()||0));
+      await sb.rpc('social_record_progress_snapshot',{
+        p_xp_total:Math.round(xp),
+        p_volume_total:cumulativeVolume,
+        p_weight:Number(userData.weight||0),
+        p_sbd_total:total
+      });
+    }catch(snapshotErr){console.warn('V17.13 snapshot:',snapshotErr)}
     const s=document.getElementById('community-sync-status');if(s)s.textContent=' Profil communautaire synchronisé';
   }catch(e){
     const msg=String(e?.message||e||'Erreur inconnue');
@@ -6960,18 +7015,46 @@ async function loadCommunityFeed(){
     </div>`;
   }).join('');
 }
-function setLeaderboardMetric(metric,btn){leaderboardMetric=metric;document.querySelectorAll('.metric-btn').forEach(x=>x.classList.remove('active'));btn?.classList.add('active');loadCommunityLeaderboard()}
+function setLeaderboardMetric(metric,btn){
+  leaderboardMetric=metric;
+  document.querySelectorAll('.metric-btn').forEach(x=>x.classList.remove('active'));
+  btn?.classList.add('active');
+  loadCommunityLeaderboard();
+}
+function setLeaderboardPeriod(period,btn){
+  leaderboardPeriod=['global','week','season'].includes(period)?period:'global';
+  document.querySelectorAll('.v173-period-btn').forEach(x=>x.classList.remove('active'));
+  (btn||document.querySelector(`.v173-period-btn[data-period="${leaderboardPeriod}"]`))?.classList.add('active');
+  const title=document.getElementById('v173-leaderboard-title');
+  const sub=document.getElementById('v173-leaderboard-sub');
+  const labels={global:['Classement global','niveau actuel de tous les chasseurs'],week:['Classement hebdomadaire','progression depuis lundi'],season:['Classement de saison','progression du trimestre en cours']};
+  if(title)title.textContent=labels[leaderboardPeriod][0];
+  if(sub)sub.textContent=labels[leaderboardPeriod][1];
+  loadCommunityLeaderboard();
+}
+window.setLeaderboardPeriod=setLeaderboardPeriod;
 async function loadCommunityLeaderboard(){
-  const box=document.getElementById('community-leaderboard');if(!box)return;box.innerHTML='<div class="community-empty">Calcul du classement…</div>';
-  const {data,error}=await sb.rpc('social_leaderboard',{p_metric:leaderboardMetric,p_limit:50});
-  if(error){box.innerHTML='<div class="community-empty">Community SQL non installé.</div>';return}
-  const unit=leaderboardMetric==='xp'?' XP':' kg';
+  const box=document.getElementById('community-leaderboard');if(!box)return;
+  box.innerHTML='<div class="community-empty">Calcul du classement…</div>';
+  let data=null,error=null;
+  try{
+    const res=await sb.rpc('social_period_leaderboard',{p_period:leaderboardPeriod,p_metric:leaderboardMetric,p_limit:50});
+    data=res.data;error=res.error;
+    if(error && leaderboardPeriod==='global'){
+      const fallback=await sb.rpc('social_leaderboard',{p_metric:leaderboardMetric,p_limit:50});
+      data=fallback.data;error=fallback.error;
+    }
+  }catch(e){error=e}
+  if(error){box.innerHTML='<div class="community-empty">Classement temporairement indisponible.</div>';return}
+  const unit=leaderboardMetric==='xp'?' XP':leaderboardMetric==='volume'?' kg':' kg';
   const rows=[...(data||[])];v16019CacheHunters(rows);
-  if(leaderboardMetric==='xp')rows.sort((a,b)=>socialDisplayXp(b)-socialDisplayXp(a)||Number(b.level||0)-Number(a.level||0));
+  rows.sort((a,b)=>Number(b.metric_value||0)-Number(a.metric_value||0)||Number(b.level||0)-Number(a.level||0));
+  const periodMeta=leaderboardPeriod==='week'?'SEMAINE':leaderboardPeriod==='season'?'SAISON':'GLOBAL';
   box.innerHTML=rows.map((p,i)=>{
-    const value=leaderboardMetric==='xp'?socialDisplayXp(p):Number(p.metric_value||0);
-    return `<div class="v16019-leader-row" role="button" tabindex="0" onclick="openSocialHunterProfile('${p.user_id}')" onkeydown="if(event.key==='Enter')openSocialHunterProfile('${p.user_id}')"><div class="v16019-leader-pos">#${i+1}</div>${socialAvatarHTML(p)}<div><div class="v16019-leader-name">${socialEsc(p.username)}</div><div class="v16019-leader-meta">Niv. ${Number(p.level||1)} · ${socialEsc(p.rank||'NOVICE')} · SBD ${socialSBD(p)} kg</div></div><div class="v16019-leader-value">${Number(value||0).toLocaleString()}${unit}</div></div>`;
-  }).join('')||'<div class="community-empty">Aucun joueur classé.</div>';
+    const value=Number(p.metric_value||0);
+    const gainLabel=(leaderboardPeriod!=='global'&&(leaderboardMetric==='xp'||leaderboardMetric==='volume'))?' gagnés':'';
+    return `<div class="v16019-leader-row v173-leader-row" role="button" tabindex="0" onclick="openSocialHunterProfile('${p.user_id}')" onkeydown="if(event.key==='Enter')openSocialHunterProfile('${p.user_id}')"><div class="v16019-leader-pos">#${i+1}</div>${socialAvatarHTML(p)}<div><div class="v16019-leader-name">${socialEsc(p.username)}</div><div class="v16019-leader-meta">${periodMeta} · Niv. ${Number(p.level||1)} · ${socialEsc(p.rank||'NOVICE')} · SBD ${socialSBD(p)} kg</div></div><div class="v16019-leader-value">${Number(value||0).toLocaleString()}${unit}<small>${gainLabel}</small></div></div>`;
+  }).join('')||'<div class="community-empty">Aucun joueur classé sur cette période.</div>';
 }
 async function searchCommunityUsers(){
   const q=document.getElementById('community-user-search')?.value.trim()||'',box=document.getElementById('community-search-results');if(!box)return;
@@ -7392,7 +7475,14 @@ function initCompactSettings(){
 
 /* Hooks */
 const __v13Switch=window.switchTab;
-window.switchTab=function(tab,btn){__v13Switch(tab,btn);if(tab==='community')renderCommunityPanel();if(tab==='settings')initCompactSettings()};
+window.switchTab=function(tab,btn){
+  const run=()=>{__v13Switch(tab,btn);if(tab==='community')renderCommunityPanel();if(tab==='settings')initCompactSettings();try{window.v173OnPageChanged?.(tab)}catch(e){}};
+  const reduced=window.matchMedia?.('(prefers-reduced-motion: reduce)')?.matches;
+  if(!reduced&&document.startViewTransition){document.startViewTransition(run);return}
+  run();
+  const active=document.querySelector('.panel.active');
+  if(active){active.classList.remove('v173-page-enter');void active.offsetWidth;active.classList.add('v173-page-enter');setTimeout(()=>active.classList.remove('v173-page-enter'),340)}
+};
 const __v13CloudSave=window.saveCloudData;
 window.saveCloudData=async function(){await __v13CloudSave();if(cloudUser&&cloudLicensed)syncSocialProfile()};
 const __v13PR=window.showPRPopup;
@@ -7654,7 +7744,7 @@ setTimeout(()=>{initCompactSettings();if(cloudUser&&cloudLicensed)syncSocialProf
   <div class="v135-rankup-box">
     <div style="font-size:.7rem;color:#aaa;font-weight:900">SYSTEM MESSAGE</div>
     <div class="big">RANK UP</div>
-    <div id="v135-rankup-name" style="font-size:1.05rem;font-weight:1000;margin:12px 0"></div>
+    <div id="v135-rankup-name" style="font-size:1.05rem;font-weight:1000;margin:12px 0"></div><div id="v173-rankup-reward" class="v173-rankup-reward"></div>
     <div style="font-size:.62rem;color:#aaa">Nouveau rang débloqué · touche pour fermer</div>
   </div>
 </div>
@@ -7820,6 +7910,8 @@ function v135CheckRankUp(){
   if(name){
     name.innerHTML=`<span class="v135-rankup-emblem"><img src="${r.iconImg}" alt=""></span><span>${r.name}</span>`;
   }
+  const reward=document.getElementById('v173-rankup-reward');
+  if(reward)reward.textContent=`CADRE ${r.name} DÉBLOQUÉ`;
   const modal=document.getElementById('v135-rankup');
   if(modal)modal.classList.add('show');
   try{playSound('success')}catch(e){}
@@ -11296,7 +11388,7 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
   function patchBody(){
     const en=lang()==='en',cloud=cloudCards('patch_note');
     return `<div class="v172-feed">${cloud||`<div class="v172-feed-card"><div class="v172-feed-copy">${en?'No new cloud patch note right now.':'Aucune nouvelle note de mise à jour pour le moment.'}</div></div>`}
-    <div class="v172-feed-card"><div class="v172-feed-top"><span class="v172-title-icon v172-blue">${icon('bolt')}</span><div><div class="v172-feed-title">${en?'CURRENT BUILD':'VERSION ACTUELLE'}</div><div class="v172-feed-meta">V17.12.7</div></div></div><div class="v172-feed-list">
+    <div class="v172-feed-card"><div class="v172-feed-top"><span class="v172-title-icon v172-blue">${icon('bolt')}</span><div><div class="v172-feed-title">${en?'CURRENT BUILD':'VERSION ACTUELLE'}</div><div class="v172-feed-meta">V17.13.0</div></div></div><div class="v172-feed-list">
       <div class="v172-feed-item">${icon('program')}<span>${en?'Power days can now be marked absent without awarding XP.':'Les jours Power peuvent maintenant être marqués absents sans donner d’XP.'}</span></div>
       <div class="v172-feed-item">${icon('message')}<span>${en?'Cloud patch notes and developer messages are active.':'Patch notes et messages développeur sont maintenant synchronisés dans le cloud.'}</span></div>
     </div></div></div>`;
@@ -11336,7 +11428,7 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
 </script>
 
 <script id="v17111-version-tools">
-const V17111_PUBLIC_VERSION='17.12.7';
+const V17111_PUBLIC_VERSION='17.13.0';
 function v17111MountVersionTools(target){
   if(!target||target.querySelector('#v17111-version-card'))return;
   const en=localStorage.getItem('leveling_language')==='en';
@@ -12480,7 +12572,7 @@ window.LevelingRecoveryV1622={
   applyWorkoutDrain:v1712ApplyWorkoutDrain
 };
 window.LevelingCoachV1712={
-  version:'17.12.7',
+  version:'17.13.0',
   refresh:()=>{renderQuests();renderRecovery();recommendation();try{window.LevelingRPG?.render?.()}catch(e){}},
   rirStats:v1712RirStats
 };
@@ -13858,8 +13950,45 @@ window.v17101CloseBroadcastInbox=function(){
 </script>
 
 
+
+<script id="v173-progression-gamification-core">
+(function(){
+'use strict';
+const VERSION='17.13.0';
+let rangeDays=60;
+function esc(v){return String(v??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]))}
+function parseDate(v){const t=Date.parse(v||'');return Number.isFinite(t)?t:0}
+function sessions(){try{return window.LevelingProgramV157?.allSessions?.()||[]}catch(e){return []}}
+function bodyHist(){try{return JSON.parse(localStorage.getItem('solo_leveling_body_hist')||'[]')||[]}catch(e){return []}}
+function rpg(){try{return JSON.parse(localStorage.getItem('leveling_v140_rpg')||'{}')||{}}catch(e){return {}}}
+function sum(rows,fn){return rows.reduce((a,x)=>a+Number(fn(x)||0),0)}
+function pct(curr,prev){if(!prev)return curr>0?100:0;return ((curr-prev)/Math.abs(prev))*100}
+function deltaClass(v){return v>0.01?'v173-up':v<-.01?'v173-down':'v173-flat'}
+function deltaText(v,suffix='%'){if(!Number.isFinite(v))return '—';return `${v>0?'+':''}${v.toFixed(1)}${suffix}`}
+function periodSessions(start,end){return sessions().filter(s=>{const t=parseDate(s.isoDate||s.date);return t>=start&&t<end})}
+function svgPath(values,w=320,h=100,pad=8){if(!values.length)return'';const vals=values.map(Number).filter(Number.isFinite);if(!vals.length)return'';const min=Math.min(...vals),max=Math.max(...vals),span=Math.max(1,max-min);return vals.map((v,i)=>`${i?'L':'M'} ${(pad+(i/Math.max(1,vals.length-1))*(w-pad*2)).toFixed(1)} ${(h-pad-((v-min)/span)*(h-pad*2)).toFixed(1)}`).join(' ')}
+function sbdSeries(days){const s=rpg(),cut=Date.now()-days*86400000;const out={squat:[],bench:[],deadlift:[]};for(const k of Object.keys(out)){out[k]=(s?.lifts?.[k]||[]).filter(x=>parseDate(x.completedAt||x.date)>=cut).slice(-24)}return out}
+function weightSeries(){return bodyHist().slice(-24).map(x=>Number(x.weight||0)).filter(x=>x>0)}
+function chartSvg(series){const sq=series.squat.map(x=>Number(x.e1rm||x.weight||0)),be=series.bench.map(x=>Number(x.e1rm||x.weight||0)),de=series.deadlift.map(x=>Number(x.e1rm||x.weight||0));return `<svg class="v173-chart" viewBox="0 0 320 100" preserveAspectRatio="none"><path class="v173-chart-grid" d="M8 25H312M8 50H312M8 75H312"/><path class="v173-chart-squat" d="${svgPath(sq)}"/><path class="v173-chart-bench" d="${svgPath(be)}"/><path class="v173-chart-dead" d="${svgPath(de)}"/></svg>`}
+function currentRankName(){try{const lvl=Number(userData?.level||1);const map=[[60,'EMPEREUR'],[50,'ECLIPSE'],[40,'SENTINEL'],[30,'SHADOW'],[20,'SPARTAN'],[10,'CHASSEUR'],[1,'ÉVEILLÉ']];return map.find(x=>lvl>=x[0])?.[1]||'ÉVEILLÉ'}catch(e){return'ÉVEILLÉ'}}
+window.v173CosmeticFrameForRank=function(rank){const n=String(rank||'').toUpperCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');if(n.includes('EMPEREUR'))return'v173-frame-emperor';if(n.includes('ECLIPSE'))return'v173-frame-eclipse';if(n.includes('SENTINEL'))return'v173-frame-sentinel';if(n.includes('SHADOW'))return'v173-frame-shadow';if(n.includes('SPARTAN'))return'v173-frame-spartan';if(n.includes('CHASSEUR'))return'v173-frame-hunter';return'v173-frame-awakened'};
+function renderCosmetics(){const host=document.getElementById('history-container');if(!host)return;let card=document.getElementById('v173-cosmetics');if(!card){card=document.createElement('section');card.id='v173-cosmetics';card.className='v173-cosmetics';host.after(card)}const lvl=Number(userData?.level||1),frames=[['ÉVEILLÉ',1],['CHASSEUR',10],['SPARTAN',20],['SHADOW',30],['SENTINEL',40],['ECLIPSE',50],['EMPEREUR',60]];card.innerHTML=`<div class="v173-cosmetics-head"><b>Cadres et récompenses</b><small>déblocage par rang XP</small></div><div class="v173-frame-list">${frames.map(([n,min])=>`<div class="v173-frame-chip ${lvl>=min?'unlocked':''}">${n}<br><small>${lvl>=min?'DÉBLOQUÉ':`NIV. ${min}`}</small></div>`).join('')}</div>`}
+window.v173RenderAdvancedHistory=function(container){
+  container.classList.add('v173-history-host');
+  const now=Date.now(),d30=30*86400000;const cur=periodSessions(now-d30,now+1),prev=periodSessions(now-2*d30,now-d30);const curVol=sum(cur,x=>x.tonnage),prevVol=sum(prev,x=>x.tonnage),curSess=cur.length,prevSess=prev.length,volDelta=pct(curVol,prevVol),sessDelta=pct(curSess,prevSess);const freq=curSess/Math.max(1,30/7);const bh=bodyHist(),weight=Number(userData?.weight||bh.at(-1)?.weight||0),oldWeight=Number(bh.at(-2)?.weight||weight),weightDelta=weight-oldWeight;const series=sbdSeries(rangeDays);const sbdNow=Number(userData?.squat||0)+Number(userData?.bench||0)+Number(userData?.deadlift||0);const rows=(typeof workoutHistory!=='undefined'&&Array.isArray(workoutHistory)?workoutHistory:[]).map((entry,originalIndex)=>({entry,originalIndex})).sort((a,b)=>(parseDate(b.entry.completedAt||b.entry.isoDate)-parseDate(a.entry.completedAt||a.entry.isoDate))).slice(0,3);
+  container.innerHTML=`<div class="v173-history-head"><div><b>Progression avancée</b><small>charges, volume, fréquence et évolution</small></div><div class="v173-history-range"><button class="v173-range-btn ${rangeDays===30?'active':''}" onclick="v173SetHistoryRange(30)">30J</button><button class="v173-range-btn ${rangeDays===60?'active':''}" onclick="v173SetHistoryRange(60)">60J</button><button class="v173-range-btn ${rangeDays===120?'active':''}" onclick="v173SetHistoryRange(120)">120J</button></div></div><div class="v173-kpi-grid"><div class="v173-kpi"><span>Poids</span><b>${weight.toFixed(1)} kg</b><em class="${deltaClass(weightDelta)}">${deltaText(weightDelta,' kg')}</em></div><div class="v173-kpi"><span>Tonnage 30j</span><b>${Math.round(curVol).toLocaleString()} kg</b><em class="${deltaClass(volDelta)}">${deltaText(volDelta)}</em></div><div class="v173-kpi"><span>Fréquence</span><b>${freq.toFixed(1)}/sem.</b><em class="${deltaClass(sessDelta)}">${deltaText(sessDelta)}</em></div><div class="v173-kpi"><span>Total SBD</span><b>${sbdNow} kg</b><em class="v173-flat">actuel</em></div></div><div class="v173-chart-card"><div class="v173-chart-head"><b>Courbes SBD · e1RM</b><small>${rangeDays} derniers jours</small></div>${chartSvg(series)}<div class="v173-legend"><span style="color:#ff2f92"><i></i>Squat</span><span style="color:#4a8cff"><i></i>Bench</span><span style="color:#ff3159"><i></i>Deadlift</span></div></div><div class="v173-compare"><div class="v173-compare-card"><span>30 derniers jours</span><b>${curSess} séances</b><small>${Math.round(curVol).toLocaleString()} kg déplacés</small></div><div class="v173-compare-card"><span>30 jours précédents</span><b>${prevSess} séances</b><small>${Math.round(prevVol).toLocaleString()} kg déplacés</small></div></div><div class="v173-recent-title">Blocs récents</div>${rows.length?rows.map(x=>typeof v1617HistoryCard==='function'?v1617HistoryCard(x.entry,x.originalIndex):'').join(''):'<div class="community-empty">Aucun bloc enregistré.</div>'}${(typeof workoutHistory!=='undefined'&&workoutHistory.length>3)?`<button class="v1617-history-more" type="button" onclick="v1617OpenFullHistory()">Voir tout l’historique · ${workoutHistory.length} blocs</button>`:''}`;
+  renderCosmetics();
+};
+window.v173SetHistoryRange=function(days){rangeDays=days;const c=document.getElementById('history-container');if(c)window.v173RenderAdvancedHistory(c)};
+window.v173OnPageChanged=function(tab){if(tab==='profile'){const c=document.getElementById('history-container');if(c)window.v173RenderAdvancedHistory(c);renderCosmetics();try{window.LevelingRPG?.syncSbd?.()}catch(e){}}if(tab==='community'){try{syncSocialProfile?.()}catch(e){}}};
+function boot(){const c=document.getElementById('history-container');if(c)window.v173RenderAdvancedHistory(c);renderCosmetics();try{syncSocialProfile?.()}catch(e){}}
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',()=>setTimeout(boot,700),{once:true});else setTimeout(boot,250);window.addEventListener('pageshow',()=>setTimeout(boot,180));
+window.LevelingV173={version:VERSION,refresh:boot};
+})();
+</script>
+
 <script id="v1711-build-marker">
-window.LEVELING_BUILD_INFO=Object.freeze({version:'17.12.7',codename:'Intelligence + Recovery',assets:'external-lossless',stripe:'live'});
+window.LEVELING_BUILD_INFO=Object.freeze({version:'17.13.0',codename:'Progression + Gamification',assets:'external-lossless',stripe:'live'});
 </script>
 </body>
 </html>
