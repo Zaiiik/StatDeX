@@ -8,7 +8,7 @@
 <!-- LEVELING-APP V16.4.1 — Stripe Checkout wired -->
 <!-- LEVELING-APP V16.4.0 — subscription backend foundation -->
 <!-- LEVELING-APP V16.3.3 — account-aware onboarding skip -->
-<!-- V17.12.4 — Intelligence + récupération : coach contextualisé, RIR, PV dynamiques, quêtes adaptatives, validation de série visuelle. -->
+<!-- V17.12.6 — Intelligence + récupération : coach contextualisé, RIR, PV dynamiques, quêtes adaptatives, validation de série visuelle. -->
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -31,7 +31,7 @@
 
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>LEVELING-APP — V17.12.4 INTELLIGENCE + RECOVERY</title>
+    <title>LEVELING-APP — V17.12.6 INTELLIGENCE + RECOVERY</title>
     <meta name="theme-color" content="#09090f">
     <meta name="application-name" content="LEVELING-APP">
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -6081,7 +6081,7 @@ function setAppUnlockedShell(){
   document.getElementById('app-container')?.classList.remove('auth-locked');
 }
 
-const APP_VERSION='17.12.4-INTELLIGENCE-RECOVERY';
+const APP_VERSION='17.12.6-INTELLIGENCE-RECOVERY';
 const ACCOUNT_LOCAL_KEYS=['solo_leveling_user','solo_leveling_smart_refs','solo_leveling_body_hist','solo_leveling_inv','solo_leveling_block','solo_leveling_day','solo_leveling_state','solo_leveling_custom_sets','solo_leveling_history','solo_leveling_active_program','solo_leveling_program_states','solo_leveling_program_custom_sets','solo_leveling_custom_program','leveling_last_local_save','leveling_last_cloud_sync','leveling_v10'];
 function clearLevelingAccountLocalData(){
   try{ACCOUNT_LOCAL_KEYS.forEach(k=>localStorage.removeItem(k));sessionStorage.removeItem('leveling_pending_license')}catch(e){console.warn('Local account cleanup:',e)}
@@ -8196,9 +8196,9 @@ function ensureDom(){
   let sbd=document.getElementById('v140-sbd');
   let coach=document.getElementById('v140-coach');
 
-  /* V17.12.4 — un seul propriétaire de la structure dynamique du Profil.
-     Les blocs sont créés une fois puis rangés dans l'ordre canonique, sans
-     temporisations concurrentes ni wrappers de transition. */
+  /* V17.12.6 — structure du Profil uniquement.
+     Aucun modal, aucun rendu, aucune récompense ici : cette fonction ne fait
+     qu'assurer l'existence et l'ordre des sections dynamiques. */
   const rankHub=document.getElementById('v135-rank-hub');
   const powerHero=panel.querySelector('.rank-card.v1354-power-hero') || panel.querySelector('.rank-card');
   const goals=panel.querySelector('.goal-card');
@@ -8208,27 +8208,17 @@ function ensureDom(){
   if(!sbd){sbd=document.createElement('section');sbd.id='v140-sbd'}
   if(!coach){coach=document.createElement('section');coach.id='v140-coach'}
 
-  /* Ordre canonique : XP -> Quêtes -> PV -> Power -> SBD -> Coach -> Objectifs. */
   let anchor=(rankHub&&rankHub.parentNode===panel)?rankHub:null;
-  if(anchor){anchor.after(quests)}
-  else if(powerHero){panel.insertBefore(quests,powerHero)}
-  else if(goals){panel.insertBefore(quests,goals)}
-  else{panel.appendChild(quests)}
+  if(anchor)anchor.after(quests);
+  else if(powerHero)panel.insertBefore(quests,powerHero);
+  else if(goals)panel.insertBefore(quests,goals);
+  else panel.appendChild(quests);
 
   quests.after(recovery);
   if(powerHero){recovery.after(powerHero);powerHero.after(sbd)}
-  else{recovery.after(sbd)}
+  else recovery.after(sbd);
   sbd.after(coach);
   if(goals&&coach.nextElementSibling!==goals)coach.after(goals);
-
-  if(!document.getElementById('v140-levelup')){
-    document.body.insertAdjacentHTML('beforeend',`
-      <div id="v140-levelup"><div class="v140-modalbox"><div> SYSTEM</div><div class="v140-levelbig"></div><p class="why"></p><button class="v140-close" onclick="this.closest('#v140-levelup').style.display='none'">CONTINUER</button></div></div>`);
-  }
-  if(!document.getElementById('v140-streak-modal')){
-    document.body.insertAdjacentHTML('beforeend',`
-      <div id="v140-streak-modal"><div class="v140-modalbox"><div class="v140-title premium-heading">${premiumIconHTML('calendar','md')}<span>CALENDRIER D'ENTRAÎNEMENT</span></div><div class="v140-week"></div><div class="stats"></div><button class="v140-close" onclick="this.closest('#v140-streak-modal').style.display='none'">FERMER</button></div></div>`);
-  }
   return true;
 }
 
@@ -8320,7 +8310,7 @@ document.addEventListener('visibilitychange',()=>{if(document.visibilityState===
 
     markOldDuplicates();
 
-    /* V17.12.4 : ce module ne déplace plus les blocs modernes.
+    /* V17.12.6 : ce module ne déplace plus les blocs modernes.
        Il nettoie uniquement les doublons historiques ; l'ordre est géré par
        l'orchestrateur unique v15ArrangeProfile/ensureDom. */
     try{window.v15ArrangeProfile?.()}catch(e){}
@@ -11306,7 +11296,7 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
   function patchBody(){
     const en=lang()==='en',cloud=cloudCards('patch_note');
     return `<div class="v172-feed">${cloud||`<div class="v172-feed-card"><div class="v172-feed-copy">${en?'No new cloud patch note right now.':'Aucune nouvelle note de mise à jour pour le moment.'}</div></div>`}
-    <div class="v172-feed-card"><div class="v172-feed-top"><span class="v172-title-icon v172-blue">${icon('bolt')}</span><div><div class="v172-feed-title">${en?'CURRENT BUILD':'VERSION ACTUELLE'}</div><div class="v172-feed-meta">V17.12.4</div></div></div><div class="v172-feed-list">
+    <div class="v172-feed-card"><div class="v172-feed-top"><span class="v172-title-icon v172-blue">${icon('bolt')}</span><div><div class="v172-feed-title">${en?'CURRENT BUILD':'VERSION ACTUELLE'}</div><div class="v172-feed-meta">V17.12.6</div></div></div><div class="v172-feed-list">
       <div class="v172-feed-item">${icon('program')}<span>${en?'Power days can now be marked absent without awarding XP.':'Les jours Power peuvent maintenant être marqués absents sans donner d’XP.'}</span></div>
       <div class="v172-feed-item">${icon('message')}<span>${en?'Cloud patch notes and developer messages are active.':'Patch notes et messages développeur sont maintenant synchronisés dans le cloud.'}</span></div>
     </div></div></div>`;
@@ -11346,7 +11336,7 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
 </script>
 
 <script id="v17111-version-tools">
-const V17111_PUBLIC_VERSION='17.12.4';
+const V17111_PUBLIC_VERSION='17.12.6';
 function v17111MountVersionTools(target){
   if(!target||target.querySelector('#v17111-version-card'))return;
   const en=localStorage.getItem('leveling_language')==='en';
@@ -11703,7 +11693,7 @@ window.v17111ForceRefresh=async function(){
     if(powerHero&&goals){
       powerHero.classList.add('v1354-power-hero');
 
-      /* V17.12.4 — l'orchestrateur Profil possède tout l'ordre dynamique.
+      /* V17.12.6 — l'orchestrateur Profil possède tout l'ordre dynamique.
          Aucun autre module n'a besoin de deviner la position de PV/Quêtes. */
       const sbd=q('#v140-sbd',panel);
       const coach=q('#v140-coach',panel);
@@ -11975,6 +11965,7 @@ function ensureRecoveryCard(){
   return card;
 }
 function renderRecovery(){
+  if(!ensureDom())return;
   const card=ensureRecoveryCard();if(!card)return;
   const r=recoveryToday(),score=r.complete?r.score:0,label=r.complete?`${r.score}/100`:'—/100';
   card.style.setProperty('--v1622-rec-color',r.color);
@@ -12270,30 +12261,34 @@ function migrateClaims(){
   });
 }
 function renderQuests(){
+  if(!ensureDom())return;
   migrateClaims();
-  const day=localDay(),list=questList();
-
-  list.forEach(q=>{
-    if(q.done)addXP(q.xp,q.title,`quest:${day}_${q.id}`);
-  });
-
+  const day=localDay();
+  const list=questList();
   const box=document.getElementById('v140-quests');
-  if(box){
-    box.innerHTML='<div class="v140-title premium-heading">'+v1712IconHTML('star','md')+'<span>Quêtes du jour</span></div><div class="v140-quest-help">3 objectifs simples à suivre pendant ta séance pour gagner de l’XP aujourd’hui.</div>'+
-      list.map(q=>{
-        const claimed=!!state.rewardClaims?.[`quest:${day}_${q.id}`];
-        const stateClass=q.done?'done':(q.status==='En cours'?'progress':'todo');
-        return `<div class="v140-quest ${claimed?'done':''}">
-          <span class="v140-quest-icon">${v1712IconHTML(q.icon||'spark','lg')}</span>
-          <div class="v140-quest-main">
-            <div class="v140-quest-topline"><b>${q.title}</b><span class="v140-quest-state ${stateClass}">${q.done?'Terminée':q.status}</span></div>
-            <small>${q.sub}</small>
-          </div>
-          <span class="v140-xp">${claimed?' ':''}+${q.xp} XP</span>
-        </div>`;
-      }).join('');
-  }
-  persist();
+  if(!box)return;
+
+  /* Le rendu visuel ne dépend d'aucun helper externe. */
+  const rows=list.map(q=>{
+    const claimed=!!state.rewardClaims?.[`quest:${day}_${q.id}`];
+    const stateClass=q.done?'done':(q.status==='En cours'?'progress':'todo');
+    return `<div class="v140-quest ${claimed?'done':''}">
+      <span class="v140-quest-icon">${v1712IconHTML(q.icon||'spark','lg')}</span>
+      <div class="v140-quest-main">
+        <div class="v140-quest-topline"><b>${q.title}</b><span class="v140-quest-state ${stateClass}">${q.done?'Terminée':q.status}</span></div>
+        <small>${q.sub}</small>
+      </div>
+      <span class="v140-xp">+${q.xp} XP</span>
+    </div>`;
+  }).join('');
+
+  box.innerHTML=`<div class="v140-title premium-heading">${v1712IconHTML('star','md')}<span>Quêtes du jour</span></div>
+    <div class="v140-quest-help">3 objectifs adaptés à ta séance, à tes PV et aux données dont le Coach a besoin.</div>${rows}`;
+
+  /* Les récompenses sont appliquées après affichage : une erreur de stockage
+     ne peut plus empêcher la carte Quêtes d'apparaître. */
+  list.forEach(q=>{if(q.done){try{addXP(q.xp,q.title,`quest:${day}_${q.id}`)}catch(e){}}});
+  try{persist()}catch(e){}
   try{window.renderXpRankLive?.()}catch(e){}
 }
 
@@ -12389,12 +12384,11 @@ function renderAll(){
   syncUserLevel();
   syncTrainingDays();
 
-  /* V17.12.4 — rendu canonique du Profil. Chaque module est autonome :
-     Quêtes, PV et Coach ne dépendent plus d'un helper d'icônes externe. */
-  renderQuests();
-  renderRecovery();
-  renderSbdCoach();
-  recommendation();
+  /* V17.12.6 — rendu indépendant des cartes du Profil. */
+  try{renderQuests()}catch(e){console.error('[LEVELING] Quêtes',e)}
+  try{renderRecovery()}catch(e){console.error('[LEVELING] PV',e)}
+  try{renderSbdCoach()}catch(e){console.error('[LEVELING] Coach',e)}
+  try{recommendation()}catch(e){}
   updateSaveLabel();
   try{window.v15ArrangeProfile?.()}catch(e){}
 }
@@ -12463,26 +12457,30 @@ window.LevelingRecoveryV1622={
   applyWorkoutDrain:v1712ApplyWorkoutDrain
 };
 window.LevelingCoachV1712={
-  version:'17.12.4',
+  version:'17.12.6',
   refresh:()=>{renderQuests();renderRecovery();recommendation();try{window.LevelingRPG?.render?.()}catch(e){}},
   rirStats:v1712RirStats
 };
 
-function boot(){
+/* V17.12.6 — bootstrap nommé et isolé.
+   Plusieurs anciens modules possèdent encore une fonction globale `boot()`.
+   Un appel tardif à `boot()` pouvait donc viser le dernier module déclaré et
+   laisser Quêtes/PV vides. Ce moteur n'utilise plus aucun nom global générique. */
+function v17126RenderIntelligenceRecovery(){
   renderAll();
 }
-function bootReliable(){
-  boot();
-  [350,900,1800].forEach(ms=>setTimeout(boot,ms));
+function v17126BootIntelligenceRecovery(){
+  v17126RenderIntelligenceRecovery();
+  [350,900,1800].forEach(ms=>setTimeout(v17126RenderIntelligenceRecovery,ms));
 }
 if(document.readyState==='loading'){
-  document.addEventListener('DOMContentLoaded',bootReliable,{once:true});
-}else bootReliable();
+  document.addEventListener('DOMContentLoaded',v17126BootIntelligenceRecovery,{once:true});
+}else v17126BootIntelligenceRecovery();
 document.addEventListener('visibilitychange',()=>{
-  if(document.visibilityState==='visible')setTimeout(boot,80);
+  if(document.visibilityState==='visible')setTimeout(v17126RenderIntelligenceRecovery,80);
 });
 document.addEventListener('click',e=>{
-  if(e.target.closest('[data-panel=\"profile\"], [data-target=\"profile\"], [onclick*=\"profile\"]'))setTimeout(boot,80);
+  if(e.target.closest('[data-panel=\"profile\"], [data-target=\"profile\"], [onclick*=\"profile\"]'))setTimeout(v17126RenderIntelligenceRecovery,80);
 },{passive:true});
 })();
 </script>
@@ -13838,7 +13836,7 @@ window.v17101CloseBroadcastInbox=function(){
 
 
 <script id="v1711-build-marker">
-window.LEVELING_BUILD_INFO=Object.freeze({version:'17.12.4',codename:'Intelligence + Recovery',assets:'external-lossless',stripe:'live'});
+window.LEVELING_BUILD_INFO=Object.freeze({version:'17.12.6',codename:'Intelligence + Recovery',assets:'external-lossless',stripe:'live'});
 </script>
 </body>
 </html>
