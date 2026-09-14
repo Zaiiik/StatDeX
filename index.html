@@ -11289,7 +11289,7 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
   function patchBody(){
     const en=lang()==='en',cloud=cloudCards('patch_note');
     return `<div class="v172-feed">${cloud||`<div class="v172-feed-card"><div class="v172-feed-copy">${en?'No new cloud patch note right now.':'Aucune nouvelle note de mise à jour pour le moment.'}</div></div>`}
-    <div class="v172-feed-card"><div class="v172-feed-top"><span class="v172-title-icon v172-blue">${icon('bolt')}</span><div><div class="v172-feed-title">${en?'CURRENT BUILD':'VERSION ACTUELLE'}</div><div class="v172-feed-meta">V17.10</div></div></div><div class="v172-feed-list">
+    <div class="v172-feed-card"><div class="v172-feed-top"><span class="v172-title-icon v172-blue">${icon('bolt')}</span><div><div class="v172-feed-title">${en?'CURRENT BUILD':'VERSION ACTUELLE'}</div><div class="v172-feed-meta">V17.11.1</div></div></div><div class="v172-feed-list">
       <div class="v172-feed-item">${icon('program')}<span>${en?'Power days can now be marked absent without awarding XP.':'Les jours Power peuvent maintenant être marqués absents sans donner d’XP.'}</span></div>
       <div class="v172-feed-item">${icon('message')}<span>${en?'Cloud patch notes and developer messages are active.':'Patch notes et messages développeur sont maintenant synchronisés dans le cloud.'}</span></div>
     </div></div></div>`;
@@ -11339,6 +11339,32 @@ function v17111MountVersionTools(target){
   box.querySelector('#v17111-refresh-btn')?.addEventListener('click',window.v17111ForceRefresh);
 }
 window.v17111MountVersionTools=v17111MountVersionTools;
+function v17111EnsureVersionTools(){
+  const panel=document.getElementById('panel-settings');
+  if(!panel)return;
+  const sections=[...panel.querySelectorAll('.compact-setting-section')];
+  const display=sections.find(section=>{
+    const txt=String(section.querySelector('.compact-setting-title')?.textContent||section.textContent||'').trim().toLowerCase();
+    return txt.includes('affichage')||txt.includes('display');
+  });
+  const body=display?.querySelector('.compact-setting-body');
+  if(body)v17111MountVersionTools(body);
+}
+window.v17111EnsureVersionTools=v17111EnsureVersionTools;
+if(document.readyState==='loading'){
+  document.addEventListener('DOMContentLoaded',()=>setTimeout(v17111EnsureVersionTools,250),{once:true});
+}else{setTimeout(v17111EnsureVersionTools,250)}
+window.addEventListener('pageshow',()=>setTimeout(v17111EnsureVersionTools,250));
+window.addEventListener('leveling-language-changed',()=>{
+  document.getElementById('v17111-version-card')?.remove();
+  setTimeout(v17111EnsureVersionTools,80);
+});
+document.addEventListener('click',event=>{
+  const target=event.target?.closest?.('button,[role=button],.compact-setting-head,.compact-setting-header');
+  if(!target)return;
+  const txt=String(target.textContent||'').toLowerCase();
+  if(txt.includes('affichage')||txt.includes('display')||txt.includes('réglages')||txt.includes('settings'))setTimeout(v17111EnsureVersionTools,80);
+});
 window.v17111ForceRefresh=async function(){
   const btn=document.getElementById('v17111-refresh-btn');if(btn){btn.disabled=true;btn.textContent=localStorage.getItem('leveling_language')==='en'?'REFRESHING…':'ACTUALISATION…'}
   try{showSocialToast?.('LEVELING-APP',localStorage.getItem('leveling_language')==='en'?'Checking the latest version…':'Vérification de la dernière version…')}catch(e){}
