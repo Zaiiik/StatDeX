@@ -1,4 +1,4 @@
-<!-- LEVELING-APP V18.2.1 AUDITED CORE — clean progression core, contextual coach, skip workflow, weekly/monthly reports, recovery, ranks and SYSTEM AI -->
+<!-- LEVELING-APP V18.2.2 RATING FIX — clean progression core, contextual coach, skip workflow, weekly/monthly reports, recovery, ranks and SYSTEM AI -->
 <!-- LEVELING-APP V17.4.0 AUTH + I18N + ONBOARDING REPLAY TEST
      - hard account gate after first-run discovery
      - dynamic FR/EN observer for content rendered after language switch
@@ -31,7 +31,7 @@
 
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>LEVELING-APP — V18.2.1 AUDITED CORE</title>
+    <title>LEVELING-APP — V18.2.2 RATING FIX</title>
     <meta name="theme-color" content="#09090f">
     <meta name="application-name" content="LEVELING-APP">
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -363,8 +363,11 @@
         .showcase-rank-info div:last-child { font-size: 0.65rem; color: #aaa; margin-top: 2px; }
         .showcase-ratio { font-family: monospace; font-weight: bold; font-size: 0.9rem; color: var(--success); }
 
-        .stars-container { display: flex; justify-content: center; gap: 8px; font-size: 2.2rem; margin: 15px 0; color: #444; cursor: pointer; }
-        .stars-container span.active { color: var(--warning); text-shadow: 0 0 10px var(--warning); }
+        .stars-container { display:flex; justify-content:center; gap:9px; margin:15px 0; cursor:pointer; }
+        .stars-container span { width:38px; height:38px; display:grid; place-items:center; border-radius:10px; color:#4a4d58; border:1px solid #2d3039; background:#101118; transition:.16s ease; }
+        .stars-container span svg { width:25px; height:25px; fill:currentColor; pointer-events:none; }
+        .stars-container span.active { color:var(--warning); border-color:rgba(255,234,0,.55); background:rgba(255,234,0,.08); box-shadow:0 0 12px rgba(255,234,0,.20); }
+        .stars-container span:active { transform:scale(.94); }
 
         nav {
             position: absolute; bottom: 0; left: 0; width: 100%;
@@ -3856,12 +3859,12 @@ btn.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDef
             <h2>Séance Terminée !</h2>
             <div id="workout-recap-text" style="font-size: 0.75rem; color: #ccc; margin: 10px 0; text-align: left; background: rgba(0,0,0,0.3); padding: 8px; border-radius: 6px;"></div>
             <p class="subtitle" style="margin-bottom:5px;">Évaluez l'intensité :</p>
-            <div class="stars-container" id="rating-stars" style="margin: 5px 0 15px 0;">
-                <span onclick="playSound('click'); setRating(1)"></span>
-                <span onclick="playSound('click'); setRating(2)"></span>
-                <span onclick="playSound('click'); setRating(3)"></span>
-                <span onclick="playSound('click'); setRating(4)"></span>
-                <span onclick="playSound('click'); setRating(5)"></span>
+            <div class="stars-container" id="rating-stars" style="margin: 5px 0 15px 0;" role="radiogroup" aria-label="Intensité de la séance">
+                <span role="radio" aria-label="Intensité 1 sur 5" aria-checked="false" onclick="playSound('click'); setRating(1)"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.7l2.84 5.75 6.35.92-4.6 4.48 1.09 6.33L12 17.2l-5.68 2.98 1.09-6.33-4.6-4.48 6.35-.92L12 2.7z"/></svg></span>
+                <span role="radio" aria-label="Intensité 2 sur 5" aria-checked="false" onclick="playSound('click'); setRating(2)"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.7l2.84 5.75 6.35.92-4.6 4.48 1.09 6.33L12 17.2l-5.68 2.98 1.09-6.33-4.6-4.48 6.35-.92L12 2.7z"/></svg></span>
+                <span role="radio" aria-label="Intensité 3 sur 5" aria-checked="false" onclick="playSound('click'); setRating(3)"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.7l2.84 5.75 6.35.92-4.6 4.48 1.09 6.33L12 17.2l-5.68 2.98 1.09-6.33-4.6-4.48 6.35-.92L12 2.7z"/></svg></span>
+                <span role="radio" aria-label="Intensité 4 sur 5" aria-checked="false" onclick="playSound('click'); setRating(4)"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.7l2.84 5.75 6.35.92-4.6 4.48 1.09 6.33L12 17.2l-5.68 2.98 1.09-6.33-4.6-4.48 6.35-.92L12 2.7z"/></svg></span>
+                <span role="radio" aria-label="Intensité 5 sur 5" aria-checked="false" onclick="playSound('click'); setRating(5)"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.7l2.84 5.75 6.35.92-4.6 4.48 1.09 6.33L12 17.2l-5.68 2.98 1.09-6.33-4.6-4.48 6.35-.92L12 2.7z"/></svg></span>
             </div>
             <div class="v1622-modal-recovery">
                 <div class="v1622-modal-recovery-title premium-heading"><svg class="ui-icon md"><use href="#ui-heart"></use></svg><span>Récupération du jour</span></div>
@@ -5567,6 +5570,7 @@ btn.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDef
             document.querySelectorAll('.stars-container span').forEach((el, idx) => {
                 if (idx < stars) el.classList.add('active');
                 else el.classList.remove('active');
+                el.setAttribute('aria-checked', idx === stars - 1 ? 'true' : 'false');
             });
         }
 
@@ -6140,7 +6144,7 @@ function setAppUnlockedShell(){
   document.getElementById('app-container')?.classList.remove('auth-locked');
 }
 
-const APP_VERSION='18.2.1-AUDITED-CORE';
+const APP_VERSION='18.2.2-RATING-FIX';
 const ACCOUNT_LOCAL_KEYS=['solo_leveling_user','solo_leveling_smart_refs','solo_leveling_body_hist','solo_leveling_inv','solo_leveling_block','solo_leveling_day','solo_leveling_state','solo_leveling_custom_sets','solo_leveling_history','solo_leveling_active_program','solo_leveling_program_states','solo_leveling_program_custom_sets','solo_leveling_custom_program','leveling_last_local_save','leveling_last_cloud_sync','leveling_v10','leveling_v181_core','leveling_v182_core'];
 function clearLevelingAccountLocalData(){
   try{ACCOUNT_LOCAL_KEYS.forEach(k=>localStorage.removeItem(k));sessionStorage.removeItem('leveling_pending_license')}catch(e){console.warn('Local account cleanup:',e)}
@@ -6512,7 +6516,7 @@ async function retryLicenseCheck(){
 function exportAppData(){
   if(typeof saveActiveProgramState==='function')saveActiveProgramState();
   let v182=null;try{v182=window.LevelingCoreV182?.exportState?.()||JSON.parse(localStorage.getItem('leveling_v182_core')||'null')}catch(e){}
-  return{version:'18.2.1',userData,smartHypertrophyRefs,bodyHistory,inventoryItems,currentBlockIndex,currentDayIndex,activeProgramKey,programWorkoutStates,programCustomSetData,customProgramData,workoutState,customSetData,workoutHistory,v182,v10:(typeof window.__levelingV10Export==='function'?window.__levelingV10Export():null)};
+  return{version:'18.2.2',userData,smartHypertrophyRefs,bodyHistory,inventoryItems,currentBlockIndex,currentDayIndex,activeProgramKey,programWorkoutStates,programCustomSetData,customProgramData,workoutState,customSetData,workoutHistory,v182,v10:(typeof window.__levelingV10Export==='function'?window.__levelingV10Export():null)};
 }
 function importAppData(d){
   if(!d||typeof d!=='object')return;suppressCloudSave=true;
@@ -6520,7 +6524,7 @@ function importAppData(d){
     if(d.userData)userData=d.userData;if(d.smartHypertrophyRefs)smartHypertrophyRefs=d.smartHypertrophyRefs;if(d.bodyHistory)bodyHistory=d.bodyHistory;if(d.inventoryItems)inventoryItems=d.inventoryItems;
     if(Number.isInteger(d.currentBlockIndex))currentBlockIndex=d.currentBlockIndex;if(Number.isInteger(d.currentDayIndex))currentDayIndex=d.currentDayIndex;if(d.activeProgramKey)activeProgramKey=d.activeProgramKey;
     if(d.programWorkoutStates)programWorkoutStates=d.programWorkoutStates;if(d.programCustomSetData)programCustomSetData=d.programCustomSetData;if(d.customProgramData)customProgramData=d.customProgramData;if(d.workoutState)workoutState=d.workoutState;if(d.customSetData)customSetData=d.customSetData;if(d.workoutHistory)workoutHistory=d.workoutHistory;
-    if(d.v182){try{localStorage.setItem('leveling_v182_core',JSON.stringify(d.v182));window.LevelingCoreV182?.importState?.(d.v182)}catch(e){console.warn('[V18.2.1] import core',e)}}
+    if(d.v182){try{localStorage.setItem('leveling_v182_core',JSON.stringify(d.v182));window.LevelingCoreV182?.importState?.(d.v182)}catch(e){console.warn('[V18.2.2] import core',e)}}
     if(d.v10&&typeof window.__levelingV10Import==='function')window.__levelingV10Import(d.v10);
     if(typeof loadActiveProgramState==='function')loadActiveProgramState();if(typeof saveToLocalStorage==='function')saveToLocalStorage();
   }finally{suppressCloudSave=false}
@@ -11415,7 +11419,7 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
 </script>
 
 <script id="v17111-version-tools">
-const V17111_PUBLIC_VERSION='18.2.1';
+const V17111_PUBLIC_VERSION='18.2.2';
 function v17111MountVersionTools(target){
   if(!target||target.querySelector('#v17111-version-card'))return;
   const en=localStorage.getItem('leveling_language')==='en';
@@ -13894,7 +13898,7 @@ window.v17101CloseBroadcastInbox=function(){
 <script id="v182-clean-core-runtime">
 (function(){
 'use strict';
-const VERSION='18.2.1';
+const VERSION='18.2.2';
 const KEY='leveling_v182_core';
 const LEGACY_KEY='leveling_v181_core';
 const DAY=86400000;
@@ -14137,7 +14141,7 @@ function answer(q){
   return`Je peux analyser tes données réelles : progression d’un exercice, charge suivante, ordre des exercices, RIR, PV, séries skippées, PR, deload et bilan semaine/mois.\n\nContexte : ${sessionAdvice()}`;
 }
 function ensureAI(){const panel=document.getElementById('panel-profile');if(!panel)return;let card=document.getElementById('v181-ai-card');if(!card){card=document.createElement('section');card.id='v181-ai-card';const coach=document.getElementById('v140-coach'),goals=panel.querySelector('.goal-card');if(coach)coach.after(card);else if(goals)panel.insertBefore(card,goals);else panel.appendChild(card)}const c=context();card.innerHTML=`<div class="v181-ai-head"><div class="v181-ai-brand"><span class="v181-ai-core">AI</span><div><b>SYSTEM AI</b><small>MOTEUR D’ANALYSE · DONNÉES RÉELLES</small></div></div><span class="v181-ai-live">LIVE DATA</span></div><div class="v181-ai-summary">PV ${c.recovery.complete?c.recovery.score:'—'}/100 · ${c.sessions.length} séance(s) / 30j · ${Math.round(c.volume).toLocaleString('fr-FR')} kg · SBD ${c.sbd} kg</div><button class="v181-ai-open" onclick="LevelingSystemAI.open()">OUVRIR LE TERMINAL SYSTEM</button>`;ensureAIModal()}
-function ensureAIModal(){if(document.getElementById('v181-ai-modal'))return;const d=document.createElement('div');d.id='v181-ai-modal';d.innerHTML=`<div class="v181-terminal"><div class="v181-terminal-head"><div><b>SYSTEM AI</b><small>LEVELING-APP · AUDITED CORE V18.2.1</small></div><button class="v181-close" onclick="LevelingSystemAI.close()">×</button></div><div id="v181-context" class="v181-context"></div><div id="v181-chat" class="v181-chat"></div><div class="v181-quick"><button onclick="LevelingSystemAI.ask('Que dois-je faire aujourd’hui ?')">Séance du jour</button><button onclick="LevelingSystemAI.ask('Pourquoi mon bench stagne ?')">Bench</button><button onclick="LevelingSystemAI.ask('Est-ce que je tente un PR au squat ?')">PR Squat</button><button onclick="LevelingSystemAI.ask('Ai-je besoin d’un deload ?')">Deload</button><button onclick="LevelingSystemAI.ask('Fais-moi mon bilan de la semaine')">Bilan semaine</button></div><div class="v181-input"><input id="v181-ai-input" placeholder="Pose une question sur ta progression…" onkeydown="if(event.key==='Enter')LevelingSystemAI.send()"><button onclick="LevelingSystemAI.send()">ENVOYER</button></div><div class="v181-disclaimer">Analyse sportive/gamifiée basée sur tes données. Ce n’est pas un avis médical.</div></div>`;d.addEventListener('click',e=>{if(e.target===d)LevelingSystemAI.close()});document.body.appendChild(d)}
+function ensureAIModal(){if(document.getElementById('v181-ai-modal'))return;const d=document.createElement('div');d.id='v181-ai-modal';d.innerHTML=`<div class="v181-terminal"><div class="v181-terminal-head"><div><b>SYSTEM AI</b><small>LEVELING-APP · RATING FIX V18.2.2</small></div><button class="v181-close" onclick="LevelingSystemAI.close()">×</button></div><div id="v181-context" class="v181-context"></div><div id="v181-chat" class="v181-chat"></div><div class="v181-quick"><button onclick="LevelingSystemAI.ask('Que dois-je faire aujourd’hui ?')">Séance du jour</button><button onclick="LevelingSystemAI.ask('Pourquoi mon bench stagne ?')">Bench</button><button onclick="LevelingSystemAI.ask('Est-ce que je tente un PR au squat ?')">PR Squat</button><button onclick="LevelingSystemAI.ask('Ai-je besoin d’un deload ?')">Deload</button><button onclick="LevelingSystemAI.ask('Fais-moi mon bilan de la semaine')">Bilan semaine</button></div><div class="v181-input"><input id="v181-ai-input" placeholder="Pose une question sur ta progression…" onkeydown="if(event.key==='Enter')LevelingSystemAI.send()"><button onclick="LevelingSystemAI.send()">ENVOYER</button></div><div class="v181-disclaimer">Analyse sportive/gamifiée basée sur tes données. Ce n’est pas un avis médical.</div></div>`;d.addEventListener('click',e=>{if(e.target===d)LevelingSystemAI.close()});document.body.appendChild(d)}
 function renderAIContext(){const c=context(),el=document.getElementById('v181-context');if(!el)return;el.innerHTML=`<div><span>PV</span><b>${c.recovery.complete?c.recovery.score:'—'}/100</b></div><div><span>RIR</span><b>${c.rir.avg===null?'—':c.rir.avg.toFixed(1)}</b></div><div><span>30 J</span><b>${c.sessions.length} séances</b></div><div><span>VOLUME</span><b>${Math.round(c.volume/1000)} t</b></div>`}
 function addMsg(t,type){const c=document.getElementById('v181-chat');if(!c)return;const d=document.createElement('div');d.className='v181-msg '+type;d.textContent=t;c.appendChild(d);c.scrollTop=c.scrollHeight}
 window.LevelingSystemAI={version:VERSION,open(){ensureAIModal();document.getElementById('v181-ai-modal').classList.add('show');renderAIContext();const c=document.getElementById('v181-chat');if(c&&!c.children.length)addMsg('SYSTEM en ligne. J’analyse tes PV, RIR, charges, ordre des exercices, séries skippées, historique et bilans de progression.','system')},close(){document.getElementById('v181-ai-modal')?.classList.remove('show')},ask(q){this.open();addMsg(q,'user');setTimeout(()=>addMsg(answer(q),'system'),80)},send(){const i=document.getElementById('v181-ai-input'),q=String(i?.value||'').trim();if(!q)return;i.value='';this.ask(q)},answer};
@@ -14155,7 +14159,7 @@ window.addEventListener('pageshow',()=>setTimeout(refresh,80));
 </script>
 
 <script id="v1711-build-marker">
-window.LEVELING_BUILD_INFO=Object.freeze({version:'18.2.1',codename:'Audited Coach Reports',assets:'external-lossless',stripe:'live'});
+window.LEVELING_BUILD_INFO=Object.freeze({version:'18.2.2',codename:'Audited Coach Reports',assets:'external-lossless',stripe:'live'});
 </script>
 </body>
 </html>
