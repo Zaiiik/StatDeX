@@ -1,4 +1,4 @@
-const CACHE='leveling-app-v17-13-0';
+const CACHE='leveling-app-v18-0-0';
 const CORE=['./','./index.html','./manifest.webmanifest','./icon-192.png','./icon-512.png'];
 
 self.addEventListener('install',event=>{

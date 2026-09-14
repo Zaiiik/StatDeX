@@ -8,7 +8,7 @@
 <!-- LEVELING-APP V16.4.1 — Stripe Checkout wired -->
 <!-- LEVELING-APP V16.4.0 — subscription backend foundation -->
 <!-- LEVELING-APP V16.3.3 — account-aware onboarding skip -->
-<!-- V17.13.0 — Progression + gamification : historique avancé, courbes SBD, comparaison 30j, Rank Up, cadres cosmétiques, classements semaine/saison, profils communauté enrichis et transitions de page fluides. -->
+<!-- V18.0.0 — Premium + SYSTEM AI : abonnement détaillé, historique Stripe, onboarding post-paiement et moteur d’analyse connecté aux données réelles. -->
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -31,7 +31,7 @@
 
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>LEVELING-APP — V17.13.0 PROGRESSION + GAMIFICATION</title>
+    <title>LEVELING-APP — V18.0.0 PREMIUM + SYSTEM AI</title>
     <meta name="theme-color" content="#09090f">
     <meta name="application-name" content="LEVELING-APP">
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -3197,6 +3197,20 @@ main{padding-bottom:calc(72px + env(safe-area-inset-bottom,0px))!important}
 @media(prefers-reduced-motion:reduce){::view-transition-old(leveling-panel),::view-transition-new(leveling-panel),.v173-page-enter,.v135-rankup-box:before,.v135-rankup-box:after{animation:none!important}}
 </style>
 
+
+<style id="v180-premium-system-ai-css">
+#v1612-subscription-root .v1612-test-note{display:none!important}
+.v180-billing-shell{margin:10px 0 12px;padding:12px;border:1px solid rgba(255,224,91,.32);border-radius:14px;background:linear-gradient(145deg,rgba(255,224,91,.06),rgba(189,0,255,.06),#0a0a10);box-shadow:0 0 18px rgba(255,224,91,.06)}
+.v180-billing-head{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}.v180-billing-head b{font-size:.72rem;color:#ffe56b}.v180-billing-head small{display:block;color:#777;font-size:.48rem;margin-top:3px}.v180-status-pill{padding:5px 8px;border:1px solid #3b3b46;border-radius:999px;font-size:.46rem;font-weight:1000;color:#fff;white-space:nowrap}.v180-status-pill.active{border-color:#00e676;color:#8affbd}.v180-status-pill.cancel{border-color:#ffb13b;color:#ffd28b}.v180-status-pill.life{border-color:#d66cff;color:#f0b9ff}
+.v180-billing-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:9px}.v180-billing-kpi{padding:8px;border:1px solid #292934;border-radius:10px;background:#101017}.v180-billing-kpi span{display:block;color:#777;font-size:.42rem;text-transform:uppercase}.v180-billing-kpi b{display:block;color:#fff;font-size:.62rem;margin-top:3px;line-height:1.25}.v180-billing-note{margin-top:8px;padding:8px;border-radius:9px;background:rgba(0,210,255,.05);border:1px solid rgba(0,210,255,.18);color:#9ea6b5;font-size:.48rem;line-height:1.45}
+.v180-payment-card{margin:8px 0 0;padding:11px;border:1px solid #2b2b36;border-radius:13px;background:#0b0b11}.v180-payment-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}.v180-payment-head b{font-size:.66rem}.v180-payment-head small{font-size:.44rem;color:#777}.v180-payment-row{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px;padding:8px 0;border-top:1px solid #20202a}.v180-payment-row:first-of-type{border-top:0}.v180-payment-main b{display:block;font-size:.58rem;color:#fff}.v180-payment-main small{display:block;font-size:.44rem;color:#777;margin-top:2px}.v180-payment-amount{text-align:right}.v180-payment-amount b{font-size:.62rem;color:#8affbd}.v180-payment-amount a{display:block;margin-top:2px;font-size:.42rem;color:#55dfff;text-decoration:none}.v180-payment-empty{padding:10px;text-align:center;color:#777;font-size:.5rem}
+.v180-ai-card{margin:8px 0;padding:12px;border:1px solid rgba(82,255,194,.4);border-radius:14px;background:radial-gradient(circle at 90% 10%,rgba(0,255,170,.08),transparent 35%),linear-gradient(145deg,rgba(0,210,255,.05),#09090f 58%,rgba(189,0,255,.05));box-shadow:0 0 20px rgba(0,255,170,.07)}.v180-ai-card-head{display:flex;align-items:center;justify-content:space-between;gap:10px}.v180-ai-title{display:flex;align-items:center;gap:9px}.v180-ai-core{width:34px;height:34px;border-radius:10px;border:1px solid rgba(82,255,194,.5);display:grid;place-items:center;color:#60ffc9;background:rgba(82,255,194,.07);box-shadow:0 0 16px rgba(82,255,194,.15);font-weight:1000}.v180-ai-title b{display:block;color:#eafff8;font-size:.78rem;letter-spacing:.07em}.v180-ai-title small{display:block;color:#6f8f84;font-size:.45rem;margin-top:2px}.v180-ai-live{font-size:.42rem;color:#7cffbf;border:1px solid rgba(82,255,194,.35);border-radius:999px;padding:5px 7px;font-weight:1000}.v180-ai-summary{margin:9px 0;color:#9ca9a5;font-size:.5rem;line-height:1.5}.v180-ai-open{width:100%;border:1px solid rgba(82,255,194,.5);border-radius:10px;background:linear-gradient(90deg,rgba(82,255,194,.10),rgba(0,210,255,.10));color:#dffff4;padding:10px;font-size:.58rem;font-weight:1000;letter-spacing:.08em}
+#v180-system-modal{display:none;position:fixed;inset:0;z-index:2147483600;background:rgba(0,0,0,.82);backdrop-filter:blur(10px);padding:max(12px,env(safe-area-inset-top)) 10px max(12px,env(safe-area-inset-bottom));align-items:center;justify-content:center}#v180-system-modal.show{display:flex}.v180-terminal{width:min(760px,100%);height:min(760px,94dvh);display:flex;flex-direction:column;border:1px solid rgba(82,255,194,.45);border-radius:16px;background:linear-gradient(180deg,#070b0a,#050507);box-shadow:0 0 40px rgba(0,255,170,.12);overflow:hidden}.v180-terminal-head{display:flex;justify-content:space-between;align-items:center;padding:12px;border-bottom:1px solid #17352b}.v180-terminal-brand b{display:block;color:#66ffc8;font-size:.82rem;letter-spacing:.13em}.v180-terminal-brand small{display:block;color:#608378;font-size:.44rem;margin-top:2px}.v180-terminal-close{width:34px;height:34px;border-radius:9px;border:1px solid #254a3e;background:#0b1512;color:#caffee;font-size:1rem}.v180-terminal-context{display:grid;grid-template-columns:repeat(4,1fr);gap:5px;padding:8px 10px;border-bottom:1px solid #13241f;background:#08100d}.v180-context-chip{padding:6px;border:1px solid #18332a;border-radius:8px;text-align:center}.v180-context-chip span{display:block;font-size:.38rem;color:#58766c;text-transform:uppercase}.v180-context-chip b{display:block;font-size:.54rem;color:#dff8ef;margin-top:2px}.v180-chat{flex:1;overflow:auto;padding:10px;scrollbar-width:thin}.v180-msg{max-width:88%;margin:7px 0;padding:9px 10px;border-radius:10px;font-size:.54rem;line-height:1.5;white-space:pre-wrap}.v180-msg.system{background:#0b1612;border:1px solid #173b2f;color:#bfeedd}.v180-msg.user{margin-left:auto;background:#10101a;border:1px solid #33334a;color:#fff}.v180-quick{display:flex;gap:5px;overflow:auto;padding:0 10px 8px}.v180-quick button{flex:none;border:1px solid #224d3e;background:#0a1511;color:#9ff5d5;border-radius:999px;padding:7px 9px;font-size:.44rem}.v180-input-row{display:grid;grid-template-columns:1fr auto;gap:6px;padding:9px 10px;border-top:1px solid #162820}.v180-input-row input{min-width:0;border:1px solid #28483d;border-radius:9px;background:#070b0a;color:#fff;padding:10px;font-size:.58rem;outline:none}.v180-input-row button{border:1px solid #39dca4;border-radius:9px;background:#0b2119;color:#baffdf;padding:0 13px;font-size:.54rem;font-weight:1000}.v180-ai-disclaimer{padding:0 10px 9px;color:#4f625c;font-size:.39rem;line-height:1.4}
+#v180-payment-onboarding{display:none;position:fixed;inset:0;z-index:2147483640;background:radial-gradient(circle at 50% 20%,rgba(0,210,255,.12),transparent 35%),rgba(0,0,0,.94);backdrop-filter:blur(9px);align-items:center;justify-content:center;padding:16px}#v180-payment-onboarding.show{display:flex}.v180-onboard{width:min(520px,100%);border:1px solid rgba(0,230,118,.45);border-radius:18px;background:#09090f;padding:16px;box-shadow:0 0 45px rgba(0,230,118,.12)}.v180-unlocked{text-align:center}.v180-unlocked-mark{width:72px;height:72px;margin:0 auto 10px;border-radius:20px;display:grid;place-items:center;border:1px solid rgba(0,230,118,.5);background:rgba(0,230,118,.08);color:#79ffb7;font-size:2rem;box-shadow:0 0 28px rgba(0,230,118,.14)}.v180-unlocked h2{color:#7dffb9;font-size:1.05rem;letter-spacing:.08em;margin:4px 0}.v180-unlocked p{color:#8e9995;font-size:.56rem;line-height:1.5}.v180-onboard-plan{display:inline-block;margin:6px 0 12px;padding:5px 9px;border:1px solid rgba(0,230,118,.3);border-radius:999px;color:#baffd8;font-size:.48rem;font-weight:1000}.v180-quick-form{display:grid;grid-template-columns:repeat(2,1fr);gap:7px;text-align:left;margin:10px 0}.v180-quick-field{padding:8px;border:1px solid #292934;border-radius:10px;background:#101017}.v180-quick-field label{display:block;color:#7f858d;font-size:.43rem;margin-bottom:4px}.v180-quick-field input{width:100%;border:0;background:transparent;color:#fff;font-size:.72rem;font-weight:1000;outline:none}.v180-onboard-actions{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-top:10px}.v180-onboard-actions button{border:1px solid #2f604f;border-radius:10px;background:#0c1713;color:#baffdf;padding:10px;font-size:.52rem;font-weight:1000}.v180-onboard-actions button.primary{border-color:#00e676;background:rgba(0,230,118,.10);color:#9affc7}
+@media(max-width:560px){.v180-billing-grid,.v180-terminal-context{grid-template-columns:repeat(2,1fr)}.v180-terminal{height:96dvh}.v180-quick-form{grid-template-columns:1fr 1fr}}
+@media(prefers-reduced-motion:reduce){#v180-system-modal,#v180-payment-onboarding{backdrop-filter:none}}
+</style>
+
 </head>
 <body data-theme="purple" class="auth-restoring">
 <svg id="premium-icon-sprite" width="0" height="0" aria-hidden="true" focusable="false" style="position:absolute;width:0;height:0;overflow:hidden">
@@ -6115,7 +6129,7 @@ function setAppUnlockedShell(){
   document.getElementById('app-container')?.classList.remove('auth-locked');
 }
 
-const APP_VERSION='17.13.0-PROGRESSION-GAMIFICATION';
+const APP_VERSION='18.0.0-PREMIUM-SYSTEM-AI';
 const ACCOUNT_LOCAL_KEYS=['solo_leveling_user','solo_leveling_smart_refs','solo_leveling_body_hist','solo_leveling_inv','solo_leveling_block','solo_leveling_day','solo_leveling_state','solo_leveling_custom_sets','solo_leveling_history','solo_leveling_active_program','solo_leveling_program_states','solo_leveling_program_custom_sets','solo_leveling_custom_program','leveling_last_local_save','leveling_last_cloud_sync','leveling_v10'];
 function clearLevelingAccountLocalData(){
   try{ACCOUNT_LOCAL_KEYS.forEach(k=>localStorage.removeItem(k));sessionStorage.removeItem('leveling_pending_license')}catch(e){console.warn('Local account cleanup:',e)}
@@ -11388,7 +11402,7 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
   function patchBody(){
     const en=lang()==='en',cloud=cloudCards('patch_note');
     return `<div class="v172-feed">${cloud||`<div class="v172-feed-card"><div class="v172-feed-copy">${en?'No new cloud patch note right now.':'Aucune nouvelle note de mise à jour pour le moment.'}</div></div>`}
-    <div class="v172-feed-card"><div class="v172-feed-top"><span class="v172-title-icon v172-blue">${icon('bolt')}</span><div><div class="v172-feed-title">${en?'CURRENT BUILD':'VERSION ACTUELLE'}</div><div class="v172-feed-meta">V17.13.0</div></div></div><div class="v172-feed-list">
+    <div class="v172-feed-card"><div class="v172-feed-top"><span class="v172-title-icon v172-blue">${icon('bolt')}</span><div><div class="v172-feed-title">${en?'CURRENT BUILD':'VERSION ACTUELLE'}</div><div class="v172-feed-meta">V18.0.0</div></div></div><div class="v172-feed-list">
       <div class="v172-feed-item">${icon('program')}<span>${en?'Power days can now be marked absent without awarding XP.':'Les jours Power peuvent maintenant être marqués absents sans donner d’XP.'}</span></div>
       <div class="v172-feed-item">${icon('message')}<span>${en?'Cloud patch notes and developer messages are active.':'Patch notes et messages développeur sont maintenant synchronisés dans le cloud.'}</span></div>
     </div></div></div>`;
@@ -11428,7 +11442,7 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
 </script>
 
 <script id="v17111-version-tools">
-const V17111_PUBLIC_VERSION='17.13.0';
+const V17111_PUBLIC_VERSION='18.0.0';
 function v17111MountVersionTools(target){
   if(!target||target.querySelector('#v17111-version-card'))return;
   const en=localStorage.getItem('leveling_language')==='en';
@@ -12572,7 +12586,7 @@ window.LevelingRecoveryV1622={
   applyWorkoutDrain:v1712ApplyWorkoutDrain
 };
 window.LevelingCoachV1712={
-  version:'17.13.0',
+  version:'18.0.0',
   refresh:()=>{renderQuests();renderRecovery();recommendation();try{window.LevelingRPG?.render?.()}catch(e){}},
   rirStats:v1712RirStats
 };
@@ -13954,7 +13968,7 @@ window.v17101CloseBroadcastInbox=function(){
 <script id="v173-progression-gamification-core">
 (function(){
 'use strict';
-const VERSION='17.13.0';
+const VERSION='18.0.0';
 let rangeDays=60;
 function esc(v){return String(v??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]))}
 function parseDate(v){const t=Date.parse(v||'');return Number.isFinite(t)?t:0}
@@ -13987,8 +14001,84 @@ window.LevelingV173={version:VERSION,refresh:boot};
 })();
 </script>
 
+
+<script id="v180-premium-system-ai-runtime">
+(function(){
+'use strict';
+const VERSION='18.0.0';
+const en=()=>localStorage.getItem('leveling_language')==='en';
+const esc=v=>String(v??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+const fmtDate=v=>{if(!v)return'—';const d=new Date(v);return Number.isNaN(d.getTime())?'—':d.toLocaleDateString(en()?'en-GB':'fr-FR',{day:'2-digit',month:'2-digit',year:'numeric'})};
+const money=(cents,currency='EUR')=>new Intl.NumberFormat(en()?'en-GB':'fr-FR',{style:'currency',currency:String(currency||'EUR').toUpperCase()}).format(Number(cents||0)/100);
+function planLabel(code){return code==='month'?(en()?'1 month':'1 mois'):code==='1y'?(en()?'1 year':'1 an'):code==='lifetime'?'Lifetime':(code||'Premium')}
+
+async function billingFetch(){
+  try{
+    const session=await v17111StripeSession();
+    const res=await fetch(`${SUPABASE_URL}/functions/v1/billing-history`,{method:'POST',headers:{'Content-Type':'application/json','Authorization':`Bearer ${session.access_token}`,'apikey':SUPABASE_PUBLISHABLE_KEY},body:'{}'});
+    const data=await res.json().catch(()=>({}));if(!res.ok)throw new Error(data?.error||'Billing unavailable');return data;
+  }catch(e){return{error:String(e?.message||e),subscription:null,payments:[]}}
+}
+function detailedStatus(access,billing){
+  const sub=billing?.subscription||{};const plan=access?.plan_code||sub.plan_code||currentSubscriptionPlan||'';const life=plan==='lifetime'||access?.lifetime===true;
+  const cancel=!!sub.cancel_at_period_end||String(sub.stripe_status||sub.status||'').includes('cancel');
+  const end=sub.stripe_current_period_end||sub.current_period_end||access?.current_period_end||sub.cancel_at||null;
+  return{plan,life,cancel,end,status:sub.stripe_status||sub.status||access?.subscription_status||'active',started:sub.started_at||sub.created_at||null};
+}
+async function renderBilling(){
+  const root=document.getElementById('v1612-subscription-root');if(!root||!cloudUser)return;
+  let host=document.getElementById('v180-billing-host');if(!host){host=document.createElement('div');host.id='v180-billing-host';const live=root.querySelector('.v17111-live-banner');live?.after(host);if(!live)root.prepend(host)}
+  host.innerHTML='<div class="v180-billing-shell"><div class="v180-billing-head"><div><b>ABONNEMENT PREMIUM</b><small>Synchronisation Stripe en cours…</small></div><span class="v180-status-pill">...</span></div></div>';
+  let access=null;try{access=await getCurrentLicenseStatus()}catch(e){}
+  const billing=await billingFetch();const s=detailedStatus(access,billing);const subscribed=access?.access_state==='SUBSCRIBED';
+  const pillClass=s.life?'life':s.cancel?'cancel':subscribed?'active':'';const pill=s.life?'LIFETIME':s.cancel?(en()?'CANCELLED · ACCESS KEPT':'ANNULÉ · ACCÈS CONSERVÉ'):(subscribed?(en()?'ACTIVE':'ACTIF'):(en()?'INACTIVE':'INACTIF'));
+  const annualSaving=s.plan==='1y'?(83.88-49.99):0;
+  host.innerHTML=`<div class="v180-billing-shell"><div class="v180-billing-head"><div><b>${en()?'PREMIUM SUBSCRIPTION':'ABONNEMENT PREMIUM'}</b><small>${en()?'Detailed status synced with Stripe':'Statut détaillé synchronisé avec Stripe'}</small></div><span class="v180-status-pill ${pillClass}">${pill}</span></div><div class="v180-billing-grid"><div class="v180-billing-kpi"><span>${en()?'Plan':'Offre'}</span><b>${esc(planLabel(s.plan))}</b></div><div class="v180-billing-kpi"><span>${s.cancel?(en()?'Access until':'Accès jusqu’au'):(s.life?(en()?'Duration':'Durée'):(en()?'Next billing':'Prochaine échéance'))}</span><b>${s.life?'∞':fmtDate(s.end)}</b></div><div class="v180-billing-kpi"><span>${en()?'Status':'Statut'}</span><b>${esc(String(s.status||'—').toUpperCase())}</b></div></div>${annualSaving?`<div class="v180-billing-note">${en()?`Annual plan saves about €${annualSaving.toFixed(2)} compared with 12 monthly payments.`:`Le plan annuel économise environ ${annualSaving.toFixed(2).replace('.',',')} € par rapport à 12 mensualités.`}</div>`:''}${s.cancel&&!s.life?`<div class="v180-billing-note">${en()?'Cancellation is confirmed. Premium access remains available until the already-paid period ends.':'Résiliation confirmée. L’accès Premium reste disponible jusqu’à la fin de la période déjà payée.'}</div>`:''}</div>${renderPayments(billing?.payments||[])}`;
+}
+function renderPayments(rows){
+  const title=en()?'PAYMENT HISTORY':'HISTORIQUE DES PAIEMENTS';
+  if(!rows.length)return`<div class="v180-payment-card"><div class="v180-payment-head"><b>${title}</b><small>Stripe LIVE</small></div><div class="v180-payment-empty">${en()?'No Stripe payment found for this account. Access may come from a key.':'Aucun paiement Stripe trouvé pour ce compte. L’accès peut provenir d’une clé.'}</div></div>`;
+  return`<div class="v180-payment-card"><div class="v180-payment-head"><b>${title}</b><small>${rows.length} ${en()?'transaction(s)':'transaction(s)'}</small></div>${rows.slice(0,8).map(p=>`<div class="v180-payment-row"><div class="v180-payment-main"><b>${esc(p.plan_label||planLabel(p.plan_code))}</b><small>${fmtDate(p.date)} · ${esc(String(p.status||'paid').toUpperCase())}</small></div><div class="v180-payment-amount"><b>${money(p.amount,p.currency)}</b>${p.invoice_url?`<a href="${esc(p.invoice_url)}" target="_blank" rel="noopener">${en()?'Invoice':'Facture'}</a>`:''}</div></div>`).join('')}</div>`;
+}
+window.LevelingBillingV180={version:VERSION,refresh:renderBilling};
+
+function rpg(){try{return JSON.parse(localStorage.getItem('leveling_v140_rpg')||'{}')||{}}catch(e){return{}}}
+function sessions(){try{return window.LevelingProgramV157?.allSessions?.()||[]}catch(e){return[]}}
+function liftSeries(kind){return (rpg()?.lifts?.[kind]||[]).map(x=>({date:x.completedAt||x.date||'',e1rm:Number(x.e1rm||x.weight||0),weight:Number(x.weight||0),reps:Number(x.reps||0)})).filter(x=>x.e1rm>0).sort((a,b)=>Date.parse(a.date)-Date.parse(b.date))}
+function avg(a){return a.length?a.reduce((s,x)=>s+Number(x||0),0)/a.length:0}
+function trend(kind){const rows=liftSeries(kind);if(rows.length<2)return{rows,delta:0,pct:0,stagnant:false};const last=rows.slice(-3).map(x=>x.e1rm),prev=rows.slice(-6,-3).map(x=>x.e1rm);const a=avg(last),b=prev.length?avg(prev):rows[0].e1rm;const d=a-b,p=b?d/b*100:0;return{rows,delta:d,pct:p,stagnant:rows.length>=4&&Math.abs(p)<1.2}}
+function recovery(){try{return window.LevelingRecoveryV1622?.today?.()||{}}catch(e){return{}}}
+function context(){const u=window.userData||{};const rec=recovery();const ss=sessions();const now=Date.now(),cut=now-30*86400000,cur=ss.filter(x=>Date.parse(x.isoDate||x.date||'')>=cut);const vol=cur.reduce((s,x)=>s+Number(x.tonnage||0),0);return{u,rec,ss,cur,vol,program:typeof activeProgramKey!=='undefined'?activeProgramKey:'',block:typeof currentBlockIndex!=='undefined'?currentBlockIndex+1:null,day:typeof currentDayIndex!=='undefined'?currentDayIndex+1:null,squat:trend('squat'),bench:trend('bench'),deadlift:trend('deadlift')}}
+function readiness(c){let score=60;const r=Number(c.rec?.score||0);if(c.rec?.complete)score=r;const fatigue=Number(c.rec?.fatigue||0);if(fatigue&&fatigue<=4)score-=8;const sleep=Number(c.rec?.sleep||0);if(sleep&&sleep<=4)score-=8;return Math.max(0,Math.min(100,Math.round(score)))}
+function liftName(k){return k==='bench'?'Bench':k==='deadlift'?'Deadlift':'Squat'}
+function liftAnalysis(kind,c){const t=c[kind],name=liftName(kind),max=Number(c.u?.[kind]||0),r=readiness(c);if(!t.rows.length)return`${name} : je n’ai pas encore assez de performances enregistrées pour mesurer une tendance. Ton max profil est ${max||'—'} kg. Renseigne quelques séances et les RIR pour que l’analyse devienne précise.`;const recent=t.rows.at(-1);let verdict=t.pct>1.5?'progression nette':t.pct<-1.5?'baisse récente':t.stagnant?'plateau probable':'progression stable';let action='maintien';if(r>=82&&t.pct>0.8)action='progression légère (+2,5 kg ou +1 rep)';else if(r<55)action='deload / baisse de 5 à 10 %';else if(t.stagnant)action='micro-progression : même charge, +1 rep ou +1 série technique';return`${name} — ${verdict}. e1RM récent ≈ ${recent.e1rm.toFixed(1)} kg, tendance ${t.pct>=0?'+':''}${t.pct.toFixed(1)} %. PV/readiness : ${r}/100.\nRecommandation : ${action}.\nPourquoi : je croise ta tendance e1RM, tes PV, ton sommeil/ressenti et la charge de travail récente. Si le ${name.toLowerCase()} arrive après beaucoup de séries lourdes, je pénalise moins une petite baisse de performance.`}
+function sessionAdvice(c){const r=readiness(c);let mode='NORMAL',detail='garde la séance prévue et les charges du Coach';if(r>=85){mode='PRÊT';detail='tu peux pousser la progression sur le mouvement principal si l’échauffement confirme de bonnes sensations'}else if(r<50){mode='DELOAD';detail='réduis les charges de 7,5 à 12,5 % et coupe 1 à 2 séries accessoires'}else if(r<68){mode='ALLÉGÉ';detail='garde la technique, baisse le volume d’environ 20 % et évite un PR'}return`Séance recommandée : ${mode}. PV/readiness ${r}/100. Programme : ${String(c.program||'non défini').toUpperCase()} · Bloc ${c.block||'—'} · Jour ${c.day||'—'}.\nJe te conseille : ${detail}.\nVolume 30 jours : ${Math.round(c.vol).toLocaleString('fr-FR')} kg sur ${c.cur.length} séance(s).`}
+function prAdvice(c,kind='bench'){const r=readiness(c),t=c[kind];const name=liftName(kind);const last=t.rows.at(-1);if(!last)return`Je n’ai pas assez de données ${name} pour décider proprement d’un PR.`;const positive=t.pct>0.5;const yes=r>=82&&positive;const maybe=r>=72&&!t.pct.toString().startsWith('-');return`${yes?'PR envisageable':maybe?'PR à confirmer à l’échauffement':'Pas de PR aujourd’hui'} sur ${name}.\nPV/readiness ${r}/100 · tendance ${t.pct>=0?'+':''}${t.pct.toFixed(1)} % · e1RM récent ${last.e1rm.toFixed(1)} kg.\n${yes?'Monte progressivement et arrête la tentative si la dernière chauffe ralentit fortement.':maybe?'Fais une dernière chauffe lourde : si la vitesse est bonne, tente un petit PR, sinon maintien.':'Privilégie une séance de qualité et reporte la tentative.'}`}
+function deloadAdvice(c){const r=readiness(c);const neg=[c.squat.pct,c.bench.pct,c.deadlift.pct].filter(x=>x<-1.5).length;const need=r<55||neg>=2;return`${need?'DELOAD RECOMMANDÉ':'DELOAD NON OBLIGATOIRE'}. PV/readiness ${r}/100, ${neg} mouvement(s) SBD en baisse nette.\n${need?'Réduis 7,5 à 12,5 % sur les mouvements principaux, 25 à 35 % de volume accessoires, garde 3 à 5 RIR pendant quelques jours.':'Tu peux continuer normalement. Utilise plutôt un allègement ponctuel si la fatigue monte ou si deux mouvements chutent en même temps.'}`}
+function answer(q){const c=context(),s=String(q||'').toLowerCase();if(/bench|développé couché/.test(s)&&/(stagn|pourquoi|bloqu|progress)/.test(s))return liftAnalysis('bench',c);if(/squat/.test(s)&&/(stagn|pourquoi|bloqu|progress)/.test(s))return liftAnalysis('squat',c);if(/dead|soulev/.test(s)&&/(stagn|pourquoi|bloqu|progress)/.test(s))return liftAnalysis('deadlift',c);if(/pr|record|max/.test(s)){const k=/squat/.test(s)?'squat':/dead|soulev/.test(s)?'deadlift':'bench';return prAdvice(c,k)}if(/deload|décharge|fatigu|récup/.test(s))return deloadAdvice(c);if(/aujourd|séance|entrain|entraîn|faire/.test(s))return sessionAdvice(c);if(/bench/.test(s))return liftAnalysis('bench',c);if(/squat/.test(s))return liftAnalysis('squat',c);if(/dead|soulev/.test(s))return liftAnalysis('deadlift',c);return`Je peux analyser tes vraies données sur :\n• stagnation Squat / Bench / Deadlift\n• séance recommandée aujourd’hui\n• tentative de PR\n• besoin de deload\n\nContexte actuel : PV/readiness ${readiness(c)}/100, ${c.cur.length} séance(s) sur 30 jours, ${Math.round(c.vol).toLocaleString('fr-FR')} kg de volume.`}
+function ensureAI(){const panel=document.getElementById('panel-profile');if(!panel)return;let card=document.getElementById('v180-ai-card');if(!card){card=document.createElement('section');card.id='v180-ai-card';card.className='v180-ai-card';const coach=document.getElementById('v140-coach'),goals=panel.querySelector('.goal-card');if(coach)coach.after(card);else if(goals)panel.insertBefore(card,goals);else panel.appendChild(card)}const c=context();card.innerHTML=`<div class="v180-ai-card-head"><div class="v180-ai-title"><span class="v180-ai-core">AI</span><div><b>SYSTEM AI</b><small>${en()?'REAL USER DATA ENGINE':'MOTEUR CONNECTÉ AUX DONNÉES RÉELLES'}</small></div></div><span class="v180-ai-live">LIVE DATA</span></div><div class="v180-ai-summary">PV ${readiness(c)}/100 · ${c.cur.length} ${en()?'workout(s) in 30 days':'séance(s) sur 30 jours'} · SBD ${Number(c.u?.squat||0)+Number(c.u?.bench||0)+Number(c.u?.deadlift||0)} kg</div><button class="v180-ai-open" type="button" onclick="LevelingSystemAI.open()">${en()?'OPEN SYSTEM TERMINAL':'OUVRIR LE TERMINAL SYSTEM'}</button>`;ensureModal()}
+function ensureModal(){if(document.getElementById('v180-system-modal'))return;const m=document.createElement('div');m.id='v180-system-modal';m.innerHTML=`<div class="v180-terminal"><div class="v180-terminal-head"><div class="v180-terminal-brand"><b>SYSTEM AI</b><small>LEVELING-APP · DATA ENGINE V18</small></div><button class="v180-terminal-close" onclick="LevelingSystemAI.close()">×</button></div><div id="v180-terminal-context" class="v180-terminal-context"></div><div id="v180-chat" class="v180-chat"></div><div class="v180-quick"><button onclick="LevelingSystemAI.ask('Pourquoi mon bench stagne ?')">Pourquoi mon bench stagne ?</button><button onclick="LevelingSystemAI.ask('Que dois-je faire aujourd’hui ?')">Que faire aujourd’hui ?</button><button onclick="LevelingSystemAI.ask('Est-ce que je tente un PR au bench ?')">Tenter un PR ?</button><button onclick="LevelingSystemAI.ask('Ai-je besoin d’un deload ?')">Besoin d’un deload ?</button></div><div class="v180-input-row"><input id="v180-ai-input" placeholder="Pose une question sur ta progression…" onkeydown="if(event.key==='Enter')LevelingSystemAI.send()"><button onclick="LevelingSystemAI.send()">ENVOYER</button></div><div class="v180-ai-disclaimer">Analyse sportive/gamifiée basée sur tes données d’entraînement. Ce n’est pas un avis médical.</div></div>`;document.body.appendChild(m)}
+function renderContext(){const c=context(),r=readiness(c),el=document.getElementById('v180-terminal-context');if(!el)return;el.innerHTML=`<div class="v180-context-chip"><span>PV</span><b>${r}/100</b></div><div class="v180-context-chip"><span>SBD</span><b>${Number(c.u?.squat||0)+Number(c.u?.bench||0)+Number(c.u?.deadlift||0)} kg</b></div><div class="v180-context-chip"><span>30J</span><b>${c.cur.length} séances</b></div><div class="v180-context-chip"><span>Volume</span><b>${Math.round(c.vol/1000)} t</b></div>`}
+function addMsg(text,type){const chat=document.getElementById('v180-chat');if(!chat)return;const d=document.createElement('div');d.className='v180-msg '+type;d.textContent=text;chat.appendChild(d);chat.scrollTop=chat.scrollHeight}
+window.LevelingSystemAI={version:VERSION,open(){ensureModal();document.getElementById('v180-system-modal')?.classList.add('show');renderContext();const chat=document.getElementById('v180-chat');if(chat&&!chat.children.length)addMsg(en()?'SYSTEM online. I am reading your training, recovery and progression data.':'SYSTEM en ligne. Je lis tes données d’entraînement, de récupération et de progression.','system')},close(){document.getElementById('v180-system-modal')?.classList.remove('show')},ask(q){this.open();addMsg(q,'user');setTimeout(()=>addMsg(answer(q),'system'),120)},send(){const i=document.getElementById('v180-ai-input'),q=String(i?.value||'').trim();if(!q)return;if(i)i.value='';this.ask(q)},answer,refresh:ensureAI};
+
+function ensureOnboarding(){if(document.getElementById('v180-payment-onboarding'))return;const d=document.createElement('div');d.id='v180-payment-onboarding';d.innerHTML=`<div class="v180-onboard"><div class="v180-unlocked"><div class="v180-unlocked-mark">✓</div><h2>ACCÈS DÉBLOQUÉ</h2><div id="v180-onboard-plan" class="v180-onboard-plan">PREMIUM</div><p>Ton paiement Stripe est confirmé. Configure rapidement tes données principales pour que le Coach et SYSTEM AI soient précis dès maintenant.</p><div class="v180-quick-form"><div class="v180-quick-field"><label>Poids du corps (kg)</label><input id="v180-ob-weight" type="number" step="0.1"></div><div class="v180-quick-field"><label>Squat (kg)</label><input id="v180-ob-squat" type="number" step="0.5"></div><div class="v180-quick-field"><label>Bench (kg)</label><input id="v180-ob-bench" type="number" step="0.5"></div><div class="v180-quick-field"><label>Deadlift (kg)</label><input id="v180-ob-dead" type="number" step="0.5"></div></div><div class="v180-onboard-actions"><button onclick="LevelingPaymentOnboarding.skip()">PLUS TARD</button><button class="primary" onclick="LevelingPaymentOnboarding.save()">ENREGISTRER & CONTINUER</button></div></div></div>`;document.body.appendChild(d)}
+function fillOnboarding(plan){const u=window.userData||{};const map={weight:u.weight,squat:u.squat,bench:u.bench,dead:u.deadlift};for(const [k,v] of Object.entries(map)){const el=document.getElementById('v180-ob-'+k);if(el)el.value=Number(v||0)||''}const p=document.getElementById('v180-onboard-plan');if(p)p.textContent=planLabel(plan).toUpperCase()}
+function cleanPaymentUrl(){try{const u=new URL(location.href);u.searchParams.delete('payment');u.searchParams.delete('session_id');history.replaceState({},'',u.pathname+(u.search?'?'+u.searchParams.toString():'')+u.hash)}catch(e){}}
+window.LevelingPaymentOnboarding={show(plan,key){ensureOnboarding();fillOnboarding(plan);document.getElementById('v180-payment-onboarding')?.classList.add('show');if(key)localStorage.setItem('v180_payment_onboarding_seen_'+key,'1');cleanPaymentUrl()},skip(){document.getElementById('v180-payment-onboarding')?.classList.remove('show');cleanPaymentUrl()},async save(){const u=window.userData||{};for(const [id,key] of [['weight','weight'],['squat','squat'],['bench','bench'],['dead','deadlift']]){const n=Number(document.getElementById('v180-ob-'+id)?.value);if(Number.isFinite(n)&&n>0)u[key]=n}try{saveToLocalStorage()}catch(e){}try{await window.saveCloudData?.()}catch(e){}try{updateProfileUI?.()}catch(e){}this.skip();try{switchTab('power',document.querySelector('.nav-item[onclick*="power"]'))}catch(e){}}};
+async function maybePaymentOnboarding(){const p=new URLSearchParams(location.search);if(p.get('payment')!=='success')return;const key=p.get('session_id')||'success';if(localStorage.getItem('v180_payment_onboarding_seen_'+key))return;for(let i=0;i<8;i++){try{const a=await getCurrentLicenseStatus();if(a?.access_state==='SUBSCRIBED'){LevelingPaymentOnboarding.show(a.plan_code,key);return}}catch(e){}await new Promise(r=>setTimeout(r,700))}}
+
+const oldRender=window.v1612RenderSubscription;if(typeof oldRender==='function'&&!oldRender.v180){window.v1612RenderSubscription=function(){const r=oldRender.apply(this,arguments);setTimeout(renderBilling,30);return r};window.v1612RenderSubscription.v180=1}
+function boot(){ensureAI();ensureModal();ensureOnboarding();const root=document.getElementById('v1612-subscription-root');if(root)renderBilling();maybePaymentOnboarding()}
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',()=>setTimeout(boot,450),{once:true});else setTimeout(boot,150);
+window.addEventListener('pageshow',()=>setTimeout(()=>{ensureAI();if(document.getElementById('v1612-subscription-root'))renderBilling()},180));
+window.addEventListener('leveling-ui-changed',()=>setTimeout(()=>{ensureAI();if(document.getElementById('panel-settings')?.classList.contains('active'))renderBilling()},80));
+window.addEventListener('leveling-language-changed',()=>setTimeout(()=>{ensureAI();renderBilling()},80));
+})();
+</script>
+
 <script id="v1711-build-marker">
-window.LEVELING_BUILD_INFO=Object.freeze({version:'17.13.0',codename:'Progression + Gamification',assets:'external-lossless',stripe:'live'});
+window.LEVELING_BUILD_INFO=Object.freeze({version:'18.0.0',codename:'Premium + SYSTEM AI',assets:'external-lossless',stripe:'live'});
 </script>
 </body>
 </html>
