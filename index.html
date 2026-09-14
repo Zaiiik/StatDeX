@@ -8,6 +8,7 @@
 <!-- LEVELING-APP V16.4.1 — Stripe Checkout wired -->
 <!-- LEVELING-APP V16.4.0 — subscription backend foundation -->
 <!-- LEVELING-APP V16.3.3 — account-aware onboarding skip -->
+<!-- V17.12.1 — Intelligence + récupération : coach contextualisé, RIR, PV dynamiques, quêtes adaptatives, validation de série visuelle. -->
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -30,7 +31,7 @@
 
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>LEVELING-APP — V17.11.1 LIVE PAYMENTS</title>
+    <title>LEVELING-APP — V17.12 INTELLIGENCE + RECOVERY</title>
     <meta name="theme-color" content="#09090f">
     <meta name="application-name" content="LEVELING-APP">
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -223,6 +224,21 @@
             flex-shrink: 0; transition: 0.2s;
         }
         .btn-check.active { background: var(--success); color: white; box-shadow: 0 0 8px var(--success); }
+        .btn-check::after {
+            content: ''; width: 8px; height: 14px; border-right: 3px solid #07140d; border-bottom: 3px solid #07140d;
+            transform: rotate(45deg) scale(.55); opacity: 0; margin-top: -3px;
+            transition: opacity .15s ease, transform .15s ease; pointer-events: none;
+        }
+        .btn-check.active::after { opacity: 1; transform: rotate(45deg) scale(1); }
+        .v1712-rir-wrap{display:inline-flex;align-items:center;gap:4px;margin-left:7px;color:#898995;font-size:.56rem;white-space:nowrap}
+        .set-input-mini.v1712-rir{width:42px!important;min-width:42px!important;text-align:center}
+        @keyframes v1712HeartPulse{0%,100%{transform:scale(1)}45%{transform:scale(1.14)}55%{transform:scale(1.05)}}
+        #v1622-recovery .v176-recovery-icon{display:inline-flex;transform-origin:center;animation:v1712HeartPulse 1.55s ease-in-out infinite;filter:drop-shadow(0 0 8px var(--v1622-rec-color,#fff))}
+        #v1622-recovery[data-recovery-state="CRITIQUE"] .v176-recovery-icon{animation-duration:.72s}
+        #v1622-recovery[data-recovery-state="FATIGUE"] .v176-recovery-icon{animation-duration:1s}
+        .v1712-rec-drain{display:flex;justify-content:space-between;gap:8px;margin:-3px 0 9px;padding:6px 8px;border-radius:8px;background:rgba(255,80,95,.055);border:1px solid rgba(255,80,95,.15);font-size:.48rem;color:#a9a0a6}.v1712-rec-drain strong{color:#ff7c89}
+        .v1712-coach-target{display:inline-block;margin-top:4px;padding:4px 7px;border-radius:7px;border:1px solid rgba(91,140,255,.22);background:rgba(91,140,255,.07);color:#d9e3ff;font-size:.52rem;font-weight:900}
+        @media(max-width:430px){.v1712-rir-wrap{margin-left:4px;font-size:.51rem}.set-input-mini.v1712-rir{width:38px!important;min-width:38px!important}}
 
         #validate-workout-container { margin-top: 15px; margin-bottom: 20px; }
         #validate-workout-btn {
@@ -4993,9 +5009,11 @@ btn.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDef
                         currentWeight = smartHypertrophyRefs[ex.name].weight;
                     }
 
+                    let currentRir = '';
                     if (customSetData[currentBlockIndex][currentDayIndex][exIndex][s]) {
                         currentReps = customSetData[currentBlockIndex][currentDayIndex][exIndex][s].reps ?? currentReps;
                         currentWeight = customSetData[currentBlockIndex][currentDayIndex][exIndex][s].weight ?? currentWeight;
+                        currentRir = customSetData[currentBlockIndex][currentDayIndex][exIndex][s].rir ?? '';
                     }
 
                     setsHtml += `
@@ -5004,8 +5022,9 @@ btn.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDef
                                 <span>Série ${s + 1} :</span>
                                 <input type="number" class="set-input-mini ${isSmartActiveForExo ? 'smart-adjusted' : ''}" value="${currentReps}" onchange="updateSetVal(${exIndex}, ${s}, 'reps', this.value)" title="Répétitions"> reps
                                 ${v1351Bodyweight ? '<span class="v1351-bodyweight-note">· poids du corps</span>' : `@ <input type="number" class="set-input-mini ${isSmartActiveForExo ? 'smart-adjusted' : ''}" value="${currentWeight}" step="0.5" onchange="updateSetVal(${exIndex}, ${s}, 'weight', this.value)" title="Poids en kg"> kg`}
+                                <span class="v1712-rir-wrap">RIR <input type="number" min="0" max="5" step="1" class="set-input-mini v1712-rir" value="${currentRir}" placeholder="—" onchange="updateSetVal(${exIndex}, ${s}, 'rir', this.value)" title="Répétitions en réserve (0 à 5)"></span>
                             </div>
-                            <button class="btn-check ${isDone ? 'active' : ''}" onclick="toggleSet(${exIndex}, ${s})">${isDone ? '' : ''}</button>
+                            <button class="btn-check ${isDone ? 'active' : ''}" onclick="toggleSet(${exIndex}, ${s})" aria-label="${isDone ? 'Série validée' : 'Valider la série'}"></button>
                         </div>
                     `;
                 }
@@ -5042,7 +5061,13 @@ btn.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDef
                     weight: baseW
                 };
             }
-            customSetData[currentBlockIndex][currentDayIndex][exIndex][setIndex][field] = parseFloat(val) || 0;
+            if(field==='rir'){
+                const parsed=val===''||val===null?null:Number(val);
+                if(parsed===null||!Number.isFinite(parsed)) delete customSetData[currentBlockIndex][currentDayIndex][exIndex][setIndex].rir;
+                else customSetData[currentBlockIndex][currentDayIndex][exIndex][setIndex].rir=Math.max(0,Math.min(5,Math.round(parsed)));
+            }else{
+                customSetData[currentBlockIndex][currentDayIndex][exIndex][setIndex][field] = parseFloat(val) || 0;
+            }
             saveToLocalStorage();scheduleCloudSave();updateResumeWorkoutBanner();
             calculateWeeklyTonnage();
         }
@@ -6056,7 +6081,7 @@ function setAppUnlockedShell(){
   document.getElementById('app-container')?.classList.remove('auth-locked');
 }
 
-const APP_VERSION='17.11.1-LIVE-PAYMENTS';
+const APP_VERSION='17.12.1-INTELLIGENCE-RECOVERY';
 const ACCOUNT_LOCAL_KEYS=['solo_leveling_user','solo_leveling_smart_refs','solo_leveling_body_hist','solo_leveling_inv','solo_leveling_block','solo_leveling_day','solo_leveling_state','solo_leveling_custom_sets','solo_leveling_history','solo_leveling_active_program','solo_leveling_program_states','solo_leveling_program_custom_sets','solo_leveling_custom_program','leveling_last_local_save','leveling_last_cloud_sync','leveling_v10'];
 function clearLevelingAccountLocalData(){
   try{ACCOUNT_LOCAL_KEYS.forEach(k=>localStorage.removeItem(k));sessionStorage.removeItem('leveling_pending_license')}catch(e){console.warn('Local account cleanup:',e)}
@@ -8116,35 +8141,50 @@ function v1617SbdNorm(name){return String(name||'').toLowerCase().normalize('NFD
 function v1617LiftKind(name){const n=v1617SbdNorm(name);if(n.includes('developpe couche')||n.includes('bench press')||n==='bench'||n.includes('spoto press'))return 'bench';if(n.includes('souleve de terre')||n.includes('deadlift'))return 'deadlift';if(n.includes('squat')&&!n.includes('bulgare')&&!n.includes('goblet')&&!n.includes('hack'))return 'squat';return ''}
 function v1617E1rm(weight,reps){const w=Math.max(0,Number(weight||0)),r=Math.max(1,Number(reps||1));return w*(1+r/30)}
 function v1617ValidationStamp(program,block,day){const k=`leveling_validated_${program}_${block}_${day}`,raw=userData?.validatedSessions?.[k];if(Number.isFinite(Number(raw))&&Number(raw)>1000000000000)return Number(raw);return Date.now()}
-function v1617TopSbdSets(block,day){const p=getPrograms()?.[block]?.[day],best={squat:null,bench:null,deadlift:null};if(!p)return best;p.exercises.forEach((ex,ei)=>{const kind=v1617LiftKind(ex?.name);if(!kind)return;let setsBefore=0;for(let pi=0;pi<ei;pi++){const prev=p.exercises?.[pi];for(let psi=0;psi<Number(prev?.sets||0);psi++)if(workoutState?.[block]?.[day]?.[pi]?.[psi])setsBefore++}for(let si=0;si<Number(ex.sets||0);si++){if(!workoutState?.[block]?.[day]?.[ei]?.[si])continue;let reps=Number(ex.defaultReps||0),weight=Number(ex.defaultWeight||0);const custom=customSetData?.[block]?.[day]?.[ei]?.[si];if(custom){if(custom.reps!==undefined&&custom.reps!==null)reps=Number(custom.reps||0);if(custom.weight!==undefined&&custom.weight!==null)weight=Number(custom.weight||0)}if(weight<=0||reps<=0)continue;const e1rm=v1617E1rm(weight,reps);if(!best[kind]||e1rm>best[kind].e1rm)best[kind]={weight,reps,e1rm,exercise:String(ex.name||''),setIndex:si,exerciseIndex:ei,setsBefore}}});return best}
-function v1617CaptureSbdSession(program=activeProgramKey,block=currentBlockIndex,day=currentDayIndex){if(program!==activeProgramKey)return false;const top=v1617TopSbdSets(block,day),s=load(),stamp=v1617ValidationStamp(program,block,day),date=new Date(stamp).toISOString().slice(0,10),cycle=Math.max(1,Number(localStorage.getItem('leveling_cycle_number')||1));let changed=false;['squat','bench','deadlift'].forEach(kind=>{const perf=top[kind];if(!perf)return;const sourceKey=[program,cycle,block,day,kind].join('|'),arr=s.lifts[kind]||(s.lifts[kind]=[]),row={sourceKey,date,completedAt:new Date(stamp).toISOString(),program,cycle,block,day,kind,exercise:perf.exercise,weight:perf.weight,value:perf.weight,reps:perf.reps,e1rm:Number(perf.e1rm.toFixed(2)),exerciseIndex:Number(perf.exerciseIndex||0),setsBefore:Number(perf.setsBefore||0)};const idx=arr.findIndex(x=>x?.sourceKey===sourceKey);if(idx>=0){if(JSON.stringify(arr[idx])!==JSON.stringify(row)){arr[idx]=row;changed=true}}else{arr.push(row);changed=true}arr.sort((a,b)=>new Date(a.completedAt||a.date||0)-new Date(b.completedAt||b.date||0));if(arr.length>80)arr.splice(0,arr.length-80)});if(changed)save(s);return changed}
+function v1617TopSbdSets(block,day){const p=getPrograms()?.[block]?.[day],best={squat:null,bench:null,deadlift:null};if(!p)return best;p.exercises.forEach((ex,ei)=>{const kind=v1617LiftKind(ex?.name);if(!kind)return;let setsBefore=0;for(let pi=0;pi<ei;pi++){const prev=p.exercises?.[pi];for(let psi=0;psi<Number(prev?.sets||0);psi++)if(workoutState?.[block]?.[day]?.[pi]?.[psi])setsBefore++}for(let si=0;si<Number(ex.sets||0);si++){if(!workoutState?.[block]?.[day]?.[ei]?.[si])continue;let reps=Number(ex.defaultReps||0),weight=Number(ex.defaultWeight||0);const custom=customSetData?.[block]?.[day]?.[ei]?.[si];let rir=null;if(custom){if(custom.reps!==undefined&&custom.reps!==null)reps=Number(custom.reps||0);if(custom.weight!==undefined&&custom.weight!==null)weight=Number(custom.weight||0);if(custom.rir!==undefined&&custom.rir!==null&&custom.rir!=='')rir=Math.max(0,Math.min(5,Number(custom.rir)))}if(weight<=0||reps<=0)continue;const e1rm=v1617E1rm(weight,reps);if(!best[kind]||e1rm>best[kind].e1rm)best[kind]={weight,reps,e1rm,rir,exercise:String(ex.name||''),setIndex:si,exerciseIndex:ei,setsBefore}}});return best}
+function v1617CaptureSbdSession(program=activeProgramKey,block=currentBlockIndex,day=currentDayIndex){if(program!==activeProgramKey)return false;const top=v1617TopSbdSets(block,day),s=load(),stamp=v1617ValidationStamp(program,block,day),date=new Date(stamp).toISOString().slice(0,10),cycle=Math.max(1,Number(localStorage.getItem('leveling_cycle_number')||1));let changed=false;['squat','bench','deadlift'].forEach(kind=>{const perf=top[kind];if(!perf)return;const sourceKey=[program,cycle,block,day,kind].join('|'),arr=s.lifts[kind]||(s.lifts[kind]=[]),row={sourceKey,date,completedAt:new Date(stamp).toISOString(),program,cycle,block,day,kind,exercise:perf.exercise,weight:perf.weight,value:perf.weight,reps:perf.reps,rir:(Number.isFinite(Number(perf.rir))?Number(perf.rir):null),e1rm:Number(perf.e1rm.toFixed(2)),exerciseIndex:Number(perf.exerciseIndex||0),setsBefore:Number(perf.setsBefore||0)};const idx=arr.findIndex(x=>x?.sourceKey===sourceKey);if(idx>=0){if(JSON.stringify(arr[idx])!==JSON.stringify(row)){arr[idx]=row;changed=true}}else{arr.push(row);changed=true}arr.sort((a,b)=>new Date(a.completedAt||a.date||0)-new Date(b.completedAt||b.date||0));if(arr.length>80)arr.splice(0,arr.length-80)});if(changed)save(s);return changed}
 function v1617SyncValidatedSbd(){try{const blocks=getPrograms?.()||[];blocks.forEach((days,bi)=>{(days||[]).forEach((_,di)=>{const k=`leveling_validated_${activeProgramKey}_${bi}_${di}`;if(localStorage.getItem(k)==='1'||userData?.validatedSessions?.[k])v1617CaptureSbdSession(activeProgramKey,bi,di)})})}catch(e){}}
+function v1712RoundLoad(value,step=2.5){const v=Math.max(0,Number(value||0));return Math.max(0,Math.round(v/step)*step)}
 function v1617CoachAdvice(name,key,arr,reference,recovery){
-  const ref=Number(reference||0),score=Number(recovery?.score);
-  const hasRecovery=!!recovery?.complete&&Number.isFinite(score);
-  const low=hasRecovery&&score<45,medium=hasRecovery&&score>=45&&score<65;
+  const ref=Number(reference||0),score=Number(recovery?.score),hasRecovery=!!recovery?.complete&&Number.isFinite(score);
   if(!arr.length){
-    let base=`Ta référence actuelle est <strong>${ref} kg</strong>. À ta prochaine séance validée, le coach enregistrera automatiquement ton meilleur set ${name}.`;
-    if(low)base=`Récupération basse aujourd’hui : <strong>ne cherche pas à monter la charge</strong>. ${base}`;
-    return{advice:base,meta:'Pas encore de top set validé disponible dans le nouvel historique.'};
+    const rec=hasRecovery&&score<60?'Commence sans progression forcée et laisse le système créer une base comparable.':'Valide une séance pour créer ta première référence contextualisée.';
+    return{advice:`Référence profil : <strong>${ref} kg</strong>. ${rec}`,meta:'Le coach utilisera ensuite performance, RIR, récupération et ordre des exercices.'};
   }
-  const last=arr[arr.length-1],lastE=Number(last.e1rm||v1617E1rm(last.weight,last.reps)),lastText=`${Number(last.weight||0)} kg × ${Number(last.reps||0)} reps`,setsBefore=Number(last.setsBefore||0);
-  const orderMeta=setsBefore>0?` · top set après ${setsBefore} séries`:' · top set réalisé frais dans la séance';
-  if(hasRecovery&&score<25)return{advice:`PV très bas : <strong>aucune hausse de charge</strong>. Reste technique et baisse de 5 à 10 % si l’échauffement paraît lourd.`,meta:`PV ${score}/100${orderMeta}`};
-  if(hasRecovery&&score<45)return{advice:`Récupération faible : <strong>garde ${Number(last.weight||0)} kg</strong> ou baisse légèrement. Pas de tentative de progression forcée aujourd’hui.`,meta:`PV ${score}/100 · dernier top ${lastText}${orderMeta}`};
-  if(arr.length===1){
-    const action=medium?'Garde cette charge et cherche des reps propres.':`Garde cette base pour la prochaine séance ${name}.`;
-    return{advice:`Dernier top set : <strong>${lastText}</strong>. ${action}`,meta:`e1RM estimé ${lastE.toFixed(1)} kg · référence profil ${ref} kg${orderMeta}`};
+  const last=arr[arr.length-1],prev=arr.length>1?arr[arr.length-2]:null;
+  const lastW=Number(last.weight||0),lastR=Number(last.reps||0),lastE=Number(last.e1rm||v1617E1rm(lastW,lastR));
+  const lastRir=last.rir===null||last.rir===undefined||last.rir===''?null:Number(last.rir);
+  const setsBefore=Number(last.setsBefore||0),lastText=`${lastW} kg × ${lastR} reps`;
+  let target=lastW,action='MAINTIEN',why=[];
+  if(hasRecovery)why.push(`PV ${score}/100`);else why.push('PV non renseignés');
+  why.push(lastRir===null?'RIR non renseigné':`RIR ${lastRir}`);
+  why.push(setsBefore>0?`${setsBefore} séries avant le top set`:'top set réalisé frais');
+  let diff=0,contextDelta=0,comparable=true;
+  if(prev){
+    const prevE=Number(prev.e1rm||v1617E1rm(prev.weight,prev.reps));
+    diff=prevE>0?((lastE-prevE)/prevE)*100:0;
+    contextDelta=setsBefore-Number(prev.setsBefore||0);
+    comparable=Math.abs(contextDelta)<=3;
+    why.push(`${diff>=0?'+':''}${diff.toFixed(1)}% e1RM vs précédent`);
+    if(!comparable)why.push(contextDelta>0?'plus de fatigue avant ce top set':'top set placé plus tôt dans la séance');
   }
-  const prev=arr[arr.length-2],prevE=Number(prev.e1rm||v1617E1rm(prev.weight,prev.reps)),diff=prevE>0?((lastE-prevE)/prevE)*100:0;
-  if(diff<=-3&&setsBefore>=6)return{advice:`La perf est plus basse, mais ton top set arrive après <strong>${setsBefore} séries</strong>. Ne baisse pas automatiquement : garde la charge et compare dans un contexte similaire.`,meta:`e1RM ${lastE.toFixed(1)} kg · ${diff.toFixed(1)}% vs séance précédente · ordre pris en compte`};
-  if(diff>=1.5){
-    if(medium)return{advice:`Tu progresses, mais tes PV sont moyens : <strong>garde ${Number(last.weight||0)} kg</strong> aujourd’hui et consolide avant +2,5 kg.`,meta:`PV ${score}/100 · e1RM ${lastE.toFixed(1)} kg · +${diff.toFixed(1)}%${orderMeta}`};
-    return{advice:`Tu progresses : <strong>${lastText}</strong>. Si la technique reste propre, vise +2,5 kg sur ton prochain top set ${name}.`,meta:`e1RM ${lastE.toFixed(1)} kg · +${diff.toFixed(1)}% vs séance précédente${orderMeta}`};
+  if(hasRecovery&&score<35){
+    action='DELOAD';target=v1712RoundLoad(lastW*.95);why.push('récupération critique');
+  }else if(hasRecovery&&score<60){
+    action='MAINTIEN';target=lastW;why.push('récupération insuffisante pour forcer une hausse');
+  }else if(prev&&diff<=-4&&comparable&&(lastRir===null||lastRir<=1)){
+    action='DELOAD';target=v1712RoundLoad(lastW*.95);why.push('baisse nette dans un contexte comparable');
+  }else if(prev&&diff<=-3&&!comparable&&contextDelta>0){
+    action='MAINTIEN';target=lastW;why.push('la baisse est probablement liée à l’ordre des exercices');
+  }else if((prev&&diff>=1.5&&(lastRir===null||lastRir>=1.5)) || (lastRir!==null&&lastRir>=2&&(!prev||diff>-1))){
+    action='PROGRESSION';target=v1712RoundLoad(lastW+2.5);why.push('marge disponible et performance stable/positive');
+  }else if(lastRir!==null&&lastRir<=0.5){
+    action='MAINTIEN';target=lastW;why.push('série proche de l’échec');
+  }else{
+    action='MAINTIEN';target=lastW;why.push('consolider avant de charger davantage');
   }
-  if(diff<=-3)return{advice:`Ta dernière perf a baissé. <strong>Garde la même charge</strong> la prochaine fois et cherche d’abord à retrouver tes reps propres.`,meta:`Dernier top set ${lastText} · e1RM ${lastE.toFixed(1)} kg (${diff.toFixed(1)}%)${orderMeta}`};
-  if(medium)return{advice:`Progression stable avec récupération moyenne : <strong>garde ${Number(last.weight||0)} kg</strong> et cherche une rep plus propre avant d’ajouter du poids.`,meta:`PV ${score}/100 · e1RM ${lastE.toFixed(1)} kg · ${diff>=0?'+':''}${diff.toFixed(1)}%${orderMeta}`};
-  return{advice:`Progression stable : <strong>${lastText}</strong>. Garde la charge et cherche 1 rep de plus avant d’ajouter du poids.`,meta:`e1RM ${lastE.toFixed(1)} kg · ${diff>=0?'+':''}${diff.toFixed(1)}% vs séance précédente${orderMeta}`};
+  const actionText=action==='PROGRESSION'?`vise <strong>${target} kg</strong> sur ton prochain top set`:action==='DELOAD'?`vise environ <strong>${target} kg</strong> pour retrouver de la qualité`:`reste à <strong>${target} kg</strong> et cherche une exécution/reps plus propres`;
+  return{advice:`Dernier top : <strong>${lastText}</strong>. ${actionText}. <span class="v1712-coach-target">${action} · objectif ${target} kg</span>`,meta:`Pourquoi : ${why.join(' · ')}.`};
 }
 
 function ensureDom(){
@@ -8216,9 +8256,9 @@ function renderSbdCoach(){
   if(coach){
     const recovery=window.LevelingRecoveryV1622?.today?.()||null;
     const recoveryLine=recovery?.complete
-      ? `<div class="v1622-coach-recovery" style="--v1622-rec-color:${recovery.color}">${recovery.icon} <strong>PV ${recovery.score}/100 · ${recovery.label}</strong> · sommeil ${recovery.sleep}/10 · ressenti ${recovery.fatigue}/10 · aujourd’hui ${recovery.dailyScore}/100 · inertie ${recovery.inertiaDays}/3 j</div>`
+      ? `<div class="v1622-coach-recovery" style="--v1622-rec-color:${recovery.color}">${recovery.icon} <strong>PV ${recovery.score}/100 · ${recovery.label}</strong> · sommeil ${recovery.sleep}/10 · ressenti ${recovery.fatigue}/10 · base ${recovery.baseScore}/100 · fatigue séance -${recovery.workoutDrain||0} · inertie ${recovery.inertiaDays}/3 j</div>`
       : '<div class="v1622-coach-recovery"> PV à compléter · renseigne sommeil + ressenti pour ajuster les conseils de charge.</div>';
-    coach.innerHTML='<div class="v140-title v176-coach-title"><span class="v176-coach-icon">'+premiumIconHTML('brain','md')+'</span><span>Coach progression SBD</span></div><div class="v1617-coach-intro">Analyse tes meilleurs sets validés, tes PV du jour et la fatigue accumulée selon l’ordre des exercices.</div>'+recoveryLine+lifts.map(([name,key])=>{const arr=s.lifts[key]||[],ref=Number(t[key]||0),c=v1617CoachAdvice(name,key,arr,ref,recovery),last=arr[arr.length-1],lastLabel=last?`${Number(last.weight||0)} × ${Number(last.reps||0)}`:'—';return `<div class="v1617-coach-row ${key}"><div class="v1617-coach-lift"><b>${name}</b><small>Réf. ${ref} kg · top ${lastLabel}</small></div><div class="v1617-coach-advice">${c.advice}<span class="v1617-coach-meta">${c.meta}</span></div></div>`}).join('');
+    coach.innerHTML='<div class="v140-title v176-coach-title"><span class="v176-coach-icon">'+premiumIconHTML('brain','md')+'</span><span>Coach progression SBD</span></div><div class="v1617-coach-intro">Analyse performance, RIR, PV, fatigue et ordre des exercices pour proposer une charge précise et expliquer pourquoi.</div>'+recoveryLine+lifts.map(([name,key])=>{const arr=s.lifts[key]||[],ref=Number(t[key]||0),c=v1617CoachAdvice(name,key,arr,ref,recovery),last=arr[arr.length-1],lastLabel=last?`${Number(last.weight||0)} × ${Number(last.reps||0)}`:'—';return `<div class="v1617-coach-row ${key}"><div class="v1617-coach-lift"><b>${name}</b><small>Réf. ${ref} kg · top ${lastLabel}</small></div><div class="v1617-coach-advice">${c.advice}<span class="v1617-coach-meta">${c.meta}</span></div></div>`}).join('');
   }
 }
 
@@ -10550,7 +10590,7 @@ const FR_EN={
 'RANG MAXIMUM ATTEINT':'MAX RANK REACHED',
 
 ' Quêtes du jour':' Daily quests','Quêtes du jour':'Daily quests',
-'3 objectifs simples à suivre pendant ta séance pour gagner de l’XP aujourd’hui.':'3 simple goals to follow during your workout to earn XP today.',
+'3 objectifs adaptés à ta séance, à tes PV et aux données dont le Coach a besoin.':'3 simple goals to follow during your workout to earn XP today.',
 'Finir ta séance':'Finish your workout','À la fin, appuie sur « Valider la séance » puis note tes étoiles.':'At the end, tap “Validate workout” then rate your session.',
 'Faire 15 séries':'Complete 15 sets','Égale une charge repère':'Match a reference load',
 'Fais au moins une série avec un poids égal ou plus lourd que ta dernière référence.':'Complete at least one set with a load equal to or heavier than your last reference.',
@@ -11289,7 +11329,7 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
   function patchBody(){
     const en=lang()==='en',cloud=cloudCards('patch_note');
     return `<div class="v172-feed">${cloud||`<div class="v172-feed-card"><div class="v172-feed-copy">${en?'No new cloud patch note right now.':'Aucune nouvelle note de mise à jour pour le moment.'}</div></div>`}
-    <div class="v172-feed-card"><div class="v172-feed-top"><span class="v172-title-icon v172-blue">${icon('bolt')}</span><div><div class="v172-feed-title">${en?'CURRENT BUILD':'VERSION ACTUELLE'}</div><div class="v172-feed-meta">V17.11.1</div></div></div><div class="v172-feed-list">
+    <div class="v172-feed-card"><div class="v172-feed-top"><span class="v172-title-icon v172-blue">${icon('bolt')}</span><div><div class="v172-feed-title">${en?'CURRENT BUILD':'VERSION ACTUELLE'}</div><div class="v172-feed-meta">V17.12.1</div></div></div><div class="v172-feed-list">
       <div class="v172-feed-item">${icon('program')}<span>${en?'Power days can now be marked absent without awarding XP.':'Les jours Power peuvent maintenant être marqués absents sans donner d’XP.'}</span></div>
       <div class="v172-feed-item">${icon('message')}<span>${en?'Cloud patch notes and developer messages are active.':'Patch notes et messages développeur sont maintenant synchronisés dans le cloud.'}</span></div>
     </div></div></div>`;
@@ -11329,7 +11369,7 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
 </script>
 
 <script id="v17111-version-tools">
-const V17111_PUBLIC_VERSION='17.11.1';
+const V17111_PUBLIC_VERSION='17.12.1';
 function v17111MountVersionTools(target){
   if(!target||target.querySelector('#v17111-version-card'))return;
   const en=localStorage.getItem('leveling_language')==='en';
@@ -11840,7 +11880,7 @@ const RPG_KEY='leveling_v140_rpg';
 const defaults={
   xp:0,totalXp:0,streak:0,lastWorkout:null,dayKey:null,
   quests:{},rewardClaims:{},smartQuestClaims:{},
-  achievements:{},sessions:[],timer:90,steps:0,dailyBonus:false,prXpKeys:{},recovery:{}
+  achievements:{},sessions:[],timer:90,steps:0,dailyBonus:false,prXpKeys:{},recovery:{},recoveryDrainClaims:{}
 };
 let state=Object.assign({},defaults);
 
@@ -11859,14 +11899,12 @@ const localDay=(d=new Date()) =>
   `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
 
 function recoveryBand(score){
-  if(!Number.isFinite(Number(score)))return{icon:'',label:'À compléter',color:'#b7b7c2'};
+  if(!Number.isFinite(Number(score)))return{icon:'',label:'À COMPLÉTER',state:'EMPTY',color:'#b7b7c2'};
   score=Number(score);
-  if(score>=85)return{icon:'',label:'Excellent',color:'#45e08a'};
-  if(score>=70)return{icon:'',label:'Bon',color:'#ff5e73'};
-  if(score>=50)return{icon:'',label:'Moyen',color:'#ffd54f'};
-  if(score>=30)return{icon:'',label:'Fatigué',color:'#ff9d45'};
-  if(score>=15)return{icon:'',label:'Très fatigué',color:'#ff6363'};
-  return{icon:'',label:'Critique',color:'#c8c8cf'};
+  if(score>=80)return{icon:'',label:'OPTIMAL',state:'OPTIMAL',color:'#45e08a'};
+  if(score>=60)return{icon:'',label:'STABLE',state:'STABLE',color:'#5b8cff'};
+  if(score>=35)return{icon:'',label:'FATIGUÉ',state:'FATIGUE',color:'#ff9d45'};
+  return{icon:'',label:'CRITIQUE',state:'CRITIQUE',color:'#ff5e73'};
 }
 function recoveryScore(sleep,feeling){
   sleep=Number(sleep);feeling=Number(feeling);
@@ -11889,7 +11927,7 @@ function recoveryEntry(day){
   const raw=state.recovery[day]&&typeof state.recovery[day]==='object'?state.recovery[day]:{};
   const sleep=Number(raw.sleep),feeling=Number(raw.fatigue);
   const complete=sleep>=1&&sleep<=10&&feeling>=1&&feeling<=10;
-  return{day,raw,sleep:complete||sleep>=1?sleep:null,fatigue:complete||feeling>=1?feeling:null,complete,dailyScore:complete?recoveryScore(sleep,feeling):null};
+  return{day,raw,sleep:complete||sleep>=1?sleep:null,fatigue:complete||feeling>=1?feeling:null,complete,dailyScore:complete?recoveryScore(sleep,feeling):null,workoutDrain:Math.max(0,Number(raw.workoutDrain||0))};
 }
 function recoveryInertia(day){
   // Inertie sur 3 jours : aujourd'hui 65 %, hier 25 %, avant-hier 10 %.
@@ -11912,27 +11950,20 @@ function recoveryInertia(day){
 function recoveryToday(day=localDay()){
   const current=recoveryEntry(day);
   const inertia=current.complete?recoveryInertia(day):{score:null,daysUsed:0,entries:[]};
-  const score=current.complete?inertia.score:null,band=recoveryBand(score);
+  const baseScore=current.complete?inertia.score:null;
+  const workoutDrain=current.complete?Math.max(0,Math.min(30,Number(current.workoutDrain||0))):0;
+  const score=current.complete?Math.max(0,Math.round(baseScore-workoutDrain)):null,band=recoveryBand(score);
   return{
-    day,
-    sleep:current.sleep,
-    fatigue:current.fatigue,
-    complete:current.complete,
-    dailyScore:current.dailyScore,
-    score,
-    inertiaDays:inertia.daysUsed,
-    inertiaEntries:inertia.entries,
-    ...band,
-    updatedAt:current.raw.updatedAt||null
+    day,sleep:current.sleep,fatigue:current.fatigue,complete:current.complete,dailyScore:current.dailyScore,
+    baseScore,workoutDrain,score,inertiaDays:inertia.daysUsed,inertiaEntries:inertia.entries,...band,updatedAt:current.raw.updatedAt||null
   };
 }
 function recoveryCoachText(r){
-  if(!r?.complete)return 'Renseigne tes 2 notes : le Coach ajustera ensuite ses conseils.';
-  if(r.score<25)return 'PV très bas : technique, aucune hausse de charge et baisse légère si nécessaire.';
-  if(r.score<45)return 'Récupération faible : maintien des charges, pas de progression forcée.';
-  if(r.score<65)return 'Récupération moyenne : consolide les reps avant d’ajouter du poids.';
-  if(r.score<85)return 'Bonne récupération : progression normale si l’échauffement et la technique sont propres.';
-  return 'Excellente récupération : feu vert pour progresser si les séries restent propres.';
+  if(!r?.complete)return 'Renseigne sommeil + ressenti : le Coach activera ensuite les recommandations contextualisées.';
+  if(r.score<35)return 'CRITIQUE : aucune progression forcée. Réduis 5 à 10 % si l’échauffement est lourd et garde de la marge.';
+  if(r.score<60)return 'FATIGUÉ : maintien prioritaire. Cherche des reps propres et évite l’échec.';
+  if(r.score<80)return 'STABLE : progression possible uniquement si le RIR et la technique confirment une vraie marge.';
+  return 'OPTIMAL : progression normale autorisée si le RIR reste cohérent et que la technique est propre.';
 }
 function recoveryOptions(value){
   let html='<option value="">—</option>';
@@ -11951,13 +11982,16 @@ function renderRecovery(){
   const card=ensureRecoveryCard();if(!card)return;
   const r=recoveryToday(),score=r.complete?r.score:0,label=r.complete?`${r.score}/100`:'—/100';
   card.style.setProperty('--v1622-rec-color',r.color);
+  card.dataset.recoveryState=r.state||'EMPTY';
   const inertiaText=r.complete
-    ? `<div class="v1624-rec-inertia"><span>Aujourd’hui <strong>${r.dailyScore}/100</strong></span><span>Inertie <strong>${r.inertiaDays}/3 jours</strong></span></div>`
+    ? `<div class="v1624-rec-inertia"><span>Base du jour <strong>${r.baseScore}/100</strong></span><span>Inertie <strong>${r.inertiaDays}/3 jours</strong></span></div>`
     : '';
+  const drainText=r.complete&&r.workoutDrain>0?`<div class="v1712-rec-drain"><span>Fatigue d’entraînement aujourd’hui</span><strong>-${r.workoutDrain} PV</strong></div>`:'';
   card.innerHTML=`<div class="v1622-rec-head"><div class="v1622-rec-title v176-recovery-title"><span class="v176-recovery-icon">${typeof premiumIconHTML==='function'?premiumIconHTML('heart','md'):''}</span><span>PV / Récupération</span></div><div class="v1622-rec-score">PV ${label}</div></div>
     <div class="v1622-rec-bar"><i style="width:${score}%"></i></div>
     <div class="v1622-rec-state"><span>État de récupération</span><strong>${r.label}</strong></div>
     ${inertiaText}
+    ${drainText}
     <div class="v1622-rec-grid">
       <div class="v1622-rec-metric"><label> Comment as-tu dormi ?</label><select class="v1622-rec-select" onchange="window.LevelingRecoveryV1622.set('sleep',this.value)">${recoveryOptions(r.sleep)}</select><small>1 = mauvais · 10 = excellent</small></div>
       <div class="v1622-rec-metric"><label> Comment te sens-tu ?</label><select class="v1622-rec-select" onchange="window.LevelingRecoveryV1622.set('fatigue',this.value)">${recoveryOptions(r.fatigue)}</select><small>1 = épuisé · 10 = parfait</small></div>
@@ -11981,6 +12015,21 @@ function prepareRecoveryModal(){
   const sleep=document.getElementById('v1622-modal-sleep'),fatigue=document.getElementById('v1622-modal-fatigue');
   if(sleep)sleep.innerHTML=recoveryOptions(r.sleep);
   if(fatigue)fatigue.innerHTML=recoveryOptions(r.fatigue);
+}
+function v1712CurrentSessionLoad(){
+  const prog=getPrograms()?.[currentBlockIndex]?.[currentDayIndex];if(!prog)return{sets:0,heavy:0};
+  let sets=0,heavy=0;
+  (prog.exercises||[]).forEach((ex,ei)=>{let exDone=0;for(let si=0;si<Number(ex.sets||0);si++){if(workoutState?.[currentBlockIndex]?.[currentDayIndex]?.[ei]?.[si]){sets++;exDone++}}if(exDone&&/squat|bench|développé couché|deadlift|soulevé de terre/i.test(String(ex.name||'')))heavy++});
+  return{sets,heavy};
+}
+function v1712ApplyWorkoutDrain(sessionKey){
+  state.recoveryDrainClaims=(state.recoveryDrainClaims&&typeof state.recoveryDrainClaims==='object')?state.recoveryDrainClaims:{};
+  if(!sessionKey||state.recoveryDrainClaims[sessionKey])return false;
+  const day=localDay(),load=v1712CurrentSessionLoad(),rating=Math.max(0,Number(selectedRating||0));
+  const drain=Math.max(5,Math.min(22,Math.round(4+load.sets*.42+load.heavy*1.5+(rating>0&&rating<=2?2:0))));
+  state.recovery=(state.recovery&&typeof state.recovery==='object')?state.recovery:{};
+  const rec=Object.assign({},state.recovery[day]||{});rec.workoutDrain=Math.min(30,Math.max(0,Number(rec.workoutDrain||0))+drain);rec.updatedAt=Date.now();state.recovery[day]=rec;
+  state.recoveryDrainClaims[sessionKey]=Date.now();persist();return true;
 }
 
 function clone(v){return JSON.parse(JSON.stringify(v))}
@@ -12183,15 +12232,35 @@ function sessionValidated(){
   const k=`leveling_validated_${activeProgramKey}_${currentBlockIndex}_${currentDayIndex}`;
   try{return localStorage.getItem(k)==='1'||!!userData?.validatedSessions?.[k]}catch(e){return false}
 }
+function v1712RirStats(){
+  const prog=getPrograms()?.[currentBlockIndex]?.[currentDayIndex];let entered=0,completed=0;
+  (prog?.exercises||[]).forEach((ex,ei)=>{for(let si=0;si<Number(ex.sets||0);si++){if(!workoutState?.[currentBlockIndex]?.[currentDayIndex]?.[ei]?.[si])continue;completed++;const r=customSetData?.[currentBlockIndex]?.[currentDayIndex]?.[ei]?.[si]?.rir;if(r!==undefined&&r!==null&&r!=='')entered++}});
+  return{entered,completed};
+}
+function v1712MainLiftQuest(){
+  const prog=getPrograms()?.[currentBlockIndex]?.[currentDayIndex];if(!prog)return null;
+  for(let ei=0;ei<(prog.exercises||[]).length;ei++){
+    const ex=prog.exercises[ei],kind=v1617LiftKind?.(ex.name)||'';if(!kind)continue;
+    let done=0,total=Number(ex.sets||0);for(let si=0;si<total;si++)if(workoutState?.[currentBlockIndex]?.[currentDayIndex]?.[ei]?.[si])done++;
+    const label=kind==='bench'?'Bench':kind==='deadlift'?'Deadlift':'Squat';
+    return{id:'mainlift',icon:'target',title:`Maîtriser ${label}`,sub:`${done}/${total} séries validées · le Coach comparera charge, reps, RIR et ordre.`,xp:80,done:total>0&&done===total,status:done===total?'Terminée':done>0?'En cours':'À faire'};
+  }
+  return null;
+}
 function questList(){
-  const sets=completedSets();
-  const validated=sessionValidated();
-  const matched=referenceMatched();
-  return [
-    {id:'session',icon:'spark',title:'Finir ta séance',sub:'À la fin, appuie sur « Valider la séance » puis note tes étoiles.',xp:120,done:validated,status:validated?'Terminée':'À faire'},
-    {id:'sets15',icon:'spark',title:'Faire 15 séries',sub:`Progression : ${sets}/15 séries validées aujourd’hui.`,xp:60,done:sets>=15,status:sets>=15?'Terminée':sets>0?'En cours':'À faire'},
-    {id:'reference',icon:'bolt',title:'Égale une charge repère',sub:'Fais au moins une série avec un poids égal ou plus lourd que ta dernière référence.',xp:80,done:matched,status:matched?'Terminée':'À faire'}
-  ];
+  const sets=completedSets(),validated=sessionValidated(),recovery=recoveryToday(),rir=v1712RirStats(),main=v1712MainLiftQuest();
+  const list=[{id:'session',icon:'spark',title:'Finir ta séance',sub:'Valide toute la séance pour enregistrer la progression et la fatigue du jour.',xp:120,done:validated,status:validated?'Terminée':'À faire'}];
+  if(!recovery.complete){
+    list.push({id:'recovery',icon:'heart',title:'Calibrer tes PV',sub:'Renseigne sommeil + ressenti pour activer les conseils de charge intelligents.',xp:50,done:false,status:'À faire'});
+  }else if(main){
+    list.push(main);
+  }else{
+    const target=Math.max(8,Math.min(15,Math.ceil(Math.max(1,sets+4)/2)*2));
+    list.push({id:'volume',icon:'bars',title:`Atteindre ${target} séries propres`,sub:`${sets}/${target} séries validées · objectif ajusté à ta séance actuelle.`,xp:70,done:sets>=target,status:sets>=target?'Terminée':sets>0?'En cours':'À faire'});
+  }
+  const rirTarget=Math.min(5,Math.max(3,rir.completed||3));
+  list.push({id:'rir',icon:'brain',title:'Donner du contexte au Coach',sub:`Renseigne le RIR sur ${rirTarget} séries validées (${rir.entered}/${rirTarget}).`,xp:60,done:rir.entered>=rirTarget,status:rir.entered>=rirTarget?'Terminée':rir.entered>0?'En cours':'À faire'});
+  return list;
 }
 function migrateClaims(){
   state.rewardClaims=(state.rewardClaims&&typeof state.rewardClaims==='object')?state.rewardClaims:{};
@@ -12307,28 +12376,16 @@ window.handleV11Import=function(input){
 };
 
 function recommendation(){
-  const prog=getPrograms()?.[currentBlockIndex]?.[currentDayIndex];
-  const el=document.getElementById('v10-rec-text');
-  if(!prog||!el)return;
-  let done=0,total=0;
-  prog.exercises.forEach((ex,ei)=>{
-    for(let si=0;si<ex.sets;si++){
-      total++;
-      if(workoutState?.[currentBlockIndex]?.[currentDayIndex]?.[ei]?.[si])done++;
-    }
-  });
-  const pct=total?Math.round(done/total*100):0;
-  const recovery=recoveryToday();
-  let msg;
-  if(recovery.complete&&recovery.score<25)msg=' PV très bas : aujourd’hui, privilégie la technique et évite toute hausse de charge.';
-  else if(recovery.complete&&recovery.score<45)msg=' Récupération faible : garde les charges prévues ou baisse légèrement si elles paraissent anormalement lourdes.';
-  else if(recovery.complete&&recovery.score<65)msg=' Récupération moyenne : consolide les reps propres avant de chercher une progression.';
-  else msg=pct===100
-    ? ' Séance complète. Prochaine fois, vise +2,5 kg sur les isolations si toutes les reps cibles passent.'
-    : pct>50
-      ? ' Plus de la moitié validée. Garde 1–2 reps en réserve et termine proprement.'
-      : ' Commence par les séries prévues. Le système mémorise tes performances pour ajuster la progression.';
-  el.textContent=`${msg} (${done}/${total} séries)`;
+  const prog=getPrograms()?.[currentBlockIndex]?.[currentDayIndex],el=document.getElementById('v10-rec-text');if(!prog||!el)return;
+  let done=0,total=0;prog.exercises.forEach((ex,ei)=>{for(let si=0;si<ex.sets;si++){total++;if(workoutState?.[currentBlockIndex]?.[currentDayIndex]?.[ei]?.[si])done++}});
+  const recovery=recoveryToday(),rir=v1712RirStats(),pct=total?Math.round(done/total*100):0;
+  let msg='Commence avec la charge prévue et renseigne ton RIR pour que le Coach apprenne le contexte réel.';
+  if(recovery.complete&&recovery.score<35)msg='PV CRITIQUE : aucune hausse aujourd’hui. Garde de la marge et baisse 5–10 % si l’échauffement est lourd.';
+  else if(recovery.complete&&recovery.score<60)msg='PV FATIGUÉ : priorité au maintien. Évite l’échec et consolide les reps.';
+  else if(recovery.complete&&recovery.score<80)msg='PV STABLE : progression seulement si la technique est propre et le RIR confirme au moins 1–2 reps de marge.';
+  else if(recovery.complete)msg='PV OPTIMAL : feu vert pour progresser si le RIR confirme une marge réelle.';
+  if(pct===100)msg+=' Séance complète : valide-la pour appliquer la fatigue d’entraînement aux PV.';
+  el.textContent=`${msg} · ${done}/${total} séries · RIR renseigné ${rir.entered}/${Math.max(1,rir.completed)}.`;
 }
 
 function renderAll(){
@@ -12352,6 +12409,7 @@ if(typeof previousFinish==='function'&&!previousFinish.v15100){
       addTrainingToday();
 
       const sid=[localDay(),program,block,day].join('|');
+      v1712ApplyWorkoutDrain(sid);
       state.lastWorkout=localDay();
       state.sessions=Array.isArray(state.sessions)?state.sessions:[];
       if(!state.sessions.some(x=>x?.sessionKey===sid)){
@@ -12399,7 +12457,13 @@ window.LevelingRecoveryV1622={
   render:renderRecovery,
   prepareModal:prepareRecoveryModal,
   score:recoveryScore,
-  inertia:recoveryInertia
+  inertia:recoveryInertia,
+  applyWorkoutDrain:v1712ApplyWorkoutDrain
+};
+window.LevelingCoachV1712={
+  version:'17.12.1',
+  refresh:()=>{renderQuests();renderRecovery();recommendation();try{window.LevelingRPG?.render?.()}catch(e){}},
+  rirStats:v1712RirStats
 };
 
 function boot(){renderAll()}
@@ -13760,7 +13824,7 @@ window.v17101CloseBroadcastInbox=function(){
 
 
 <script id="v1711-build-marker">
-window.LEVELING_BUILD_INFO=Object.freeze({version:'17.11.1',codename:'Hardening & Performance',assets:'external-lossless',stripe:'live'});
+window.LEVELING_BUILD_INFO=Object.freeze({version:'17.12.1',codename:'Intelligence + Recovery',assets:'external-lossless',stripe:'live'});
 </script>
 </body>
 </html>
