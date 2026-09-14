@@ -8,7 +8,7 @@
 <!-- LEVELING-APP V16.4.1 — Stripe Checkout wired -->
 <!-- LEVELING-APP V16.4.0 — subscription backend foundation -->
 <!-- LEVELING-APP V16.3.3 — account-aware onboarding skip -->
-<!-- V17.12.6 — Intelligence + récupération : coach contextualisé, RIR, PV dynamiques, quêtes adaptatives, validation de série visuelle. -->
+<!-- V17.12.7 — Intelligence + récupération : coach contextualisé, RIR, PV dynamiques, quêtes adaptatives, validation de série visuelle. -->
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -31,7 +31,7 @@
 
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>LEVELING-APP — V17.12.6 INTELLIGENCE + RECOVERY</title>
+    <title>LEVELING-APP — V17.12.7 INTELLIGENCE + RECOVERY</title>
     <meta name="theme-color" content="#09090f">
     <meta name="application-name" content="LEVELING-APP">
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -6081,7 +6081,7 @@ function setAppUnlockedShell(){
   document.getElementById('app-container')?.classList.remove('auth-locked');
 }
 
-const APP_VERSION='17.12.6-INTELLIGENCE-RECOVERY';
+const APP_VERSION='17.12.7-INTELLIGENCE-RECOVERY';
 const ACCOUNT_LOCAL_KEYS=['solo_leveling_user','solo_leveling_smart_refs','solo_leveling_body_hist','solo_leveling_inv','solo_leveling_block','solo_leveling_day','solo_leveling_state','solo_leveling_custom_sets','solo_leveling_history','solo_leveling_active_program','solo_leveling_program_states','solo_leveling_program_custom_sets','solo_leveling_custom_program','leveling_last_local_save','leveling_last_cloud_sync','leveling_v10'];
 function clearLevelingAccountLocalData(){
   try{ACCOUNT_LOCAL_KEYS.forEach(k=>localStorage.removeItem(k));sessionStorage.removeItem('leveling_pending_license')}catch(e){console.warn('Local account cleanup:',e)}
@@ -11296,7 +11296,7 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
   function patchBody(){
     const en=lang()==='en',cloud=cloudCards('patch_note');
     return `<div class="v172-feed">${cloud||`<div class="v172-feed-card"><div class="v172-feed-copy">${en?'No new cloud patch note right now.':'Aucune nouvelle note de mise à jour pour le moment.'}</div></div>`}
-    <div class="v172-feed-card"><div class="v172-feed-top"><span class="v172-title-icon v172-blue">${icon('bolt')}</span><div><div class="v172-feed-title">${en?'CURRENT BUILD':'VERSION ACTUELLE'}</div><div class="v172-feed-meta">V17.12.6</div></div></div><div class="v172-feed-list">
+    <div class="v172-feed-card"><div class="v172-feed-top"><span class="v172-title-icon v172-blue">${icon('bolt')}</span><div><div class="v172-feed-title">${en?'CURRENT BUILD':'VERSION ACTUELLE'}</div><div class="v172-feed-meta">V17.12.7</div></div></div><div class="v172-feed-list">
       <div class="v172-feed-item">${icon('program')}<span>${en?'Power days can now be marked absent without awarding XP.':'Les jours Power peuvent maintenant être marqués absents sans donner d’XP.'}</span></div>
       <div class="v172-feed-item">${icon('message')}<span>${en?'Cloud patch notes and developer messages are active.':'Patch notes et messages développeur sont maintenant synchronisés dans le cloud.'}</span></div>
     </div></div></div>`;
@@ -11336,7 +11336,7 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
 </script>
 
 <script id="v17111-version-tools">
-const V17111_PUBLIC_VERSION='17.12.6';
+const V17111_PUBLIC_VERSION='17.12.7';
 function v17111MountVersionTools(target){
   if(!target||target.querySelector('#v17111-version-card'))return;
   const en=localStorage.getItem('leveling_language')==='en';
@@ -11676,8 +11676,17 @@ window.v17111ForceRefresh=async function(){
     const title=q('.v1615-ascension-title',panel);
     const subtitle=q('.v1615-ascension-sub',panel);
     const rankHub=q('#v135-rank-hub',panel);
-    const quests=q('#v140-quests',panel);
-    const recovery=q('#v1622-recovery',panel);
+
+    /* V17.12.7 — l'orchestrateur Profil est l'unique propriétaire des
+       sections dynamiques. Il les crée ici si nécessaire puis les ordonne. */
+    let quests=q('#v140-quests',panel);
+    if(!quests){quests=document.createElement('section');quests.id='v140-quests'}
+    let recovery=q('#v1622-recovery',panel);
+    if(!recovery){recovery=document.createElement('section');recovery.id='v1622-recovery'}
+    let sbd=q('#v140-sbd',panel);
+    if(!sbd){sbd=document.createElement('section');sbd.id='v140-sbd'}
+    let coach=q('#v140-coach',panel);
+    if(!coach){coach=document.createElement('section');coach.id='v140-coach'}
 
     /* V16.0.24 — ordre canonique :
        TITRE -> SOUS-TITRE -> XP -> QUÊTES -> PV/RÉCUPÉRATION -> POWER -> SBD -> COACH -> OBJECTIFS. */
@@ -11695,8 +11704,8 @@ window.v17111ForceRefresh=async function(){
 
       /* V17.12.6 — l'orchestrateur Profil possède tout l'ordre dynamique.
          Aucun autre module n'a besoin de deviner la position de PV/Quêtes. */
-      const sbd=q('#v140-sbd',panel);
-      const coach=q('#v140-coach',panel);
+      sbd=q('#v140-sbd',panel)||sbd;
+      coach=q('#v140-coach',panel)||coach;
       if(recovery)recovery.after(powerHero);
       else if(quests)quests.after(powerHero);
       else if(rankHub)rankHub.after(powerHero);
@@ -11867,6 +11876,20 @@ state.xp=Number(state.totalXp||0);
 const localDay=(d=new Date()) =>
   `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
 
+function v17127EnsureProfileSections(){
+  const panel=document.getElementById('panel-profile');
+  if(!panel)return false;
+  try{window.v15ArrangeProfile?.()}catch(e){console.error('[LEVELING] Profil layout',e)}
+  return !!(document.getElementById('v140-quests')&&document.getElementById('v1622-recovery')&&document.getElementById('v140-sbd')&&document.getElementById('v140-coach'));
+}
+function v17127LiftKind(name){
+  const n=String(name||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase();
+  if(n.includes('developpe couche')||n.includes('bench press')||n==='bench'||n.includes('spoto press'))return 'bench';
+  if(n.includes('souleve de terre')||n.includes('deadlift'))return 'deadlift';
+  if(n.includes('squat')&&!n.includes('bulgare')&&!n.includes('goblet')&&!n.includes('hack'))return 'squat';
+  return '';
+}
+
 function v1712IconHTML(name,size='md'){
   const px=size==='lg'?18:size==='sm'?12:15;
   const common=`width="${px}" height="${px}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"`;
@@ -11956,7 +11979,7 @@ function recoveryOptions(value){
 function ensureRecoveryCard(){
   const panel=document.getElementById('panel-profile');
   if(!panel)return null;
-  try{typeof ensureDom==='function'&&ensureDom()}catch(e){}
+  v17127EnsureProfileSections()
   const quests=document.getElementById('v140-quests');
   let card=document.getElementById('v1622-recovery');
   if(!card){card=document.createElement('section');card.id='v1622-recovery'}
@@ -11965,7 +11988,7 @@ function ensureRecoveryCard(){
   return card;
 }
 function renderRecovery(){
-  if(!ensureDom())return;
+  if(!v17127EnsureProfileSections())return;
   const card=ensureRecoveryCard();if(!card)return;
   const r=recoveryToday(),score=r.complete?r.score:0,label=r.complete?`${r.score}/100`:'—/100';
   card.style.setProperty('--v1622-rec-color',r.color);
@@ -12227,7 +12250,7 @@ function v1712RirStats(){
 function v1712MainLiftQuest(){
   const prog=getPrograms()?.[currentBlockIndex]?.[currentDayIndex];if(!prog)return null;
   for(let ei=0;ei<(prog.exercises||[]).length;ei++){
-    const ex=prog.exercises[ei],kind=v1617LiftKind?.(ex.name)||'';if(!kind)continue;
+    const ex=prog.exercises[ei],kind=v17127LiftKind(ex.name);if(!kind)continue;
     let done=0,total=Number(ex.sets||0);for(let si=0;si<total;si++)if(workoutState?.[currentBlockIndex]?.[currentDayIndex]?.[ei]?.[si])done++;
     const label=kind==='bench'?'Bench':kind==='deadlift'?'Deadlift':'Squat';
     return{id:'mainlift',icon:'target',title:`Maîtriser ${label}`,sub:`${done}/${total} séries validées · le Coach comparera charge, reps, RIR et ordre.`,xp:80,done:total>0&&done===total,status:done===total?'Terminée':done>0?'En cours':'À faire'};
@@ -12261,7 +12284,7 @@ function migrateClaims(){
   });
 }
 function renderQuests(){
-  if(!ensureDom())return;
+  if(!v17127EnsureProfileSections())return;
   migrateClaims();
   const day=localDay();
   const list=questList();
@@ -12380,11 +12403,11 @@ function recommendation(){
 }
 
 function renderAll(){
-  if(!ensureDom())return;
+  if(!v17127EnsureProfileSections())return;
   syncUserLevel();
   syncTrainingDays();
 
-  /* V17.12.6 — rendu indépendant des cartes du Profil. */
+  /* V17.12.7 — rendu indépendant, après création canonique des sections. */
   try{renderQuests()}catch(e){console.error('[LEVELING] Quêtes',e)}
   try{renderRecovery()}catch(e){console.error('[LEVELING] PV',e)}
   try{renderSbdCoach()}catch(e){console.error('[LEVELING] Coach',e)}
@@ -12457,30 +12480,30 @@ window.LevelingRecoveryV1622={
   applyWorkoutDrain:v1712ApplyWorkoutDrain
 };
 window.LevelingCoachV1712={
-  version:'17.12.6',
+  version:'17.12.7',
   refresh:()=>{renderQuests();renderRecovery();recommendation();try{window.LevelingRPG?.render?.()}catch(e){}},
   rirStats:v1712RirStats
 };
 
-/* V17.12.6 — bootstrap nommé et isolé.
+/* V17.12.7 — bootstrap nommé et isolé.
    Plusieurs anciens modules possèdent encore une fonction globale `boot()`.
    Un appel tardif à `boot()` pouvait donc viser le dernier module déclaré et
    laisser Quêtes/PV vides. Ce moteur n'utilise plus aucun nom global générique. */
-function v17126RenderIntelligenceRecovery(){
+function v17127RenderIntelligenceRecovery(){
   renderAll();
 }
-function v17126BootIntelligenceRecovery(){
-  v17126RenderIntelligenceRecovery();
-  [350,900,1800].forEach(ms=>setTimeout(v17126RenderIntelligenceRecovery,ms));
+function v17127BootIntelligenceRecovery(){
+  v17127RenderIntelligenceRecovery();
+  [350,900,1800].forEach(ms=>setTimeout(v17127RenderIntelligenceRecovery,ms));
 }
 if(document.readyState==='loading'){
-  document.addEventListener('DOMContentLoaded',v17126BootIntelligenceRecovery,{once:true});
-}else v17126BootIntelligenceRecovery();
+  document.addEventListener('DOMContentLoaded',v17127BootIntelligenceRecovery,{once:true});
+}else v17127BootIntelligenceRecovery();
 document.addEventListener('visibilitychange',()=>{
-  if(document.visibilityState==='visible')setTimeout(v17126RenderIntelligenceRecovery,80);
+  if(document.visibilityState==='visible')setTimeout(v17127RenderIntelligenceRecovery,80);
 });
 document.addEventListener('click',e=>{
-  if(e.target.closest('[data-panel=\"profile\"], [data-target=\"profile\"], [onclick*=\"profile\"]'))setTimeout(v17126RenderIntelligenceRecovery,80);
+  if(e.target.closest('[data-panel=\"profile\"], [data-target=\"profile\"], [onclick*=\"profile\"]'))setTimeout(v17127RenderIntelligenceRecovery,80);
 },{passive:true});
 })();
 </script>
@@ -13836,7 +13859,7 @@ window.v17101CloseBroadcastInbox=function(){
 
 
 <script id="v1711-build-marker">
-window.LEVELING_BUILD_INFO=Object.freeze({version:'17.12.6',codename:'Intelligence + Recovery',assets:'external-lossless',stripe:'live'});
+window.LEVELING_BUILD_INFO=Object.freeze({version:'17.12.7',codename:'Intelligence + Recovery',assets:'external-lossless',stripe:'live'});
 </script>
 </body>
 </html>
