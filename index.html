@@ -1,4 +1,4 @@
-<!-- LEVELING-APP V18.2.0 COACH REPORTS — clean progression core, contextual coach, skip workflow, weekly/monthly reports, recovery, ranks and SYSTEM AI -->
+<!-- LEVELING-APP V18.2.1 AUDITED CORE — clean progression core, contextual coach, skip workflow, weekly/monthly reports, recovery, ranks and SYSTEM AI -->
 <!-- LEVELING-APP V17.4.0 AUTH + I18N + ONBOARDING REPLAY TEST
      - hard account gate after first-run discovery
      - dynamic FR/EN observer for content rendered after language switch
@@ -31,7 +31,7 @@
 
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>LEVELING-APP — V18.2.0 COACH REPORTS</title>
+    <title>LEVELING-APP — V18.2.1 AUDITED CORE</title>
     <meta name="theme-color" content="#09090f">
     <meta name="application-name" content="LEVELING-APP">
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -4936,17 +4936,21 @@ btn.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDef
         }
 
         function isDayCompleted(bIdx, dIdx) {
+            const validationKey=`leveling_validated_${activeProgramKey}_${bIdx}_${dIdx}`;
+            if(localStorage.getItem(validationKey)==='1'||!!userData?.validatedSessions?.[validationKey]) return true;
             if (!workoutState[bIdx] || !workoutState[bIdx][dIdx]) return false;
             const programsByBlock = getPrograms();
             let dayProg = programsByBlock[bIdx][dIdx];
-            let total = 0, done = 0;
+            let total = 0, resolved = 0;
             dayProg.exercises.forEach((ex, exIdx) => {
                 for(let s=0; s<ex.sets; s++) {
                     total++;
-                    if (workoutState[bIdx][dIdx][exIdx] && workoutState[bIdx][dIdx][exIdx][s]) done++;
+                    const done=!!workoutState[bIdx][dIdx][exIdx]?.[s];
+                    const skipped=!!userData?.skippedSets?.[`${activeProgramKey}|${bIdx}|${dIdx}|${exIdx}|${s}`];
+                    if(done||skipped) resolved++;
                 }
             });
-            return total > 0 && done === total;
+            return total > 0 && resolved === total;
         }
 
         function v182SkipKey(exIndex,setIndex) {
@@ -6136,8 +6140,8 @@ function setAppUnlockedShell(){
   document.getElementById('app-container')?.classList.remove('auth-locked');
 }
 
-const APP_VERSION='18.2.0-COACH-REPORTS';
-const ACCOUNT_LOCAL_KEYS=['solo_leveling_user','solo_leveling_smart_refs','solo_leveling_body_hist','solo_leveling_inv','solo_leveling_block','solo_leveling_day','solo_leveling_state','solo_leveling_custom_sets','solo_leveling_history','solo_leveling_active_program','solo_leveling_program_states','solo_leveling_program_custom_sets','solo_leveling_custom_program','leveling_last_local_save','leveling_last_cloud_sync','leveling_v10'];
+const APP_VERSION='18.2.1-AUDITED-CORE';
+const ACCOUNT_LOCAL_KEYS=['solo_leveling_user','solo_leveling_smart_refs','solo_leveling_body_hist','solo_leveling_inv','solo_leveling_block','solo_leveling_day','solo_leveling_state','solo_leveling_custom_sets','solo_leveling_history','solo_leveling_active_program','solo_leveling_program_states','solo_leveling_program_custom_sets','solo_leveling_custom_program','leveling_last_local_save','leveling_last_cloud_sync','leveling_v10','leveling_v181_core','leveling_v182_core'];
 function clearLevelingAccountLocalData(){
   try{ACCOUNT_LOCAL_KEYS.forEach(k=>localStorage.removeItem(k));sessionStorage.removeItem('leveling_pending_license')}catch(e){console.warn('Local account cleanup:',e)}
 }
@@ -6507,7 +6511,8 @@ async function retryLicenseCheck(){
 }
 function exportAppData(){
   if(typeof saveActiveProgramState==='function')saveActiveProgramState();
-  return{version:'14.2.0',userData,smartHypertrophyRefs,bodyHistory,inventoryItems,currentBlockIndex,currentDayIndex,activeProgramKey,programWorkoutStates,programCustomSetData,customProgramData,workoutState,customSetData,workoutHistory,v10:(typeof window.__levelingV10Export==='function'?window.__levelingV10Export():null)};
+  let v182=null;try{v182=window.LevelingCoreV182?.exportState?.()||JSON.parse(localStorage.getItem('leveling_v182_core')||'null')}catch(e){}
+  return{version:'18.2.1',userData,smartHypertrophyRefs,bodyHistory,inventoryItems,currentBlockIndex,currentDayIndex,activeProgramKey,programWorkoutStates,programCustomSetData,customProgramData,workoutState,customSetData,workoutHistory,v182,v10:(typeof window.__levelingV10Export==='function'?window.__levelingV10Export():null)};
 }
 function importAppData(d){
   if(!d||typeof d!=='object')return;suppressCloudSave=true;
@@ -6515,6 +6520,7 @@ function importAppData(d){
     if(d.userData)userData=d.userData;if(d.smartHypertrophyRefs)smartHypertrophyRefs=d.smartHypertrophyRefs;if(d.bodyHistory)bodyHistory=d.bodyHistory;if(d.inventoryItems)inventoryItems=d.inventoryItems;
     if(Number.isInteger(d.currentBlockIndex))currentBlockIndex=d.currentBlockIndex;if(Number.isInteger(d.currentDayIndex))currentDayIndex=d.currentDayIndex;if(d.activeProgramKey)activeProgramKey=d.activeProgramKey;
     if(d.programWorkoutStates)programWorkoutStates=d.programWorkoutStates;if(d.programCustomSetData)programCustomSetData=d.programCustomSetData;if(d.customProgramData)customProgramData=d.customProgramData;if(d.workoutState)workoutState=d.workoutState;if(d.customSetData)customSetData=d.customSetData;if(d.workoutHistory)workoutHistory=d.workoutHistory;
+    if(d.v182){try{localStorage.setItem('leveling_v182_core',JSON.stringify(d.v182));window.LevelingCoreV182?.importState?.(d.v182)}catch(e){console.warn('[V18.2.1] import core',e)}}
     if(d.v10&&typeof window.__levelingV10Import==='function')window.__levelingV10Import(d.v10);
     if(typeof loadActiveProgramState==='function')loadActiveProgramState();if(typeof saveToLocalStorage==='function')saveToLocalStorage();
   }finally{suppressCloudSave=false}
@@ -11409,7 +11415,7 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
 </script>
 
 <script id="v17111-version-tools">
-const V17111_PUBLIC_VERSION='18.2.0';
+const V17111_PUBLIC_VERSION='18.2.1';
 function v17111MountVersionTools(target){
   if(!target||target.querySelector('#v17111-version-card'))return;
   const en=localStorage.getItem('leveling_language')==='en';
@@ -13888,7 +13894,7 @@ window.v17101CloseBroadcastInbox=function(){
 <script id="v182-clean-core-runtime">
 (function(){
 'use strict';
-const VERSION='18.2.0';
+const VERSION='18.2.1';
 const KEY='leveling_v182_core';
 const LEGACY_KEY='leveling_v181_core';
 const DAY=86400000;
@@ -13999,7 +14005,15 @@ function periodBounds(kind='week',offset=0){
   return{start:d.getTime(),end:end.getTime(),label:`${d.toLocaleDateString('fr-FR',{day:'2-digit',month:'2-digit'})} → ${new Date(end.getTime()-DAY).toLocaleDateString('fr-FR',{day:'2-digit',month:'2-digit',year:'numeric'})}`};
 }
 function bodyRows(){
-  try{return (Array.isArray(bodyHistory)?bodyHistory:[]).map((x,i)=>({...x,_i:i,_t:parseDate(x.isoDate||x.date)}))}catch(e){return[]}
+  try{return (Array.isArray(bodyHistory)?bodyHistory:[]).map((x,i)=>({...x,_i:i,_t:parseDate(x.isoDate||x.date)})).sort((a,b)=>a._t-b._t)}catch(e){return[]}
+}
+function exerciseTrendInBounds(name,start,end){
+  const key=String(name||'').toLowerCase(),rows=[];
+  state.sessions.forEach(s=>{const t=parseDate(s.date);if(t<start||t>=end)return;(s.exercises||[]).forEach(e=>{if(String(e.name||'').toLowerCase()===key)rows.push({...e,date:s.date})})});
+  rows.sort((a,b)=>parseDate(a.date)-parseDate(b.date));
+  if(!rows.length)return{rows,pct:0,stagnant:false,current:0};
+  const vals=rows.map(adjustedE1RM),recent=vals.slice(-3),prev=vals.slice(-6,-3),a=avg(recent),base=prev.length?avg(prev):vals[0],pct=base?(a-base)/base*100:0;
+  return{rows,pct,stagnant:rows.length>=4&&Math.abs(pct)<1.1,current:a};
 }
 function reportData(kind=state.reportPeriod||'week'){
   const b=periodBounds(kind),rows=canonicalSessions().filter(x=>{const t=parseDate(x.date);return t>=b.start&&t<b.end});
@@ -14013,7 +14027,7 @@ function reportData(kind=state.reportPeriod||'week'){
   const startWeight=weights.length?Number(weights[0].weight):null,endWeight=weights.length?Number(weights.at(-1).weight):Number(userData?.weight||0)||null;
   const weightDelta=startWeight!==null&&endWeight!==null?endWeight-startWeight:null;
   const sbd=Number(userData?.squat||0)+Number(userData?.bench||0)+Number(userData?.deadlift||0);
-  const trends=['Squat','Développé Couché','Deadlift'].map(name=>({name,...exerciseTrend(name)}));
+  const trends=['Squat','Développé Couché','Deadlift'].map(name=>({name,...exerciseTrendInBounds(name,b.start,b.end)}));
   return{kind,b,rows,detailed,volume,sets,skips,planned,completion,avgRecovery:rec.length?avg(rec):null,avgSleep:sleep.length?avg(sleep):null,avgFatigue:fatigue.length?avg(fatigue):null,avgRir:rirs.length?avg(rirs):null,startWeight,endWeight,weightDelta,sbd,trends};
 }
 function reportCoachText(d){
@@ -14073,8 +14087,9 @@ function setReportPeriod(kind){state.reportPeriod=kind==='month'?'month':'week';
 function saveWeighIn(){
   const w=Number(document.getElementById('v182-weight')?.value),bf=Number(document.getElementById('v182-bf')?.value);
   if(!Number.isFinite(w)||w<30||w>300){alert('Entre un poids valide.');return}
-  userData.weight=w;if(Number.isFinite(bf)&&bf>2&&bf<70)userData.bodyFat=bf;
-  try{if(!Array.isArray(bodyHistory))bodyHistory=[];const key=localDay();const found=bodyHistory.find(x=>x.isoDate===key);if(found){found.weight=w;if(Number.isFinite(bf))found.bodyFat=bf}else bodyHistory.push({date:`S${bodyHistory.length+1}`,isoDate:key,weight:w,bodyFat:Number.isFinite(bf)?bf:Number(userData.bodyFat||0)});bodyHistory=bodyHistory.slice(-180)}catch(e){}
+  const validBf=Number.isFinite(bf)&&bf>2&&bf<70;
+  userData.weight=w;if(validBf)userData.bodyFat=bf;
+  try{if(!Array.isArray(bodyHistory))bodyHistory=[];const key=localDay();const found=bodyHistory.find(x=>x.isoDate===key);if(found){found.weight=w;if(validBf)found.bodyFat=bf}else bodyHistory.push({date:`S${bodyHistory.length+1}`,isoDate:key,weight:w,bodyFat:validBf?bf:Number(userData.bodyFat||0)});bodyHistory=bodyHistory.slice(-180)}catch(e){}
   try{saveToLocalStorage?.()}catch(e){}try{scheduleCloudSaveImmediate?.()}catch(e){}try{updateProfileUI?.()}catch(e){}
   renderReports();try{showSocialToast?.('PESÉE','Poids enregistré dans ton bilan.')}catch(e){}
 }
@@ -14122,13 +14137,15 @@ function answer(q){
   return`Je peux analyser tes données réelles : progression d’un exercice, charge suivante, ordre des exercices, RIR, PV, séries skippées, PR, deload et bilan semaine/mois.\n\nContexte : ${sessionAdvice()}`;
 }
 function ensureAI(){const panel=document.getElementById('panel-profile');if(!panel)return;let card=document.getElementById('v181-ai-card');if(!card){card=document.createElement('section');card.id='v181-ai-card';const coach=document.getElementById('v140-coach'),goals=panel.querySelector('.goal-card');if(coach)coach.after(card);else if(goals)panel.insertBefore(card,goals);else panel.appendChild(card)}const c=context();card.innerHTML=`<div class="v181-ai-head"><div class="v181-ai-brand"><span class="v181-ai-core">AI</span><div><b>SYSTEM AI</b><small>MOTEUR D’ANALYSE · DONNÉES RÉELLES</small></div></div><span class="v181-ai-live">LIVE DATA</span></div><div class="v181-ai-summary">PV ${c.recovery.complete?c.recovery.score:'—'}/100 · ${c.sessions.length} séance(s) / 30j · ${Math.round(c.volume).toLocaleString('fr-FR')} kg · SBD ${c.sbd} kg</div><button class="v181-ai-open" onclick="LevelingSystemAI.open()">OUVRIR LE TERMINAL SYSTEM</button>`;ensureAIModal()}
-function ensureAIModal(){if(document.getElementById('v181-ai-modal'))return;const d=document.createElement('div');d.id='v181-ai-modal';d.innerHTML=`<div class="v181-terminal"><div class="v181-terminal-head"><div><b>SYSTEM AI</b><small>LEVELING-APP · CLEAN CORE V18.2</small></div><button class="v181-close" onclick="LevelingSystemAI.close()">×</button></div><div id="v181-context" class="v181-context"></div><div id="v181-chat" class="v181-chat"></div><div class="v181-quick"><button onclick="LevelingSystemAI.ask('Que dois-je faire aujourd’hui ?')">Séance du jour</button><button onclick="LevelingSystemAI.ask('Pourquoi mon bench stagne ?')">Bench</button><button onclick="LevelingSystemAI.ask('Est-ce que je tente un PR au squat ?')">PR Squat</button><button onclick="LevelingSystemAI.ask('Ai-je besoin d’un deload ?')">Deload</button><button onclick="LevelingSystemAI.ask('Fais-moi mon bilan de la semaine')">Bilan semaine</button></div><div class="v181-input"><input id="v181-ai-input" placeholder="Pose une question sur ta progression…" onkeydown="if(event.key==='Enter')LevelingSystemAI.send()"><button onclick="LevelingSystemAI.send()">ENVOYER</button></div><div class="v181-disclaimer">Analyse sportive/gamifiée basée sur tes données. Ce n’est pas un avis médical.</div></div>`;d.addEventListener('click',e=>{if(e.target===d)LevelingSystemAI.close()});document.body.appendChild(d)}
+function ensureAIModal(){if(document.getElementById('v181-ai-modal'))return;const d=document.createElement('div');d.id='v181-ai-modal';d.innerHTML=`<div class="v181-terminal"><div class="v181-terminal-head"><div><b>SYSTEM AI</b><small>LEVELING-APP · AUDITED CORE V18.2.1</small></div><button class="v181-close" onclick="LevelingSystemAI.close()">×</button></div><div id="v181-context" class="v181-context"></div><div id="v181-chat" class="v181-chat"></div><div class="v181-quick"><button onclick="LevelingSystemAI.ask('Que dois-je faire aujourd’hui ?')">Séance du jour</button><button onclick="LevelingSystemAI.ask('Pourquoi mon bench stagne ?')">Bench</button><button onclick="LevelingSystemAI.ask('Est-ce que je tente un PR au squat ?')">PR Squat</button><button onclick="LevelingSystemAI.ask('Ai-je besoin d’un deload ?')">Deload</button><button onclick="LevelingSystemAI.ask('Fais-moi mon bilan de la semaine')">Bilan semaine</button></div><div class="v181-input"><input id="v181-ai-input" placeholder="Pose une question sur ta progression…" onkeydown="if(event.key==='Enter')LevelingSystemAI.send()"><button onclick="LevelingSystemAI.send()">ENVOYER</button></div><div class="v181-disclaimer">Analyse sportive/gamifiée basée sur tes données. Ce n’est pas un avis médical.</div></div>`;d.addEventListener('click',e=>{if(e.target===d)LevelingSystemAI.close()});document.body.appendChild(d)}
 function renderAIContext(){const c=context(),el=document.getElementById('v181-context');if(!el)return;el.innerHTML=`<div><span>PV</span><b>${c.recovery.complete?c.recovery.score:'—'}/100</b></div><div><span>RIR</span><b>${c.rir.avg===null?'—':c.rir.avg.toFixed(1)}</b></div><div><span>30 J</span><b>${c.sessions.length} séances</b></div><div><span>VOLUME</span><b>${Math.round(c.volume/1000)} t</b></div>`}
 function addMsg(t,type){const c=document.getElementById('v181-chat');if(!c)return;const d=document.createElement('div');d.className='v181-msg '+type;d.textContent=t;c.appendChild(d);c.scrollTop=c.scrollHeight}
 window.LevelingSystemAI={version:VERSION,open(){ensureAIModal();document.getElementById('v181-ai-modal').classList.add('show');renderAIContext();const c=document.getElementById('v181-chat');if(c&&!c.children.length)addMsg('SYSTEM en ligne. J’analyse tes PV, RIR, charges, ordre des exercices, séries skippées, historique et bilans de progression.','system')},close(){document.getElementById('v181-ai-modal')?.classList.remove('show')},ask(q){this.open();addMsg(q,'user');setTimeout(()=>addMsg(answer(q),'system'),80)},send(){const i=document.getElementById('v181-ai-input'),q=String(i?.value||'').trim();if(!q)return;i.value='';this.ask(q)},answer};
 function refresh(){try{ensureAI()}catch(e){}try{renderHistory(document.getElementById('history-container'))}catch(e){}try{ensureReportsSection()}catch(e){}try{checkRankUp()}catch(e){}try{maybeSundayWeighIn()}catch(e){}}
 
-const CORE_API={version:VERSION,captureValidatedSession,recoveryPenalty,buildQuests,coachSummary,renderHistory,setHistoryRange,exerciseTrend,nextLoad,refresh,ensureReportsSection,renderReports,setReportPeriod,saveWeighIn,downloadReport,printReport,reportData,debug:()=>({state:JSON.parse(JSON.stringify(state)),recovery:currentRecovery(),rir:rirStatsCurrent(),sessionAdvice:sessionAdvice(),week:reportData('week'),month:reportData('month')})};
+function exportState(){return JSON.parse(JSON.stringify(state))}
+function importState(next){if(!next||typeof next!=='object')return false;const clean=JSON.parse(JSON.stringify(next));clean.sessions=Array.isArray(clean.sessions)?clean.sessions:[];clean.historyRange=Number(clean.historyRange)||30;clean.reportPeriod=['week','month'].includes(clean.reportPeriod)?clean.reportPeriod:'week';state=clean;save();setTimeout(refresh,20);return true}
+const CORE_API={version:VERSION,captureValidatedSession,recoveryPenalty,buildQuests,coachSummary,renderHistory,setHistoryRange,exerciseTrend,nextLoad,refresh,ensureReportsSection,renderReports,setReportPeriod,saveWeighIn,downloadReport,printReport,reportData,exportState,importState,debug:()=>({state:exportState(),recovery:currentRecovery(),rir:rirStatsCurrent(),sessionAdvice:sessionAdvice(),week:reportData('week'),month:reportData('month')})};
 window.LevelingCoreV182=CORE_API;
 window.LevelingCoreV181=CORE_API;
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',()=>setTimeout(()=>{refresh();try{window.v15BuildSettings?.()}catch(e){}try{initWorkoutSystem?.()}catch(e){}},420),{once:true});else setTimeout(()=>{refresh();try{window.v15BuildSettings?.()}catch(e){}try{initWorkoutSystem?.()}catch(e){}},120);
@@ -14138,7 +14155,7 @@ window.addEventListener('pageshow',()=>setTimeout(refresh,80));
 </script>
 
 <script id="v1711-build-marker">
-window.LEVELING_BUILD_INFO=Object.freeze({version:'18.2.0',codename:'Coach Reports',assets:'external-lossless',stripe:'live'});
+window.LEVELING_BUILD_INFO=Object.freeze({version:'18.2.1',codename:'Audited Coach Reports',assets:'external-lossless',stripe:'live'});
 </script>
 </body>
 </html>
