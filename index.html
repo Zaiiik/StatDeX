@@ -1,4 +1,4 @@
-<!-- LEVELING-APP V18.2.2 RATING FIX — clean progression core, contextual coach, skip workflow, weekly/monthly reports, recovery, ranks and SYSTEM AI -->
+<!-- LEVELING-APP V18.5.0 COACH PRO + COMMUNITY V3 — Coach Intelligence V2, Pro reports, richer community, SYSTEM engine reinforced -->
 <!-- LEVELING-APP V17.4.0 AUTH + I18N + ONBOARDING REPLAY TEST
      - hard account gate after first-run discovery
      - dynamic FR/EN observer for content rendered after language switch
@@ -31,7 +31,7 @@
 
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>LEVELING-APP — V18.2.2 RATING FIX</title>
+    <title>LEVELING-APP — V18.5.0 COACH PRO + COMMUNITY V3</title>
     <meta name="theme-color" content="#09090f">
     <meta name="application-name" content="LEVELING-APP">
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -6144,7 +6144,7 @@ function setAppUnlockedShell(){
   document.getElementById('app-container')?.classList.remove('auth-locked');
 }
 
-const APP_VERSION='18.2.2-RATING-FIX';
+const APP_VERSION='18.5.0-COACH-PRO-COMMUNITY';
 const ACCOUNT_LOCAL_KEYS=['solo_leveling_user','solo_leveling_smart_refs','solo_leveling_body_hist','solo_leveling_inv','solo_leveling_block','solo_leveling_day','solo_leveling_state','solo_leveling_custom_sets','solo_leveling_history','solo_leveling_active_program','solo_leveling_program_states','solo_leveling_program_custom_sets','solo_leveling_custom_program','leveling_last_local_save','leveling_last_cloud_sync','leveling_v10','leveling_v181_core','leveling_v182_core'];
 function clearLevelingAccountLocalData(){
   try{ACCOUNT_LOCAL_KEYS.forEach(k=>localStorage.removeItem(k));sessionStorage.removeItem('leveling_pending_license')}catch(e){console.warn('Local account cleanup:',e)}
@@ -6516,7 +6516,7 @@ async function retryLicenseCheck(){
 function exportAppData(){
   if(typeof saveActiveProgramState==='function')saveActiveProgramState();
   let v182=null;try{v182=window.LevelingCoreV182?.exportState?.()||JSON.parse(localStorage.getItem('leveling_v182_core')||'null')}catch(e){}
-  return{version:'18.2.2',userData,smartHypertrophyRefs,bodyHistory,inventoryItems,currentBlockIndex,currentDayIndex,activeProgramKey,programWorkoutStates,programCustomSetData,customProgramData,workoutState,customSetData,workoutHistory,v182,v10:(typeof window.__levelingV10Export==='function'?window.__levelingV10Export():null)};
+  return{version:'18.5.0',userData,smartHypertrophyRefs,bodyHistory,inventoryItems,currentBlockIndex,currentDayIndex,activeProgramKey,programWorkoutStates,programCustomSetData,customProgramData,workoutState,customSetData,workoutHistory,v182,v10:(typeof window.__levelingV10Export==='function'?window.__levelingV10Export():null)};
 }
 function importAppData(d){
   if(!d||typeof d!=='object')return;suppressCloudSave=true;
@@ -6524,7 +6524,7 @@ function importAppData(d){
     if(d.userData)userData=d.userData;if(d.smartHypertrophyRefs)smartHypertrophyRefs=d.smartHypertrophyRefs;if(d.bodyHistory)bodyHistory=d.bodyHistory;if(d.inventoryItems)inventoryItems=d.inventoryItems;
     if(Number.isInteger(d.currentBlockIndex))currentBlockIndex=d.currentBlockIndex;if(Number.isInteger(d.currentDayIndex))currentDayIndex=d.currentDayIndex;if(d.activeProgramKey)activeProgramKey=d.activeProgramKey;
     if(d.programWorkoutStates)programWorkoutStates=d.programWorkoutStates;if(d.programCustomSetData)programCustomSetData=d.programCustomSetData;if(d.customProgramData)customProgramData=d.customProgramData;if(d.workoutState)workoutState=d.workoutState;if(d.customSetData)customSetData=d.customSetData;if(d.workoutHistory)workoutHistory=d.workoutHistory;
-    if(d.v182){try{localStorage.setItem('leveling_v182_core',JSON.stringify(d.v182));window.LevelingCoreV182?.importState?.(d.v182)}catch(e){console.warn('[V18.2.2] import core',e)}}
+    if(d.v182){try{localStorage.setItem('leveling_v182_core',JSON.stringify(d.v182));window.LevelingCoreV182?.importState?.(d.v182)}catch(e){console.warn('[V18.5.0] import core',e)}}
     if(d.v10&&typeof window.__levelingV10Import==='function')window.__levelingV10Import(d.v10);
     if(typeof loadActiveProgramState==='function')loadActiveProgramState();if(typeof saveToLocalStorage==='function')saveToLocalStorage();
   }finally{suppressCloudSave=false}
@@ -11419,7 +11419,7 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
 </script>
 
 <script id="v17111-version-tools">
-const V17111_PUBLIC_VERSION='18.2.2';
+const V17111_PUBLIC_VERSION='18.5.0';
 function v17111MountVersionTools(target){
   if(!target||target.querySelector('#v17111-version-card'))return;
   const en=localStorage.getItem('leveling_language')==='en';
@@ -13898,7 +13898,7 @@ window.v17101CloseBroadcastInbox=function(){
 <script id="v182-clean-core-runtime">
 (function(){
 'use strict';
-const VERSION='18.2.2';
+const VERSION='18.5.0';
 const KEY='leveling_v182_core';
 const LEGACY_KEY='leveling_v181_core';
 const DAY=86400000;
@@ -13959,21 +13959,28 @@ function nextLoad(name){
   const rows=exerciseHistory(name),last=rows.at(-1),r=currentRecovery();if(!last||!last.sets?.length)return null;
   const work=last.sets.filter(x=>x.weight>0);if(!work.length)return null;
   const base=Math.max(...work.map(x=>x.weight)),rir=Number.isFinite(last.avgRir)?last.avgRir:2,pv=r.complete?Number(r.score||0):60;
-  const fatigueContext=Number(last.order||1)>2||Number(last.preVolume||0)>5000;
-  const skipContext=Number(last.skippedSets||0)>0;
-  let action='MAINTIEN',target=base,reason='charge consolidée : priorité aux reps et à la technique';
-  if(pv<45||rir<1){
-    action='ALLÉGER';target=Math.max(0,Math.round(base*.95*2)/2);reason='PV bas ou effort trop proche de l’échec';
-  }else if(pv>=78&&rir>=2.5&&!skipContext){
-    action='PROGRESSER';target=Math.round((base+2.5)*2)/2;reason='PV élevé + marge RIR suffisante';
-  }else if(skipContext){
-    reason='séries skippées à la dernière séance : le Coach ne force pas une hausse';
-  }else if(fatigueContext&&rir>=1.5){
-    reason='exercice réalisé tard / après beaucoup de volume : maintien avant de juger une baisse';
-  }else if(rir>=1.5&&rir<=2.5){
-    reason='effort dans la zone cible : progression par reps avant la charge';
-  }
-  return{base,target,action,reason,rir,order:last.order,preVolume:last.preVolume,skipContext,fatigueContext,pv};
+  const recent=rows.slice(-4),trend=exerciseTrend(name),fatigueContext=Number(last.order||1)>2||Number(last.preVolume||0)>5000;
+  const skipRate=recent.length?recent.reduce((s,x)=>s+Number(x.skippedSets||0),0)/Math.max(1,recent.reduce((s,x)=>s+Number(x.plannedSets||0),0)):0;
+  const completion=recent.length?avg(recent.map(x=>{const p=Number(x.plannedSets||0),d=Number((x.sets||[]).length);return p?d/p*100:100})):100;
+  const recScores=recent.map(x=>Number(x.recovery?.score||0)).filter(x=>x>0),recentPV=recScores.length?avg(recScores):pv;
+  const block=Number(currentBlockIndex||0)+1,day=Number(currentDayIndex||0)+1;
+  const deloadBlock=/deload|déload|all[eé]g/i.test(String(getCurrentDay()?.name||''))||block===4;
+  const main=/squat|bench|couch|dead|soulev/i.test(String(name||''));
+  const increment=base>=140?5:base>=60?2.5:1;
+  let action='MAINTIEN',target=base,reasons=[],confidence=55;
+  if(deloadBlock){action='DELOAD';target=Math.max(0,Math.round(base*.9*2)/2);reasons.push(`bloc ${block} orienté allègement/deload`);confidence+=20}
+  else if(pv<40||recentPV<45){action='ALLÉGER';target=Math.max(0,Math.round(base*.95*2)/2);reasons.push(`récupération basse (PV ${pv}/100, moyenne récente ${recentPV.toFixed(0)}/100)`);confidence+=20}
+  else if(rir<1){action='ALLÉGER';target=Math.max(0,Math.round(base*.95*2)/2);reasons.push(`RIR ${rir.toFixed(1)} trop proche de l’échec`);confidence+=18}
+  else if(skipRate>=.15||completion<82){action='MAINTIEN';reasons.push(`${Math.round(skipRate*100)}% de séries skippées / ${Math.round(completion)}% réalisées récemment`);confidence+=15}
+  else if(trend.pct<-3&&rows.length>=4){action='ALLÉGER';target=Math.max(0,Math.round(base*.975*2)/2);reasons.push(`tendance e1RM ${trend.pct.toFixed(1)}% sur les dernières expositions`);confidence+=12}
+  else if(pv>=78&&rir>=2.5&&trend.pct>=-1.5){action='PROGRESSER';target=Math.round((base+increment)*2)/2;reasons.push(`PV ${pv}/100 + RIR ${rir.toFixed(1)} = marge suffisante`);confidence+=22}
+  else if(fatigueContext&&rir>=1.5){action='MAINTIEN';reasons.push(`exercice n°${last.order}, après ${Math.round(Number(last.preVolume||0)).toLocaleString('fr-FR')} kg de volume`);confidence+=12}
+  else if(rir>=1.5&&rir<=2.5){action='MAINTIEN';reasons.push(`RIR ${rir.toFixed(1)} dans la zone cible : consolider les reps avant de charger`);confidence+=12}
+  else reasons.push('données encore mixtes : maintien prudent pour obtenir une exposition comparable');
+  if(main)reasons.push('mouvement principal : progression volontairement conservatrice');
+  if(trend.rows.length>=4)reasons.push(`tendance contextualisée ${trend.pct>=0?'+':''}${trend.pct.toFixed(1)}%`);
+  confidence=Math.min(96,confidence+Math.min(15,rows.length*2));
+  return{base,target,action,reason:reasons.join(' · '),reasons,confidence,rir,order:last.order,preVolume:last.preVolume,skipContext:skipRate>0,fatigueContext,pv,recentPV,skipRate,completion,trendPct:trend.pct,block,day,deloadBlock};
 }
 function coachSummary(){
   const r=currentRecovery(),rir=rirStatsCurrent(),day=getCurrentDay();if(!day)return'';
@@ -14036,15 +14043,20 @@ function reportData(kind=state.reportPeriod||'week'){
 }
 function reportCoachText(d){
   if(!d.rows.length)return'Aucune séance enregistrée sur cette période. Le bilan deviendra précis après tes prochaines validations.';
-  const best=d.trends.filter(x=>x.rows?.length).sort((a,b)=>b.pct-a.pct)[0];
-  const weak=d.trends.filter(x=>x.rows?.length).sort((a,b)=>a.pct-b.pct)[0];
-  const lines=[];
+  const ranked=d.trends.filter(x=>x.rows?.length).sort((a,b)=>b.pct-a.pct),best=ranked[0],weak=ranked.at(-1),lines=[];
   if(d.avgRecovery!==null)lines.push(`Récupération moyenne ${d.avgRecovery.toFixed(0)}/100${d.avgSleep!==null?` · sommeil ${d.avgSleep.toFixed(1)}/10`:''}.`);
   lines.push(`${d.rows.length} séance(s), ${Math.round(d.volume).toLocaleString('fr-FR')} kg de volume et ${d.completion}% des séries planifiées réalisées.`);
-  if(d.skips)lines.push(`${d.skips} série(s) skippée(s) : elles ne sont pas considérées comme des échecs et n’augmentent jamais automatiquement la charge.`);
-  if(best)lines.push(`Meilleure tendance : ${best.name} ${best.pct>=0?'+':''}${best.pct.toFixed(1)} %.`);
-  if(weak&&weak!==best&&weak.pct<-1)lines.push(`À surveiller : ${weak.name} ${weak.pct.toFixed(1)} %, à remettre dans le contexte du RIR, des PV et de l’ordre des exercices.`);
-  if(d.avgRir!==null)lines.push(`RIR moyen ${d.avgRir.toFixed(1)} : ${d.avgRir<1.2?'intensité très haute, priorité à la récupération':d.avgRir>3?'marge élevée, progression possible si les PV suivent':'zone de travail cohérente'}.`);
+  if(d.skips)lines.push(`${d.skips} série(s) skippée(s) : elles restent visibles dans le bilan mais ne déclenchent ni PR ni hausse automatique.`);
+  if(best)lines.push(`Meilleure progression : ${best.name} ${best.pct>=0?'+':''}${best.pct.toFixed(1)}%.`);
+  if(weak&&weak!==best)lines.push(`Point à surveiller : ${weak.name} ${weak.pct>=0?'+':''}${weak.pct.toFixed(1)}%.`);
+  if(d.avgRir!==null)lines.push(`RIR moyen ${d.avgRir.toFixed(1)} : ${d.avgRir<1.2?'intensité très haute, récupère avant de pousser la charge':d.avgRir>3?'marge élevée, une progression est envisageable si les PV suivent':'zone de travail cohérente'}.`);
+  const next=[];
+  if(d.avgRecovery!==null&&d.avgRecovery<55)next.push('démarrer la prochaine semaine en mode allégé');
+  else if(d.completion>=90&&(d.avgRir===null||d.avgRir>=1.5))next.push('conserver le volume et autoriser les petites hausses validées par le Coach');
+  else next.push('consolider les charges avant d’augmenter le volume');
+  if(d.skips>=Math.max(3,d.planned*.12))next.push('réduire la densité ou revoir les exercices souvent skippés');
+  if(weak&&weak.pct<-2)next.push(`prioriser la qualité technique sur ${weak.name}`);
+  lines.push(`Plan conseillé : ${next.join(' ; ')}.`);
   return lines.join(' ');
 }
 function reportRowsHtml(d){
@@ -14141,7 +14153,7 @@ function answer(q){
   return`Je peux analyser tes données réelles : progression d’un exercice, charge suivante, ordre des exercices, RIR, PV, séries skippées, PR, deload et bilan semaine/mois.\n\nContexte : ${sessionAdvice()}`;
 }
 function ensureAI(){const panel=document.getElementById('panel-profile');if(!panel)return;let card=document.getElementById('v181-ai-card');if(!card){card=document.createElement('section');card.id='v181-ai-card';const coach=document.getElementById('v140-coach'),goals=panel.querySelector('.goal-card');if(coach)coach.after(card);else if(goals)panel.insertBefore(card,goals);else panel.appendChild(card)}const c=context();card.innerHTML=`<div class="v181-ai-head"><div class="v181-ai-brand"><span class="v181-ai-core">AI</span><div><b>SYSTEM AI</b><small>MOTEUR D’ANALYSE · DONNÉES RÉELLES</small></div></div><span class="v181-ai-live">LIVE DATA</span></div><div class="v181-ai-summary">PV ${c.recovery.complete?c.recovery.score:'—'}/100 · ${c.sessions.length} séance(s) / 30j · ${Math.round(c.volume).toLocaleString('fr-FR')} kg · SBD ${c.sbd} kg</div><button class="v181-ai-open" onclick="LevelingSystemAI.open()">OUVRIR LE TERMINAL SYSTEM</button>`;ensureAIModal()}
-function ensureAIModal(){if(document.getElementById('v181-ai-modal'))return;const d=document.createElement('div');d.id='v181-ai-modal';d.innerHTML=`<div class="v181-terminal"><div class="v181-terminal-head"><div><b>SYSTEM AI</b><small>LEVELING-APP · RATING FIX V18.2.2</small></div><button class="v181-close" onclick="LevelingSystemAI.close()">×</button></div><div id="v181-context" class="v181-context"></div><div id="v181-chat" class="v181-chat"></div><div class="v181-quick"><button onclick="LevelingSystemAI.ask('Que dois-je faire aujourd’hui ?')">Séance du jour</button><button onclick="LevelingSystemAI.ask('Pourquoi mon bench stagne ?')">Bench</button><button onclick="LevelingSystemAI.ask('Est-ce que je tente un PR au squat ?')">PR Squat</button><button onclick="LevelingSystemAI.ask('Ai-je besoin d’un deload ?')">Deload</button><button onclick="LevelingSystemAI.ask('Fais-moi mon bilan de la semaine')">Bilan semaine</button></div><div class="v181-input"><input id="v181-ai-input" placeholder="Pose une question sur ta progression…" onkeydown="if(event.key==='Enter')LevelingSystemAI.send()"><button onclick="LevelingSystemAI.send()">ENVOYER</button></div><div class="v181-disclaimer">Analyse sportive/gamifiée basée sur tes données. Ce n’est pas un avis médical.</div></div>`;d.addEventListener('click',e=>{if(e.target===d)LevelingSystemAI.close()});document.body.appendChild(d)}
+function ensureAIModal(){if(document.getElementById('v181-ai-modal'))return;const d=document.createElement('div');d.id='v181-ai-modal';d.innerHTML=`<div class="v181-terminal"><div class="v181-terminal-head"><div><b>SYSTEM AI</b><small>LEVELING-APP · COACH PRO V18.5.0</small></div><button class="v181-close" onclick="LevelingSystemAI.close()">×</button></div><div id="v181-context" class="v181-context"></div><div id="v181-chat" class="v181-chat"></div><div class="v181-quick"><button onclick="LevelingSystemAI.ask('Que dois-je faire aujourd’hui ?')">Séance du jour</button><button onclick="LevelingSystemAI.ask('Pourquoi mon bench stagne ?')">Bench</button><button onclick="LevelingSystemAI.ask('Est-ce que je tente un PR au squat ?')">PR Squat</button><button onclick="LevelingSystemAI.ask('Ai-je besoin d’un deload ?')">Deload</button><button onclick="LevelingSystemAI.ask('Fais-moi mon bilan de la semaine')">Bilan semaine</button></div><div class="v181-input"><input id="v181-ai-input" placeholder="Pose une question sur ta progression…" onkeydown="if(event.key==='Enter')LevelingSystemAI.send()"><button onclick="LevelingSystemAI.send()">ENVOYER</button></div><div class="v181-disclaimer">Analyse sportive/gamifiée basée sur tes données. Ce n’est pas un avis médical.</div></div>`;d.addEventListener('click',e=>{if(e.target===d)LevelingSystemAI.close()});document.body.appendChild(d)}
 function renderAIContext(){const c=context(),el=document.getElementById('v181-context');if(!el)return;el.innerHTML=`<div><span>PV</span><b>${c.recovery.complete?c.recovery.score:'—'}/100</b></div><div><span>RIR</span><b>${c.rir.avg===null?'—':c.rir.avg.toFixed(1)}</b></div><div><span>30 J</span><b>${c.sessions.length} séances</b></div><div><span>VOLUME</span><b>${Math.round(c.volume/1000)} t</b></div>`}
 function addMsg(t,type){const c=document.getElementById('v181-chat');if(!c)return;const d=document.createElement('div');d.className='v181-msg '+type;d.textContent=t;c.appendChild(d);c.scrollTop=c.scrollHeight}
 window.LevelingSystemAI={version:VERSION,open(){ensureAIModal();document.getElementById('v181-ai-modal').classList.add('show');renderAIContext();const c=document.getElementById('v181-chat');if(c&&!c.children.length)addMsg('SYSTEM en ligne. J’analyse tes PV, RIR, charges, ordre des exercices, séries skippées, historique et bilans de progression.','system')},close(){document.getElementById('v181-ai-modal')?.classList.remove('show')},ask(q){this.open();addMsg(q,'user');setTimeout(()=>addMsg(answer(q),'system'),80)},send(){const i=document.getElementById('v181-ai-input'),q=String(i?.value||'').trim();if(!q)return;i.value='';this.ask(q)},answer};
@@ -14158,8 +14170,21 @@ window.addEventListener('pageshow',()=>setTimeout(refresh,80));
 })();
 </script>
 
+<style id="v185-community-pro-style">
+.v185-compare{margin-top:10px;padding:10px;border:1px solid #292d38;border-radius:12px;background:#0b0d13}.v185-compare-title{font-size:.5rem;font-weight:1000;color:#ff8fc2;letter-spacing:.06em;margin-bottom:7px}.v185-compare-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}.v185-compare-grid div{padding:7px;border:1px solid #242832;border-radius:8px;text-align:center}.v185-compare-grid span{display:block;color:#747986;font-size:.42rem}.v185-compare-grid b{font-size:.58rem}.v185-badges{display:flex;gap:5px;flex-wrap:wrap;margin-top:9px}.v185-badge{border:1px solid rgba(255,47,146,.35);background:rgba(255,47,146,.07);color:#ffc2df;border-radius:999px;padding:4px 7px;font-size:.43rem;font-weight:900}.v185-ai-status{margin-top:6px;color:#7f8490;font-size:.44rem;line-height:1.45}
+</style>
+<script id="v185-community-pro-runtime">
+(function(){
+'use strict';
+function badges(p){const a=[];const s=Number(p.squat||0),b=Number(p.bench||0),d=Number(p.deadlift||0),total=s+b+d,w=Number(p.weekly_volume||0),lvl=Number(p.level||1);if(total>=500)a.push('SBD 500+');else if(total>=400)a.push('SBD 400+');if(w>=20000)a.push('20T SEMAINE');else if(w>=10000)a.push('10T SEMAINE');if(lvl>=20)a.push('VÉTÉRAN');if(Math.max(s,b,d)>0)a.push('SBD ACTIF');return a.slice(0,4)}
+const old=window.openSocialHunterProfile;
+window.openSocialHunterProfile=function(userId){old?.(userId);setTimeout(()=>{try{const p=v16019HunterCache.get(String(userId)),card=document.querySelector('#v16019-hunter-modal .v16019-hunter-card');if(!p||!card||card.querySelector('.v185-compare'))return;const mine={squat:Number(userData?.squat||0),bench:Number(userData?.bench||0),deadlift:Number(userData?.deadlift||0)},vals=[['Squat',Number(p.squat||0)-mine.squat],['Bench',Number(p.bench||0)-mine.bench],['Deadlift',Number(p.deadlift||0)-mine.deadlift]];const box=document.createElement('div');box.className='v185-compare';box.innerHTML=`<div class="v185-compare-title">COMPARAISON AVEC TOI</div><div class="v185-compare-grid">${vals.map(([n,v])=>`<div><span>${n}</span><b>${v>=0?'+':''}${v} kg</b></div>`).join('')}</div><div class="v185-badges">${badges(p).map(x=>`<span class="v185-badge">${x}</span>`).join('')||'<span class="v185-badge">NOUVEAU CHASSEUR</span>'}</div><div class="v185-ai-status">Volume semaine : ${Number(p.weekly_volume||0).toLocaleString('fr-FR')} kg · comparaison informative, sans modifier les rangs.</div>`;card.querySelector('.v16019-hunter-stats')?.after(box)}catch(e){}},0)};
+function aiLabel(){const el=document.querySelector('#v181-ai-card .v181-ai-brand small');if(el)el.textContent='COACH INTELLIGENCE V2 · DONNÉES RÉELLES'}
+window.addEventListener('leveling-ui-changed',()=>setTimeout(aiLabel,20));setTimeout(aiLabel,600);
+})();
+</script>
 <script id="v1711-build-marker">
-window.LEVELING_BUILD_INFO=Object.freeze({version:'18.2.2',codename:'Audited Coach Reports',assets:'external-lossless',stripe:'live'});
+window.LEVELING_BUILD_INFO=Object.freeze({version:'18.5.0',codename:'Coach Pro + Community V3',assets:'external-lossless',stripe:'live'});
 </script>
 </body>
 </html>
