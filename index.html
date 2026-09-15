@@ -31,7 +31,7 @@
 
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>LEVELING-APP — V19.3.9 SYSTEM AI ANALYSIS LIVE</title>
+    <title>LEVELING-APP — V19.4.0 SYSTEM AI CANONICAL CORE</title>
     <meta name="theme-color" content="#09090f">
     <meta name="application-name" content="LEVELING-APP">
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -3284,17 +3284,14 @@ body[data-theme="mono"] .v1932-analysis-icon .ui-icon{color:#f0f0f0}
 </style>
 
 
-<style id="v1939-ai-live-css">
-.v1939-ai-insight{margin:0 0 14px;padding:13px;border:1px solid rgba(91,209,255,.27);border-radius:14px;background:linear-gradient(120deg,rgba(26,120,158,.09),rgba(137,38,181,.09))}
-.v1939-ai-insight-top{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:9px}
-.v1939-ai-insight-title{font-size:11px;font-weight:950;color:#86e4ff;letter-spacing:.07em}
-.v1939-ai-confidence{font-size:9px;font-weight:900;padding:5px 7px;border-radius:999px;border:1px solid rgba(255,190,70,.35);color:#ffc760}
-.v1939-ai-text{font-size:11px;line-height:1.5;color:#e9e9f1}
-.v1939-ai-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}
-.v1939-ai-mini{padding:9px;border-radius:11px;background:rgba(3,7,13,.48);border:1px solid rgba(255,255,255,.09)}
-.v1939-ai-mini b{display:block;font-size:9px;color:#8d94a6;margin-bottom:4px;text-transform:uppercase}
-.v1939-ai-mini span{font-size:11px;font-weight:850;color:#fff}
-.v1939-ai-rec{margin-top:9px;padding:10px;border-left:2px solid #cf55ff;background:rgba(190,57,255,.07);font-size:10px;line-height:1.45;color:#e6c8f2}
+
+<style id="v1940-canonical-system-css">
+#history-container .v181-compare{display:none!important}
+#history-container .v181-statusline{border-left:3px solid #c552ff!important;background:linear-gradient(90deg,rgba(197,82,255,.10),rgba(71,210,255,.04))!important;padding:10px 11px!important;border-radius:0 10px 10px 0;color:#cfd4df!important}
+#history-container .v181-kpi:nth-child(1){border-color:rgba(88,216,255,.42)!important}
+#history-container .v181-kpi:nth-child(2){border-color:rgba(81,232,166,.35)!important}
+#history-container .v181-kpi:nth-child(3){border-color:rgba(197,82,255,.38)!important}
+#history-container .v181-kpi:nth-child(4){border-color:rgba(255,110,190,.35)!important}
 </style>
 
 </head>
@@ -6640,7 +6637,41 @@ function exportAppData(){
   return{version:'18.6.0',userData,smartHypertrophyRefs,bodyHistory,inventoryItems,currentBlockIndex,currentDayIndex,activeProgramKey,programWorkoutStates,programCustomSetData,customProgramData,workoutState,customSetData,workoutHistory,v182,v10:(typeof window.__levelingV10Export==='function'?window.__levelingV10Export():null)};
 }
 function importAppData(d){
-  if(!d||typeof d!=='object')return;suppressCloudSave=true;
+  if(!d||typeof d!=='object')return;
+  /* V19.4 : fusion canonique avant import. Une sauvegarde cloud plus ancienne ne peut
+     plus annuler une séance, une absence, une série faite ou une séance détaillée locale. */
+  try{
+    const local=exportAppData();
+    const mergeObj=(a,b)=>({...((b&&typeof b==='object')?b:{}),...((a&&typeof a==='object')?a:{})});
+    const unionBy=(a,b,keyFn)=>{
+      const m=new Map();
+      [...(Array.isArray(b)?b:[]),...(Array.isArray(a)?a:[])].forEach(x=>{if(!x)return;const k=keyFn(x);if(k)m.set(k,{...(m.get(k)||{}),...x})});
+      return [...m.values()];
+    };
+    d={...d,userData:{...(d.userData||{})}};
+    const lu=local.userData||{}, iu=d.userData||{};
+    d.userData.validatedSessions=mergeObj(lu.validatedSessions,iu.validatedSessions);
+    d.userData.absentSessions=mergeObj(lu.absentSessions,iu.absentSessions);
+    Object.keys(d.userData.validatedSessions||{}).forEach(k=>{if(d.userData.validatedSessions[k]&&d.userData.absentSessions?.[k])delete d.userData.absentSessions[k]});
+    const ls=lu.systemAI||{}, is=iu.systemAI||{};
+    d.userData.systemAI={
+      ...is,...ls,
+      events:unionBy(ls.events,is.events,x=>x.id||`${x.date}|${x.program}|${x.block}|${x.day}|${x.status}`),
+      current:mergeObj(ls.current,is.current)
+    };
+    d.userData.skippedSets=mergeObj(lu.skippedSets,iu.skippedSets);
+    d.programWorkoutStates=mergeObj(local.programWorkoutStates,d.programWorkoutStates);
+    d.programCustomSetData=mergeObj(local.programCustomSetData,d.programCustomSetData);
+    if(local.v182||d.v182){
+      const lv=local.v182||{},iv=d.v182||{};
+      d.v182={...iv,...lv,sessions:unionBy(lv.sessions,iv.sessions,x=>x.id||`${x.date}|${x.program}|${x.block}|${x.day}`)};
+    }
+    if(local.v10||d.v10){
+      const lv=local.v10||{},iv=d.v10||{};
+      d.v10={...iv,...lv,sessions:unionBy(lv.sessions,iv.sessions,x=>x.sessionKey||x.id||`${x.date}|${x.program}|${x.block}|${x.day}`)};
+    }
+  }catch(e){console.warn('[V19.4] canonical cloud merge',e)}
+  suppressCloudSave=true;
   try{
     if(d.userData)userData=d.userData;if(d.smartHypertrophyRefs)smartHypertrophyRefs=d.smartHypertrophyRefs;if(d.bodyHistory)bodyHistory=d.bodyHistory;if(d.inventoryItems)inventoryItems=d.inventoryItems;
     if(Number.isInteger(d.currentBlockIndex))currentBlockIndex=d.currentBlockIndex;if(Number.isInteger(d.currentDayIndex))currentDayIndex=d.currentDayIndex;if(d.activeProgramKey)activeProgramKey=d.activeProgramKey;
@@ -12627,24 +12658,55 @@ function validationMap(){
   if(!userData.validatedSessions || typeof userData.validatedSessions!=='object') userData.validatedSessions={};
   return userData.validatedSessions;
 }
+function systemAIState(){
+  if(!userData.systemAI || typeof userData.systemAI!=='object') userData.systemAI={};
+  if(!userData.systemAI.events || !Array.isArray(userData.systemAI.events)) userData.systemAI.events=[];
+  if(!userData.systemAI.current || typeof userData.systemAI.current!=='object') userData.systemAI.current={};
+  return userData.systemAI;
+}
+function systemAIEvent(status,program=activeProgramKey,block=currentBlockIndex,day=currentDayIndex){
+  const sys=systemAIState(), key=validationKey(program,block,day), now=Date.now();
+  const date=isoDay();
+  const id=[date,program,block,day,status].join('|');
+  let planned=0,done=0,skipped=0;
+  try{
+    const d=getPrograms()?.[block]?.[day];
+    (d?.exercises||[]).forEach((ex,ei)=>{for(let si=0;si<Number(ex.sets||0);si++){
+      planned++;
+      if(workoutState?.[block]?.[day]?.[ei]?.[si])done++;
+      if(userData?.skippedSets?.[`${program}|${block}|${day}|${ei}|${si}`])skipped++;
+    }});
+  }catch(e){}
+  const event={id,date,at:now,status,program,block:Number(block),day:Number(day),cycle:cycleNo(),plannedSets:planned,doneSets:done,skippedSets:skipped};
+  const idx=sys.events.findIndex(x=>x?.id===id);
+  if(idx>=0)sys.events[idx]={...sys.events[idx],...event}; else sys.events.push(event);
+  if(sys.events.length>1200)sys.events=sys.events.slice(-1200);
+  sys.current[key]={status,at:now,date,cycle:cycleNo()};
+  return event;
+}
 function absenceMap(){
   if(!userData.absentSessions || typeof userData.absentSessions!=='object') userData.absentSessions={};
   return userData.absentSessions;
 }
 function isAbsent(program=activeProgramKey,block=currentBlockIndex,day=currentDayIndex){
-  return !!absenceMap()[validationKey(program,block,day)];
+  const key=validationKey(program,block,day), rec=systemAIState().current[key];
+  if(rec?.status==='validated')return false;
+  if(rec?.status==='absent')return true;
+  return !!absenceMap()[key];
 }
 function markAbsent(program=activeProgramKey,block=currentBlockIndex,day=currentDayIndex){
   if(program!=='powerbuilding' || isValidated(program,block,day))return false;
   const key=validationKey(program,block,day);
   absenceMap()[key]=Date.now();
-  try{saveToLocalStorage()}catch(e){}
+  systemAIEvent('absent',program,block,day);
+  try{saveToLocalStorage();scheduleCloudSaveImmediate?.()}catch(e){}
   return true;
 }
 function clearAbsent(program=activeProgramKey,block=currentBlockIndex,day=currentDayIndex){
   const key=validationKey(program,block,day);
   if(absenceMap()[key])delete absenceMap()[key];
-  try{saveToLocalStorage()}catch(e){}
+  const sys=systemAIState();if(sys.current[key]?.status==='absent')delete sys.current[key];
+  try{saveToLocalStorage();scheduleCloudSaveImmediate?.()}catch(e){}
 }
 function isResolved(program=activeProgramKey,block=currentBlockIndex,day=currentDayIndex){
   return isValidated(program,block,day)||isAbsent(program,block,day);
@@ -12655,14 +12717,18 @@ function blockResolved(block=currentBlockIndex,program=activeProgramKey){
   return days.every((_,di)=>isResolved(program,block,di));
 }
 function isValidated(program=activeProgramKey,block=currentBlockIndex,day=currentDayIndex){
-  const key=validationKey(program,block,day);
+  const key=validationKey(program,block,day), rec=systemAIState().current[key];
+  if(rec?.status==='validated')return true;
+  if(rec?.status==='absent')return false;
   return localStorage.getItem(key)==='1' || !!validationMap()[key];
 }
 function markValidated(program=activeProgramKey,block=currentBlockIndex,day=currentDayIndex){
   const key=validationKey(program,block,day);
   localStorage.setItem(key,'1');
   validationMap()[key]=Date.now();
-  try{saveToLocalStorage()}catch(e){}
+  if(absenceMap()[key])delete absenceMap()[key];
+  systemAIEvent('validated',program,block,day);
+  try{saveToLocalStorage();scheduleCloudSaveImmediate?.()}catch(e){}
   return key;
 }
 function clearValidationKeys(){
@@ -12674,6 +12740,7 @@ function clearValidationKeys(){
   keys.forEach(k=>localStorage.removeItem(k));
   userData.validatedSessions={};
   userData.absentSessions={};
+  try{systemAIState().current={}}catch(e){}
 }
 
 function refreshValidationUI(){
@@ -14122,8 +14189,7 @@ function renderHistory(container){
     <div class="v181-kpi"><span>Données détaillées</span><b>${detailed.length}/${cur.length}</b><em>séances exploitables par l’IA</em></div>
   </div>
   <div class="v181-chart"><div class="v181-chart-head"><b>Courbes SBD · e1RM contextualisé</b><small>${range} derniers jours</small></div>${svgSeries(range)}<div class="v181-legend"><span style="color:#ff2f92"><i></i>Squat</span><span style="color:#4a8cff"><i></i>Bench</span><span style="color:#ff3159"><i></i>Deadlift</span></div></div>
-  <div class="v181-compare"><div><span>30 derniers jours</span><b>${cur.length} séances</b><small>${Math.round(curVol).toLocaleString('fr-FR')} kg déplacés</small></div><div><span>30 jours précédents</span><b>${prev.length} séances</b><small>${Math.round(prevVol).toLocaleString('fr-FR')} kg déplacés</small></div></div>
-  <div class="v181-statusline">${allDetailed.length?`<strong>${allDetailed.length}</strong> séance(s) possèdent le détail exercices/séries pour les analyses avancées. Les autres validations restent comptées dans les totaux.`:`Tes validations historiques sont bien comptées. Les courbes e1RM/RIR deviendront plus précises avec les prochaines séances enregistrées en détail.`}</div>`;
+  <div class="v181-statusline">${allDetailed.length?`SYSTEM AI exploite <strong>${allDetailed.length}</strong> séance(s) détaillée(s). Les anciennes validations restent utilisées pour fréquence et tonnage sans inventer de RIR/e1RM.`:`SYSTEM AI utilise déjà tes validations historiques pour fréquence et tonnage. Les prochaines séances détaillées enrichiront automatiquement e1RM, RIR et fatigue.`}</div>`;
   return true
 }
 function setHistoryRange(n){state.historyRange=[30,60,120].includes(Number(n))?Number(n):30;save();renderHistory(document.getElementById('history-container'))}
@@ -14411,7 +14477,7 @@ window.addEventListener('pageshow',()=>setTimeout(refreshDay,120));document.addE
 </script>
 
 <script id="v1711-build-marker">
-window.LEVELING_BUILD_INFO=Object.freeze({version:'19.3.7',codename:'System AI V2',assets:'external-lossless',stripe:'live'});
+window.LEVELING_BUILD_INFO=Object.freeze({version:'19.4.0',codename:'System AI Canonical Core',assets:'external-lossless',stripe:'live'});
 </script>
 
 
@@ -14488,7 +14554,7 @@ window.LevelingV1937={decorate,findAnalysisCard};
 
 <script id="v1938-stability-runtime">
 (()=>{'use strict';
-const BUILD='19.3.9';
+const BUILD='19.4.0';
 window.LEVELING_BUILD=BUILD;
 /* Une seule source d'affichage pour les anciens badges de version laissés par les modules historiques. */
 function syncVersionLabels(root=document){
@@ -14497,7 +14563,7 @@ function syncVersionLabels(root=document){
   for(const n of nodes){
     const p=n.parentElement;if(!p||/SCRIPT|STYLE/.test(p.tagName))continue;
     const t=n.nodeValue||'';
-    if(/^\s*V?(?:17\.11\.1|18\.6\.0)\s*$/i.test(t)) n.nodeValue=t.replace(/V?(?:17\.11\.1|18\.6\.0)/i,'V19.3.9');
+    if(/^\s*V?(?:17\.11\.1|18\.6\.0)\s*$/i.test(t)) n.nodeValue=t.replace(/V?(?:17\.11\.1|18\.6\.0)/i,'V19.4.0');
   }
 }
 let lastDay=new Date().toDateString();
@@ -14514,49 +14580,6 @@ window.LevelingV1938={build:BUILD,resume,syncVersionLabels};
 })();
 </script>
 
-
-<script id="v1939-ai-live-runtime">
-(()=>{'use strict';
-const num=s=>Number(String(s||'').replace(/\s/g,'').replace(',','.').match(/-?\d+(?:\.\d+)?/)?.[0]||0);
-function getCard(){
- if(window.LevelingV1937?.findAnalysisCard)return window.LevelingV1937.findAnalysisCard();
- return document.querySelector('.v1937-analysis-shell');
-}
-function leaf(card,re){return [...card.querySelectorAll('div,p,span')].find(x=>x.children.length===0&&re.test(x.textContent||''))}
-function read(){
- const c=getCard();if(!c)return null;
- const text=c.innerText||'';
- const sessions=num(text.match(/S[ÉE]ANCES 30J[\s\S]{0,30}?(\d+)/i)?.[1]);
- const detailedMatch=text.match(/DONN[ÉE]ES D[ÉE]TAILL[ÉE]ES[\s\S]{0,35}?(\d+)\s*\/\s*(\d+)/i);
- const detailed=Number(detailedMatch?.[1]||0), total=Number(detailedMatch?.[2]||sessions||0);
- const tonnage=num(text.match(/TONNAGE 30J[\s\S]{0,35}?([\d\s]+)\s*kg/i)?.[1]);
- const freq=num(text.match(/FR[ÉE]QUENCE[\s\S]{0,30}?([\d.,]+)\s*\/\s*sem/i)?.[1]);
- return {c,sessions,detailed,total,tonnage,freq};
-}
-function render(){
- const d=read();if(!d)return;
- let box=d.c.querySelector('.v1939-ai-insight');
- if(!box){box=document.createElement('div');box.className='v1939-ai-insight';const chips=d.c.querySelector('.v1937-analysis-chips');(chips||d.c.querySelector('.v1937-system-analysis-head'))?.insertAdjacentElement('afterend',box)}
- if(!box)return;
- const ratio=d.total?Math.round(d.detailed/d.total*100):0;
- let quality='EN APPRENTISSAGE', q='Données détaillées insuffisantes';
- if(ratio>=60){quality='ÉLEVÉE';q='Analyse individualisée fiable'} else if(ratio>=25){quality='MOYENNE';q='Tendance exploitable, précision en progression'}
- let trend='Historique détecté';
- if(d.sessions>=1&&d.tonnage>0)trend=`${d.sessions} séances et ${Math.round(d.tonnage).toLocaleString('fr-FR')} kg de volume détectés sur 30 jours.`;
- let rec;
- if(d.detailed<3) rec=`SYSTEM AI possède encore peu de séances détaillées (${d.detailed}/${d.total||d.sessions}). Continue à valider tes prochaines séances avec charges, répétitions et RIR : les recommandations e1RM, fatigue et progression deviendront progressivement personnalisées.`;
- else if(d.freq>=6) rec=`Ta fréquence récente est élevée (${d.freq.toFixed(1)}/sem.). SYSTEM AI surveillera surtout la récupération, le RIR et l'évolution des performances avant de proposer une hausse de charge.`;
- else rec=`Les données détaillées commencent à être exploitables. SYSTEM AI compare maintenant charge, volume, fréquence, RIR et récupération avant les prochaines recommandations.`;
- box.innerHTML=`<div class="v1939-ai-insight-top"><div class="v1939-ai-insight-title">LECTURE SYSTEM AI</div><div class="v1939-ai-confidence">${quality}</div></div><div class="v1939-ai-text">${trend}</div><div class="v1939-ai-grid"><div class="v1939-ai-mini"><b>Données IA</b><span>${d.detailed}/${d.total||d.sessions} détaillées · ${ratio}%</span></div><div class="v1939-ai-mini"><b>Fréquence</b><span>${d.freq?d.freq.toFixed(1)+'/sem.':'En attente'}</span></div><div class="v1939-ai-mini"><b>État analyse</b><span>${q}</span></div><div class="v1939-ai-mini"><b>e1RM / RIR</b><span>${d.detailed>=3?'Analyse active':'Collecte en cours'}</span></div></div><div class="v1939-ai-rec">${rec}</div>`;
-}
-let busy=false;function queue(){if(busy)return;busy=true;setTimeout(()=>{busy=false;render()},90)}
-document.addEventListener('DOMContentLoaded',()=>{queue();setTimeout(queue,500)});
-document.addEventListener('visibilitychange',()=>{if(!document.hidden)queue()});
-document.addEventListener('click',e=>{if(e.target.closest?.('[data-range],.nav-item'))queue()},true);
-const mo=new MutationObserver(queue);document.addEventListener('DOMContentLoaded',()=>{const p=document.getElementById('panel-profile');if(p)mo.observe(p,{subtree:true,childList:true,characterData:true})});
-window.LevelingV1939={render,read};
-})();
-</script>
 
 </body>
 </html>
