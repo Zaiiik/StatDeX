@@ -31,7 +31,7 @@
 
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>LEVELING-APP — V19.3.7 SYSTEM AI ANALYSIS</title>
+    <title>LEVELING-APP — V19.3.8 STABILISATION</title>
     <meta name="theme-color" content="#09090f">
     <meta name="application-name" content="LEVELING-APP">
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -3276,6 +3276,13 @@ body[data-theme="mono"] .v1932-analysis-icon .ui-icon{color:#f0f0f0}
 .v1937-original-techline{display:none!important}
 </style>
 
+
+<style id="v1938-stability-css">
+/* Stabilisation: réduire le coût des animations hors écran sans changer le design */
+.panel:not(.active) *{animation-play-state:paused!important}
+@media (prefers-reduced-motion:reduce){.panel.active{animation-duration:.08s!important}}
+</style>
+
 </head>
 <body data-theme="purple" class="auth-restoring">
 <svg id="premium-icon-sprite" width="0" height="0" aria-hidden="true" focusable="false" style="position:absolute;width:0;height:0;overflow:hidden">
@@ -6244,7 +6251,7 @@ function setAppUnlockedShell(){
   document.getElementById('app-container')?.classList.remove('auth-locked');
 }
 
-const APP_VERSION='19.3.7-SYSTEM-AI-ANALYSIS';
+const APP_VERSION='19.3.8';
 const ACCOUNT_LOCAL_KEYS=['solo_leveling_user','solo_leveling_smart_refs','solo_leveling_body_hist','solo_leveling_inv','solo_leveling_block','solo_leveling_day','solo_leveling_state','solo_leveling_custom_sets','solo_leveling_history','solo_leveling_active_program','solo_leveling_program_states','solo_leveling_program_custom_sets','solo_leveling_custom_program','leveling_last_local_save','leveling_last_cloud_sync','leveling_v10','leveling_v181_core','leveling_v182_core'];
 function clearLevelingAccountLocalData(){
   try{ACCOUNT_LOCAL_KEYS.forEach(k=>localStorage.removeItem(k));sessionStorage.removeItem('leveling_pending_license')}catch(e){console.warn('Local account cleanup:',e)}
@@ -9289,7 +9296,7 @@ body.v1358-settings-open{overflow:hidden!important}
    Aucun hook finishWorkoutFinal / updateProfileUI / switchTab.
    ============================================================ */
 
-const VERSION='16.2.17';
+const VERSION='19.3.8';
 const RPG_KEY='leveling_v140_rpg';
 
 function loadRpg(){try{return JSON.parse(localStorage.getItem(RPG_KEY)||'{}')||{}}catch(e){return {}}}
@@ -11461,7 +11468,7 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
   function patchBody(){
     const en=lang()==='en',cloud=cloudCards('patch_note');
     return `<div class="v172-feed">${cloud||`<div class="v172-feed-card"><div class="v172-feed-copy">${en?'No new cloud patch note right now.':'Aucune nouvelle note de mise à jour pour le moment.'}</div></div>`}
-    <div class="v172-feed-card"><div class="v172-feed-top"><span class="v172-title-icon v172-blue">${icon('bolt')}</span><div><div class="v172-feed-title">${en?'CURRENT BUILD':'VERSION ACTUELLE'}</div><div class="v172-feed-meta">V17.11.1</div></div></div><div class="v172-feed-list">
+    <div class="v172-feed-card"><div class="v172-feed-top"><span class="v172-title-icon v172-blue">${icon('bolt')}</span><div><div class="v172-feed-title">${en?'CURRENT BUILD':'VERSION ACTUELLE'}</div><div class="v172-feed-meta">V19.3.8</div></div></div><div class="v172-feed-list">
       <div class="v172-feed-item">${icon('program')}<span>${en?'Power days can now be marked absent without awarding XP.':'Les jours Power peuvent maintenant être marqués absents sans donner d’XP.'}</span></div>
       <div class="v172-feed-item">${icon('message')}<span>${en?'Cloud patch notes and developer messages are active.':'Patch notes et messages développeur sont maintenant synchronisés dans le cloud.'}</span></div>
     </div></div></div>`;
@@ -13980,7 +13987,7 @@ window.v17101CloseBroadcastInbox=function(){
 <script id="v182-clean-core-runtime">
 (function(){
 'use strict';
-const VERSION='19.0.0';
+const VERSION='19.3.8';
 const KEY='leveling_v182_core';
 const LEGACY_KEY='leveling_v181_core';
 const DAY=86400000;
@@ -14287,7 +14294,7 @@ window.addEventListener('pageshow',()=>setTimeout(refresh,80));
 <script id="v190-system-coach-runtime">
 (function(){
 'use strict';
-const VERSION='19.2.0',KEY='leveling_v190_system_coach',DAY=86400000;
+const VERSION='19.3.8',KEY='leveling_v190_system_coach',DAY=86400000;
 const esc=v=>String(v??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
 const norm=v=>String(v||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
 const clamp=(n,a,b)=>Math.max(a,Math.min(b,Number(n)||0));
@@ -14360,7 +14367,7 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
 (function(){
 'use strict';
 window.LEVELING_UI_UNIFIED=true;
-const VERSION='19.3.0',DAY=86400000;
+const VERSION='19.3.8',DAY=86400000;
 const norm=v=>String(v||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
 const detailed=()=>{try{return (window.LevelingCoreV182||window.LevelingCoreV181)?.debug?.().state?.sessions||[]}catch(e){return[]}};
 const canonical=()=>{try{const a=window.LevelingProgramV157?.allSessions?.();if(Array.isArray(a)&&a.length)return a}catch(e){}return detailed()};
@@ -14461,6 +14468,35 @@ document.addEventListener('visibilitychange',()=>{if(!document.hidden)setTimeout
 const mo=new MutationObserver(queue);
 document.addEventListener('DOMContentLoaded',()=>{const p=document.getElementById('panel-profile');if(p)mo.observe(p,{childList:true,subtree:true})});
 window.LevelingV1937={decorate,findAnalysisCard};
+})();
+</script>
+
+
+<script id="v1938-stability-runtime">
+(()=>{'use strict';
+const BUILD='19.3.8';
+window.LEVELING_BUILD=BUILD;
+/* Une seule source d'affichage pour les anciens badges de version laissés par les modules historiques. */
+function syncVersionLabels(root=document){
+  const walker=document.createTreeWalker(root,NodeFilter.SHOW_TEXT);
+  const nodes=[]; while(walker.nextNode())nodes.push(walker.currentNode);
+  for(const n of nodes){
+    const p=n.parentElement;if(!p||/SCRIPT|STYLE/.test(p.tagName))continue;
+    const t=n.nodeValue||'';
+    if(/^\s*V?(?:17\.11\.1|18\.6\.0)\s*$/i.test(t)) n.nodeValue=t.replace(/V?(?:17\.11\.1|18\.6\.0)/i,'V19.3.8');
+  }
+}
+let lastDay=new Date().toDateString();
+function resume(){
+  syncVersionLabels();
+  const nowDay=new Date().toDateString();
+  if(nowDay!==lastDay){lastDay=nowDay;try{window.LevelingCoreV182?.refresh?.()}catch(e){}}
+  try{window.LevelingV1937?.decorate?.()}catch(e){}
+}
+document.addEventListener('DOMContentLoaded',()=>{resume();setTimeout(resume,400)});
+document.addEventListener('visibilitychange',()=>{if(!document.hidden)setTimeout(resume,50)});
+window.addEventListener('pageshow',resume);
+window.LevelingV1938={build:BUILD,resume,syncVersionLabels};
 })();
 </script>
 
