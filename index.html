@@ -31,7 +31,7 @@
 
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>LEVELING-APP — V19.2.0 SYSTEM CORE</title>
+    <title>LEVELING-APP — V19.3.7 SYSTEM AI ANALYSIS</title>
     <meta name="theme-color" content="#09090f">
     <meta name="application-name" content="LEVELING-APP">
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -3159,6 +3159,123 @@ main{padding-bottom:calc(72px + env(safe-area-inset-bottom,0px))!important}
 }
 </style>
 
+
+<style id="v1932-canonical-clean-css">
+.v1932-program-title,.v1932-analysis-title{
+ display:flex!important;align-items:center;gap:11px;margin:18px 0 20px!important;
+ font-weight:1000!important;letter-spacing:.015em!important;
+}
+.v1932-program-title{color:#55d9ff!important;text-shadow:0 0 18px rgba(85,217,255,.28)!important}
+.v1932-program-title .ui-icon{width:28px;height:28px;color:#55d9ff}
+.v1932-analysis-title{color:#cf66ff!important;text-shadow:0 0 18px rgba(207,102,255,.28)!important}
+.v1932-analysis-icon{width:42px;height:42px;display:grid;place-items:center;border-radius:13px;
+ border:1px solid rgba(207,102,255,.55);background:rgba(176,72,255,.09);box-shadow:0 0 20px rgba(176,72,255,.12)}
+.v1932-analysis-icon .ui-icon{width:24px;height:24px;color:#cf66ff}
+#history-container.v1932-analysis-card{border-color:rgba(176,72,255,.48)!important;
+ background:linear-gradient(145deg,rgba(22,10,32,.93),rgba(7,11,18,.96))!important;
+ box-shadow:0 0 25px rgba(176,72,255,.08)!important}
+#history-container .v181-history-head{align-items:center}
+#history-container .v181-history-head small{color:#9a91a5!important}
+
+/* Thème mono : les contrôles doivent rester lisibles, jamais donner l'impression d'être désactivés. */
+body[data-theme="mono"] .day-tab{
+ border:1.5px solid #686868!important;background:#0b0b0b!important;color:#ededed!important;
+ box-shadow:inset 0 0 0 1px rgba(255,255,255,.025)!important
+}
+body[data-theme="mono"] .day-tab::before{
+ content:'◇';display:inline-block;margin-right:6px;color:#8c8c8c;font-size:.72em;vertical-align:1px
+}
+body[data-theme="mono"] .day-tab.active{
+ border-color:#ffd54a!important;background:rgba(255,213,74,.09)!important;color:#fff!important;
+ box-shadow:0 0 12px rgba(255,213,74,.16)!important
+}
+body[data-theme="mono"] .day-tab.active::before{content:'◆';color:#ffd54a}
+body[data-theme="mono"] .day-tab.done-badge{border-color:#00df7b!important;background:rgba(0,223,123,.07)!important}
+body[data-theme="mono"] .day-tab.done-badge::before{content:'✓';color:#00ef88;font-weight:1000}
+body[data-theme="mono"] .v140-quest{border-color:rgba(255,213,74,.62)!important}
+body[data-theme="mono"] .v140-quest.done{
+ border-color:#00df7b!important;box-shadow:0 0 12px rgba(0,223,123,.10)!important;opacity:1!important
+}
+body[data-theme="mono"] .v140-quest.done .v140-quest-state.done{
+ color:#9dffca!important;border-color:rgba(0,223,123,.45)!important;background:rgba(0,223,123,.08)!important
+}
+body[data-theme="mono"] .v1932-analysis-title{color:#f0f0f0!important;-webkit-text-fill-color:#f0f0f0!important}
+body[data-theme="mono"] .v1932-analysis-icon{border-color:#777;background:#111;box-shadow:none}
+body[data-theme="mono"] .v1932-analysis-icon .ui-icon{color:#f0f0f0}
+</style>
+
+
+<style id="v1933-data-clean-css">
+/* Une donnée = une surface principale */
+.v1933-goal-row{display:grid!important;grid-template-columns:minmax(0,1fr) 78px!important;gap:9px!important;align-items:center!important}
+.v1933-goal-main{min-width:0}
+.v1933-goal-values{display:flex;flex-wrap:wrap;gap:5px 10px;margin-top:5px}
+.v1933-goal-values span{font-size:.47rem;color:#858997}.v1933-goal-values b{color:#fff;font-size:.54rem}
+.v1933-goal-values .ai,.v1933-goal-total .ai{color:#cf69ff}.v1933-goal-values .ai b{color:#e3a4ff}
+.v1933-goal-row .goal-track{grid-column:1/2;margin-top:2px}
+.v1933-goal-row .goal-input{grid-column:2;grid-row:1/3;width:100%!important}
+.v1933-goal-total{margin-top:10px;padding:12px;border:1px solid rgba(207,105,255,.38);border-radius:12px;background:rgba(177,72,255,.06);display:grid;grid-template-columns:1fr auto;gap:4px 10px;align-items:center}
+.v1933-goal-total>span{font-size:.49rem;color:#8d8796}.v1933-goal-total>b{font-size:.78rem;color:#fff}.v1933-goal-total .ai{grid-column:1/-1}
+.v1933-ai-note{margin-top:8px;padding:9px 10px;border-left:3px solid #b94cff;background:rgba(185,76,255,.05);color:#888391;font-size:.47rem;line-height:1.5}
+.v1933-analysis-kpis .v181-kpi:nth-child(1){border-color:rgba(84,216,255,.35)}
+.v1933-analysis-kpis .v181-kpi:nth-child(4){border-color:rgba(207,105,255,.35)}
+@media(max-width:430px){.v1933-goal-row{grid-template-columns:minmax(0,1fr) 72px!important}.v1933-goal-values{gap:4px 7px}}
+</style>
+
+
+
+
+<style id="v1937-system-analysis-css">
+/* V19.3.7 — SYSTEM AI devient visuellement le coeur de l'analyse */
+#panel-profile .v1932-analysis-title,
+#panel-profile .v1937-analysis-title{
+ color:#d969ff!important;
+ text-shadow:0 0 10px rgba(211,75,255,.58),0 0 28px rgba(83,213,255,.20);
+}
+#panel-profile .v1937-analysis-shell{
+ position:relative; overflow:hidden;
+ border:1px solid rgba(192,69,255,.72)!important;
+ background:
+  radial-gradient(circle at 0 0,rgba(166,42,226,.19),transparent 31%),
+  radial-gradient(circle at 100% 12%,rgba(35,207,255,.10),transparent 29%),
+  linear-gradient(145deg,rgba(17,10,27,.985),rgba(7,12,20,.99))!important;
+ box-shadow:0 0 26px rgba(180,49,255,.15),inset 0 0 36px rgba(59,202,255,.035);
+}
+.v1937-system-analysis-head{
+ position:relative;display:flex;align-items:center;gap:13px;
+ margin:0 0 15px;padding:14px;
+ border:1px solid rgba(198,77,255,.43);border-radius:16px;
+ background:linear-gradient(105deg,rgba(134,35,193,.19),rgba(24,139,171,.10));
+ box-shadow:inset 0 0 24px rgba(182,58,255,.045);
+}
+.v1937-system-analysis-icon{
+ width:46px;height:46px;flex:0 0 46px;display:grid;place-items:center;border-radius:14px;
+ color:#e072ff;border:1px solid rgba(220,104,255,.65);
+ background:rgba(135,37,180,.12);box-shadow:0 0 18px rgba(201,59,255,.25);
+}
+.v1937-system-analysis-icon svg{width:27px;height:27px}
+.v1937-system-analysis-copy{min-width:0;flex:1}
+.v1937-system-analysis-name{
+ color:#f2dcff;font-weight:950;font-size:15px;letter-spacing:.085em;text-transform:uppercase;
+ text-shadow:0 0 12px rgba(210,78,255,.25);
+}
+.v1937-system-analysis-sub{margin-top:4px;color:#75dcff;font-size:11px;line-height:1.35}
+.v1937-system-analysis-live{
+ color:#57edb9;font-size:10px;font-weight:950;padding:6px 8px;border-radius:999px;
+ border:1px solid rgba(87,237,185,.38);background:rgba(30,128,101,.10);
+}
+.v1937-analysis-chips{display:flex;gap:7px;flex-wrap:wrap;margin:0 0 16px}
+.v1937-analysis-chip{
+ padding:6px 9px;border-radius:999px;font-size:10px;font-weight:850;letter-spacing:.02em;
+ color:#a6eaff;border:1px solid rgba(92,207,255,.28);background:rgba(26,134,175,.08);
+}
+.v1937-analysis-chip:nth-child(even){
+ color:#e7a0ff;border-color:rgba(209,91,255,.31);background:rgba(143,38,188,.08);
+}
+/* La ligne technique d'origine reste disponible au moteur, mais n'est plus un texte gris perdu */
+.v1937-original-techline{display:none!important}
+</style>
+
 </head>
 <body data-theme="purple" class="auth-restoring">
 <svg id="premium-icon-sprite" width="0" height="0" aria-hidden="true" focusable="false" style="position:absolute;width:0;height:0;overflow:hidden">
@@ -3498,41 +3615,9 @@ btn.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDef
                     <div class="power-rank-progress"><i></i></div>
                 </div>
 
-                <h2>Statistiques du Chasseur</h2>
-                <div class="profile-card">
-                    <div class="stats-grid">
-                        <div class="stat-box"><div class="stat-value" id="val-weight">85 kg</div><div class="stat-label">Poids</div></div>
-                        <div class="stat-box"><div class="stat-value" id="val-height">175 cm</div><div class="stat-label">Taille</div></div>
-                        <div class="stat-box"><div class="stat-value" id="val-bf">15 %</div><div class="stat-label">Body Fat</div></div>
-                        <div class="stat-box"><div class="stat-value" id="val-workouts">0</div><div class="stat-label">Séances validées</div></div>
-                    </div>
-                    <button class="btn-action" onclick="playSound('click'); switchTab('settings', document.querySelectorAll('.nav-item')[4])">Modifier profil & charges SBD</button>
-                </div>
-
-                <h2>Bilan & Total Hebdo</h2>
-                <div class="profile-card">
-                    <div class="stats-grid" style="grid-template-columns: 1fr;">
-                        <div class="stat-box">
-                            <div class="stat-value" id="val-weekly-tonnage">0 kg</div>
-                            <div class="stat-label">Charge Totale Validée (Bloc Actuel)</div>
-                        </div>
-                    </div>
-                </div>
-
-                <h2 data-i18n="block_history">Historique des blocs</h2>
-                <p class="subtitle" data-i18n="block_history_sub">Tes derniers blocs validés · ouvre l’historique complet si besoin</p>
-                <div class="profile-card" id="history-container">
+                <h2 class="v1932-analysis-title"><span class="v1932-analysis-icon"><svg class="ui-icon" aria-hidden="true"><use href="#ui-chart"></use></svg></span><span>ANALYSE / PROGRESSION</span></h2>
+                <div class="profile-card v1932-analysis-card" id="history-container">
                     <p style="font-size:0.75rem; color:#888; text-align:center;">Aucun historique enregistré pour le moment. Validez vos blocs !</p>
-                </div>
-
-                <h2>Records Personnels (1RM)</h2>
-                <div class="profile-card">
-                    <div class="stats-grid">
-                        <div class="stat-box"><div class="stat-value" id="val-squat">50 kg</div><div class="stat-label">Squat</div></div>
-                        <div class="stat-box"><div class="stat-value" id="val-bench">50 kg</div><div class="stat-label">Bench Press</div></div>
-                        <div class="stat-box"><div class="stat-value" id="val-deadlift">50 kg</div><div class="stat-label">Deadlift</div></div>
-                        <div class="stat-box"><div class="stat-value" id="val-pr-count">0</div><div class="stat-label">PR Battus</div></div>
-                    </div>
                 </div>
             </div>
 
@@ -3563,8 +3648,7 @@ btn.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDef
             </div>
 
             <div id="panel-power" class="panel">
-                <h2> POWER</h2>
-                <p class="subtitle">Choisis ton programme d'entraînement.</p>
+                <h2 class="v1932-program-title"><svg class="ui-icon" aria-hidden="true"><use href="#ui-program"></use></svg><span>CHOISIS TON PROGRAMME</span></h2>
 
                 <div id="power-program-selector" class="power-program-grid">
                     <div class="power-program-card sbd" onclick="playSound('click'); openPowerProgram('sbd')">
@@ -5854,22 +5938,32 @@ function renderTodayDashboard(){
   const btn=el('today-action-btn');if(btn)btn.textContent=c.done>0&&c.pct<100?'▶ REPRENDRE LA SÉANCE':' COMMENCER LA SÉANCE';
 }
 function startOrResumeToday(){initWorkoutSystem();const b=document.querySelector("button.nav-item[onclick*=\"switchTab('workout'\"]");switchTab('workout',b)}
+function v1933AiGoal(k,current){
+  const now=new Date(), end=new Date(now.getFullYear(),11,31,23,59,59), months=Math.max(.5,(end-now)/(30.4375*86400000));
+  const rate={squat:.010,bench:.008,deadlift:.010}[k]||.009;
+  const raw=current*Math.pow(1+rate,months);
+  const step=2.5;
+  return Math.max(current,Math.round(raw/step)*step);
+}
 function renderGoals(){
   ensureV127Data();const box=document.getElementById('goal-rows');if(!box)return;
-  const rows=[['squat','Squat',Number(userData.squat||0),'kg'],['bench','Bench',Number(userData.bench||0),'kg'],['deadlift','Deadlift',Number(userData.deadlift||0),'kg'],['weight','Poids de corps',Number(userData.weight||0),'kg']];
-  box.innerHTML=rows.map(([k,label,current,unit])=>{const goal=Number(userData.goals[k]||0),pct=goal>0?Math.min(100,Math.max(0,current/goal*100)):0;return `<div class="goal-row"><div><div class="goal-name" data-sbd-label="${k}">${label}</div><div class="goal-caption">${current} / ${goal||0} ${unit}</div></div><div class="goal-track"><div class="goal-fill" style="width:${pct.toFixed(1)}%"></div></div><input class="goal-input" id="goal-${k}" type="number" step="${k==='weight'?'0.1':'2.5'}" value="${goal||''}"></div>`}).join('');
+  const rows=[['squat','Squat',Number(userData.squat||0)],['bench','Bench',Number(userData.bench||0)],['deadlift','Deadlift',Number(userData.deadlift||0)]];
+  const year=new Date().getFullYear();
+  const body=rows.map(([k,label,current])=>{
+    const goal=Number(userData.goals[k]||0),ai=v1933AiGoal(k,current),pct=goal>0?Math.min(100,Math.max(0,current/goal*100)):0;
+    return `<div class="goal-row v1933-goal-row">
+      <div class="v1933-goal-main"><div class="goal-name" data-sbd-label="${k}">${label}</div>
+      <div class="v1933-goal-values"><span>ACTUEL <b>${current} kg</b></span><span>OBJECTIF <b>${goal||'—'}${goal?' kg':''}</b></span><span class="ai">SYSTEM AI · FIN ${year} <b>${ai} kg</b></span></div></div>
+      <div class="goal-track"><div class="goal-fill" style="width:${pct.toFixed(1)}%"></div></div>
+      <input class="goal-input" id="goal-${k}" aria-label="Objectif ${label}" type="number" step="2.5" value="${goal||''}">
+    </div>`;
+  }).join('');
+  const curTotal=rows.reduce((a,x)=>a+x[2],0),goalTotal=rows.reduce((a,x)=>a+Number(userData.goals[x[0]]||0),0),aiTotal=rows.reduce((a,x)=>a+v1933AiGoal(x[0],x[2]),0);
+  box.innerHTML=body+`<div class="v1933-goal-total"><span>TOTAL SBD</span><b>${curTotal} kg</b><span>Objectif : ${goalTotal||'—'}${goalTotal?' kg':''}</span><span class="ai">SYSTEM AI fin ${year} : ${aiTotal} kg</span></div>
+  <div class="v1933-ai-note">Projection indicative recalculée par SYSTEM AI à partir de tes charges actuelles. Elle évoluera avec tes séances détaillées, e1RM, RIR et récupération.</div>`;
 }
-function saveGoalsFromUI(){ensureV127Data();['squat','bench','deadlift','weight'].forEach(k=>{const v=Number(document.getElementById('goal-'+k)?.value);if(v>0)userData.goals[k]=v});saveToLocalStorage();if(typeof scheduleCloudSaveImmediate==='function')scheduleCloudSaveImmediate();renderGoals();playSound('success')}
-function renderProfileV2(){
-  ensureV127Data();const total=Number(userData.squat||0)+Number(userData.bench||0)+Number(userData.deadlift||0),rank=getSBDRank(total,Number(userData.weight||0));
-  renderAvatarInto(document.getElementById('profile-v2-avatar'));const set=(id,v)=>{const e=document.getElementById(id);if(e)e.textContent=v};
-  set('profile-v2-name',userData.playerName||userData.name||'Joueur');set('profile-v2-rank',rank.name);set('profile-v2-program',`Programme actif : ${getProgramMeta(activeProgramKey)?.title||activeProgramKey}`);
-  set('pv2-level',userData.level||1);set('pv2-weight',`${userData.weight||0} kg`);set('pv2-height',`${userData.height||0} cm`);set('pv2-squat',`${userData.squat||0} kg`);set('pv2-bench',`${userData.bench||0} kg`);set('pv2-dead',`${userData.deadlift||0} kg`);set('pv2-total',`${total} kg`);set('pv2-workouts',userData.workoutsCompleted||0);set('pv2-prs',userData.prCount||0);
-  const best=document.getElementById('pv2-best-prs'),entries=Object.entries(userData.prRecords||{}).sort((a,b)=>(b[1].e1rm||0)-(a[1].e1rm||0)).slice(0,6);
-  if(best)best.innerHTML=entries.length?entries.map(([n,r])=>`<div class="pr-item"><span>${escV127(n)}</span><b>${Number(r.e1rm||0).toFixed(1)} kg e1RM</b></div>`).join(''):'<div style="font-size:.64rem;color:#777">Aucun PR automatique pour le moment.</div>';
-  const recent=document.getElementById('pv2-recent-prs'),prs=userData.recentPRs||[];if(recent)recent.innerHTML=prs.length?prs.slice(0,6).map(p=>`<div class="pr-item"><span>${escV127(p.exercise)} · ${p.weight} kg × ${p.reps}</span><b>${new Date(p.date).toLocaleDateString('fr-FR')}</b></div>`).join(''):'<div style="font-size:.64rem;color:#777">Aucun PR récent.</div>';
-  const hist=document.getElementById('pv2-history');if(hist)hist.textContent=`${workoutHistory?.length||0} bloc(s) enregistré(s) · ${typeof v10!=='undefined'?(v10.sessions?.length||0):0} séance(s) rapide(s) · ${Number(userData.trophies||0)} trophée(s).`;
-}
+function saveGoalsFromUI(){ensureV127Data();['squat','bench','deadlift'].forEach(k=>{const v=Number(document.getElementById('goal-'+k)?.value);if(v>0)userData.goals[k]=v});saveToLocalStorage();if(typeof scheduleCloudSaveImmediate==='function')scheduleCloudSaveImmediate();renderGoals();playSound('success')}
+
 function openProfileV2(){renderProfileV2();document.getElementById('profile-v2-modal')?.classList.add('show')}
 function closeProfileV2(){document.getElementById('profile-v2-modal')?.classList.remove('show')}
 setTimeout(()=>{try{ensureV127Data();renderTodayDashboard();renderGoals()}catch(e){console.warn('V12.7 UI',e)}},180);
@@ -6150,7 +6244,7 @@ function setAppUnlockedShell(){
   document.getElementById('app-container')?.classList.remove('auth-locked');
 }
 
-const APP_VERSION='19.2.0-SYSTEM-CORE';
+const APP_VERSION='19.3.7-SYSTEM-AI-ANALYSIS';
 const ACCOUNT_LOCAL_KEYS=['solo_leveling_user','solo_leveling_smart_refs','solo_leveling_body_hist','solo_leveling_inv','solo_leveling_block','solo_leveling_day','solo_leveling_state','solo_leveling_custom_sets','solo_leveling_history','solo_leveling_active_program','solo_leveling_program_states','solo_leveling_program_custom_sets','solo_leveling_custom_program','leveling_last_local_save','leveling_last_cloud_sync','leveling_v10','leveling_v181_core','leveling_v182_core'];
 function clearLevelingAccountLocalData(){
   try{ACCOUNT_LOCAL_KEYS.forEach(k=>localStorage.removeItem(k));sessionStorage.removeItem('leveling_pending_license')}catch(e){console.warn('Local account cleanup:',e)}
@@ -8068,31 +8162,12 @@ function v1352OpenProgress(type){
  m.style.display='flex';
 }
 function v1352CleanProfile(){
- const p=document.getElementById('panel-profile');if(!p||document.getElementById('v1352-progress-hub'))return;
- const hub=document.createElement('div');hub.id='v1352-progress-hub';hub.className='v1352-progress-hub';
- hub.innerHTML=`<button class="v1352-progress-btn" onclick="v1352OpenProgress('body')"><b> Poids & Body Fat</b><small>Courbes physiques</small></button>
- <button class="v1352-progress-btn" onclick="v1352OpenProgress('sbd')"><b> Charges SBD</b><small>Courbes Squat · Bench · Deadlift</small></button>
- <button class="v1352-progress-btn" onclick="v1352OpenProgress('volume')"><b> Volume & séances</b><small>Activité d'entraînement</small></button>
- <button class="v1352-progress-btn" onclick="v1352OpenProgress('pr')"><b>Records</b><small>PR et références</small></button>`;
- /* V16.0.1 — emplacement canonique dès la création.
-    Ces 4 cartes étaient auparavant créées après le hub XP, puis déplacées
-    sous Objectifs seulement lors d'un rendu Profil ultérieur. Résultat :
-    elles apparaissaient en haut après F5 puis en bas après un changement
-    d'onglet. Elles naissent maintenant directement à leur place finale. */
- const goals=p.querySelector('.goal-card');
- if(goals) goals.after(hub);
- else {
-   const rankHub=document.getElementById('v135-rank-hub');
-   (rankHub||p.querySelector('h2'))?.after(hub);
- }
- /* cache les gros blocs de stats/courbes devenus accessibles par les cartes */
- ['Statistiques du Chasseur','Bilan & Total Hebdo','Records Personnels'].forEach(txt=>{
-   [...p.querySelectorAll('h2')].filter(h=>h.textContent.includes(txt)).forEach(h=>{h.classList.add('v1352-profile-clean-hidden');let n=h.nextElementSibling;if(n)n.classList.add('v1352-profile-clean-hidden')})
- });
- const oldNav=document.getElementById('v135-profile-nav');if(oldNav)oldNav.querySelectorAll('button').forEach(b=>{if(b.textContent.includes('Progression'))b.onclick=()=>hub.scrollIntoView({behavior:'smooth',block:'center'})});
+ const old=document.getElementById('v1352-progress-hub');
+ if(old)old.remove();
+ /* V19.3.2: les anciennes tuiles statistiques ne sont plus une surface Accueil.
+    SYSTEM AI et ANALYSE / PROGRESSION utilisent directement les mêmes données. */
 }
 
-/* Notifications */
 function v1352NotifPrefs(){
  if(!userData.notificationPrefs)userData.notificationPrefs={enabled:false,dm:true,quests:true,workout:true,streak:true};
  return userData.notificationPrefs;
@@ -14000,7 +14075,11 @@ function coachSummary(){
   return`${mode} · PV ${pv===null?'—':pv}/100 · ${rirTxt} · ${done}/${total} séries${skipTxt}. ${mode==='DELOAD'?'Baisse la charge et le volume.':mode==='ALLÉGÉ'?'Ne force aucune hausse aujourd’hui.':mode==='OPTIMAL'?'Progression possible si l’échauffement confirme.':'Garde la charge prévue et progresse proprement.'}`;
 }
 function daysSinceExercise(regex){let t=0;state.sessions.forEach(s=>{if(s.exercises?.some(e=>regex.test(String(e.name||''))))t=Math.max(t,parseDate(s.date))});return t?Math.floor((Date.now()-t)/DAY):999}
-function buildQuests(base){const r=currentRecovery(),q=[];const day=localDay();if(!r.complete)q.push({id:'recovery',icon:'heart',title:'Scanner ta récupération',sub:'Renseigne sommeil + ressenti pour activer les PV et le Coach.',xp:40,done:false,status:'À faire'});else if(Number(r.score)<60)q.push({id:'recovery',icon:'heart',title:'Séance contrôlée',sub:`PV ${r.score}/100 : termine la séance sans aller à l’échec.`,xp:70,done:!!base.validated,status:base.validated?'Terminée':'En cours'});
+function buildQuests(base){const r=currentRecovery(),q=[];const day=localDay(),score=Number(r.score||r.pv||0),hasRecovery=!!r.complete||score>0;
+  q.push(hasRecovery
+    ? {id:'recovery',icon:'heart',title:'Scanner ta récupération',sub:`PV ${score}/100 enregistrés aujourd’hui. SYSTEM AI a mis à jour ton état.`,xp:40,done:true,status:'Terminée'}
+    : {id:'recovery',icon:'heart',title:'Scanner ta récupération',sub:'Renseigne sommeil + ressenti pour activer les PV et SYSTEM AI.',xp:40,done:false,status:'À faire'});
+  if(hasRecovery&&score<60)q.push({id:'controlled',icon:'heart',title:'Séance contrôlée',sub:`PV ${score}/100 : termine la séance sans aller à l’échec.`,xp:70,done:!!base.validated,status:base.validated?'Terminée':'En cours'});
   const gaps=[['bench',/bench|couch/i,daysSinceExercise(/bench|couch/i)],['squat',/squat/i,daysSinceExercise(/squat/i)],['deadlift',/dead|soulev/i,daysSinceExercise(/dead|soulev/i)]].sort((a,b)=>b[2]-a[2]);const main=gaps[0];const currentNames=(getCurrentDay()?.exercises||[]).map(x=>String(x.name||'')).join(' ');if(main[2]>=5&&main[1].test(currentNames))q.push({id:'mainlift-'+main[0],icon:'bolt',title:`Priorité ${main[0]==='bench'?'Bench':main[0]==='squat'?'Squat':'Deadlift'}`,sub:`${main[2]} jour(s) depuis le dernier travail enregistré : garde 1–3 RIR sur les séries principales.`,xp:90,done:!!base.validated,status:base.validated?'Terminée':'En cours'});
   q.push({id:'sets15',icon:'spark',title:'Volume de qualité',sub:`${base.sets}/15 séries validées · renseigne le RIR sur les séries importantes.`,xp:60,done:base.sets>=15,status:base.sets>=15?'Terminée':base.sets>0?'En cours':'À faire'});
   if(q.length<3)q.push({id:'session',icon:'spark',title:'Finir ta séance',sub:'Valide la séance une fois toutes les séries terminées.',xp:120,done:!!base.validated,status:base.validated?'Terminée':'À faire'});return q.slice(0,3)}
@@ -14008,7 +14087,24 @@ function periodSessions(start,end){return canonicalSessions().filter(x=>{const t
 function sum(a,fn){return a.reduce((s,x)=>s+Number(fn(x)||0),0)}
 function pct(a,b){return b?((a-b)/b*100):a?100:0}
 function svgSeries(range){const cut=Date.now()-range*DAY;const colors={Squat:'#ff2f92',Bench:'#4a8cff',Deadlift:'#ff3159'};const names=['Squat','Bench','Deadlift'];const all=[];names.forEach(name=>exerciseHistory(name).filter(x=>parseDate(x.date)>=cut).forEach(x=>all.push({name,t:parseDate(x.date),v:adjustedE1RM(x)})));if(!all.length)return'<div style="padding:22px;text-align:center;color:#666;font-size:.52rem">Pas encore assez de données SBD.</div>';const minT=Math.min(...all.map(x=>x.t)),maxT=Math.max(...all.map(x=>x.t)),minV=Math.min(...all.map(x=>x.v)),maxV=Math.max(...all.map(x=>x.v));const W=520,H=112,p=12,x=t=>p+(W-2*p)*(maxT===minT?.5:(t-minT)/(maxT-minT)),y=v=>H-p-(H-2*p)*(maxV===minV?.5:(v-minV)/(maxV-minV));const lines=names.map(name=>{const a=all.filter(z=>z.name===name).sort((a,b)=>a.t-b.t);if(!a.length)return'';return`<polyline fill="none" stroke="${colors[name]}" stroke-width="2.4" points="${a.map(z=>`${x(z.t).toFixed(1)},${y(z.v).toFixed(1)}`).join(' ')}"/>${a.map(z=>`<circle cx="${x(z.t).toFixed(1)}" cy="${y(z.v).toFixed(1)}" r="2.6" fill="${colors[name]}"/>`).join('')}`}).join('');return`<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="none"><path d="M12 12V100H508" stroke="#252832" fill="none"/>${lines}</svg>`}
-function renderHistory(container){if(!container)return false;container.classList.add('v181-history');const now=Date.now(),d30=30*DAY,cur=periodSessions(now-d30,now+1),prev=periodSessions(now-2*d30,now-d30),curVol=sum(cur,x=>x.tonnage),prevVol=sum(prev,x=>x.tonnage),delta=pct(curVol,prevVol),freq=cur.length/(30/7),range=state.historyRange||30,sbd=Number(userData?.squat||0)+Number(userData?.bench||0)+Number(userData?.deadlift||0),weight=Number(userData?.weight||0);container.innerHTML=`<div class="v181-history-head"><div><b>Progression avancée</b><small>charge, volume, fréquence, RIR et fatigue contextuelle</small></div><div class="v181-range">${[30,60,120].map(x=>`<button class="${range===x?'active':''}" onclick="LevelingCoreV181.setHistoryRange(${x})">${x}J</button>`).join('')}</div></div><div class="v181-kpis"><div class="v181-kpi"><span>Poids</span><b>${weight?weight.toFixed(1)+' kg':'—'}</b><em>actuel</em></div><div class="v181-kpi"><span>Tonnage 30j</span><b>${Math.round(curVol).toLocaleString('fr-FR')} kg</b><em class="${delta<0?'down':'up'}">${delta>=0?'+':''}${delta.toFixed(1)} % vs 30j</em></div><div class="v181-kpi"><span>Fréquence</span><b>${freq.toFixed(1)}/sem.</b><em>${cur.length} séances</em></div><div class="v181-kpi"><span>Total SBD</span><b>${sbd} kg</b><em>profil actuel</em></div></div><div class="v181-chart"><div class="v181-chart-head"><b>Courbes SBD · e1RM contextualisé</b><small>${range} derniers jours</small></div>${svgSeries(range)}<div class="v181-legend"><span style="color:#ff2f92"><i></i>Squat</span><span style="color:#4a8cff"><i></i>Bench</span><span style="color:#ff3159"><i></i>Deadlift</span></div></div><div class="v181-compare"><div><span>30 derniers jours</span><b>${cur.length} séances</b><small>${Math.round(curVol).toLocaleString('fr-FR')} kg déplacés</small></div><div><span>30 jours précédents</span><b>${prev.length} séances</b><small>${Math.round(prevVol).toLocaleString('fr-FR')} kg déplacés</small></div></div><div class="v181-statusline"><strong>${state.sessions.length}</strong> séance(s) capturée(s) avec détail d’exercices depuis V18.2. Les anciennes séances restent visibles dans l’historique classique.</div>`;return true}
+function renderHistory(container){
+  if(!container)return false;
+  container.classList.add('v181-history');
+  const now=Date.now(),d30=30*DAY,cur=periodSessions(now-d30,now+1),prev=periodSessions(now-2*d30,now-d30);
+  const curVol=sum(cur,x=>x.tonnage),prevVol=sum(prev,x=>x.tonnage),delta=pct(curVol,prevVol),freq=cur.length/(30/7),range=state.historyRange||30;
+  const detailed=cur.filter(x=>Array.isArray(x.exercises)&&x.exercises.length),allDetailed=canonicalSessions().filter(x=>Array.isArray(x.exercises)&&x.exercises.length);
+  container.innerHTML=`<div class="v181-history-head"><div><small>Charge · volume · fréquence · e1RM · RIR · fatigue contextuelle</small></div><div class="v181-range">${[30,60,120].map(x=>`<button class="${range===x?'active':''}" onclick="LevelingCoreV181.setHistoryRange(${x})">${x}J</button>`).join('')}</div></div>
+  <div class="v181-kpis v1933-analysis-kpis">
+    <div class="v181-kpi"><span>Séances 30j</span><b>${cur.length}</b><em>historique unifié</em></div>
+    <div class="v181-kpi"><span>Tonnage 30j</span><b>${Math.round(curVol).toLocaleString('fr-FR')} kg</b><em class="${delta<0?'down':'up'}">${delta>=0?'+':''}${delta.toFixed(1)} % vs 30j</em></div>
+    <div class="v181-kpi"><span>Fréquence</span><b>${freq.toFixed(1)}/sem.</b><em>sur les 30 derniers jours</em></div>
+    <div class="v181-kpi"><span>Données détaillées</span><b>${detailed.length}/${cur.length}</b><em>séances exploitables par l’IA</em></div>
+  </div>
+  <div class="v181-chart"><div class="v181-chart-head"><b>Courbes SBD · e1RM contextualisé</b><small>${range} derniers jours</small></div>${svgSeries(range)}<div class="v181-legend"><span style="color:#ff2f92"><i></i>Squat</span><span style="color:#4a8cff"><i></i>Bench</span><span style="color:#ff3159"><i></i>Deadlift</span></div></div>
+  <div class="v181-compare"><div><span>30 derniers jours</span><b>${cur.length} séances</b><small>${Math.round(curVol).toLocaleString('fr-FR')} kg déplacés</small></div><div><span>30 jours précédents</span><b>${prev.length} séances</b><small>${Math.round(prevVol).toLocaleString('fr-FR')} kg déplacés</small></div></div>
+  <div class="v181-statusline">${allDetailed.length?`<strong>${allDetailed.length}</strong> séance(s) possèdent le détail exercices/séries pour les analyses avancées. Les autres validations restent comptées dans les totaux.`:`Tes validations historiques sont bien comptées. Les courbes e1RM/RIR deviendront plus précises avec les prochaines séances enregistrées en détail.`}</div>`;
+  return true
+}
 function setHistoryRange(n){state.historyRange=[30,60,120].includes(Number(n))?Number(n):30;save();renderHistory(document.getElementById('history-container'))}
 
 function periodBounds(kind='week',offset=0){
@@ -14250,43 +14346,123 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
 </script>
 
 
-<style id="v192-unified-system-css">
-/* V19.2 — une seule surface SYSTEM AI sur l'accueil. Les moteurs historiques restent actifs en arrière-plan. */
+<style id="v193-system-ai-v2-css">
+/* V19.3 — SYSTEM AI est l'unique surface de coaching. XP/rangs restent indépendants. */
 #v190-coach-today,#v190-muscle-card,#v190-achievements-card,#v190-goals-card,#v181-ai-card,#v140-sbd,#v140-coach,#v181-history-host,#v1622-recovery{display:none!important}
-#v192-system-hub{margin:12px 0;border:1px solid rgba(178,77,255,.5);border-radius:20px;padding:14px;background:radial-gradient(circle at 12% 0,rgba(170,44,255,.18),transparent 38%),linear-gradient(145deg,#0b0e18,#090b11);box-shadow:0 0 28px rgba(154,57,255,.1)}
-.v192-hub-head{display:flex;justify-content:space-between;align-items:center;gap:10px}.v192-brand{display:flex;align-items:center;gap:9px}.v192-brand .ui-icon{color:#c66cff;filter:drop-shadow(0 0 7px rgba(198,108,255,.5))}.v192-brand b{display:block;font-size:.82rem;letter-spacing:.09em}.v192-brand small{display:block;color:#8f96a8;font-size:.52rem;margin-top:2px}.v192-live{font-size:.5rem;color:#55f4bd;border:1px solid rgba(85,244,189,.35);border-radius:999px;padding:4px 7px;font-weight:1000}.v192-kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;margin:11px 0}.v192-kpi{padding:9px 7px;border-radius:12px;background:rgba(255,255,255,.025);border:1px solid rgba(255,255,255,.075);min-width:0}.v192-kpi span{display:block;color:#858da0;font-size:.49rem;white-space:nowrap}.v192-kpi b{display:block;margin-top:4px;font-size:.7rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.v192-kpi.rec b{color:#55f4bd}.v192-kpi.sbd b{color:#ff5d76}.v192-kpi.prog b{color:#54c8ff}.v192-kpi.mode b{color:#d98cff}.v192-advice{font-size:.61rem;line-height:1.55;color:#c7cbd5;border-left:2px solid #b24dff;padding-left:9px}.v192-hub-actions{display:grid;grid-template-columns:1fr auto;gap:8px;margin-top:11px}.v192-open,.v192-checkin{border-radius:12px;padding:10px;border:1px solid rgba(178,77,255,.45);background:linear-gradient(135deg,rgba(178,77,255,.17),rgba(0,195,255,.09));color:#fff;font-size:.58rem;font-weight:1000;letter-spacing:.05em}.v192-checkin{border-color:rgba(85,244,189,.32);background:rgba(85,244,189,.06)}
-#v192-system-modal{position:fixed;inset:0;z-index:17000;display:none;align-items:center;justify-content:center;padding:12px;background:rgba(0,0,0,.91)}#v192-system-modal.show{display:flex}.v192-modal{width:min(760px,97vw);max-height:94vh;overflow:hidden;border:1px solid rgba(178,77,255,.45);border-radius:20px;background:#080a10;box-shadow:0 0 50px rgba(157,55,255,.14);display:flex;flex-direction:column}.v192-modal-head{display:flex;justify-content:space-between;align-items:flex-start;padding:14px}.v192-modal-head b{font-size:.86rem;letter-spacing:.08em}.v192-modal-head small{display:block;color:#81899a;font-size:.52rem;margin-top:3px}.v192-tabs{display:flex;gap:6px;overflow-x:auto;padding:0 12px 10px;scrollbar-width:none}.v192-tabs::-webkit-scrollbar{display:none}.v192-tab{flex:0 0 auto;border:1px solid #292e3b;background:#0c1018;color:#9ca4b4;border-radius:10px;padding:8px 10px;font-size:.53rem;font-weight:1000}.v192-tab.active{color:#fff;border-color:#a94cff;background:rgba(169,76,255,.13);box-shadow:0 0 12px rgba(169,76,255,.12)}.v192-content{overflow:auto;padding:0 12px 14px}.v192-pane{display:none}.v192-pane.active{display:block}.v192-panel{border:1px solid #242936;background:#0b0e15;border-radius:14px;padding:11px;margin-bottom:8px}.v192-panel h4{margin:0 0 8px;font-size:.62rem;color:#d28aff}.v192-panel p,.v192-panel small{font-size:.58rem;line-height:1.55;color:#aeb5c2}.v192-mini-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:7px}.v192-mini{border:1px solid #242936;border-radius:11px;padding:9px;background:#090c12}.v192-mini span{display:block;font-size:.48rem;color:#7f8798}.v192-mini b{display:block;margin-top:3px;font-size:.67rem}.v192-chat{min-height:170px;max-height:300px;overflow:auto;border:1px solid #242936;border-radius:13px;padding:9px;background:#06080d}.v192-chat .v190-msg{font-size:.62rem}.v192-input{display:flex;gap:7px;margin-top:8px}.v192-input input{flex:1;min-width:0;background:#0c1017;border:1px solid #2b3040;color:#fff;border-radius:11px;padding:10px;font-size:.62rem}.v192-input button,.v192-program-btn{border:1px solid rgba(169,76,255,.4);background:rgba(169,76,255,.1);color:#fff;border-radius:11px;padding:9px 11px;font-size:.55rem;font-weight:1000}.v192-bars{display:grid;gap:7px}.v192-barline{display:grid;grid-template-columns:88px 1fr 36px;gap:7px;align-items:center;font-size:.52rem}.v192-track{height:7px;background:#171b24;border-radius:99px;overflow:hidden}.v192-track i{display:block;height:100%;background:linear-gradient(90deg,#55cfff,#c05cff);border-radius:inherit}
-@media(max-width:560px){.v192-kpis{grid-template-columns:repeat(2,1fr)}.v192-hub-actions{grid-template-columns:1fr}.v192-mini-grid{grid-template-columns:1fr 1fr}}
+#v193-system-hub{margin:12px 0;border:1px solid rgba(176,72,255,.55);border-radius:22px;padding:15px;background:radial-gradient(circle at 8% 0,rgba(182,64,255,.2),transparent 38%),radial-gradient(circle at 95% 90%,rgba(0,218,255,.09),transparent 42%),linear-gradient(145deg,#0b0d17,#080b11);box-shadow:0 0 30px rgba(164,60,255,.13);overflow:hidden;position:relative}
+.v193-head{display:flex;align-items:center;justify-content:space-between;gap:10px}.v193-brand{display:flex;align-items:center;gap:10px}.v193-brand .ui-icon{color:#c05cff;filter:drop-shadow(0 0 8px rgba(192,92,255,.55))}.v193-brand b{display:block;font-size:.82rem;letter-spacing:.11em}.v193-brand small{display:block;color:#8e93a2;font-size:.48rem;margin-top:3px}.v193-live{font-size:.48rem;font-weight:1000;color:#54f1ba;border:1px solid rgba(84,241,186,.38);padding:5px 8px;border-radius:999px}
+.v193-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-top:12px}.v193-kpi{border:1px solid rgba(255,255,255,.09);border-radius:14px;padding:10px;background:rgba(255,255,255,.025);min-height:62px}.v193-kpi span{display:block;font-size:.48rem;color:#858b99}.v193-kpi b{display:block;margin-top:4px;font-size:.74rem}.v193-kpi.pv b{color:var(--pv-color,#55efb1)}.v193-kpi.sbd b{color:#ff5b84}.v193-kpi.sessions b{color:#65d9ff}.v193-kpi.mode b{color:#d886ff}
+.v193-pvbar{height:6px;background:#171a22;border-radius:99px;overflow:hidden;margin-top:7px}.v193-pvbar i{display:block;height:100%;width:var(--pv,0%);background:var(--pv-color,#55efb1);border-radius:inherit;box-shadow:0 0 10px var(--pv-color,#55efb1)}.v193-advice{margin:12px 0;padding-left:10px;border-left:3px solid #b84dff;color:#c9ccd5;font-size:.61rem;line-height:1.5}.v193-actions{display:grid;gap:8px}.v193-actions button{border-radius:13px;padding:11px;font-size:.58rem;font-weight:1000;letter-spacing:.03em}.v193-open{border:1px solid rgba(176,72,255,.5);background:linear-gradient(110deg,rgba(176,72,255,.17),rgba(0,210,255,.09));color:#fff}.v193-check{border:1px solid rgba(72,224,188,.34);background:rgba(72,224,188,.06);color:#fff}
+#v193-system-modal{position:fixed;inset:0;z-index:17500;display:none;align-items:center;justify-content:center;padding:10px;background:rgba(0,0,0,.92)}#v193-system-modal.show{display:flex}.v193-modal{width:min(780px,98vw);max-height:95vh;display:flex;flex-direction:column;overflow:hidden;border:1px solid rgba(176,72,255,.5);border-radius:21px;background:#07090e;box-shadow:0 0 55px rgba(160,50,255,.17)}.v193-modal-head{display:flex;justify-content:space-between;align-items:flex-start;padding:14px}.v193-modal-head b{font-size:.86rem;letter-spacing:.09em}.v193-modal-head small{display:block;color:#7f8796;font-size:.5rem;margin-top:4px}.v193-tabs{display:flex;gap:6px;overflow-x:auto;padding:0 12px 10px;scrollbar-width:none}.v193-tabs::-webkit-scrollbar{display:none}.v193-tab{flex:0 0 auto;border:1px solid #292d38;background:#0c0f16;color:#9299a8;border-radius:10px;padding:8px 10px;font-size:.51rem;font-weight:1000}.v193-tab.active{color:#fff;border-color:#b64cff;background:rgba(182,76,255,.14)}.v193-content{overflow:auto;padding:0 12px 14px}.v193-pane{display:none}.v193-pane.active{display:block}.v193-panel{border:1px solid #242834;background:#0a0d13;border-radius:14px;padding:11px;margin-bottom:8px}.v193-panel h4{margin:0 0 9px;font-size:.62rem;color:#d58cff}.v193-panel p,.v193-panel small{font-size:.58rem;line-height:1.55;color:#aeb4c0}.v193-mini-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}.v193-mini{border:1px solid #242834;border-radius:11px;padding:9px;background:#080b10}.v193-mini span{display:block;font-size:.46rem;color:#7d8492}.v193-mini b{display:block;margin-top:4px;font-size:.65rem}.v193-chat{min-height:180px;max-height:310px;overflow:auto;border:1px solid #242834;border-radius:13px;padding:9px;background:#05070b}.v193-input{display:flex;gap:7px;margin-top:8px}.v193-input input{flex:1;min-width:0;background:#0b0f16;border:1px solid #2c3040;color:#fff;border-radius:11px;padding:10px;font-size:.62rem}.v193-input button,.v193-btn{border:1px solid rgba(182,76,255,.42);background:rgba(182,76,255,.1);color:#fff;border-radius:11px;padding:9px 11px;font-size:.54rem;font-weight:1000}.v193-bars{display:grid;gap:7px;margin-top:9px}.v193-barline{display:grid;grid-template-columns:88px 1fr 34px;gap:7px;align-items:center;font-size:.5rem}.v193-track{height:7px;background:#171a22;border-radius:99px;overflow:hidden}.v193-track i{display:block;height:100%;background:linear-gradient(90deg,#55d9ff,#c05cff);border-radius:inherit}.v193-source{margin-top:8px;color:#676e7b!important;font-size:.46rem!important}.v193-quest{display:grid;grid-template-columns:1fr auto;gap:8px;border:1px solid #252936;border-radius:11px;padding:9px;margin-top:7px}.v193-quest b{font-size:.58rem}.v193-quest small{display:block;margin-top:3px}.v193-xp{color:#ffd45a;font-weight:1000;font-size:.55rem}.v193-quick{display:flex;gap:6px;overflow:auto;margin:8px 0}.v193-quick button{flex:0 0 auto;border:1px solid #2a3040;background:#0c121b;color:#fff;border-radius:9px;padding:8px;font-size:.52rem;font-weight:900}
+@media(max-width:520px){.v193-modal{width:100%;max-height:96vh}.v193-mini-grid{grid-template-columns:1fr 1fr}}
 </style>
-<script id="v192-unified-system-runtime">
+<script id="v193-system-ai-v2-runtime">
 (function(){
 'use strict';
 window.LEVELING_UI_UNIFIED=true;
-const DAY=86400000;
+const VERSION='19.3.0',DAY=86400000;
 const norm=v=>String(v||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
-function api(){return window.LevelingV190}
-function core(){return window.LevelingCoreV182||window.LevelingCoreV181}
-function profile(){return window.userData||{}}
-function coach(){try{return api()?.debug?.().coach||{pv:0,mode:'NORMAL',advice:'Complète ton check-in pour obtenir une recommandation.'}}catch(e){return{pv:0,mode:'NORMAL',advice:'Analyse disponible après synchronisation.'}}}
-function sessions(){try{return core()?.debug?.().state?.sessions||[]}catch(e){return[]}}
-function programName(){try{return getProgramMeta?.(activeProgramKey)?.title||String(activeProgramKey||'Programme')}catch(e){return'Programme'}}
-function sbd(){const u=profile();return Number(u.squat||0)+Number(u.bench||0)+Number(u.deadlift||0)}
-function ensureHub(){const panel=document.getElementById('panel-profile');if(!panel)return;let h=document.getElementById('v192-system-hub');if(!h){h=document.createElement('section');h.id='v192-system-hub';const rank=document.getElementById('v135-rank-hub');const quests=document.getElementById('v140-quests');if(quests?.parentNode===panel)quests.after(h);else if(rank?.parentNode===panel)rank.after(h);else panel.prepend(h)}renderHub(h)}
-function renderHub(h){const c=coach(),ss=sessions(),m=ss.filter(x=>Date.parse(x.date||x.isoDate||'')>=Date.now()-30*DAY);h.innerHTML=`<div class="v192-hub-head"><div class="v192-brand"><svg class="ui-icon lg"><use href="#ui-brain"></use></svg><div><b>SYSTEM AI</b><small>COACH CENTRAL · PROGRESSION · RÉCUPÉRATION</small></div></div><span class="v192-live">LIVE</span></div><div class="v192-kpis"><div class="v192-kpi rec"><span>READINESS</span><b>${Math.round(c.pv||0)}/100</b></div><div class="v192-kpi sbd"><span>SBD</span><b>${sbd()} KG</b></div><div class="v192-kpi prog"><span>30 JOURS</span><b>${m.length} SÉANCES</b></div><div class="v192-kpi mode"><span>MODE</span><b>${c.mode||'NORMAL'}</b></div></div><div class="v192-advice">${String(c.advice||'').replace(/[<>]/g,'')}</div><div class="v192-hub-actions"><button class="v192-open" onclick="LevelingSystemAI.open()">OUVRIR SYSTEM AI</button><button class="v192-checkin" onclick="LevelingV190.openReadiness()">CHECK-IN</button></div>`}
-function ensureModal(){let d=document.getElementById('v192-system-modal');if(d)return d;document.getElementById('v190-system-modal')?.remove();d=document.createElement('div');d.id='v192-system-modal';d.innerHTML=`<div class="v192-modal"><div class="v192-modal-head"><div><b>SYSTEM AI · SYSTEM CORE</b><small>Une seule interface · tous les moteurs LEVELING-APP</small></div><button class="v190-close" onclick="LevelingSystemAI.close()">×</button></div><div class="v192-tabs"><button class="v192-tab active" data-v192="today">AUJOURD'HUI</button><button class="v192-tab" data-v192="coach">COACH</button><button class="v192-tab" data-v192="progress">PROGRESSION</button><button class="v192-tab" data-v192="recovery">RÉCUPÉRATION</button><button class="v192-tab" data-v192="history">HISTORIQUE</button><button class="v192-tab" data-v192="goals">OBJECTIFS</button><button class="v192-tab" data-v192="season">SAISON</button><button class="v192-tab" data-v192="program">PROGRAMME</button></div><div class="v192-content"><div class="v192-pane active" data-pane="today"></div><div class="v192-pane" data-pane="coach"></div><div class="v192-pane" data-pane="progress"></div><div class="v192-pane" data-pane="recovery"></div><div class="v192-pane" data-pane="history"></div><div class="v192-pane" data-pane="goals"></div><div class="v192-pane" data-pane="season"></div><div class="v192-pane" data-pane="program"></div></div></div>`;d.addEventListener('click',e=>{if(e.target===d)LevelingSystemAI.close();const b=e.target.closest?.('.v192-tab');if(b)setTab(b.dataset.v192)});document.body.appendChild(d);return d}
-function setTab(name){document.querySelectorAll('.v192-tab').forEach(x=>x.classList.toggle('active',x.dataset.v192===name));document.querySelectorAll('.v192-pane').forEach(x=>x.classList.toggle('active',x.dataset.pane===name));renderPanes()}
-function trend(name){try{const t=core()?.exerciseTrend?.(name),n=core()?.nextLoad?.(name);return t?.rows?.length?`${Number(t.pct||0)>=0?'+':''}${Number(t.pct||0).toFixed(1)} % · prochaine cible ${n?.targetWeight||n?.weight||'—'} kg`:'Pas assez de données détaillées'}catch(e){return'Analyse indisponible'}}
-function renderPanes(){const c=coach(),ss=sessions(),m=ss.filter(x=>Date.parse(x.date||x.isoDate||'')>=Date.now()-30*DAY),vol=m.reduce((a,x)=>a+Number(x.tonnage||0),0),dbg=api()?.debug?.()||{},mus=dbg.muscles||{},ach=dbg.achievements||[],u=profile(),forecast=(()=>{try{return typeof goalForecast==='function'?goalForecast():null}catch(e){return null}})();const set=(n,html)=>{const e=document.querySelector(`.v192-pane[data-pane="${n}"]`);if(e)e.innerHTML=html};set('today',`<div class="v192-panel"><h4>SÉANCE DU JOUR</h4><div class="v192-mini-grid"><div class="v192-mini"><span>PROGRAMME</span><b>${programName()}</b></div><div class="v192-mini"><span>READINESS</span><b>${Math.round(c.pv||0)}/100</b></div><div class="v192-mini"><span>MODE CONSEILLÉ</span><b>${c.mode||'NORMAL'}</b></div><div class="v192-mini"><span>JOUR</span><b>${new Date().toLocaleDateString('fr-FR',{weekday:'long'}).toUpperCase()}</b></div></div><p>${c.advice||''}</p><button class="v192-program-btn" onclick="LevelingV190.openReadiness()">METTRE À JOUR LE CHECK-IN</button></div>`);set('coach',`<div class="v192-chat" id="v192-chat"></div><div class="v190-quick"><button onclick="LevelingSystemAI.ask('Que dois-je faire aujourd’hui ?')">AUJOURD'HUI</button><button onclick="LevelingSystemAI.ask('Pourquoi mon bench stagne ?')">BENCH</button><button onclick="LevelingSystemAI.ask('Ai-je besoin d’un deload ?')">DELOAD</button><button onclick="LevelingSystemAI.ask('Fais mon bilan 30 jours')">BILAN 30J</button></div><div class="v192-input"><input id="v192-ai-input" placeholder="Parle à SYSTEM AI…" onkeydown="if(event.key==='Enter')LevelingSystemAI.send()"><button onclick="LevelingSystemAI.send()">ENVOYER</button></div>`);set('progress',`<div class="v192-panel"><h4>PROGRESSION SBD</h4><div class="v192-mini-grid"><div class="v192-mini"><span>SQUAT · ${Number(u.squat||0)} KG</span><b>${trend('Squat')}</b></div><div class="v192-mini"><span>BENCH · ${Number(u.bench||0)} KG</span><b>${trend('Développé couché')}</b></div><div class="v192-mini"><span>DEADLIFT · ${Number(u.deadlift||0)} KG</span><b>${trend('Deadlift')}</b></div><div class="v192-mini"><span>TOTAL SBD</span><b>${sbd()} KG</b></div></div></div>`);const entries=Object.entries(mus).sort((a,b)=>b[1]-a[1]),max=Math.max(1,...entries.map(x=>x[1]));set('recovery',`<div class="v192-panel"><h4>RÉCUPÉRATION & VOLUME 7 JOURS</h4><div class="v192-mini-grid"><div class="v192-mini"><span>READINESS</span><b>${Math.round(c.pv||0)}/100</b></div><div class="v192-mini"><span>MODE</span><b>${c.mode||'NORMAL'}</b></div></div><div class="v192-bars">${entries.length?entries.map(([k,v])=>`<div class="v192-barline"><span>${k}</span><div class="v192-track"><i style="width:${Math.min(100,v/max*100)}%"></i></div><b>${v}</b></div>`).join(''):'<small>Pas encore assez de séries détaillées.</small>'}</div></div>`);set('history',`<div class="v192-panel"><h4>30 DERNIERS JOURS</h4><div class="v192-mini-grid"><div class="v192-mini"><span>SÉANCES</span><b>${m.length}</b></div><div class="v192-mini"><span>TONNAGE</span><b>${Math.round(vol).toLocaleString('fr-FR')} KG</b></div><div class="v192-mini"><span>MOYENNE / SEMAINE</span><b>${(m.length/4.285).toFixed(1)}</b></div><div class="v192-mini"><span>SBD PROFIL</span><b>${sbd()} KG</b></div></div></div>`);set('goals',`<div class="v192-panel"><h4>OBJECTIFS INTELLIGENTS</h4><p>${forecast?.text||forecast?.advice||'SYSTEM AI utilise tes tendances SBD et ton historique pour ajuster les prochaines cibles sans forcer une progression artificielle.'}</p></div>`);set('season',`<div class="v192-panel"><h4>SUCCÈS & SAISON</h4>${ach.length?ach.map(a=>`<div class="v192-mini" style="margin-bottom:6px"><span>${a.unlocked?'DÉBLOQUÉ':'EN COURS'}</span><b>${String(a.name||a.title||'Succès').replace(/[<>]/g,'')}</b></div>`).join(''):'<p>Les succès apparaîtront avec ta progression.</p>'}</div>`);set('program',`<div class="v192-panel"><h4>PROGRAMME AVEC SYSTEM AI</h4><p>Décris ton objectif, ton nombre de jours disponibles, tes priorités SBD ou hypertrophie et tes contraintes. SYSTEM AI construit le split, contrôle le volume, ajoute une périodisation et peut l’enregistrer dans Mon programme.</p><button class="v192-program-btn" onclick="LevelingProgramAI.open()">CRÉER / MODIFIER MON PROGRAMME</button><button class="v192-program-btn" style="margin-left:6px" onclick="LevelingV190.openShare()">PARTAGER / IMPORTER</button></div>`)}
-function appendChat(text,type){const c=document.getElementById('v192-chat');if(!c)return;const d=document.createElement('div');d.className='v190-msg '+type;d.textContent=text;c.appendChild(d);c.scrollTop=c.scrollHeight}
-const old=window.LevelingSystemAI||{};window.LevelingSystemAI={version:'19.2.0',open(){ensureModal().classList.add('show');setTab('today')},close(){document.getElementById('v192-system-modal')?.classList.remove('show')},ask(q){ensureModal().classList.add('show');setTab('coach');appendChat(q,'user');let ans='';try{const c=coach(),n=norm(q);if(/programme|routine|split/.test(n))ans='Ouvre l’onglet PROGRAMME : je peux construire ou modifier ton programme selon tes jours disponibles, tes priorités SBD/hypertrophie et tes contraintes.';else if(/bench/.test(n))ans='Bench : '+trend('Développé couché');else if(/squat/.test(n))ans='Squat : '+trend('Squat');else if(/dead|soulev/.test(n))ans='Deadlift : '+trend('Deadlift');else if(/deload|fatigue/.test(n))ans=c.pv<55?'Readiness bas : réduis temporairement charge et volume. Un deload court est cohérent si cette tendance persiste.':'Pas de deload global évident actuellement. Surveille la fatigue locale et la qualité des prochaines séances.';else if(/bilan|30/.test(n)){const m=sessions().filter(x=>Date.parse(x.date||x.isoDate||'')>=Date.now()-30*DAY);ans=`${m.length} séances sur 30 jours · SBD ${sbd()} kg · readiness ${Math.round(c.pv||0)}/100.`}else ans=`Readiness ${Math.round(c.pv||0)}/100 · ${c.mode||'NORMAL'}. ${c.advice||''}`;}catch(e){ans='Analyse momentanément indisponible.'}setTimeout(()=>appendChat(ans,'system'),50)},send(){const i=document.getElementById('v192-ai-input'),q=i?.value.trim();if(!q)return;i.value='';this.ask(q)}};
-function cleanup(){['v190-coach-today','v190-muscle-card','v190-achievements-card','v190-goals-card','v181-ai-card'].forEach(id=>document.getElementById(id)?.remove());ensureHub()}
-function midnight(){try{v1618AdoptCalendarDay?.(false);initWorkoutSystem?.();LevelingProgramV157?.refreshValidationUI?.()}catch(e){}const now=new Date(),next=new Date(now);next.setHours(24,0,1,0);setTimeout(midnight,Math.max(1000,next-now))}
-if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',()=>{setTimeout(cleanup,850);setTimeout(midnight,1000)},{once:true});else{setTimeout(cleanup,500);setTimeout(midnight,1000)}window.addEventListener('pageshow',()=>setTimeout(cleanup,120));document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')setTimeout(cleanup,100)});
+const detailed=()=>{try{return (window.LevelingCoreV182||window.LevelingCoreV181)?.debug?.().state?.sessions||[]}catch(e){return[]}};
+const canonical=()=>{try{const a=window.LevelingProgramV157?.allSessions?.();if(Array.isArray(a)&&a.length)return a}catch(e){}return detailed()};
+const recent=(days=30)=>{const cut=Date.now()-days*DAY;return canonical().filter(x=>{const t=Date.parse(x.isoDate||x.date||x.completedAt||'');return t&&t>=cut})};
+const profile=()=>window.userData||{};
+const sbd=()=>Number(profile().squat||0)+Number(profile().bench||0)+Number(profile().deadlift||0);
+function recovery(){try{return window.LevelingRecoveryV1622?.today?.()||{}}catch(e){return{}}}
+function coach(){try{return window.LevelingV190?.debug?.().coach||{pv:Number(recovery().score||60),mode:'NORMAL',advice:''}}catch(e){return{pv:Number(recovery().score||60),mode:'NORMAL',advice:''}}}
+function pvMeta(score){score=Math.max(0,Math.min(100,Number(score)||0));if(score>=80)return{label:'OPTIMAL',color:'#51efb0'};if(score>=60)return{label:'BON',color:'#55d9ff'};if(score>=40)return{label:'MOYEN',color:'#ffb347'};return{label:'FAIBLE',color:'#ff5575'}}
+function programName(){try{return (getProgramMeta?.(activeProgramKey)?.title||activeProgramKey||'Programme').toString().toUpperCase()}catch(e){return'PROGRAMME'}}
+function ensureHub(){const panel=document.getElementById('panel-profile');if(!panel)return;document.getElementById('v192-system-hub')?.remove();let h=document.getElementById('v193-system-hub');if(!h){h=document.createElement('section');h.id='v193-system-hub';const q=document.getElementById('v140-quests'),r=document.getElementById('v135-rank-hub');if(q?.parentNode===panel)q.after(h);else if(r?.parentNode===panel)r.after(h);else panel.prepend(h)}renderHub(h)}
+function renderHub(h){const c=coach(),pv=Math.round(c.pv||0),pm=pvMeta(pv),m=recent(30);h.style.setProperty('--pv-color',pm.color);h.style.setProperty('--pv',pv+'%');h.innerHTML=`<div class="v193-head"><div class="v193-brand"><svg class="ui-icon lg"><use href="#ui-brain"></use></svg><div><b>SYSTEM AI</b><small>CŒUR DE LEVELING-APP · COACH · ANALYSE · PROGRAMME</small></div></div><span class="v193-live">ACTIF</span></div><div class="v193-grid"><div class="v193-kpi pv"><span>PV / RÉCUPÉRATION</span><b>${pv}/100 · ${pm.label}</b><div class="v193-pvbar"><i></i></div></div><div class="v193-kpi sbd"><span>TOTAL SBD</span><b>${sbd()} KG</b></div><div class="v193-kpi sessions"><span>30 DERNIERS JOURS</span><b>${m.length} SÉANCE${m.length>1?'S':''}</b></div><div class="v193-kpi mode"><span>MODE CONSEILLÉ</span><b>${c.mode||'NORMAL'}</b></div></div><div class="v193-advice">${String(c.advice||'SYSTEM AI analyse ta séance, ta récupération et ta progression.').replace(/[<>]/g,'')}</div><div class="v193-actions"><button class="v193-open" onclick="LevelingSystemAI.open()">OUVRIR SYSTEM AI</button><button class="v193-check" onclick="LevelingV190.openReadiness()">ÉVALUER MON ÉTAT</button></div>`}
+function ensureModal(){let d=document.getElementById('v193-system-modal');if(d)return d;document.getElementById('v192-system-modal')?.remove();document.getElementById('v190-system-modal')?.remove();d=document.createElement('div');d.id='v193-system-modal';d.innerHTML=`<div class="v193-modal"><div class="v193-modal-head"><div><b>SYSTEM AI · V2</b><small>Un seul système · toutes les données LEVELING-APP</small></div><button class="v190-close" onclick="LevelingSystemAI.close()">×</button></div><div class="v193-tabs">${[['today','AUJOURD’HUI'],['coach','COACH'],['progress','PROGRESSION'],['recovery','RÉCUPÉRATION'],['analysis','ANALYSE'],['quests','QUÊTES'],['goals','OBJECTIFS'],['program','PROGRAMME']].map(([k,l],i)=>`<button class="v193-tab ${i?'':'active'}" data-v193="${k}">${l}</button>`).join('')}</div><div class="v193-content">${['today','coach','progress','recovery','analysis','quests','goals','program'].map((k,i)=>`<div class="v193-pane ${i?'':'active'}" data-pane="${k}"></div>`).join('')}</div></div>`;d.addEventListener('click',e=>{if(e.target===d)LevelingSystemAI.close();const b=e.target.closest?.('.v193-tab');if(b)setTab(b.dataset.v193)});document.body.appendChild(d);return d}
+function setTab(name){document.querySelectorAll('.v193-tab').forEach(x=>x.classList.toggle('active',x.dataset.v193===name));document.querySelectorAll('.v193-pane').forEach(x=>x.classList.toggle('active',x.dataset.pane===name));renderPanes()}
+function trend(name){try{const core=window.LevelingCoreV182||window.LevelingCoreV181,t=core?.exerciseTrend?.(name),n=core?.nextLoad?.(name);return t?.rows?.length?`${Number(t.pct||0)>=0?'+':''}${Number(t.pct||0).toFixed(1)} % · cible ${n?.targetWeight||n?.weight||'—'} kg`:'Données détaillées insuffisantes'}catch(e){return'Données détaillées insuffisantes'}}
+function questData(){try{const q=document.querySelectorAll('#v140-quests .quest-item,#v140-quests [class*=quest]');const out=[];q.forEach(x=>{const t=x.innerText?.trim();if(t&&t.length<300&&!out.some(a=>a===t))out.push(t)});return out.slice(0,3)}catch(e){return[]}}
+function renderPanes(){const c=coach(),pv=Math.round(c.pv||0),pm=pvMeta(pv),m=recent(30),vol=m.reduce((a,x)=>a+Number(x.tonnage||x.volume||0),0),u=profile(),ds=detailed(),q=questData();const set=(n,html)=>{const e=document.querySelector(`.v193-pane[data-pane="${n}"]`);if(e)e.innerHTML=html};set('today',`<div class="v193-panel"><h4>AUJOURD’HUI</h4><div class="v193-mini-grid"><div class="v193-mini"><span>PROGRAMME</span><b>${programName()}</b></div><div class="v193-mini"><span>PV</span><b style="color:${pm.color}">${pv}/100 · ${pm.label}</b></div><div class="v193-mini"><span>MODE</span><b>${c.mode||'NORMAL'}</b></div><div class="v193-mini"><span>JOUR LOCAL</span><b>${new Date().toLocaleDateString('fr-FR',{weekday:'long'}).toUpperCase()}</b></div></div><p>${c.advice||''}</p><button class="v193-btn" onclick="LevelingV190.openReadiness()">METTRE À JOUR MON ÉTAT</button></div>`);set('coach',`<div id="v193-chat" class="v193-chat"></div><div class="v193-quick"><button onclick="LevelingSystemAI.ask('Combien je mets au bench aujourd’hui ?')">CHARGE BENCH</button><button onclick="LevelingSystemAI.ask('Pourquoi je stagne ?')">STAGNATION</button><button onclick="LevelingSystemAI.ask('Est-ce que je dois deload ?')">DELOAD</button><button onclick="LevelingSystemAI.ask('Analyse ma semaine')">BILAN</button></div><div class="v193-input"><input id="v193-ai-input" placeholder="Parle à SYSTEM AI…" onkeydown="if(event.key==='Enter')LevelingSystemAI.send()"><button onclick="LevelingSystemAI.send()">ENVOYER</button></div>`);set('progress',`<div class="v193-panel"><h4>PROGRESSION</h4><div class="v193-mini-grid"><div class="v193-mini"><span>SQUAT · ${Number(u.squat||0)} KG</span><b>${trend('Squat')}</b></div><div class="v193-mini"><span>BENCH · ${Number(u.bench||0)} KG</span><b>${trend('Développé couché')}</b></div><div class="v193-mini"><span>DEADLIFT · ${Number(u.deadlift||0)} KG</span><b>${trend('Deadlift')}</b></div><div class="v193-mini"><span>TOTAL SBD</span><b>${sbd()} KG</b></div></div><p class="v193-source">Les tendances utilisent les séances détaillées ; ton rang Power et ton SBD profil restent conservés.</p></div>`);let mus={};try{mus=window.LevelingV190?.debug?.().muscles||{}}catch(e){}const entries=Object.entries(mus).sort((a,b)=>b[1]-a[1]),max=Math.max(1,...entries.map(x=>x[1]));set('recovery',`<div class="v193-panel"><h4>RÉCUPÉRATION</h4><div class="v193-mini-grid"><div class="v193-mini"><span>PV</span><b style="color:${pm.color}">${pv}/100 · ${pm.label}</b></div><div class="v193-mini"><span>MODE</span><b>${c.mode||'NORMAL'}</b></div></div><div class="v193-bars">${entries.length?entries.map(([k,v])=>`<div class="v193-barline"><span>${k}</span><div class="v193-track"><i style="width:${Math.min(100,v/max*100)}%"></i></div><b>${v}</b></div>`).join(''):'<small>Le volume musculaire détaillé commencera à se remplir avec les nouvelles séances.</small>'}</div></div>`);set('analysis',`<div class="v193-panel"><h4>ANALYSE 30 JOURS</h4><div class="v193-mini-grid"><div class="v193-mini"><span>SÉANCES VALIDÉES</span><b>${m.length}</b></div><div class="v193-mini"><span>TONNAGE</span><b>${Math.round(vol).toLocaleString('fr-FR')} KG</b></div><div class="v193-mini"><span>FRÉQUENCE</span><b>${(m.length/(30/7)).toFixed(1)} / SEM.</b></div><div class="v193-mini"><span>SÉANCES DÉTAILLÉES</span><b>${ds.length}</b></div></div><p class="v193-source">Le compteur principal lit maintenant l’historique canonique des séances validées. Les anciennes séances de test peuvent donc encore apparaître jusqu’à leur sortie de la fenêtre des 30 jours.</p></div>`);set('quests',`<div class="v193-panel"><h4>QUÊTES ADAPTATIVES SYSTEM</h4>${q.length?q.map((x,i)=>`<div class="v193-quest"><div><b>${String(x).split('\n')[0]}</b><small>${String(x).split('\n').slice(1).join(' · ')}</small></div><span class="v193-xp">SYSTEM</span></div>`).join(''):'<p>Les quêtes sont générées selon récupération, séance du jour, RIR, volume et régularité. Elles continuent d’alimenter ton XP sans modifier ton rang actuel.</p>'}</div>`);set('goals',`<div class="v193-panel"><h4>OBJECTIFS & RANG POWER</h4><div class="v193-mini-grid"><div class="v193-mini"><span>SBD ACTUEL</span><b>${sbd()} KG</b></div><div class="v193-mini"><span>POIDS</span><b>${Number(u.weight||0)?Number(u.weight).toFixed(1)+' KG':'—'}</b></div></div><p>SYSTEM AI utilise tes objectifs et les règles de progression Power pour te guider sans créer un deuxième coach séparé.</p></div>`);set('program',`<div class="v193-panel"><h4>PROGRAMME AVEC SYSTEM AI</h4><p>Décris ton nombre de jours, ton objectif, tes priorités SBD/hypertrophie, la durée maximale des séances et tes contraintes. Le même SYSTEM construit, adapte et périodise ton programme.</p><button class="v193-btn" onclick="LevelingProgramAI.open()">CRÉER / MODIFIER MON PROGRAMME</button></div>`)}
+function append(text,type){const c=document.getElementById('v193-chat');if(!c)return;const d=document.createElement('div');d.className='v190-msg '+type;d.textContent=text;c.appendChild(d);c.scrollTop=c.scrollHeight}
+function answer(q){const n=norm(q),c=coach(),pv=Math.round(c.pv||0),m=recent(30);if(/programme|split|routine|hypertroph/.test(n))return'Je gère aussi les programmes. Ouvre PROGRAMME et indique tes jours disponibles, tes priorités, la durée des séances et ton objectif.';if(/bench/.test(n))return`Bench : ${trend('Développé couché')}. PV ${pv}/100. ${c.advice||''}`;if(/squat/.test(n))return`Squat : ${trend('Squat')}. PV ${pv}/100. ${c.advice||''}`;if(/dead|soulev/.test(n))return`Deadlift : ${trend('Deadlift')}. PV ${pv}/100. ${c.advice||''}`;if(/deload|fatigue|recuper/.test(n))return pv<40?'Tes PV sont faibles : séance très allégée ou repos cohérent. Si la tendance persiste, un deload est pertinent.':pv<60?'Tes PV sont moyens : réduis le volume et évite l’échec aujourd’hui.':'Aucun signal global fort de deload actuellement. Je privilégie la progression prévue avec RIR contrôlé.';if(/stagn|pourquoi/.test(n))return`Je croise maintenant SBD, RIR, PV, fréquence, volume, skips et ordre des exercices. Avec les nouvelles séances détaillées, je pourrai isoler si le frein vient de la fatigue, du volume ou de la progression de charge.`;if(/bilan|semaine|30/.test(n))return`${m.length} séance(s) validée(s) sur 30 jours · SBD ${sbd()} kg · PV ${pv}/100 · mode ${c.mode||'NORMAL'}.`;return`PV ${pv}/100 · mode ${c.mode||'NORMAL'}. ${c.advice||'Je suis prêt à analyser ta séance, ta progression, tes quêtes ou ton programme.'}`}
+window.LevelingSystemAI={version:VERSION,open(){ensureModal().classList.add('show');setTab('today')},close(){document.getElementById('v193-system-modal')?.classList.remove('show')},ask(q){ensureModal().classList.add('show');setTab('coach');append(q,'user');setTimeout(()=>append(answer(q),'system'),45)},send(){const i=document.getElementById('v193-ai-input'),q=String(i?.value||'').trim();if(!q)return;i.value='';this.ask(q)}};
+function cleanup(){['v190-coach-today','v190-muscle-card','v190-achievements-card','v190-goals-card','v181-ai-card','v192-system-hub'].forEach(id=>document.getElementById(id)?.remove());ensureHub()}
+function refreshDay(){try{v1618AdoptCalendarDay?.(false);initWorkoutSystem?.();LevelingProgramV157?.refreshValidationUI?.()}catch(e){}cleanup()}
+function scheduleMidnight(){const now=new Date(),next=new Date(now);next.setHours(24,0,1,0);setTimeout(()=>{refreshDay();scheduleMidnight()},Math.max(1000,next-now))}
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',()=>{setTimeout(cleanup,850);setTimeout(scheduleMidnight,1000)},{once:true});else{setTimeout(cleanup,500);setTimeout(scheduleMidnight,1000)}
+window.addEventListener('pageshow',()=>setTimeout(refreshDay,120));document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')setTimeout(refreshDay,100)});
 })();
 </script>
 
 <script id="v1711-build-marker">
-window.LEVELING_BUILD_INFO=Object.freeze({version:'19.2.0',codename:'System Core',assets:'external-lossless',stripe:'live'});
+window.LEVELING_BUILD_INFO=Object.freeze({version:'19.3.7',codename:'System AI V2',assets:'external-lossless',stripe:'live'});
 </script>
+
+
+
+
+<script id="v1937-system-analysis-runtime">
+(()=>{'use strict';
+const TECH=/Charge\s*[·•]\s*volume\s*[·•]\s*fr[ée]quence/i;
+function visible(el){return !!(el && el.getClientRects().length);}
+function score(el){
+ let s=0, t=(el.textContent||'');
+ if(/TONNAGE 30J/i.test(t))s+=4;
+ if(/DONN[ÉE]ES D[ÉE]TAILL[ÉE]ES/i.test(t))s+=4;
+ if(/Courbes SBD/i.test(t))s+=4;
+ if(/30J/.test(t)&&/60J/.test(t)&&/120J/.test(t))s+=3;
+ if(TECH.test(t))s+=3;
+ return s;
+}
+function findAnalysisCard(){
+ const profile=document.getElementById('panel-profile'); if(!profile)return null;
+ const candidates=[...profile.querySelectorAll('section,article,div')].filter(visible);
+ let best=null,bestScore=0;
+ for(const el of candidates){
+   const s=score(el);
+   if(s>bestScore && el.children.length>1){best=el;bestScore=s}
+ }
+ if(!best)return null;
+ // remonter uniquement si le parent est encore clairement la même carte d'analyse
+ let cur=best;
+ for(let i=0;i<3;i++){
+   const p=cur.parentElement;
+   if(!p||p===profile)break;
+   const ps=score(p);
+   if(ps>=bestScore && /30J/.test(p.textContent||'') && p.children.length<20){cur=p;bestScore=ps}else break;
+ }
+ return cur;
+}
+function decorate(){
+ const card=findAnalysisCard(); if(!card)return;
+ card.classList.add('v1937-analysis-shell');
+ if(!card.querySelector('.v1937-system-analysis-head')){
+   const head=document.createElement('div');
+   head.className='v1937-system-analysis-head';
+   head.innerHTML='<div class="v1937-system-analysis-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 19V10m5 9V5m5 14v-7m5 7V3M3 19h18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="m4 14 5-4 5 2 5-6" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="v1937-system-analysis-copy"><div class="v1937-system-analysis-name">SYSTEM AI · ANALYSE</div><div class="v1937-system-analysis-sub">Le cœur de tes performances · progression · récupération</div></div><div class="v1937-system-analysis-live">ACTIF</div>';
+   card.insertBefore(head,card.firstChild);
+ }
+ const leaves=[...card.querySelectorAll('div,p,span')].filter(x=>x.children.length===0 && TECH.test(x.textContent||''));
+ if(leaves.length){
+   leaves.forEach(x=>x.classList.add('v1937-original-techline'));
+   if(!card.querySelector('.v1937-analysis-chips')){
+     const chips=document.createElement('div');chips.className='v1937-analysis-chips';
+     ['CHARGE','VOLUME','FRÉQUENCE','e1RM','RIR','FATIGUE'].forEach(v=>{
+       const c=document.createElement('span');c.className='v1937-analysis-chip';c.textContent=v;chips.appendChild(c);
+     });
+     const head=card.querySelector('.v1937-system-analysis-head');
+     head.insertAdjacentElement('afterend',chips);
+   }
+ }
+ const title=[...document.querySelectorAll('#panel-profile h1,#panel-profile h2,#panel-profile h3,#panel-profile div')]
+   .find(x=>x.children.length===0 && /^\s*ANALYSE\s*\/\s*PROGRESSION\s*$/i.test(x.textContent||''));
+ if(title)title.classList.add('v1937-analysis-title');
+}
+let queued=false;
+function queue(){if(queued)return;queued=true;requestAnimationFrame(()=>{queued=false;decorate()})}
+document.addEventListener('DOMContentLoaded',()=>{queue();setTimeout(queue,250);setTimeout(queue,900)});
+document.addEventListener('click',e=>{if(e.target.closest?.('.nav-item')||e.target.closest?.('[data-range]'))setTimeout(queue,80)},true);
+document.addEventListener('visibilitychange',()=>{if(!document.hidden)setTimeout(queue,100)});
+const mo=new MutationObserver(queue);
+document.addEventListener('DOMContentLoaded',()=>{const p=document.getElementById('panel-profile');if(p)mo.observe(p,{childList:true,subtree:true})});
+window.LevelingV1937={decorate,findAnalysisCard};
+})();
+</script>
+
 </body>
 </html>
