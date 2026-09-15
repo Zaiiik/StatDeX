@@ -31,7 +31,7 @@
 
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>LEVELING-APP — V19.4.0 SYSTEM AI CANONICAL CORE</title>
+    <title>LEVELING-APP — V19.4.1 SYSTEM AI CLEAN ANALYSIS</title>
     <meta name="theme-color" content="#09090f">
     <meta name="application-name" content="LEVELING-APP">
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -3294,6 +3294,15 @@ body[data-theme="mono"] .v1932-analysis-icon .ui-icon{color:#f0f0f0}
 #history-container .v181-kpi:nth-child(4){border-color:rgba(255,110,190,.35)!important}
 </style>
 
+<style id="v1941-system-ai-clean-css">
+.v1941-learning{min-height:170px;display:flex;flex-direction:column;justify-content:center;gap:13px;padding:18px 16px;text-align:center}
+.v1941-learning-count{font-size:18px;font-weight:950;color:#e99aff;text-shadow:0 0 16px rgba(215,77,255,.25)}
+.v1941-learning-text{max-width:520px;margin:auto;color:#aeb5c4;font-size:12px;line-height:1.5}
+.v1941-learning-bars{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:4px}
+.v1941-learning-bars span{display:flex;justify-content:space-between;gap:7px;padding:9px 10px;border:1px solid rgba(101,213,255,.18);border-radius:10px;background:rgba(8,13,23,.62);font-size:10px;color:#aab3c5}
+.v1941-learning-bars b{color:#dce7f7}.v1941-learning-bars i{font-style:normal;color:#64dcff;font-weight:900}
+@media(max-width:420px){.v1941-learning-bars{grid-template-columns:1fr}.v1941-learning{min-height:190px}}
+</style>
 </head>
 <body data-theme="purple" class="auth-restoring">
 <svg id="premium-icon-sprite" width="0" height="0" aria-hidden="true" focusable="false" style="position:absolute;width:0;height:0;overflow:hidden">
@@ -11513,7 +11522,7 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
   function patchBody(){
     const en=lang()==='en',cloud=cloudCards('patch_note');
     return `<div class="v172-feed">${cloud||`<div class="v172-feed-card"><div class="v172-feed-copy">${en?'No new cloud patch note right now.':'Aucune nouvelle note de mise à jour pour le moment.'}</div></div>`}
-    <div class="v172-feed-card"><div class="v172-feed-top"><span class="v172-title-icon v172-blue">${icon('bolt')}</span><div><div class="v172-feed-title">${en?'CURRENT BUILD':'VERSION ACTUELLE'}</div><div class="v172-feed-meta">V19.3.8</div></div></div><div class="v172-feed-list">
+    <div class="v172-feed-card"><div class="v172-feed-top"><span class="v172-title-icon v172-blue">${icon('bolt')}</span><div><div class="v172-feed-title">${en?'CURRENT BUILD':'VERSION ACTUELLE'}</div><div class="v172-feed-meta">V19.4.1</div></div></div><div class="v172-feed-list">
       <div class="v172-feed-item">${icon('program')}<span>${en?'Power days can now be marked absent without awarding XP.':'Les jours Power peuvent maintenant être marqués absents sans donner d’XP.'}</span></div>
       <div class="v172-feed-item">${icon('message')}<span>${en?'Cloud patch notes and developer messages are active.':'Patch notes et messages développeur sont maintenant synchronisés dans le cloud.'}</span></div>
     </div></div></div>`;
@@ -14554,7 +14563,7 @@ window.LevelingV1937={decorate,findAnalysisCard};
 
 <script id="v1938-stability-runtime">
 (()=>{'use strict';
-const BUILD='19.4.0';
+const BUILD='19.4.1';
 window.LEVELING_BUILD=BUILD;
 /* Une seule source d'affichage pour les anciens badges de version laissés par les modules historiques. */
 function syncVersionLabels(root=document){
@@ -14581,5 +14590,21 @@ window.LevelingV1938={build:BUILD,resume,syncVersionLabels};
 </script>
 
 
+<script id="v1941-smart-chart-ui">
+(()=>{'use strict';
+function improve(){
+ const host=document.getElementById('history-container');if(!host)return;
+ const txt=host.textContent||'';
+ const m=txt.match(/DONNÉES DÉTAILLÉES\s*(\d+)\s*\/\s*(\d+)/i);
+ const detailed=m?Number(m[1]):0,total=m?Number(m[2]):0;
+ const chart=[...host.querySelectorAll('div')].find(x=>/Courbes SBD\s*·\s*e1RM contextualisé/i.test(x.textContent||'') && x.querySelector('svg.v181-chart'));
+ if(!chart||detailed>=3)return;
+ const svg=chart.querySelector('svg.v181-chart'); if(!svg)return;
+ svg.outerHTML=`<div class="v1941-learning"><div class="v1941-learning-count">${detailed} séance${detailed>1?'s':''} détaillée${detailed>1?'s':''} collectée${detailed>1?'s':''}</div><div class="v1941-learning-text">SYSTEM AI construit ta base SBD. La courbe apparaîtra quand il disposera d'au moins 3 mesures comparables sur un même mouvement, afin de ne pas afficher une fausse tendance.</div><div class="v1941-learning-bars"><span><b>Squat</b><i>collecte</i></span><span><b>Bench</b><i>collecte</i></span><span><b>Deadlift</b><i>collecte</i></span></div></div>`;
+}
+document.addEventListener('DOMContentLoaded',()=>{setTimeout(improve,250);setTimeout(improve,900)});
+document.addEventListener('click',()=>setTimeout(improve,120),true);
+})();
+</script>
 </body>
 </html>
