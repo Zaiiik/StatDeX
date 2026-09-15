@@ -31,7 +31,7 @@
 
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>LEVELING-APP — V19.3.8 STABILISATION</title>
+    <title>LEVELING-APP — V19.3.9 SYSTEM AI ANALYSIS LIVE</title>
     <meta name="theme-color" content="#09090f">
     <meta name="application-name" content="LEVELING-APP">
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -3281,6 +3281,20 @@ body[data-theme="mono"] .v1932-analysis-icon .ui-icon{color:#f0f0f0}
 /* Stabilisation: réduire le coût des animations hors écran sans changer le design */
 .panel:not(.active) *{animation-play-state:paused!important}
 @media (prefers-reduced-motion:reduce){.panel.active{animation-duration:.08s!important}}
+</style>
+
+
+<style id="v1939-ai-live-css">
+.v1939-ai-insight{margin:0 0 14px;padding:13px;border:1px solid rgba(91,209,255,.27);border-radius:14px;background:linear-gradient(120deg,rgba(26,120,158,.09),rgba(137,38,181,.09))}
+.v1939-ai-insight-top{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:9px}
+.v1939-ai-insight-title{font-size:11px;font-weight:950;color:#86e4ff;letter-spacing:.07em}
+.v1939-ai-confidence{font-size:9px;font-weight:900;padding:5px 7px;border-radius:999px;border:1px solid rgba(255,190,70,.35);color:#ffc760}
+.v1939-ai-text{font-size:11px;line-height:1.5;color:#e9e9f1}
+.v1939-ai-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}
+.v1939-ai-mini{padding:9px;border-radius:11px;background:rgba(3,7,13,.48);border:1px solid rgba(255,255,255,.09)}
+.v1939-ai-mini b{display:block;font-size:9px;color:#8d94a6;margin-bottom:4px;text-transform:uppercase}
+.v1939-ai-mini span{font-size:11px;font-weight:850;color:#fff}
+.v1939-ai-rec{margin-top:9px;padding:10px;border-left:2px solid #cf55ff;background:rgba(190,57,255,.07);font-size:10px;line-height:1.45;color:#e6c8f2}
 </style>
 
 </head>
@@ -14474,7 +14488,7 @@ window.LevelingV1937={decorate,findAnalysisCard};
 
 <script id="v1938-stability-runtime">
 (()=>{'use strict';
-const BUILD='19.3.8';
+const BUILD='19.3.9';
 window.LEVELING_BUILD=BUILD;
 /* Une seule source d'affichage pour les anciens badges de version laissés par les modules historiques. */
 function syncVersionLabels(root=document){
@@ -14483,7 +14497,7 @@ function syncVersionLabels(root=document){
   for(const n of nodes){
     const p=n.parentElement;if(!p||/SCRIPT|STYLE/.test(p.tagName))continue;
     const t=n.nodeValue||'';
-    if(/^\s*V?(?:17\.11\.1|18\.6\.0)\s*$/i.test(t)) n.nodeValue=t.replace(/V?(?:17\.11\.1|18\.6\.0)/i,'V19.3.8');
+    if(/^\s*V?(?:17\.11\.1|18\.6\.0)\s*$/i.test(t)) n.nodeValue=t.replace(/V?(?:17\.11\.1|18\.6\.0)/i,'V19.3.9');
   }
 }
 let lastDay=new Date().toDateString();
@@ -14497,6 +14511,50 @@ document.addEventListener('DOMContentLoaded',()=>{resume();setTimeout(resume,400
 document.addEventListener('visibilitychange',()=>{if(!document.hidden)setTimeout(resume,50)});
 window.addEventListener('pageshow',resume);
 window.LevelingV1938={build:BUILD,resume,syncVersionLabels};
+})();
+</script>
+
+
+<script id="v1939-ai-live-runtime">
+(()=>{'use strict';
+const num=s=>Number(String(s||'').replace(/\s/g,'').replace(',','.').match(/-?\d+(?:\.\d+)?/)?.[0]||0);
+function getCard(){
+ if(window.LevelingV1937?.findAnalysisCard)return window.LevelingV1937.findAnalysisCard();
+ return document.querySelector('.v1937-analysis-shell');
+}
+function leaf(card,re){return [...card.querySelectorAll('div,p,span')].find(x=>x.children.length===0&&re.test(x.textContent||''))}
+function read(){
+ const c=getCard();if(!c)return null;
+ const text=c.innerText||'';
+ const sessions=num(text.match(/S[ÉE]ANCES 30J[\s\S]{0,30}?(\d+)/i)?.[1]);
+ const detailedMatch=text.match(/DONN[ÉE]ES D[ÉE]TAILL[ÉE]ES[\s\S]{0,35}?(\d+)\s*\/\s*(\d+)/i);
+ const detailed=Number(detailedMatch?.[1]||0), total=Number(detailedMatch?.[2]||sessions||0);
+ const tonnage=num(text.match(/TONNAGE 30J[\s\S]{0,35}?([\d\s]+)\s*kg/i)?.[1]);
+ const freq=num(text.match(/FR[ÉE]QUENCE[\s\S]{0,30}?([\d.,]+)\s*\/\s*sem/i)?.[1]);
+ return {c,sessions,detailed,total,tonnage,freq};
+}
+function render(){
+ const d=read();if(!d)return;
+ let box=d.c.querySelector('.v1939-ai-insight');
+ if(!box){box=document.createElement('div');box.className='v1939-ai-insight';const chips=d.c.querySelector('.v1937-analysis-chips');(chips||d.c.querySelector('.v1937-system-analysis-head'))?.insertAdjacentElement('afterend',box)}
+ if(!box)return;
+ const ratio=d.total?Math.round(d.detailed/d.total*100):0;
+ let quality='EN APPRENTISSAGE', q='Données détaillées insuffisantes';
+ if(ratio>=60){quality='ÉLEVÉE';q='Analyse individualisée fiable'} else if(ratio>=25){quality='MOYENNE';q='Tendance exploitable, précision en progression'}
+ let trend='Historique détecté';
+ if(d.sessions>=1&&d.tonnage>0)trend=`${d.sessions} séances et ${Math.round(d.tonnage).toLocaleString('fr-FR')} kg de volume détectés sur 30 jours.`;
+ let rec;
+ if(d.detailed<3) rec=`SYSTEM AI possède encore peu de séances détaillées (${d.detailed}/${d.total||d.sessions}). Continue à valider tes prochaines séances avec charges, répétitions et RIR : les recommandations e1RM, fatigue et progression deviendront progressivement personnalisées.`;
+ else if(d.freq>=6) rec=`Ta fréquence récente est élevée (${d.freq.toFixed(1)}/sem.). SYSTEM AI surveillera surtout la récupération, le RIR et l'évolution des performances avant de proposer une hausse de charge.`;
+ else rec=`Les données détaillées commencent à être exploitables. SYSTEM AI compare maintenant charge, volume, fréquence, RIR et récupération avant les prochaines recommandations.`;
+ box.innerHTML=`<div class="v1939-ai-insight-top"><div class="v1939-ai-insight-title">LECTURE SYSTEM AI</div><div class="v1939-ai-confidence">${quality}</div></div><div class="v1939-ai-text">${trend}</div><div class="v1939-ai-grid"><div class="v1939-ai-mini"><b>Données IA</b><span>${d.detailed}/${d.total||d.sessions} détaillées · ${ratio}%</span></div><div class="v1939-ai-mini"><b>Fréquence</b><span>${d.freq?d.freq.toFixed(1)+'/sem.':'En attente'}</span></div><div class="v1939-ai-mini"><b>État analyse</b><span>${q}</span></div><div class="v1939-ai-mini"><b>e1RM / RIR</b><span>${d.detailed>=3?'Analyse active':'Collecte en cours'}</span></div></div><div class="v1939-ai-rec">${rec}</div>`;
+}
+let busy=false;function queue(){if(busy)return;busy=true;setTimeout(()=>{busy=false;render()},90)}
+document.addEventListener('DOMContentLoaded',()=>{queue();setTimeout(queue,500)});
+document.addEventListener('visibilitychange',()=>{if(!document.hidden)queue()});
+document.addEventListener('click',e=>{if(e.target.closest?.('[data-range],.nav-item'))queue()},true);
+const mo=new MutationObserver(queue);document.addEventListener('DOMContentLoaded',()=>{const p=document.getElementById('panel-profile');if(p)mo.observe(p,{subtree:true,childList:true,characterData:true})});
+window.LevelingV1939={render,read};
 })();
 </script>
 
