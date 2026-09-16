@@ -1,5 +1,5 @@
-const CACHE='leveling-app-v21-3-2';
-const CORE=['./','./index.html','./manifest.webmanifest','./icon-192.png','./icon-512.png'];
+const CACHE='leveling-app-v21-4-4';
+const CORE=['./','./index.html','./manifest.webmanifest','./icon-192.png','./icon-512.png','./notification-badge.png'];
 
 self.addEventListener('install',event=>{
   self.skipWaiting();
@@ -17,5 +17,5 @@ self.addEventListener('fetch',event=>{
   if(url.origin!==self.location.origin)return;
   event.respondWith((async()=>{const cached=await caches.match(req);const networkPromise=(async()=>{try{const res=await fetch(req);if(res&&(res.ok||res.type==='opaque')){const copy=res.clone();event.waitUntil(caches.open(CACHE).then(cache=>cache.put(req,copy)))}return res}catch(e){return cached||Response.error()}})();return cached||networkPromise})());
 });
-self.addEventListener('push',event=>{let d={};try{d=event.data?event.data.json():{}}catch(e){d={title:'LEVELING-APP',body:event.data?.text()||'Nouvelle notification'}}event.waitUntil(self.registration.showNotification(d.title||'LEVELING-APP',{body:d.body||'',icon:'./icon-192.png',badge:'./icon-192.png',tag:d.tag||'leveling',data:{url:d.url||'./'},vibrate:[120,60,120]}))});
+self.addEventListener('push',event=>{let d={};try{d=event.data?event.data.json():{}}catch(e){d={title:'LEVELING-APP',body:event.data?.text()||'Nouvelle notification'}}event.waitUntil(self.registration.showNotification(d.title||'LEVELING-APP',{body:d.body||'',icon:'./icon-192.png',badge:'./notification-badge.png',tag:d.tag||'leveling',data:{url:d.url||'./'},vibrate:[120,60,120]}))});
 self.addEventListener('notificationclick',event=>{event.notification.close();const url=event.notification.data?.url||'./';event.waitUntil(clients.matchAll({type:'window',includeUncontrolled:true}).then(list=>{for(const client of list){if('focus'in client){client.navigate(url);return client.focus()}}return clients.openWindow?clients.openWindow(url):null}))});
