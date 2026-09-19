@@ -15691,12 +15691,47 @@ window.addEventListener('message',async e=>{
  }
 });
 document.getElementById('v233-check')?.addEventListener('click',async()=>{
- note('Vérification…');let u=await verified();
- if(!u){const email=localStorage.getItem(E)||'',password=localStorage.getItem(P)||'';if(email&&password){const r=await sb.auth.signInWithPassword({email,password});if(!r.error){cloudUser=r.data.user;u=await verified()}}}
- if(!u){note('Pas encore confirmé. Ouvre le lien reçu par e-mail puis réessaie.');return}
- localStorage.setItem(S,'verified');commit();hideVerify();showSystem();post('lvl-onboard-verified-resume');
+ const btn=document.getElementById('v233-check');
+ const email=localStorage.getItem(E)||'',password=localStorage.getItem(P)||'';
+ if(btn){btn.disabled=true;btn.textContent='VÉRIFICATION...'}
+ note('Connexion au compte confirmé…');
+ try{
+   if(!email||!password)throw new Error('Identifiants temporaires introuvables. Utilise « Changer de compte ».');
+
+   // Source of truth: sign back in with the credentials entered during SYSTEM onboarding.
+   const {data,error}=await sb.auth.signInWithPassword({email,password});
+   if(error)throw error;
+   if(!data?.session?.user)throw new Error('Aucune session reçue après connexion.');
+
+   cloudUser=data.session.user;
+   localStorage.setItem(V2141_PENDING_EMAIL,email);
+
+   // Supabase accepted the credentials after the mailbox confirmation.
+   // Refresh the server-side LEVELING access, but do not block onboarding on a lagging RPC flag.
+   let info=null;
+   try{info=await getCurrentLicenseStatus()}catch(e){console.warn('Access refresh after verification:',e)}
+   if(info?.status==='DISABLED')throw new Error('Ce compte est actuellement désactivé.');
+
+   localStorage.setItem(S,'verified');
+   commit();
+   note('E-mail confirmé. Identité validée.');
+   if(btn){btn.textContent='E-MAIL CONFIRMÉ ✓'}
+
+   // Resume the validated SYSTEM flow at Program AI.
+   setTimeout(()=>{
+     hideVerify();showSystem();post('lvl-onboard-verified-resume');
+   },450);
+ }catch(err){
+   const raw=String(err?.message||err||'');
+   let friendly=raw;
+   if(/email not confirmed/i.test(raw))friendly='Ton adresse n’est pas encore confirmée. Clique sur le lien reçu par e-mail puis réessaie.';
+   else if(/invalid login credentials/i.test(raw))friendly='Connexion refusée. Vérifie que tu utilises bien le même e-mail et le même mot de passe.';
+   else if(/rate limit|too many/i.test(raw))friendly='Trop de tentatives rapprochées. Attends un instant puis réessaie.';
+   note(friendly);
+   if(btn){btn.disabled=false;btn.textContent='J’AI CONFIRMÉ MON E-MAIL'}
+ }
 });
-document.getElementById('v233-resend')?.addEventListener('click',async()=>{note('Envoi…');try{await v2141SendVerification(localStorage.getItem(E)||'');note('Nouveau lien envoyé.')}catch(e){note(e?.message||'Envoi impossible.')}});
+document.getElementById('v233-resend')?.addEventListener('click',async()=>{note('Envoi…');try{await v2141SendVerification(localStorage.getItem(E)||'');note('Nouveau lien envoyé à '+(localStorage.getItem(E)||'ton adresse')+'.')}catch(e){note(e?.message||'Envoi impossible.')}});
 document.getElementById('v233-change')?.addEventListener('click',async()=>{try{authExplicitSignOut=true;await sb.auth.signOut()}catch(_){}finally{authExplicitSignOut=false}cloudUser=null;cloudLicensed=false;localStorage.removeItem(E);localStorage.removeItem(P);localStorage.setItem(S,'profile-ready');hideVerify();showSystem();post('lvl-onboard-account-only-reset')});
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot,{once:true});else boot();
 })();
