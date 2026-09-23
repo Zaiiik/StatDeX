@@ -271,13 +271,13 @@ function renderBroadcasts(){
 }
 
 async function loadRelease(){const {data,error}=await sb.rpc('admin_get_app_release');if(!error&&data){const r=Array.isArray(data)?data[0]:data;if(r){$('releaseVersion').value=r.latest_version||'';$('releaseMessage').value=r.message||''}}}
-const ADMIN_CURRENT_APP_VERSION='17.11.1';
+const ADMIN_CURRENT_APP_VERSION='22.1.3';
 function versionParts(v){return String(v||'0').match(/\d+/g)?.map(Number)||[0]}
 function versionNewer(a,b){const x=versionParts(a),y=versionParts(b),n=Math.max(x.length,y.length);for(let i=0;i<n;i++){const A=x[i]||0,B=y[i]||0;if(A>B)return true;if(A<B)return false}return false}
 async function saveRelease(active){
   const version=$('releaseVersion').value.trim(),message=$('releaseMessage').value.trim();
   if(active&&(!version||!message))return setMsg('releaseMsg','Version et message requis.','err');
-  if(active&&!versionNewer(version,ADMIN_CURRENT_APP_VERSION))return setMsg('releaseMsg',`Entre une version supérieure à ${ADMIN_CURRENT_APP_VERSION} (exemple : 17.12). Sinon les clients sont déjà à jour et le bandeau ne doit pas apparaître.`,'err');
+  if(active&&!versionNewer(version,ADMIN_CURRENT_APP_VERSION))return setMsg('releaseMsg',`Entre une version supérieure à ${ADMIN_CURRENT_APP_VERSION}. Sinon les clients sont déjà à jour et le bandeau ne doit pas apparaître.`,'err');
   const {error}=await sb.rpc('admin_set_app_release_v2',{p_version:version||ADMIN_CURRENT_APP_VERSION,p_message:message||'',p_active:active});
   if(error)return setMsg('releaseMsg',error.message,'err');
   setMsg('releaseMsg',active?`Bandeau V${version} activé. Il apparaîtra sur les versions plus anciennes.`:'Bandeau retiré.','ok')
