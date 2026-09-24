@@ -271,7 +271,7 @@ function renderBroadcasts(){
 }
 
 async function loadRelease(){const {data,error}=await sb.rpc('admin_get_app_release');if(!error&&data){const r=Array.isArray(data)?data[0]:data;if(r){$('releaseVersion').value=r.latest_version||'';$('releaseMessage').value=r.message||''}}}
-const ADMIN_CURRENT_APP_VERSION='22.1.4';
+const ADMIN_CURRENT_APP_VERSION='22.1.5';
 function versionParts(v){return String(v||'0').match(/\d+/g)?.map(Number)||[0]}
 function versionNewer(a,b){const x=versionParts(a),y=versionParts(b),n=Math.max(x.length,y.length);for(let i=0;i<n;i++){const A=x[i]||0,B=y[i]||0;if(A>B)return true;if(A<B)return false}return false}
 async function saveRelease(active){

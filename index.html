@@ -1,4 +1,4 @@
-<!-- LEVELING-APP V22.1.4 — SAFE CLOUD RECONCILIATION · BASE V21.9.2 VALIDATED -->
+<!-- LEVELING-APP V22.1.5 — ACCOUNT ENTRY + SETTINGS RESTORE · BASE V21.9.2 VALIDATED -->
 <!-- LEVELING-APP V18.6.0 CLEAN CORE + PROGRAM AI — consolidated coaching core, safer progression flow, PROGRAM AI assistant -->
 <!-- LEVELING-APP V17.4.0 AUTH + I18N + ONBOARDING REPLAY TEST
      - hard account gate after first-run discovery
@@ -17,7 +17,7 @@
 
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>LEVELING-APP — V22.1.4 ACCESS+</title>
+    <title>LEVELING-APP — V22.1.5 ACCESS+</title>
     <meta name="theme-color" content="#09090f">
     <meta name="application-name" content="LEVELING-APP">
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -3864,6 +3864,7 @@ main{padding-bottom:calc(72px + env(safe-area-inset-bottom,0px))!important}
 .eye{font-size:9px;font-weight:950;letter-spacing:.16em;color:#c36cff}.title{font-size:29px;line-height:1.02;font-weight:1000;margin:8px 0}.sub{font-size:12px;line-height:1.55;color:#a29aa9;margin:0 0 18px}
 .field{margin:12px 0}.field label{display:block;font-size:9px;font-weight:950;letter-spacing:.09em;color:#ff70d2;margin-bottom:6px}.field input,.field select{width:100%;border:1px solid #372b40;border-radius:13px;background:#09070c;color:#fff;padding:14px;font-size:16px;outline:none}.field input:focus,.field select:focus{border-color:#c13dff;box-shadow:0 0 20px #bc36ff25}
 .primary{width:100%;border:0;border-radius:13px;padding:14px;background:linear-gradient(90deg,#9825ff,#cf35ff,#ff48bf);color:#fff;font-weight:1000;letter-spacing:.04em}
+.secondary{width:100%;margin-top:9px;border:1px solid #4b3957;border-radius:13px;padding:13px;background:#0d0911;color:#e9dff0;font-weight:950;letter-spacing:.04em}
 #sysReturn{background:#000}.sysstage{width:min(450px,100%);padding:24px}.sysname{text-align:center;color:#fff;font-size:18px;font-weight:1000;letter-spacing:.3em;text-shadow:0 0 14px #fff9,0 0 38px #c03aff66;margin-bottom:38px}.terminal{border-left:2px solid #d36aff;padding:5px 0 5px 17px;min-height:160px}.line{min-height:24px;font-size:13px;line-height:1.6;color:#dcd4e2;opacity:0;transform:translateY(3px);transition:.16s}.line.on{opacity:1;transform:none}.line strong{color:#fff}.line.pink{color:#ff75d7}.cursor{display:inline-block;width:7px;height:13px;background:#fff;vertical-align:-2px;animation:blink .7s steps(1) infinite}@keyframes blink{50%{opacity:0}}
 .progress{height:3px;background:#17121b;border-radius:9px;overflow:hidden;margin:14px 0 18px}.progress i{display:block;height:100%;background:linear-gradient(90deg,#9825ff,#ff48bf);transition:width .28s ease}
 .question{font-size:26px;font-weight:1000;line-height:1.04;margin:8px 0 16px}.unitwrap{position:relative}.unitwrap span{position:absolute;right:13px;bottom:15px;color:#766c7c;font-size:10px;font-weight:900}
@@ -4154,7 +4155,7 @@ main{padding-bottom:calc(72px + env(safe-area-inset-bottom,0px))!important}
  &lt;/div&gt;
  &lt;div class=&quot;d15bottom&quot;&gt;&lt;div class=&quot;d15dots&quot;&gt;&lt;i class=&quot;on&quot;&gt;&lt;/i&gt;&lt;i&gt;&lt;/i&gt;&lt;i&gt;&lt;/i&gt;&lt;/div&gt;&lt;button class=&quot;d15next&quot;&gt;CONTINUER&lt;/button&gt;&lt;/div&gt;
 &lt;/div&gt;
-&lt;div id=&quot;account&quot;&gt;&lt;div class=&quot;panel&quot;&gt;&lt;div class=&quot;eye&quot;&gt;LEVELING-APP · COMPTE&lt;/div&gt;&lt;div class=&quot;title&quot;&gt;CRÉE TON ACCÈS&lt;/div&gt;&lt;p class=&quot;sub&quot;&gt;Deux informations. Le SYSTEM s&#x27;occupe du reste après la connexion.&lt;/p&gt;&lt;div class=&quot;field&quot;&gt;&lt;label&gt;ADRESSE EMAIL&lt;/label&gt;&lt;input id=&quot;email&quot; type=&quot;email&quot; autocomplete=&quot;email&quot; placeholder=&quot;toi@email.com&quot;&gt;&lt;/div&gt;&lt;div class=&quot;field&quot;&gt;&lt;label&gt;MOT DE PASSE&lt;/label&gt;&lt;input id=&quot;password&quot; type=&quot;password&quot; autocomplete=&quot;new-password&quot; placeholder=&quot;8 caractères minimum&quot;&gt;&lt;/div&gt;&lt;button class=&quot;primary&quot; id=&quot;accountNext&quot;&gt;CRÉER MON COMPTE&lt;/button&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;div id=&quot;account&quot;&gt;&lt;div class=&quot;panel&quot;&gt;&lt;div class=&quot;eye&quot;&gt;LEVELING-APP · COMPTE&lt;/div&gt;&lt;div class=&quot;title&quot;&gt;TON ACCÈS&lt;/div&gt;&lt;p class=&quot;sub&quot;&gt;Connecte-toi si tu as déjà un compte. Sinon, crée ton accès puis complète ton profil.&lt;/p&gt;&lt;button class=&quot;secondary&quot; id=&quot;accountLogin&quot;&gt;J&#x27;AI DÉJÀ UN COMPTE&lt;/button&gt;&lt;div class=&quot;field&quot;&gt;&lt;label&gt;ADRESSE EMAIL&lt;/label&gt;&lt;input id=&quot;email&quot; type=&quot;email&quot; autocomplete=&quot;email&quot; placeholder=&quot;toi@email.com&quot;&gt;&lt;/div&gt;&lt;div class=&quot;field&quot;&gt;&lt;label&gt;MOT DE PASSE&lt;/label&gt;&lt;input id=&quot;password&quot; type=&quot;password&quot; autocomplete=&quot;new-password&quot; placeholder=&quot;8 caractères minimum&quot;&gt;&lt;/div&gt;&lt;button class=&quot;primary&quot; id=&quot;accountNext&quot;&gt;CRÉER MON COMPTE&lt;/button&gt;&lt;/div&gt;&lt;/div&gt;
 &lt;div id=&quot;sysReturn&quot;&gt;&lt;div class=&quot;sysstage&quot;&gt;&lt;div class=&quot;sysname&quot;&gt;SYSTEM&lt;/div&gt;&lt;div class=&quot;terminal&quot; id=&quot;terminal&quot;&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;
 &lt;div id=&quot;profile&quot;&gt;&lt;i class=&quot;scanSweep&quot;&gt;&lt;/i&gt;&lt;div class=&quot;panel&quot;&gt;&lt;div class=&quot;eye&quot; id=&quot;pEye&quot;&gt;SYSTEM · PROFIL&lt;/div&gt;&lt;div class=&quot;question&quot; id=&quot;pQ&quot;&gt;&lt;/div&gt;&lt;div class=&quot;progress&quot;&gt;&lt;i id=&quot;pProg&quot;&gt;&lt;/i&gt;&lt;/div&gt;&lt;div id=&quot;pBody&quot;&gt;&lt;/div&gt;&lt;button class=&quot;primary&quot; id=&quot;pNext&quot;&gt;TRANSMETTRE AU SYSTEM&lt;/button&gt;&lt;/div&gt;&lt;/div&gt;
 &lt;div id=&quot;program&quot;&gt;&lt;div class=&quot;panel&quot;&gt;&lt;div class=&quot;eye&quot;&gt;SYSTEM · PROGRAM AI&lt;/div&gt;&lt;div class=&quot;title&quot; id=&quot;aiTitle&quot;&gt;ANALYSE DU PROFIL&lt;/div&gt;&lt;p class=&quot;sub&quot; id=&quot;aiText&quot;&gt;Préparation de ton premier programme...&lt;/p&gt;&lt;div class=&quot;progress&quot;&gt;&lt;i id=&quot;aiBar&quot; style=&quot;width:5%&quot;&gt;&lt;/i&gt;&lt;/div&gt;&lt;button class=&quot;primary&quot; id=&quot;finish&quot; style=&quot;display:none&quot;&gt;ENTRER DANS LEVELING-APP&lt;/button&gt;&lt;/div&gt;&lt;/div&gt;
@@ -4276,6 +4277,7 @@ window.addEventListener(&#x27;message&#x27;,e=&gt;{
  showDiscovery15();renderD15();animateSlideText(0);
 });
 /* V22 CLEAN: obsolete V16 onboarding runtime removed */
+accountLogin.onclick=()=&gt;parent.postMessage({type:&#x27;lvl-onboard-login-request&#x27;},&#x27;*&#x27;);
 accountNext.onclick=()=&gt;{
  const em=email.value.trim(),pw=password.value;
  if(!em||pw.length&lt;8){account.querySelector(&#x27;.sub&#x27;).textContent=&#x27;Email valide + mot de passe de 8 caractères minimum.&#x27;;return}
@@ -7204,7 +7206,7 @@ function setAppUnlockedShell(){
   document.getElementById('app-container')?.classList.remove('auth-locked');
 }
 
-const APP_VERSION='22.1.4';
+const APP_VERSION='22.1.5';
 const ACCOUNT_LOCAL_KEYS=['solo_leveling_user','solo_leveling_smart_refs','solo_leveling_body_hist','solo_leveling_inv','solo_leveling_block','solo_leveling_day','solo_leveling_state','solo_leveling_custom_sets','solo_leveling_history','solo_leveling_active_program','solo_leveling_program_states','solo_leveling_program_custom_sets','solo_leveling_custom_program','leveling_last_local_save','leveling_last_cloud_sync','solo_leveling_v10','leveling_v181_core','leveling_v182_core'];
 function clearLevelingAccountLocalData(){
   try{ACCOUNT_LOCAL_KEYS.forEach(k=>localStorage.removeItem(k));sessionStorage.removeItem('leveling_pending_license')}catch(e){console.warn('Local account cleanup:',e)}
@@ -12604,7 +12606,7 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
   window.addEventListener('pageshow',()=>setTimeout(refreshCloud,500));
 })();
 </script><script id="v17111-version-tools">
-const V17111_PUBLIC_VERSION='22.1.4';
+const V17111_PUBLIC_VERSION='22.1.5';
 function v17111MountVersionTools(target){
   if(!target||target.querySelector('#v17111-version-card'))return;
   const en=localStorage.getItem('leveling_language')==='en';
@@ -12817,7 +12819,7 @@ window.v17111ForceRefresh=async function(){
     if(main){try{main.scrollTo({top:0,left:0,behavior:'auto'})}catch(e){main.scrollTop=0}}
   }
 
-  function settingsHome(){const panel=q('#panel-settings');if(!panel)return;v221HideDisplayNav(panel);panel.classList.remove('v151-page-open');panel.dataset.v151Page='';qa('.compact-setting-section',panel).forEach(s=>s.classList.remove('v151-active'));scrollSettingsTop()}
+  function settingsHome(){const panel=q('#panel-settings');if(!panel)return;v221HideDisplayNav(panel);panel.classList.remove('v151-page-open');panel.dataset.v151Page='';qa('.compact-setting-section',panel).forEach(s=>{s.classList.remove('v151-active');s.hidden=false});const grid=q('.compact-settings-grid',panel);if(grid)grid.hidden=true;const menu=q('#v151-settings-menu',panel);if(menu){menu.hidden=false;menu.style.removeProperty('display')}scrollSettingsTop()}
 
   function v221PlaceMainColor(panel){const ambiance=findSettingSection('ambiance',panel);if(!ambiance)return;const title=[...panel.querySelectorAll('h1,h2,h3,h4,b,strong,span,div')].find(el=>el.children.length===0&&el.textContent.trim()==='Couleur principale');if(!title)return;let card=title;for(let i=0;i<5&&card.parentElement;i++){if(card.parentElement.querySelectorAll('button,[data-color],input').length>=4){card=card.parentElement;break}card=card.parentElement}const body=q('.compact-setting-body',ambiance)||ambiance;if(card&&card!==body&&card.parentNode!==body)body.prepend(card)}
 function v221DisplayGroups(){return {personalize:{title:'Personnalisation',sub:'Couleurs · thèmes · ambiances',members:['ambiance']},interface:{title:'Interface',sub:'Plein écran · PWA · découverte · version',members:['display']},languageNotifications:{title:'Langue & notifications',sub:'Langue · alertes · rappels',members:['language','notifications']}}}
@@ -12853,7 +12855,7 @@ function settingsPage(key){
   function buildSettings(){
     const panel=q('#panel-settings');if(!panel)return;
     /* V25.6.2: settings are built once. Rebuilding the menu on every visit caused the subscription card to flash. */
-    if(panel.classList.contains('v151-ready') && q('#v151-settings-menu',panel)) return;
+    if(panel.classList.contains('v151-ready') && q('#v151-settings-menu',panel)){settingsHome();return}
     ensureSettingsSource();
     mergeSettingsContent(panel);
 
@@ -16379,6 +16381,7 @@ function commit(){
 async function boot(){
  if(localStorage.getItem(D)==='1'){hideSystem();hideVerify();return}
  const st=localStorage.getItem(S);
+ if(st==='login'){hideSystem();hideVerify();try{setGateVisible?.('login')}catch(_){showAuthScreen?.('login')}return}
  if(st==='verifying'){showVerify();return}
  if(st==='verified'){showVerify();const b=document.getElementById('v233-check'),g=document.getElementById('v237-continue');if(b){b.disabled=true;b.textContent='E-MAIL CONFIRMÉ ✓'}if(g)g.style.display='block';note('E-mail confirmé. Identité validée.');return}
  if(await user()){hideSystem();hideVerify();return}
@@ -16386,6 +16389,11 @@ async function boot(){
 }
 window.addEventListener('message',async e=>{
  const m=e.data||{};if(!String(m.type||'').startsWith('lvl-onboard-'))return;
+ if(m.type==='lvl-onboard-login-request'){
+   localStorage.setItem(S,'login');localStorage.removeItem(P);localStorage.removeItem(R);hideSystem();hideVerify();
+   try{setGateVisible?.('login')}catch(_){document.getElementById('auth-gate')?.classList.remove('hidden');showAuthScreen?.('login')}
+   return;
+ }
  if(m.type==='lvl-onboard-replay-finish'){
    sessionStorage.removeItem('leveling_manual_onboarding_replay');
    hideSystem();hideVerify();

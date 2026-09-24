@@ -1,6 +1,6 @@
 # LEVELING-APP
 
-PWA de suivi d'entraînement, de progression SBD et de rangs. La version applicative actuelle est `22.1.4`.
+PWA de suivi d'entraînement, de progression SBD et de rangs. La version applicative actuelle est `22.1.5`.
 
 Le dépôt canonique est [Zaiiik/StatDeX](https://github.com/Zaiiik/StatDeX). L'application publique reste volontairement livrée sans étape de compilation : `index.html` contient le runtime principal et `admin/` contient l'interface d'administration.
 
