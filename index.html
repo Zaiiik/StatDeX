@@ -1,4 +1,4 @@
-<!-- LEVELING-APP V22.1.3 — SESSION-STABLE ROLLBACK · BASE V21.9.2 VALIDATED -->
+<!-- LEVELING-APP V22.1.4 — SAFE CLOUD RECONCILIATION · BASE V21.9.2 VALIDATED -->
 <!-- LEVELING-APP V18.6.0 CLEAN CORE + PROGRAM AI — consolidated coaching core, safer progression flow, PROGRAM AI assistant -->
 <!-- LEVELING-APP V17.4.0 AUTH + I18N + ONBOARDING REPLAY TEST
      - hard account gate after first-run discovery
@@ -17,7 +17,7 @@
 
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>LEVELING-APP — V22.1.3 ACCESS+</title>
+    <title>LEVELING-APP — V22.1.4 ACCESS+</title>
     <meta name="theme-color" content="#09090f">
     <meta name="application-name" content="LEVELING-APP">
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -6597,7 +6597,11 @@ function saveActiveProgramState() {
             if (selectedRating >= 4) {
                 userData.trophies += selectedRating;
             }
-            userData.level = 1 + Math.floor(userData.workoutsCompleted / 3);
+            /* Le niveau est canonique côté XP. Ne jamais le recalculer depuis le
+               nombre de séances : le moteur de progression le synchronise après
+               l'attribution des récompenses de cette séance. */
+            const canonicalLevel = Number(window.LevelingProgressionV15?.getLevel?.());
+            if (Number.isFinite(canonicalLevel) && canonicalLevel >= 1) userData.level = canonicalLevel;
 
             if (currentDayIndex === 6) {
                 checkSundayCompletion();
@@ -7042,6 +7046,28 @@ const sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_PUBLISHABLE_KEY,{
   auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true,storage:window.localStorage}
 });
 let cloudUser=null,cloudLicensed=false,cloudLoadedOnce=false,cloudSaveTimer=null,suppressCloudSave=false,licenseWatchTimer=null,lastLicenseStatus='UNKNOWN';
+let cloudLoadPromise=null,cloudSavePending=false,cloudRevision=null,cloudSyncUserId=null,cloudSyncGeneration=0,cloudConflict=false,cloudConflictRetries=0;
+let cloudIoQueue=Promise.resolve();
+function prepareCloudSyncIdentity(userId){
+  userId=String(userId||'');
+  if(cloudSyncUserId!==userId){
+    cloudSyncGeneration++;
+    cloudSyncUserId=userId;
+    cloudLoadedOnce=false;
+    cloudLoadPromise=null;
+    cloudSavePending=false;
+    cloudRevision=null;
+    cloudConflict=false;
+    cloudConflictRetries=0;
+    clearTimeout(cloudSaveTimer);
+  }
+  return cloudSyncGeneration;
+}
+function enqueueCloudIo(task){
+  const run=cloudIoQueue.then(task,task);
+  cloudIoQueue=run.catch(()=>{});
+  return run;
+}
 /* V17.10.1 — expose live getters for legacy modules loaded in separate script blocks.
    Top-level const/let are not properties of window, which previously made modules
    such as cloud messages and ideas believe Supabase/auth were unavailable. */
@@ -7178,8 +7204,8 @@ function setAppUnlockedShell(){
   document.getElementById('app-container')?.classList.remove('auth-locked');
 }
 
-const APP_VERSION='22.1.3';
-const ACCOUNT_LOCAL_KEYS=['solo_leveling_user','solo_leveling_smart_refs','solo_leveling_body_hist','solo_leveling_inv','solo_leveling_block','solo_leveling_day','solo_leveling_state','solo_leveling_custom_sets','solo_leveling_history','solo_leveling_active_program','solo_leveling_program_states','solo_leveling_program_custom_sets','solo_leveling_custom_program','leveling_last_local_save','leveling_last_cloud_sync','leveling_v10','leveling_v181_core','leveling_v182_core'];
+const APP_VERSION='22.1.4';
+const ACCOUNT_LOCAL_KEYS=['solo_leveling_user','solo_leveling_smart_refs','solo_leveling_body_hist','solo_leveling_inv','solo_leveling_block','solo_leveling_day','solo_leveling_state','solo_leveling_custom_sets','solo_leveling_history','solo_leveling_active_program','solo_leveling_program_states','solo_leveling_program_custom_sets','solo_leveling_custom_program','leveling_last_local_save','leveling_last_cloud_sync','solo_leveling_v10','leveling_v181_core','leveling_v182_core'];
 function clearLevelingAccountLocalData(){
   try{ACCOUNT_LOCAL_KEYS.forEach(k=>localStorage.removeItem(k));sessionStorage.removeItem('leveling_pending_license')}catch(e){console.warn('Local account cleanup:',e)}
 }
@@ -7333,7 +7359,7 @@ async function v1647RefreshAccessAfterExternalReturn(){
   try{
     const info=await getCurrentLicenseStatus();
     if(info.status==='DISABLED'){showBlockedGate('Cette licence est actuellement désactivée.');return}
-    if(await v2141RouteAccess(info,{unlock:false})){if(navigator.onLine)scheduleCloudSave();else setCloudStatus('offline')}
+    if(await v2141RouteAccess(info,{unlock:false})){if(navigator.onLine){if(!cloudLoadedOnce)await loadCloudData();else if(cloudSavePending)scheduleCloudSave()}else setCloudStatus('offline')}
   }catch(e){console.warn('Refresh access:',e)}finally{v1647AccessRefreshBusy=false}
 }
 window.v1647RefreshAccessAfterExternalReturn=v1647RefreshAccessAfterExternalReturn;
@@ -7451,82 +7477,139 @@ function exportAppData(){
   let v182=null;try{v182=window.LevelingCoreV182?.exportState?.()||JSON.parse(localStorage.getItem('leveling_v182_core')||'null')}catch(e){}
   return{version:'18.6.0',userData,smartHypertrophyRefs,bodyHistory,inventoryItems,currentBlockIndex,currentDayIndex,activeProgramKey,programWorkoutStates,programCustomSetData,customProgramData,workoutState,customSetData,workoutHistory,v182,v10:(typeof window.__levelingV10Export==='function'?window.__levelingV10Export():null)};
 }
-function importAppData(d){
-  if(!d||typeof d!=='object')return;
-  /* V19.4 : fusion canonique avant import. Une sauvegarde cloud plus ancienne ne peut
-     plus annuler une séance, une absence, une série faite ou une séance détaillée locale. */
-  try{
-    const local=exportAppData();
-    const mergeObj=(a,b)=>({...((b&&typeof b==='object')?b:{}),...((a&&typeof a==='object')?a:{})});
-    const unionBy=(a,b,keyFn)=>{
-      const m=new Map();
-      [...(Array.isArray(b)?b:[]),...(Array.isArray(a)?a:[])].forEach(x=>{if(!x)return;const k=keyFn(x);if(k)m.set(k,{...(m.get(k)||{}),...x})});
-      return [...m.values()];
-    };
-    d={...d,userData:{...(d.userData||{})}};
-    const lu=local.userData||{}, iu=d.userData||{};
-    d.userData.validatedSessions=mergeObj(lu.validatedSessions,iu.validatedSessions);
-    d.userData.absentSessions=mergeObj(lu.absentSessions,iu.absentSessions);
-    Object.keys(d.userData.validatedSessions||{}).forEach(k=>{if(d.userData.validatedSessions[k]&&d.userData.absentSessions?.[k])delete d.userData.absentSessions[k]});
-    const ls=lu.systemAI||{}, is=iu.systemAI||{};
-    d.userData.systemAI={
-      ...is,...ls,
-      events:unionBy(ls.events,is.events,x=>x.id||`${x.date}|${x.program}|${x.block}|${x.day}|${x.status}`),
-      current:mergeObj(ls.current,is.current)
-    };
-    d.userData.skippedSets=mergeObj(lu.skippedSets,iu.skippedSets);
-    d.programWorkoutStates=mergeObj(local.programWorkoutStates,d.programWorkoutStates);
-    d.programCustomSetData=mergeObj(local.programCustomSetData,d.programCustomSetData);
-    if(local.v182||d.v182){
-      const lv=local.v182||{},iv=d.v182||{};
-      d.v182={...iv,...lv,sessions:unionBy(lv.sessions,iv.sessions,x=>x.id||`${x.date}|${x.program}|${x.block}|${x.day}`)};
-    }
-    if(local.v10||d.v10){
-      const lv=local.v10||{},iv=d.v10||{};
-      d.v10={...iv,...lv,sessions:unionBy(lv.sessions,iv.sessions,x=>x.sessionKey||x.id||`${x.date}|${x.program}|${x.block}|${x.day}`)};
-    }
-  }catch(e){console.warn('[V19.4] canonical cloud merge',e)}
-  suppressCloudSave=true;
+const v2214Obj=v=>!!v&&typeof v==='object'&&!Array.isArray(v);
+const v2214Map=(older,newer)=>({...((v2214Obj(older))?older:{}),...((v2214Obj(newer))?newer:{})});
+function v2214Union(older,newer,keyFn){
+  const rows=new Map();
+  [...(Array.isArray(older)?older:[]),...(Array.isArray(newer)?newer:[])].forEach(x=>{if(!x)return;const key=keyFn(x);if(key)rows.set(key,{...(rows.get(key)||{}),...x})});
+  return [...rows.values()];
+}
+function v2214Cycle(d){return Math.max(1,Number(d?.cycleNumber)||1)}
+function v2214Xp(d){return Math.max(0,Number(d?.v10?.totalXp)||0,Number(d?.v10?.xp)||0)}
+function v2214Progress(d){return [v2214Cycle(d),Math.max(0,Number(d?.userData?.workoutsCompleted)||0),v2214Xp(d),Array.isArray(d?.v10?.sessions)?d.v10.sessions.length:0]}
+function v2214CompareProgress(a,b){const x=v2214Progress(a),y=v2214Progress(b);for(let i=0;i<x.length;i++){if(x[i]!==y[i])return x[i]>y[i]?1:-1}return 0}
+function v2214MergeTree(older,newer){
+  if(v2214Obj(older)&&v2214Obj(newer)){const out={...older};Object.keys(newer).forEach(k=>{out[k]=k in out?v2214MergeTree(out[k],newer[k]):newer[k]});return out}
+  if(typeof older==='boolean'&&typeof newer==='boolean')return older||newer;
+  return newer===undefined?older:newer;
+}
+function v2214CycleMap(older,newer,olderCycle,newerCycle){
+  const a=v2214Obj(older)?older:{},b=v2214Obj(newer)?newer:{};
+  if(olderCycle===newerCycle)return v2214MergeTree(a,b);
+  const winner=olderCycle>newerCycle?a:b,out={};
+  Object.entries(v2214Map(a,b)).forEach(([k,v])=>{if(!String(k).includes('powerbuilding'))out[k]=v});
+  Object.entries(winner).forEach(([k,v])=>{if(String(k).includes('powerbuilding'))out[k]=v});
+  return out;
+}
+function v2214MergeAppData(incoming,local,{preferLocalOnTie=false}={}){
+  const remote=v2214Obj(incoming)?incoming:{},device=v2214Obj(local)?local:{};
+  const cmp=v2214CompareProgress(device,remote),deviceWins=cmp>0||(cmp===0&&preferLocalOnTie);
+  const older=deviceWins?remote:device,newer=deviceWins?device:remote;
+  const olderCycle=v2214Cycle(older),newerCycle=v2214Cycle(newer),out={...older,...newer};
+  if(olderCycle===newerCycle&&String(older.activeProgramKey||'')===String(newer.activeProgramKey||'')){
+    const op=[Math.max(0,Number(older.currentBlockIndex)||0),Math.max(0,Number(older.currentDayIndex)||0)];
+    const np=[Math.max(0,Number(newer.currentBlockIndex)||0),Math.max(0,Number(newer.currentDayIndex)||0)];
+    const pointer=op[0]>np[0]||(op[0]===np[0]&&op[1]>np[1])?op:np;
+    out.currentBlockIndex=pointer[0];out.currentDayIndex=pointer[1];
+  }
+  const ou=v2214Obj(older.userData)?older.userData:{},nu=v2214Obj(newer.userData)?newer.userData:{};
+  out.cycleNumber=Math.max(olderCycle,newerCycle);
+  out.userData={...ou,...nu};
+  ['workoutsCompleted','prCount','trophies'].forEach(k=>{out.userData[k]=Math.max(0,Number(ou[k])||0,Number(nu[k])||0)});
+  out.userData.validatedSessions=v2214CycleMap(ou.validatedSessions,nu.validatedSessions,olderCycle,newerCycle);
+  out.userData.absentSessions=v2214CycleMap(ou.absentSessions,nu.absentSessions,olderCycle,newerCycle);
+  Object.keys(out.userData.validatedSessions).forEach(k=>{if(out.userData.validatedSessions[k]&&out.userData.absentSessions[k])delete out.userData.absentSessions[k]});
+  const os=v2214Obj(ou.systemAI)?ou.systemAI:{},ns=v2214Obj(nu.systemAI)?nu.systemAI:{};
+  out.userData.systemAI={...os,...ns,events:v2214Union(os.events,ns.events,x=>`${x.cycle||1}|${x.id||`${x.date}|${x.program}|${x.block}|${x.day}|${x.status}`}`),current:v2214CycleMap(os.current,ns.current,olderCycle,newerCycle)};
+  out.userData.skippedSets=v2214CycleMap(ou.skippedSets,nu.skippedSets,olderCycle,newerCycle);
+  const op=v2214Obj(older.programWorkoutStates)?older.programWorkoutStates:{},np=v2214Obj(newer.programWorkoutStates)?newer.programWorkoutStates:{};
+  const oc=v2214Obj(older.programCustomSetData)?older.programCustomSetData:{},nc=v2214Obj(newer.programCustomSetData)?newer.programCustomSetData:{};
+  out.programWorkoutStates=v2214MergeTree(op,np);out.programCustomSetData=v2214MergeTree(oc,nc);
+  if(olderCycle!==newerCycle){out.programWorkoutStates.powerbuilding=np.powerbuilding||{};out.programCustomSetData.powerbuilding=nc.powerbuilding||{}}
+  out.validatedSessions=v2214CycleMap(older.validatedSessions,newer.validatedSessions,olderCycle,newerCycle);
+  const ov=v2214Obj(older.v10)?older.v10:{},nv=v2214Obj(newer.v10)?newer.v10:{},totalXp=Math.max(v2214Xp(older),v2214Xp(newer));
+  const recent=(String(nv.lastWorkout||nv.dayKey||'')>=String(ov.lastWorkout||ov.dayKey||''))?nv:ov;
+  out.v10={...ov,...nv,xp:totalXp,totalXp,streak:Math.max(0,Number(recent.streak)||0),steps:Math.max(0,Number(recent.steps)||0),dailyBonus:!!recent.dailyBonus,
+    quests:v2214Map(ov.quests,nv.quests),rewardClaims:v2214Map(ov.rewardClaims,nv.rewardClaims),smartQuestClaims:v2214Map(ov.smartQuestClaims,nv.smartQuestClaims),achievements:v2214Map(ov.achievements,nv.achievements),prXpKeys:v2214Map(ov.prXpKeys,nv.prXpKeys),recovery:v2214Map(ov.recovery,nv.recovery),
+    sessions:v2214Union(ov.sessions,nv.sessions,x=>x.sessionKey||x.id||`${x.date}|${x.program}|${x.block}|${x.day}`)};
+  if(totalXp>0)out.userData.level=1+Math.floor(totalXp/1000);else out.userData.level=Math.max(1,Number(ou.level)||1,Number(nu.level)||1);
+  const o182=v2214Obj(older.v182)?older.v182:{},n182=v2214Obj(newer.v182)?newer.v182:{};
+  if(Object.keys(o182).length||Object.keys(n182).length)out.v182={...o182,...n182,sessions:v2214Union(o182.sessions,n182.sessions,x=>x.id||`${x.date}|${x.program}|${x.block}|${x.day}`)};
+  out.workoutHistory=v2214Union(older.workoutHistory,newer.workoutHistory,x=>x.id||`${x.date}|${x.blockName}|${x.totalTonnage}`);
+  out.workoutState=out.programWorkoutStates?.[out.activeProgramKey]||newer.workoutState||{};
+  out.customSetData=out.programCustomSetData?.[out.activeProgramKey]||newer.customSetData||{};
+  return out;
+}
+window.LevelingCloudMergeV2214={merge:v2214MergeAppData,compare:v2214CompareProgress};
+function importAppData(d,options={}){
+  if(!d||typeof d!=='object')return null;
+  try{const local=typeof window.exportAppData==='function'?window.exportAppData():exportAppData();d=v2214MergeAppData(d,local,options)}catch(e){console.warn('[V22.1.4] canonical cloud merge',e)}
+  const wasSuppressed=suppressCloudSave;suppressCloudSave=true;
   try{
     if(d.userData)userData=d.userData;if(d.smartHypertrophyRefs)smartHypertrophyRefs=d.smartHypertrophyRefs;if(d.bodyHistory)bodyHistory=d.bodyHistory;if(d.inventoryItems)inventoryItems=d.inventoryItems;
     if(Number.isInteger(d.currentBlockIndex))currentBlockIndex=d.currentBlockIndex;if(Number.isInteger(d.currentDayIndex))currentDayIndex=d.currentDayIndex;if(d.activeProgramKey)activeProgramKey=d.activeProgramKey;
     if(d.programWorkoutStates)programWorkoutStates=d.programWorkoutStates;if(d.programCustomSetData)programCustomSetData=d.programCustomSetData;if(d.customProgramData)customProgramData=d.customProgramData;if(d.workoutState)workoutState=d.workoutState;if(d.customSetData)customSetData=d.customSetData;if(d.workoutHistory)workoutHistory=d.workoutHistory;
     if(d.v182){try{localStorage.setItem('leveling_v182_core',JSON.stringify(d.v182));window.LevelingCoreV182?.importState?.(d.v182)}catch(e){console.warn('[V18.6.0] import core',e)}}
-    if(d.v10&&typeof window.__levelingV10Import==='function')window.__levelingV10Import(d.v10);
+    if(d.v10){try{localStorage.setItem('solo_leveling_v10',JSON.stringify(d.v10))}catch(e){console.warn('[V22.1.4] progression persist',e)};if(typeof window.__levelingV10Import==='function')window.__levelingV10Import(d.v10)}
     if(typeof loadActiveProgramState==='function')loadActiveProgramState();if(typeof saveToLocalStorage==='function')saveToLocalStorage();
-  }finally{suppressCloudSave=false}
+  }finally{suppressCloudSave=wasSuppressed}
+  return d;
 }
-async function loadCloudData(){
-  if(!cloudUser||!cloudLicensed)return;
-  lastCloudSyncAt=parseInt(localStorage.getItem('leveling_last_cloud_sync')||'0')||0;setCloudStatus(navigator.onLine?'syncing':'offline');
+async function performCloudLoad(userId,generation){
+  if(document.readyState==='loading')await new Promise(resolve=>document.addEventListener('DOMContentLoaded',resolve,{once:true}));
+  if(!cloudUser||cloudUser.id!==userId||generation!==cloudSyncGeneration)return false;
+  const previousSync=parseInt(localStorage.getItem('leveling_last_cloud_sync')||'0')||0;
+  const lastLocalSave=parseInt(localStorage.getItem('leveling_last_local_save')||'0')||0;
+  const localDirty=previousSync>0&&lastLocalSave>previousSync;
+  lastCloudSyncAt=previousSync;
+  setCloudStatus(navigator.onLine?'syncing':'offline');
 
-  /* V16.3.6 — En fichier local de test, le bloc/jour/programme que l'utilisateur
-     a réellement sélectionné sur cet appareil reste prioritaire. Le cloud peut
-     restaurer les performances et le profil sans renvoyer un Bloc 3 vers Bloc 1. */
-  const preserveLocalTraining=(location.protocol==='file:'||location.protocol==='content:');
-  const localTraining=preserveLocalTraining?{
-    block:localStorage.getItem('solo_leveling_block'),
-    day:localStorage.getItem('solo_leveling_day'),
-    program:localStorage.getItem('solo_leveling_active_program')
-  }:null;
+  try{
+    const {data,error}=await sb.from('profiles').select('app_data,username,updated_at').eq('id',userId).single();
+    if(error)throw error;
+    if(!data||!cloudUser||cloudUser.id!==userId||generation!==cloudSyncGeneration)return false;
 
-  const {data,error}=await sb.from('profiles').select('app_data,username').eq('id',cloudUser.id).single();
-  if(!error&&data){
+    cloudRevision=data.updated_at||null;
+    cloudConflict=false;
     if(data.username&&!userData.playerName)userData.playerName=data.username;
     if(data.app_data&&Object.keys(data.app_data).length){
-      importAppData(data.app_data);
-      if(localTraining){
-        const b=Number(localTraining.block),d=Number(localTraining.day);
-        if(Number.isInteger(b)&&b>=0)currentBlockIndex=b;
-        if(Number.isInteger(d)&&d>=0)currentDayIndex=d;
-        if(localTraining.program)activeProgramKey=localTraining.program;
-        if(typeof loadActiveProgramState==='function')loadActiveProgramState();
-        if(typeof saveToLocalStorage==='function')saveToLocalStorage();
-        try{if(typeof initWorkoutSystem==='function')initWorkoutSystem()}catch(e){}
-      }
-    }else await saveCloudData();
+      let localSnapshot={};
+      try{localSnapshot=typeof window.exportAppData==='function'?window.exportAppData():exportAppData()}catch(e){}
+      const localAhead=v2214CompareProgress(localSnapshot,data.app_data)>0;
+      if(typeof window.importAppData==='function')window.importAppData(data.app_data,{preferLocalOnTie:localDirty});
+      else importAppData(data.app_data,{preferLocalOnTie:localDirty});
+      cloudLoadedOnce=true;
+      if(localDirty||localAhead)cloudSavePending=true;
+    }else{
+      cloudLoadedOnce=true;
+      cloudSavePending=true;
+      return performCloudSave(userId,generation);
+    }
+
+    if(cloudSavePending)queueMicrotask(()=>saveCloudData());
+    else{
+      lastCloudSyncAt=Date.now();
+      localStorage.setItem('leveling_last_cloud_sync',String(lastCloudSyncAt));
+      setCloudStatus('synced');
+    }
+    return true;
+  }catch(e){
+    console.warn('Cloud load:',e?.message||e);
+    cloudLoadedOnce=false;
+    setCloudStatus(navigator.onLine?'error':'offline');
+    return false;
   }
-  else if(error)console.warn('Cloud load:',error.message);cloudLoadedOnce=true;
+}
+function loadCloudData(){
+  if(!cloudUser||!cloudLicensed)return Promise.resolve(false);
+  const userId=cloudUser.id,generation=prepareCloudSyncIdentity(userId);
+  if(cloudLoadedOnce&&!cloudConflict)return Promise.resolve(true);
+  if(cloudLoadPromise)return cloudLoadPromise;
+  const task=enqueueCloudIo(()=>performCloudLoad(userId,generation))
+    .catch(e=>{console.warn('Cloud load queue:',e?.message||e);return false});
+  cloudLoadPromise=task;
+  task.finally(()=>{if(cloudLoadPromise===task)cloudLoadPromise=null});
+  return task;
 }
 
 let lastCloudSyncAt=0;
@@ -7544,8 +7627,12 @@ function setCloudStatus(state,text){
   if(badge)badge.textContent=state==='synced'?' SYNCHRONISÉ':state==='syncing'?' SYNC…':state==='offline'?' HORS LIGNE':' CLOUD';
   if(detail)detail.textContent=state==='offline'?'Changements enregistrés sur cet appareil. Synchronisation à la reconnexion.':(text||formatSyncAge(lastCloudSyncAt));
 }
-setInterval(()=>{if(lastCloudSyncAt&&cloudUser&&cloudLicensed&&navigator.onLine&&document.visibilityState==='visible')setCloudStatus('synced')},60000);
-function scheduleCloudSaveImmediate(){if(!cloudUser||!cloudLicensed||suppressCloudSave)return;clearTimeout(cloudSaveTimer);saveCloudData()}
+setInterval(()=>{if(lastCloudSyncAt&&cloudLoadedOnce&&!cloudSavePending&&!cloudConflict&&cloudUser&&cloudLicensed&&navigator.onLine&&document.visibilityState==='visible')setCloudStatus('synced')},60000);
+function scheduleCloudSaveImmediate(){
+  if(!cloudUser||!cloudLicensed||suppressCloudSave)return Promise.resolve(false);
+  prepareCloudSyncIdentity(cloudUser.id);cloudSavePending=true;clearTimeout(cloudSaveTimer);
+  return saveCloudData();
+}
 window.scheduleCloudSaveImmediate=scheduleCloudSaveImmediate;
 
 function hasWorkoutProgress(){
@@ -7599,17 +7686,66 @@ async function forceAppUpdate(){
   location.replace(location.pathname+'?updated='+Date.now());
 }
 
-async function saveCloudData(){
-  if(!cloudUser||!cloudLicensed||suppressCloudSave)return;
-  if(!navigator.onLine){setCloudStatus('offline');return}
+async function performCloudSave(userId,generation){
+  if(!cloudSavePending)return true;
+  if(!cloudUser||cloudUser.id!==userId||generation!==cloudSyncGeneration||!cloudLicensed||suppressCloudSave)return false;
+  if(!cloudLoadedOnce||cloudConflict)return false;
+  if(!navigator.onLine){setCloudStatus('offline');return false}
+
+  cloudSavePending=false;
   setCloudStatus('syncing');
-  const updates={app_data:exportAppData(),updated_at:new Date().toISOString()};if(userData.playerName)updates.username=userData.playerName;
-  const {error}=await sb.from('profiles').update(updates).eq('id',cloudUser.id);
-  if(error){console.warn('Cloud save:',error.message);setCloudStatus('error');return}
-  lastCloudSyncAt=Date.now();localStorage.setItem('leveling_last_cloud_sync',String(lastCloudSyncAt));setCloudStatus('synced');
+  const nextRevision=new Date(Math.max(Date.now(),(Date.parse(cloudRevision)||0)+1)).toISOString();
+  const snapshot=typeof window.exportAppData==='function'?window.exportAppData():exportAppData();
+  const updates={app_data:snapshot,updated_at:nextRevision};
+  if(userData.playerName)updates.username=userData.playerName;
+
+  try{
+    let request=sb.from('profiles').update(updates).eq('id',userId);
+    request=cloudRevision?request.eq('updated_at',cloudRevision):request.is('updated_at',null);
+    const {data,error}=await request.select('updated_at').maybeSingle();
+    if(error)throw error;
+    if(!cloudUser||cloudUser.id!==userId||generation!==cloudSyncGeneration)return false;
+    if(!data){
+      cloudSavePending=true;
+      cloudConflict=true;
+      if(cloudConflictRetries<2){
+        cloudConflictRetries++;
+        if(await performCloudLoad(userId,generation))return false;
+      }
+      setCloudStatus('error','Conflit cloud détecté · recharge l’application');
+      console.warn('Cloud save conflict: la sauvegarde distante a changé depuis son chargement. Aucune donnée n’a été écrasée.');
+      try{window.dispatchEvent(new CustomEvent('leveling-cloud-conflict',{detail:{userId}}))}catch(e){}
+      return false;
+    }
+    cloudRevision=data.updated_at||nextRevision;
+    cloudConflict=false;
+    cloudConflictRetries=0;
+    lastCloudSyncAt=Date.now();
+    localStorage.setItem('leveling_last_cloud_sync',String(lastCloudSyncAt));
+    setCloudStatus('synced');
+    if(cloudSavePending)queueMicrotask(()=>saveCloudData());
+    return true;
+  }catch(e){
+    cloudSavePending=true;
+    console.warn('Cloud save:',e?.message||e);
+    setCloudStatus(navigator.onLine?'error':'offline');
+    return false;
+  }
+}
+function saveCloudData(){
+  if(!cloudUser||!cloudLicensed||suppressCloudSave)return Promise.resolve(false);
+  const userId=cloudUser.id,generation=prepareCloudSyncIdentity(userId);
+  cloudSavePending=true;
+  /* Important : une sauvegarde ne déclenche jamais elle-même la lecture initiale.
+     unlockLevelingApp lie d'abord le compte local, puis attend loadCloudData(). */
+  if(!cloudLoadedOnce||cloudConflict){setCloudStatus(navigator.onLine?'syncing':'offline');return Promise.resolve(false)}
+  return enqueueCloudIo(()=>performCloudSave(userId,generation));
 }
 function scheduleCloudSave(){
-  if(!cloudUser||!cloudLicensed||suppressCloudSave)return;clearTimeout(cloudSaveTimer);setCloudStatus(navigator.onLine?'syncing':'offline');cloudSaveTimer=setTimeout(saveCloudData,350)
+  if(!cloudUser||!cloudLicensed||suppressCloudSave)return;
+  prepareCloudSyncIdentity(cloudUser.id);cloudSavePending=true;clearTimeout(cloudSaveTimer);
+  setCloudStatus(navigator.onLine?'syncing':'offline');
+  if(cloudLoadedOnce&&!cloudConflict)cloudSaveTimer=setTimeout(saveCloudData,350);
 }
 window.scheduleCloudSave=scheduleCloudSave;
 const __v12LocalSave=window.saveToLocalStorage;
@@ -7634,7 +7770,7 @@ async function unlockLevelingApp(forceTrial=false){
   try{setTimeout(()=>window.LevelingDeveloperMessagesV172?.refreshCloud?.(),120)}catch(e){}
   try{setTimeout(()=>checkAppRelease(),180)}catch(e){}
   startLicenseWatch();
-  if(navigator.onLine)scheduleCloudSave();else setCloudStatus('offline');
+  if(navigator.onLine){if(cloudSavePending)scheduleCloudSave();else if(cloudLoadedOnce)setCloudStatus('synced');else setCloudStatus('error')}else setCloudStatus('offline');
   try{setTimeout(()=>window.LevelingAccessV214?.refresh?.(),0)}catch(e){}
   return true;
 }
@@ -7712,7 +7848,7 @@ async function restoreSupabaseSession(source='startup'){
       const info=await getCurrentLicenseStatus();
       lastLicenseStatus=info.status||'UNKNOWN';
       if(info.status==='DISABLED'){showBlockedGate('Cette licence est actuellement désactivée.');return false}
-      if(await v2141RouteAccess(info))return true;
+      if(await v2141RouteAccess(info)){if(!cloudLoadedOnce&&navigator.onLine)await loadCloudData();return true}
       const cached=v214CachedAccess();
       if(info.status==='ERROR'&&cached&&v214ValidState(cached.access_state)){v214ApplyAccessInfo(cached);setAppUnlockedShell();setCloudStatus(navigator.onLine?'error':'offline');startLicenseWatch();return true}
       cloudLicensed=false;
@@ -7744,7 +7880,7 @@ document.addEventListener('visibilitychange',()=>{
   if(document.visibilityState==='visible')queueSessionRestore('visibility',80);
 });
 window.addEventListener('pageshow',()=>queueSessionRestore('pageshow',60));
-window.addEventListener('online',()=>{setCloudStatus('syncing');queueSessionRestore('online',30)});
+window.addEventListener('online',()=>{setCloudStatus('syncing');queueSessionRestore('online',30);if(cloudLoadedOnce&&!cloudConflict&&cloudSavePending)queueMicrotask(()=>saveCloudData())});
 window.addEventListener('offline',()=>setCloudStatus('offline'));
 sb.auth.onAuthStateChange((event,session)=>{
   if(session?.user){
@@ -7762,7 +7898,7 @@ document.addEventListener('pointerup',e=>{
 registerLevelingSW();updateInstallUI();
 /* Session restoration can run immediately, but all account UI is deferred while
    the 4-page discovery onboarding owns the screen. */
-restoreSupabaseSession('startup');
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',()=>restoreSupabaseSession('startup'),{once:true});else restoreSupabaseSession('startup');
 </script>
 
     <div id="ios-install-modal" onclick="if(event.target===this)closeIOSInstallHelp()">
@@ -10290,8 +10426,13 @@ function restoreValidated(obj){
   if(!obj||typeof obj!=='object')return;
   if(!userData.validatedSessions||typeof userData.validatedSessions!=='object')userData.validatedSessions={};
   try{
+    const canonical=new Set(Object.entries(obj).filter(([k,v])=>k.startsWith('leveling_validated_')&&!!v).map(([k])=>k));
+    const stale=[];
+    for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(k?.startsWith('leveling_validated_powerbuilding_')&&!canonical.has(k))stale.push(k)}
+    stale.forEach(k=>localStorage.removeItem(k));
+    Object.keys(userData.validatedSessions).filter(k=>k.startsWith('leveling_validated_powerbuilding_')&&!canonical.has(k)).forEach(k=>delete userData.validatedSessions[k]);
     Object.entries(obj).forEach(([k,v])=>{
-      if(!k.startsWith('leveling_validated_')||v!=='1')return;
+      if(!k.startsWith('leveling_validated_')||!v)return;
       localStorage.setItem(k,'1');
       userData.validatedSessions[k]=userData.validatedSessions[k]||Date.now();
     });
@@ -10347,42 +10488,46 @@ function exportClean(){
   return d;
 }
 
-function importClean(data){
-  const localBefore=sbdSnapshot(userData);
-  if(validSbd(localBefore))saveSafe(localBefore);
-  const incoming=sbdSnapshot(data?.userData||{});
-  const winner=selectSbdWinner(localBefore,incoming,loadSafe());
+function importClean(data,options={}){
+  const outerSuppressed=suppressCloudSave;suppressCloudSave=true;
+  try{
+    const localBefore=sbdSnapshot(userData);
+    if(validSbd(localBefore))saveSafe(localBefore);
+    const incoming=sbdSnapshot(data?.userData||{});
+    const winner=selectSbdWinner(localBefore,incoming,loadSafe());
 
-  let payload=data;
-  if(data&&typeof data==='object'){
-    try{payload=JSON.parse(JSON.stringify(data))}catch(e){payload={...data}}
-    payload.userData={...(data.userData||{})};
-    if(winner)applySbd(payload.userData,winner);
-  }
+    let payload=data;
+    if(data&&typeof data==='object'){
+      try{payload=JSON.parse(JSON.stringify(data))}catch(e){payload={...data}}
+      payload.userData={...(data.userData||{})};
+      if(winner)applySbd(payload.userData,winner);
+    }
 
-  const result=baseImport?baseImport(payload):undefined;
+    const result=baseImport?baseImport(payload,options):payload;
+    const applied=result&&typeof result==='object'?result:payload;
 
-  if(winner){
-    applySbd(userData,winner);
-    saveSafe(sbdSnapshot(userData));
-  }
-  if(payload?.v140Rpg)saveRpg(payload.v140Rpg);
-  if(payload?.validatedSessions)restoreValidated(payload.validatedSessions);
-  if(Number(payload?.cycleNumber)>0)localStorage.setItem('leveling_cycle_number',String(Math.max(1,Number(payload.cycleNumber))));
-  try{if(payload?.v10)window.__levelingV10Import?.(payload.v10)}catch(e){}
+    if(winner){
+      applySbd(userData,winner);
+      saveSafe(sbdSnapshot(userData));
+    }
+    if(applied?.v140Rpg)saveRpg(applied.v140Rpg);
+    if(applied?.validatedSessions)restoreValidated(applied.validatedSessions);
+    if(Number(applied?.cycleNumber)>0)localStorage.setItem('leveling_cycle_number',String(Math.max(1,Number(applied.cycleNumber))));
+    try{if(!baseImport&&applied?.v10)window.__levelingV10Import?.(applied.v10)}catch(e){}
 
-  try{saveToLocalStorage()}catch(e){}
-  setTimeout(()=>{
-    try{updateProfileUI?.()}catch(e){}
-    try{renderGoals?.()}catch(e){}
-    try{renderProfileV2?.()}catch(e){}
-    try{window.renderPowerRankLive?.()}catch(e){}
-    try{window.renderXpRankLive?.()}catch(e){}
-    try{window.LevelingProgramV157?.refreshValidationUI?.()}catch(e){}
-    try{window.LevelingProgressionV15?.render?.()}catch(e){}
-    try{renderAll?.()}catch(e){}
-  },0);
-  return result;
+    try{saveToLocalStorage()}catch(e){}
+    setTimeout(()=>{
+      try{updateProfileUI?.()}catch(e){}
+      try{renderGoals?.()}catch(e){}
+      try{renderProfileV2?.()}catch(e){}
+      try{window.renderPowerRankLive?.()}catch(e){}
+      try{window.renderXpRankLive?.()}catch(e){}
+      try{window.LevelingProgramV157?.refreshValidationUI?.()}catch(e){}
+      try{window.LevelingProgressionV15?.render?.()}catch(e){}
+      try{renderAll?.()}catch(e){}
+    },0);
+    return applied;
+  }finally{suppressCloudSave=outerSuppressed}
 }
 
 window.exportAppData=exportClean;
@@ -12459,7 +12604,7 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
   window.addEventListener('pageshow',()=>setTimeout(refreshCloud,500));
 })();
 </script><script id="v17111-version-tools">
-const V17111_PUBLIC_VERSION='22.1.3';
+const V17111_PUBLIC_VERSION='22.1.4';
 function v17111MountVersionTools(target){
   if(!target||target.querySelector('#v17111-version-card'))return;
   const en=localStorage.getItem('leveling_language')==='en';
@@ -12975,7 +13120,7 @@ try{
   if(saved&&typeof saved==='object')state=Object.assign({},defaults,saved);
 }catch(e){}
 
-if(!Number.isFinite(Number(state.totalXp)))state.totalXp=0;
+state.totalXp=Math.max(0,Number(state.totalXp)||0,Number(state.xp)||0);
 if(Number(state.totalXp)===0 && Number(userData?.workoutsCompleted||0)>0){
   state.totalXp=Number(userData.workoutsCompleted||0)*250;
 }
@@ -13125,10 +13270,14 @@ function exportState(){return clone(state)}
 function importState(data){
   if(data&&typeof data==='object'){
     state=Object.assign({},defaults,data);
-    state.totalXp=Math.max(0,Number(state.totalXp||0));
+    state.totalXp=Math.max(0,Number(state.totalXp)||0,Number(state.xp)||0);
+    if(state.totalXp===0 && Number(userData?.workoutsCompleted||0)>0){
+      state.totalXp=Number(userData.workoutsCompleted||0)*250;
+    }
     state.xp=state.totalXp;
     state.recovery=(state.recovery&&typeof state.recovery==='object')?state.recovery:{};
     persist();
+    try{syncUserLevel()}catch(e){}
   }
   return exportState();
 }
@@ -13507,7 +13656,8 @@ window.LevelingProgressionV15={
   addXP,render:renderAll,
   syncStreak:syncTrainingDays,
   getStreak:()=>syncTrainingDays(),
-  getXp:()=>Number(state.totalXp||0)
+  getXp:()=>Number(state.totalXp||0),
+  getLevel:levelFromXp
 };
 window.LevelingRecoveryV1622={
   today:()=>recoveryToday(),
@@ -17111,7 +17261,7 @@ window.LevelingRPGV250=Object.assign(previous,{openQuests,closeQuests,renderQues
 
 
 <section id="v25649-duel-modal" class="v25649-modal" aria-hidden="true">
-<header class="v25649-head"><button id="v25649-back" type="button">‹</button><div><h2>DUEL</h2><small>COMPARAISON DE CHASSEURS</small></div></header>
+<header class="v2122-detail-head v25649-head"><button id="v25649-back" type="button">‹</button><div><b>DUEL</b><small>Comparaison de chasseurs</small></div></header>
 <main class="v25649-body">
  <div class="v25649-tabs"><button class="active" data-v25649-mode="xp">DUEL XP</button><button data-v25649-mode="power">DUEL POWER</button></div>
 
@@ -17156,7 +17306,7 @@ window.LevelingRPGV250=Object.assign(previous,{openQuests,closeQuests,renderQues
 
 <style id="v25649-css">
 .v25649-modal{position:fixed;inset:0;z-index:10050;background:radial-gradient(circle at 50% 0,rgba(91,35,130,.08),transparent 28%),#040609;color:#f7f8fb;display:none;overflow:auto;padding-bottom:35px}.v25649-modal.show{display:block}
-.v25649-head{position:sticky;top:0;z-index:5;display:flex;align-items:center;gap:18px;padding:17px 20px;background:rgba(4,6,9,.97);border-bottom:1px solid #202631}.v25649-head button{width:48px;height:48px;border:1px solid #29323e;border-radius:15px;background:#0a0e14;color:#fff;font-size:1.5rem}.v25649-head h2{margin:0;color:#f3cf62;letter-spacing:.12em;font-size:1rem;text-shadow:0 0 14px rgba(243,207,98,.18)}.v25649-head small{font-size:.34rem;color:#737b88;letter-spacing:.15em}
+.v25649-head{position:sticky;top:0;z-index:5;display:flex;align-items:center;gap:10px;margin:0 0 10px;padding:calc(8px + env(safe-area-inset-top)) 11px 9px;min-height:58px;box-sizing:border-box;background:#07080d;border-bottom:1px solid #202735;box-shadow:0 7px 18px rgba(0,0,0,.48)}.v25649-head>button{width:38px;height:38px;min-width:38px;border-radius:12px}.v25649-head b{font-size:.66rem}.v25649-head small{font-size:.41rem}
 .v25649-body{max-width:680px;margin:auto;padding:16px 14px 28px}.v25649-tabs{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}.v25649-tabs button{height:52px;border:1px solid #2b3441;border-radius:16px;background:linear-gradient(145deg,#0a0e15,#070a0f);color:#7f8999;font-weight:1000;font-size:.64rem;letter-spacing:.015em}.v25649-tabs button.active{color:#fff;border-color:var(--accent-purple);background:linear-gradient(135deg,color-mix(in srgb,var(--accent-purple) 10%,#090d14),color-mix(in srgb,var(--accent-rose) 14%,#090a10));box-shadow:0 0 0 1px color-mix(in srgb,var(--accent-purple) 18%,transparent),0 0 24px color-mix(in srgb,var(--accent-purple) 13%,transparent)}
 .v25649-team{border:1px solid #28313d;border-radius:18px;padding:12px 13px;margin-bottom:12px;background:linear-gradient(145deg,#080c12,#05080d);box-shadow:inset 0 1px rgba(255,255,255,.025)}.v25649-team-title{font-size:.34rem;font-weight:1000;letter-spacing:.13em;color:#77808e;margin-bottom:8px}.v25649-quick{display:flex;gap:10px;overflow-x:auto;scrollbar-width:none}.v25649-quick::-webkit-scrollbar{display:none}.v25649-quick button{flex:0 0 54px;border:0;background:none;color:#89919e;padding:0;display:grid;justify-items:center;gap:3px}.v25649-quick button span{width:42px;height:42px;border-radius:50%;border:1.5px solid #35404c;background:#0b1017;display:grid;place-items:center;overflow:hidden;font-weight:1000}.v25649-quick button span img{width:100%;height:100%;object-fit:cover}.v25649-quick button small{font-size:.29rem;max-width:54px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.v25649-quick button.selected span{border-color:#f2c65d;box-shadow:0 0 12px rgba(242,198,93,.18)}
 .v25649-fighters{display:grid;grid-template-columns:1fr 58px 1fr;align-items:center;border:1px solid #2a3440;border-radius:20px;padding:15px 12px;background:radial-gradient(circle at 0 50%,rgba(75,217,255,.12),transparent 40%),radial-gradient(circle at 100% 50%,rgba(246,187,69,.11),transparent 40%),linear-gradient(145deg,#080c12,#06080c);box-shadow:inset 0 1px rgba(255,255,255,.03),0 14px 30px rgba(0,0,0,.18)}.v25649-fighters article{display:grid;justify-items:center;gap:3px;text-align:center}.v25649-face{width:62px;height:62px;border-radius:50%;display:grid;place-items:center;overflow:hidden;font-weight:1000;background:#0a1017}.v25649-face img{width:100%;height:100%;object-fit:cover}.v25649-face.cyan{border:2px solid #57dcff;color:#57dcff;box-shadow:0 0 14px rgba(87,220,255,.13)}.v25649-face.gold{border:2px solid #f0bd52;color:#f0bd52;box-shadow:0 0 14px rgba(240,189,82,.13)}.v25649-fighters b{font-size:.5rem}.v25649-fighters small{font-size:.31rem;color:#737d8b}.v25649-vs{text-align:center;font-size:1.05rem;font-weight:1000;font-style:italic;text-shadow:-2px 0 10px #4edaff,2px 0 10px #e8b448}

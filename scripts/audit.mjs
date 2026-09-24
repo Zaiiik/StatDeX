@@ -87,6 +87,20 @@ for (const [name, value] of Object.entries(versions)) {
   else if (canonicalVersion && value !== canonicalVersion) warnings.push(`Version ${name}=${value}, attendue=${canonicalVersion}`);
 }
 
+const syncGuards = [
+  ["lecture de la révision cloud", "select('app_data,username,updated_at')"],
+  ['blocage des écritures avant chargement', 'if(!cloudLoadedOnce||cloudConflict)return false;'],
+  ['comparaison atomique de révision', "request.eq('updated_at',cloudRevision)"],
+  ['fusion de progression canonique', 'window.LevelingCloudMergeV2214='],
+  ['chargement différé jusqu’au DOM complet', "document.addEventListener('DOMContentLoaded',resolve,{once:true})"],
+  ['nouvelle tentative bornée après conflit', 'if(cloudConflictRetries<2)']
+];
+for (const [label, needle] of syncGuards) {
+  if (!index.includes(needle)) errors.push(`Protection sync absente : ${label}`);
+}
+if (index.includes('preserveLocalTraining')) errors.push('Ancienne priorité locale non sécurisée encore présente.');
+if (index.includes("'leveling_v10'")) errors.push('Ancienne clé progression leveling_v10 encore utilisée.');
+
 const dataImages = [...index.matchAll(/data:image\/([a-zA-Z0-9.+-]+);base64,([A-Za-z0-9+/=]+)/g)]
   .map(match => match[2]);
 const dataImageHashes = new Map();
@@ -116,11 +130,12 @@ const metrics = {
 };
 
 const nonRegressionBudgets = {
-  indexBytes: 8_429_350,
+  // V22.1.4 adds bounded conflict recovery and generation-aware cloud merging.
+  indexBytes: 8_440_000,
   styleBlocks: 103,
   scriptBlocks: 55,
   importantRules: 3_593,
-  eventListeners: 170,
+  eventListeners: 172,
   timeouts: 174,
   intervals: 7,
   mutationObservers: 3,

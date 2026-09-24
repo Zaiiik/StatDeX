@@ -1,9 +1,11 @@
 {
   "name": "leveling-app",
-  "version": "22.1.3",
+  "version": "22.1.4",
   "private": true,
   "type": "module",
   "scripts": {
-    "audit": "node scripts/audit.mjs"
+    "audit": "node scripts/audit.mjs",
+    "test:sync": "node scripts/sync-regression.mjs",
+    "test": "npm run audit && npm run test:sync"
   }
 }
