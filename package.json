@@ -4,8 +4,27 @@
   "private": true,
   "type": "module",
   "scripts": {
+    "build:native-bridge": "node scripts/build-native-bridge.mjs --mode=test --out=native-ads.js",
+    "build:android:test": "node scripts/build-capacitor.mjs --mode=test",
+    "build:android:production": "node scripts/build-capacitor.mjs --mode=production",
+    "android:sync:test": "node scripts/build-capacitor.mjs --mode=test && capacitor sync android",
+    "android:sync:production": "node scripts/build-capacitor.mjs --mode=production && capacitor sync android",
     "audit": "node scripts/audit.mjs",
+    "check:inline": "node scripts/check-inline-scripts.mjs",
+    "test:ads": "node scripts/admob-regression.mjs",
+    "test:shop": "node scripts/crystal-shop-regression.mjs",
+    "test:build-modes": "node scripts/build-mode-regression.mjs",
+    "test:runtime": "node scripts/runtime-regression.mjs",
     "test:sync": "node scripts/sync-regression.mjs",
-    "test": "npm run audit && npm run test:sync"
+    "test": "node scripts/check-inline-scripts.mjs && node scripts/audit.mjs && node scripts/sync-regression.mjs && node scripts/build-mode-regression.mjs && node scripts/admob-regression.mjs && node scripts/crystal-shop-regression.mjs && node scripts/runtime-regression.mjs"
+  },
+  "dependencies": {
+    "@capacitor-community/admob": "8.1.0",
+    "@capacitor/android": "8.5.2",
+    "@capacitor/core": "8.5.2"
+  },
+  "devDependencies": {
+    "@capacitor/cli": "8.5.2",
+    "esbuild": "0.28.2"
   }
 }

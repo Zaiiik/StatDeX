@@ -11,6 +11,14 @@ const warnings = [];
 const requiredFiles = [
   'index.html',
   'service-worker.js',
+  'native-ads.js',
+  'src/native-ads.js',
+  'capacitor.config.json',
+  'android/app/src/main/AndroidManifest.xml',
+  'android/app/src/main/res/values/strings.xml',
+  'supabase/migrations/202609260001_rewarded_ad_claim_v1.sql',
+  'supabase/migrations/20260927000100_crystal_shop_v1.sql',
+  'supabase/migrations/20260927000200_crystal_shop_v1_hardening.sql',
   'manifest.webmanifest',
   'notification-badge.png',
   'icon-192.png',
@@ -33,6 +41,7 @@ for (const path of requiredFiles) {
 
 const index = read('index.html');
 const serviceWorker = read('service-worker.js');
+const nativeAds = read('native-ads.js');
 const adminIndex = read('admin/index.html');
 const adminServiceWorker = read('admin/service-worker.js');
 
@@ -63,6 +72,7 @@ inlineScripts.forEach((match, position) => {
   compileJavaScript(match[2], `Script inline ${position + 1}`);
 });
 compileJavaScript(serviceWorker, 'service-worker.js');
+compileJavaScript(nativeAds, 'native-ads.js');
 compileJavaScript(adminServiceWorker, 'admin/service-worker.js');
 
 const assetReferences = [...new Set(
@@ -72,6 +82,13 @@ const assetReferences = [...new Set(
 for (const path of assetReferences) {
   if (!existsSync(join(root, path))) errors.push(`Référence locale introuvable : ${path}`);
 }
+
+const staticMarkup = index
+  .replace(/<script\b[^>]*>[\s\S]*?<\/script>/gi, '')
+  .replace(/<style\b[^>]*>[\s\S]*?<\/style>/gi, '');
+const staticIds = [...staticMarkup.matchAll(/\bid\s*=\s*["']([^"']+)["']/gi)].map(match => match[1]);
+const duplicateIds = [...new Set(staticIds.filter((id, position) => staticIds.indexOf(id) !== position))];
+if (duplicateIds.length) errors.push(`IDs HTML dupliqués : ${duplicateIds.join(', ')}`);
 
 const version = pattern => index.match(pattern)?.[1] ?? null;
 const versions = {
@@ -130,13 +147,14 @@ const metrics = {
 };
 
 const nonRegressionBudgets = {
-  // V22.1.4 adds bounded conflict recovery and generation-aware cloud merging.
-  indexBytes: 8_440_000,
+  // V22.1.5 ajoute le pont AdMob externe et les garde-fous POWER/UMP bornés.
+  // Les libellés anglais canoniques et les états visuels Boutique/Thèmes restent bornés ici.
+  indexBytes: 8_500_000,
   styleBlocks: 103,
-  scriptBlocks: 55,
+  scriptBlocks: 56,
   importantRules: 3_593,
-  eventListeners: 172,
-  timeouts: 174,
+  eventListeners: 177,
+  timeouts: 175,
   intervals: 7,
   mutationObservers: 3,
   bodyObservers: 1,

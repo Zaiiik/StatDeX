@@ -103,11 +103,13 @@ assert.equal(afterReset.userData.systemAI.current.leveling_validated_powerbuildi
 
 const tieCloud = { ...freshCloud, currentDayIndex: 0 };
 const tieLocal = { ...freshCloud, currentDayIndex: 1 };
-assert.equal(merge(tieCloud, tieLocal).currentDayIndex, 1, 'Le jour le plus avancé gagne une égalité propre.');
+assert.equal(merge(tieCloud, tieLocal).currentDayIndex, 0, 'Une sélection distante à égalité reste une simple préférence d’interface.');
 assert.equal(merge(tieCloud, tieLocal, { preferLocalOnTie: true }).currentDayIndex, 1, 'Une modification locale avancée reste conservée.');
 const advancedCloud = { ...freshCloud, currentBlockIndex: 0, currentDayIndex: 1 };
 const stalePointer = { ...freshCloud, currentBlockIndex: 0, currentDayIndex: 0 };
-assert.equal(merge(advancedCloud, stalePointer, { preferLocalOnTie: true }).currentDayIndex, 1, 'Un pointeur local ancien ne doit jamais faire reculer le jour cloud.');
+assert.equal(merge(advancedCloud, stalePointer, { preferLocalOnTie: true }).currentDayIndex, 0, 'Le pointeur choisi suit la source gagnante au lieu de prétendre mesurer la progression.');
+assert.ok(html.includes("cycleNumber:Math.max(1,Number(localStorage.getItem('leveling_cycle_number')||1))"), 'Le cycle canonique doit être exporté avec les données cloud.');
+assert.ok(html.includes('currentBlockIndex=v261CanonicalBlock(activeProgramKey)'), 'Le bloc affiché doit être recalculé depuis les validations réelles après fusion.');
 const falseValidation = {
   ...freshCloud,
   userData: { ...freshCloud.userData, validatedSessions: { leveling_validated_powerbuilding_0_0: false } },

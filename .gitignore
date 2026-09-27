@@ -1,0 +1,13 @@
+node_modules/
+dist/
+LEVELING-APP-*.zip
+entrepreneur-express/
+android/.gradle/
+android/build/
+android/app/build/
+android/local.properties
+*.jks
+*.keystore
+keystore.properties
+*.iml
+.idea/

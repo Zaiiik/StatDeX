@@ -1,0 +1,12 @@
+{
+  "appId": "com.nextlvldigital.levelingapp",
+  "appName": "LEVELING-APP",
+  "webDir": "dist",
+  "backgroundColor": "#050507",
+  "android": {
+    "allowMixedContent": false
+  },
+  "server": {
+    "androidScheme": "https"
+  }
+}
