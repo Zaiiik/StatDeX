@@ -11,3 +11,4 @@ android/local.properties
 keystore.properties
 *.iml
 .idea/
+supabase/.temp/
