@@ -673,6 +673,239 @@
   // src/native-ads.js
   init_dist();
 
+  // src/native-billing.js
+  init_dist();
+  var NativeBilling = registerPlugin("LevelingBilling");
+  var runtime = {
+    ready: false,
+    syncing: false,
+    catalog: [],
+    products: [],
+    lastReason: "not_initialized"
+  };
+  function isNativeAndroid() {
+    try {
+      return Capacitor.isNativePlatform() && Capacitor.getPlatform() === "android";
+    } catch {
+      return false;
+    }
+  }
+  function diagnostic(reason, detail = "") {
+    runtime.lastReason = String(reason || "unknown");
+    console.info(`[LEVELING BILLING] ${runtime.lastReason}${detail ? ` \xB7 ${String(detail).slice(0, 140)}` : ""}`);
+    window.dispatchEvent(new CustomEvent("leveling-billing-status", { detail: status() }));
+    if (runtime.ready) {
+      try {
+        window.v1612RenderSubscription?.();
+      } catch {
+      }
+    }
+  }
+  function status() {
+    return {
+      nativeAndroid: isNativeAndroid(),
+      ready: runtime.ready,
+      syncing: runtime.syncing,
+      catalogCount: runtime.catalog.length,
+      productCount: runtime.products.length,
+      lastReason: runtime.lastReason
+    };
+  }
+  async function session() {
+    const client = window.sb;
+    if (!client) throw new Error("SUPABASE_NOT_READY");
+    const { data, error } = await client.auth.getSession();
+    if (error || !data?.session?.access_token || !data.session.user?.id) throw new Error("NOT_AUTHENTICATED");
+    return data.session;
+  }
+  async function callFunction(slug, payload = null, method = "POST") {
+    const activeSession = await session();
+    const client = window.sb;
+    const supabaseUrl = String(client?.supabaseUrl || "").replace(/\/$/, "");
+    const publishableKey = String(client?.supabaseKey || "");
+    if (!supabaseUrl || !publishableKey) throw new Error("SUPABASE_CONFIG_NOT_READY");
+    const response = await fetch(`${supabaseUrl}/functions/v1/${slug}`, {
+      method,
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${activeSession.access_token}`,
+        "apikey": publishableKey
+      },
+      body: payload == null ? void 0 : JSON.stringify(payload)
+    });
+    let body = {};
+    try {
+      body = await response.json();
+    } catch {
+    }
+    if (!response.ok) throw new Error(body?.error || `${slug.toUpperCase().replaceAll("-", "_")}_${response.status}`);
+    return body;
+  }
+  async function accountHash(userId2) {
+    const digest = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(String(userId2)));
+    return Array.from(new Uint8Array(digest), (byte) => byte.toString(16).padStart(2, "0")).join("");
+  }
+  function configForPurchase(purchase2) {
+    const ids = Array.isArray(purchase2?.products) ? purchase2.products : [];
+    return runtime.catalog.find((item) => ids.includes(item.product_id));
+  }
+  async function verifyPurchase(purchase2) {
+    const config = configForPurchase(purchase2);
+    if (!config || !purchase2?.purchaseToken) {
+      diagnostic("purchase_not_configured");
+      return false;
+    }
+    try {
+      const result = await callFunction("google-play-verify-purchase", {
+        product_id: config.product_id,
+        purchase_token: purchase2.purchaseToken,
+        purchase_type: config.product_type
+      });
+      diagnostic(result.entitled ? "purchase_verified" : `purchase_${result.purchase_state || "not_entitled"}`, config.product_id);
+      if (result.entitled) {
+        await window.v1647RefreshAccessAfterExternalReturn?.();
+        await window.LevelingCrystalShop?.refresh?.(true);
+      }
+      return result.entitled === true;
+    } catch (error) {
+      diagnostic("verification_failed", error?.message || error);
+      return false;
+    }
+  }
+  async function processPurchases(purchases) {
+    let verified = 0;
+    for (const purchase2 of Array.isArray(purchases) ? purchases : []) {
+      if (purchase2?.purchaseState === "purchased" || purchase2?.purchaseState === "pending") {
+        if (await verifyPurchase(purchase2)) verified += 1;
+      }
+    }
+    return verified;
+  }
+  async function initialize() {
+    if (!isNativeAndroid()) return false;
+    if (runtime.ready) return true;
+    if (runtime.syncing) return false;
+    runtime.syncing = true;
+    try {
+      const catalogResponse = await callFunction("google-play-products", {});
+      runtime.catalog = Array.isArray(catalogResponse?.products) ? catalogResponse.products : [];
+      if (!runtime.catalog.length) {
+        runtime.ready = false;
+        diagnostic("catalog_empty");
+        return false;
+      }
+      const productResponse = await NativeBilling.getProducts({
+        products: runtime.catalog.map((item) => ({
+          productId: item.product_id,
+          productType: item.billing_product_type
+        }))
+      });
+      runtime.products = Array.isArray(productResponse?.products) ? productResponse.products : [];
+      runtime.ready = runtime.products.length > 0;
+      diagnostic(runtime.ready ? "ready" : "products_unavailable", `${runtime.products.length}/${runtime.catalog.length}`);
+      if (runtime.ready) await restorePurchases();
+      return runtime.ready;
+    } catch (error) {
+      runtime.ready = false;
+      diagnostic("initialization_failed", error?.message || error);
+      return false;
+    } finally {
+      runtime.syncing = false;
+    }
+  }
+  async function purchase(productId) {
+    if (!isNativeAndroid()) return false;
+    if (!runtime.ready && !await initialize()) return false;
+    const activeSession = await session();
+    const config = runtime.catalog.find((item) => item.product_id === productId);
+    const product = runtime.products.find((item) => item.productId === productId);
+    if (!config || !product) throw new Error("PRODUCT_NOT_AVAILABLE");
+    const result = await NativeBilling.purchase({
+      productId,
+      basePlanId: config.base_plan_id || "",
+      offerId: config.offer_id || "",
+      obfuscatedAccountId: await accountHash(activeSession.user.id)
+    });
+    diagnostic(result?.launched ? "purchase_flow_launched" : "purchase_flow_refused", productId);
+    return result?.launched === true;
+  }
+  function planCodeForCard(planId) {
+    return { "4w": "month", "1y": "1y", life: "lifetime" }[String(planId)] || String(planId || "");
+  }
+  async function purchasePlan(planId) {
+    if (!runtime.ready && !await initialize()) {
+      throw new Error("GOOGLE_PLAY_PRODUCTS_NOT_CONFIGURED");
+    }
+    const planCode = planCodeForCard(planId);
+    const config = runtime.catalog.find((item) => item.plan_code === planCode && ["subscription", "lifetime"].includes(item.entitlement_kind));
+    if (!config) throw new Error("GOOGLE_PLAY_PLAN_NOT_CONFIGURED");
+    return purchase(config.product_id);
+  }
+  async function purchaseCrystals(productId) {
+    const config = runtime.catalog.find((item) => item.product_id === productId && item.entitlement_kind === "crystals");
+    if (!config) throw new Error("GOOGLE_PLAY_CRYSTAL_PRODUCT_NOT_CONFIGURED");
+    return purchase(config.product_id);
+  }
+  function priceForPlan(planId) {
+    const planCode = planCodeForCard(planId);
+    const config = runtime.catalog.find((item) => item.plan_code === planCode && ["subscription", "lifetime"].includes(item.entitlement_kind));
+    const product = runtime.products.find((item) => item.productId === config?.product_id);
+    const offers = Array.isArray(product?.offers) ? product.offers : [];
+    const matching = offers.find(
+      (offer) => (!config?.base_plan_id || offer.basePlanId === config.base_plan_id) && (!config?.offer_id || offer.offerId === config.offer_id)
+    ) || offers[0];
+    const phases = Array.isArray(matching?.pricingPhases) ? matching.pricingPhases : [];
+    return phases.at(-1)?.formattedPrice || matching?.formattedPrice || "";
+  }
+  async function restorePurchases() {
+    if (!isNativeAndroid()) return 0;
+    const result = await NativeBilling.restorePurchases();
+    const verified = await processPurchases(result?.purchases);
+    diagnostic("restore_complete", `${verified} verified`);
+    return verified;
+  }
+  async function openSubscriptionCenter() {
+    if (!isNativeAndroid()) return false;
+    const result = await NativeBilling.openSubscriptionCenter();
+    return result?.opened === true;
+  }
+  async function onPurchaseEvent(event) {
+    if (Number(event?.responseCode) === 1) {
+      diagnostic("purchase_canceled");
+      return;
+    }
+    if (Number(event?.responseCode) !== 0) {
+      diagnostic("purchase_update_failed", event?.debugMessage || event?.responseCode);
+      return;
+    }
+    await processPurchases(event?.purchases);
+  }
+  NativeBilling.addListener("purchaseUpdated", onPurchaseEvent);
+  NativeBilling.addListener("purchasesRestored", (event) => processPurchases(event?.purchases));
+  window.LevelingBilling = Object.freeze({
+    isNativeAndroid,
+    initialize,
+    purchase,
+    purchasePlan,
+    purchaseCrystals,
+    priceForPlan,
+    restorePurchases,
+    getPurchaseState: restorePurchases,
+    openSubscriptionCenter,
+    status
+  });
+  window.addEventListener("leveling-access-changed", () => {
+    if (isNativeAndroid() && !runtime.syncing) initialize();
+  });
+  document.addEventListener("visibilitychange", () => {
+    if (document.visibilityState === "visible" && isNativeAndroid() && runtime.ready) restorePurchases();
+  });
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", () => setTimeout(initialize, 0), { once: true });
+  } else {
+    setTimeout(initialize, 0);
+  }
+
   // node_modules/.pnpm/@capacitor-community+admob@8.1.0/node_modules/@capacitor-community/admob/dist/esm/index.js
   init_dist();
 
@@ -800,7 +1033,7 @@
     rewarded: "ca-app-pub-3940256099942544/5224354917",
     interstitial: "ca-app-pub-3940256099942544/1033173712"
   });
-  var runtime = {
+  var runtime2 = {
     initialized: false,
     canRequestAds: false,
     consentStatus: "UNKNOWN",
@@ -824,7 +1057,7 @@
   var listenersPromise = null;
   var rewardReloadTimer = 0;
   var interstitialReloadTimer = 0;
-  function isNativeAndroid() {
+  function isNativeAndroid2() {
     try {
       return Capacitor.isNativePlatform() && Capacitor.getPlatform() === "android";
     } catch {
@@ -848,39 +1081,39 @@
     const state = String(info?.access_state || "UNKNOWN").toUpperCase();
     return ["TRIAL", "PASS", "FREE"].includes(state) && info?.ad_supported === true;
   }
-  function diagnostic(kind, reason, detail = "") {
+  function diagnostic2(kind, reason, detail = "") {
     const normalized = String(reason || "unknown");
-    if (kind === "rewarded") runtime.lastRewardedReason = normalized;
-    else if (kind === "interstitial") runtime.lastInterstitialReason = normalized;
-    else runtime.lastConsentReason = normalized;
+    if (kind === "rewarded") runtime2.lastRewardedReason = normalized;
+    else if (kind === "interstitial") runtime2.lastInterstitialReason = normalized;
+    else runtime2.lastConsentReason = normalized;
     const suffix = detail ? ` \xB7 ${String(detail).slice(0, 160)}` : "";
     console.info(`[LEVELING ADS] ${kind}: ${normalized}${suffix}`);
     emitStatus();
     return false;
   }
-  function status() {
+  function status2() {
     return {
       mode: ADS_MODE,
-      nativeAndroid: isNativeAndroid(),
-      initialized: runtime.initialized,
-      canRequestAds: runtime.canRequestAds,
-      consentStatus: runtime.consentStatus,
-      privacyOptionsRequired: runtime.privacyOptionsRequired,
-      rewardedReady: runtime.rewardedReady,
-      rewardedLoading: runtime.rewardedLoading,
-      rewardedShowing: runtime.rewardedShowing,
-      interstitialReady: runtime.interstitialReady,
-      interstitialLoading: runtime.interstitialLoading,
-      interstitialShowing: runtime.interstitialShowing,
-      lastRewardedReason: runtime.lastRewardedReason,
-      lastInterstitialReason: runtime.lastInterstitialReason,
-      lastConsentReason: runtime.lastConsentReason,
+      nativeAndroid: isNativeAndroid2(),
+      initialized: runtime2.initialized,
+      canRequestAds: runtime2.canRequestAds,
+      consentStatus: runtime2.consentStatus,
+      privacyOptionsRequired: runtime2.privacyOptionsRequired,
+      rewardedReady: runtime2.rewardedReady,
+      rewardedLoading: runtime2.rewardedLoading,
+      rewardedShowing: runtime2.rewardedShowing,
+      interstitialReady: runtime2.interstitialReady,
+      interstitialLoading: runtime2.interstitialLoading,
+      interstitialShowing: runtime2.interstitialShowing,
+      lastRewardedReason: runtime2.lastRewardedReason,
+      lastInterstitialReason: runtime2.lastInterstitialReason,
+      lastConsentReason: runtime2.lastConsentReason,
       rewardedLimit: DAILY_REWARDED_LIMIT,
       rewardCrystals: REWARD_CRYSTALS
     };
   }
   function emitStatus() {
-    window.dispatchEvent(new CustomEvent("leveling-native-ads-status", { detail: status() }));
+    window.dispatchEvent(new CustomEvent("leveling-native-ads-status", { detail: status2() }));
   }
   function userId() {
     return String(window.getLevelingCloudAccessState?.()?.user?.id || "anonymous");
@@ -900,8 +1133,8 @@
   }
   function scheduleReload(kind) {
     const accessAllowed = kind === "rewarded" ? rewardedAccessAllowed({ includeQuota: false }) : interstitialAccessAllowed();
-    if (!isNativeAndroid() || !runtime.canRequestAds || !accessAllowed) return;
-    const failures = kind === "rewarded" ? runtime.rewardFailures : runtime.interstitialFailures;
+    if (!isNativeAndroid2() || !runtime2.canRequestAds || !accessAllowed) return;
+    const failures = kind === "rewarded" ? runtime2.rewardFailures : runtime2.interstitialFailures;
     const delay = BACKOFF_MS[Math.min(failures, BACKOFF_MS.length - 1)];
     clearReloadTimer(kind);
     const callback = () => kind === "rewarded" ? prepareRewarded() : prepareInterstitial();
@@ -909,34 +1142,34 @@
     else interstitialReloadTimer = window.setTimeout(callback, delay);
   }
   async function addListenersOnce() {
-    if (runtime.listenersReady) return true;
+    if (runtime2.listenersReady) return true;
     if (listenersPromise) return listenersPromise;
     listenersPromise = Promise.all([
       AdMob.addListener(RewardAdPluginEvents.Loaded, () => {
-        runtime.rewardedLoading = false;
-        runtime.rewardedReady = true;
-        runtime.rewardFailures = 0;
-        runtime.lastRewardedReason = "loaded";
+        runtime2.rewardedLoading = false;
+        runtime2.rewardedReady = true;
+        runtime2.rewardFailures = 0;
+        runtime2.lastRewardedReason = "loaded";
         clearReloadTimer("rewarded");
         emitStatus();
       }),
       AdMob.addListener(RewardAdPluginEvents.FailedToLoad, (error) => {
-        runtime.rewardedLoading = false;
-        runtime.rewardedReady = false;
-        runtime.rewardFailures += 1;
-        diagnostic("rewarded", "load_failed", error?.message || error?.code || "plugin_event");
+        runtime2.rewardedLoading = false;
+        runtime2.rewardedReady = false;
+        runtime2.rewardFailures += 1;
+        diagnostic2("rewarded", "load_failed", error?.message || error?.code || "plugin_event");
         scheduleReload("rewarded");
       }),
       AdMob.addListener(RewardAdPluginEvents.Showed, () => {
-        runtime.rewardedReady = false;
-        runtime.lastRewardedReason = "shown";
+        runtime2.rewardedReady = false;
+        runtime2.lastRewardedReason = "shown";
         emitStatus();
       }),
       AdMob.addListener(RewardAdPluginEvents.Rewarded, async (reward) => {
-        const request = runtime.rewardRequest;
+        const request = runtime2.rewardRequest;
         if (!request || request.rewardEventReceived) return;
         request.rewardEventReceived = true;
-        diagnostic("rewarded", "reward_earned");
+        diagnostic2("rewarded", "reward_earned");
         try {
           const credited = await window.LevelingRewardedAdsV2141?.creditNativeReward?.({
             claimId: request.claimId,
@@ -953,76 +1186,76 @@
         }
       }),
       AdMob.addListener(RewardAdPluginEvents.Dismissed, () => {
-        const request = runtime.rewardRequest;
-        runtime.rewardedShowing = false;
-        runtime.rewardRequest = null;
+        const request = runtime2.rewardRequest;
+        runtime2.rewardedShowing = false;
+        runtime2.rewardRequest = null;
         if (request && !request.rewardEventReceived) {
-          diagnostic("rewarded", "dismissed_before_reward");
+          diagnostic2("rewarded", "dismissed_before_reward");
           request.resolve(false);
         }
         emitStatus();
         prepareRewarded();
       }),
       AdMob.addListener(RewardAdPluginEvents.FailedToShow, (error) => {
-        const request = runtime.rewardRequest;
-        runtime.rewardedShowing = false;
-        runtime.rewardedReady = false;
-        runtime.rewardRequest = null;
+        const request = runtime2.rewardRequest;
+        runtime2.rewardedShowing = false;
+        runtime2.rewardedReady = false;
+        runtime2.rewardRequest = null;
         if (request) request.resolve(false);
-        diagnostic("rewarded", "show_failed", error?.message || error?.code || "plugin_event");
+        diagnostic2("rewarded", "show_failed", error?.message || error?.code || "plugin_event");
         scheduleReload("rewarded");
       }),
       AdMob.addListener(InterstitialAdPluginEvents.Loaded, () => {
-        runtime.interstitialLoading = false;
-        runtime.interstitialReady = true;
-        runtime.interstitialFailures = 0;
-        runtime.lastInterstitialReason = "loaded";
+        runtime2.interstitialLoading = false;
+        runtime2.interstitialReady = true;
+        runtime2.interstitialFailures = 0;
+        runtime2.lastInterstitialReason = "loaded";
         clearReloadTimer("interstitial");
         emitStatus();
       }),
       AdMob.addListener(InterstitialAdPluginEvents.FailedToLoad, (error) => {
-        runtime.interstitialLoading = false;
-        runtime.interstitialReady = false;
-        runtime.interstitialFailures += 1;
-        diagnostic("interstitial", "load_failed", error?.message || error?.code || "plugin_event");
+        runtime2.interstitialLoading = false;
+        runtime2.interstitialReady = false;
+        runtime2.interstitialFailures += 1;
+        diagnostic2("interstitial", "load_failed", error?.message || error?.code || "plugin_event");
         scheduleReload("interstitial");
       }),
       AdMob.addListener(InterstitialAdPluginEvents.Showed, () => {
-        const request = runtime.interstitialRequest;
+        const request = runtime2.interstitialRequest;
         if (request && !request.shown) {
           request.shown = true;
           request.resolve(true);
         }
-        runtime.interstitialReady = false;
-        runtime.lastInterstitialReason = "shown";
+        runtime2.interstitialReady = false;
+        runtime2.lastInterstitialReason = "shown";
         emitStatus();
       }),
       AdMob.addListener(InterstitialAdPluginEvents.Dismissed, () => {
-        const request = runtime.interstitialRequest;
-        runtime.interstitialShowing = false;
-        runtime.interstitialRequest = null;
+        const request = runtime2.interstitialRequest;
+        runtime2.interstitialShowing = false;
+        runtime2.interstitialRequest = null;
         if (request && !request.shown) request.resolve(false);
         emitStatus();
         prepareInterstitial();
       }),
       AdMob.addListener(InterstitialAdPluginEvents.FailedToShow, (error) => {
-        const request = runtime.interstitialRequest;
-        runtime.interstitialShowing = false;
-        runtime.interstitialReady = false;
-        runtime.interstitialRequest = null;
+        const request = runtime2.interstitialRequest;
+        runtime2.interstitialShowing = false;
+        runtime2.interstitialReady = false;
+        runtime2.interstitialRequest = null;
         if (request) request.resolve(false);
-        diagnostic("interstitial", "show_failed", error?.message || error?.code || "plugin_event");
+        diagnostic2("interstitial", "show_failed", error?.message || error?.code || "plugin_event");
         scheduleReload("interstitial");
       })
     ]).then(() => {
-      runtime.listenersReady = true;
+      runtime2.listenersReady = true;
       return true;
     });
     return listenersPromise;
   }
-  async function initialize() {
-    if (!isNativeAndroid()) return false;
-    if (runtime.initialized) return runtime.canRequestAds;
+  async function initialize2() {
+    if (!isNativeAndroid2()) return false;
+    if (runtime2.initialized) return runtime2.canRequestAds;
     if (initializePromise) return initializePromise;
     initializePromise = (async () => {
       try {
@@ -1033,26 +1266,26 @@
           tagForChildDirectedTreatment: false,
           tagForUnderAgeOfConsent: false
         });
-        runtime.initialized = true;
+        runtime2.initialized = true;
         let consent = await AdMob.requestConsentInfo();
         if (consent.isConsentFormAvailable && consent.status === AdmobConsentStatus.REQUIRED) {
           consent = await AdMob.showConsentForm();
         }
-        runtime.consentStatus = String(consent.status || "UNKNOWN");
-        runtime.canRequestAds = consent.canRequestAds === true;
-        runtime.privacyOptionsRequired = consent.privacyOptionsRequirementStatus === "REQUIRED";
-        runtime.lastConsentReason = runtime.canRequestAds ? "ads_allowed" : "ads_blocked";
-        diagnostic("consent", runtime.lastConsentReason, `status=${runtime.consentStatus} privacy=${runtime.privacyOptionsRequired ? "required" : "not_required"}`);
-        if (runtime.canRequestAds) {
+        runtime2.consentStatus = String(consent.status || "UNKNOWN");
+        runtime2.canRequestAds = consent.canRequestAds === true;
+        runtime2.privacyOptionsRequired = consent.privacyOptionsRequirementStatus === "REQUIRED";
+        runtime2.lastConsentReason = runtime2.canRequestAds ? "ads_allowed" : "ads_blocked";
+        diagnostic2("consent", runtime2.lastConsentReason, `status=${runtime2.consentStatus} privacy=${runtime2.privacyOptionsRequired ? "required" : "not_required"}`);
+        if (runtime2.canRequestAds) {
           const preparations = [];
           if (rewardedAccessAllowed({ includeQuota: false })) preparations.push(prepareRewarded());
           if (interstitialAccessAllowed()) preparations.push(prepareInterstitial());
           await Promise.allSettled(preparations);
         }
-        return runtime.canRequestAds;
+        return runtime2.canRequestAds;
       } catch (error) {
-        runtime.canRequestAds = false;
-        diagnostic("consent", "initialization_failed", error?.message || error);
+        runtime2.canRequestAds = false;
+        diagnostic2("consent", "initialization_failed", error?.message || error);
         return false;
       } finally {
         initializePromise = null;
@@ -1061,11 +1294,11 @@
     return initializePromise;
   }
   async function prepareRewarded() {
-    if (!isNativeAndroid()) return diagnostic("rewarded", "not_native_android");
-    if (!runtime.canRequestAds) return diagnostic("rewarded", "consent_not_ready");
-    if (!rewardedAccessAllowed({ includeQuota: false })) return diagnostic("rewarded", "not_authenticated");
-    if (runtime.rewardedReady || runtime.rewardedLoading || runtime.rewardedShowing) return runtime.rewardedReady;
-    runtime.rewardedLoading = true;
+    if (!isNativeAndroid2()) return diagnostic2("rewarded", "not_native_android");
+    if (!runtime2.canRequestAds) return diagnostic2("rewarded", "consent_not_ready");
+    if (!rewardedAccessAllowed({ includeQuota: false })) return diagnostic2("rewarded", "not_authenticated");
+    if (runtime2.rewardedReady || runtime2.rewardedLoading || runtime2.rewardedShowing) return runtime2.rewardedReady;
+    runtime2.rewardedLoading = true;
     emitStatus();
     try {
       await AdMob.prepareRewardVideoAd({
@@ -1073,27 +1306,27 @@
         isTesting: !IS_PRODUCTION,
         immersiveMode: true
       });
-      runtime.rewardedLoading = false;
-      runtime.rewardedReady = true;
-      runtime.rewardFailures = 0;
-      runtime.lastRewardedReason = "loaded";
+      runtime2.rewardedLoading = false;
+      runtime2.rewardedReady = true;
+      runtime2.rewardFailures = 0;
+      runtime2.lastRewardedReason = "loaded";
       emitStatus();
       return true;
     } catch (error) {
-      runtime.rewardedLoading = false;
-      runtime.rewardedReady = false;
-      runtime.rewardFailures += 1;
-      diagnostic("rewarded", "load_failed", error?.message || error);
+      runtime2.rewardedLoading = false;
+      runtime2.rewardedReady = false;
+      runtime2.rewardFailures += 1;
+      diagnostic2("rewarded", "load_failed", error?.message || error);
       scheduleReload("rewarded");
       return false;
     }
   }
   async function prepareInterstitial() {
-    if (!isNativeAndroid()) return diagnostic("interstitial", "not_native_android");
-    if (!runtime.canRequestAds) return diagnostic("interstitial", "consent_not_ready");
-    if (!interstitialAccessAllowed()) return diagnostic("interstitial", "access_not_ad_supported");
-    if (runtime.interstitialReady || runtime.interstitialLoading || runtime.interstitialShowing) return runtime.interstitialReady;
-    runtime.interstitialLoading = true;
+    if (!isNativeAndroid2()) return diagnostic2("interstitial", "not_native_android");
+    if (!runtime2.canRequestAds) return diagnostic2("interstitial", "consent_not_ready");
+    if (!interstitialAccessAllowed()) return diagnostic2("interstitial", "access_not_ad_supported");
+    if (runtime2.interstitialReady || runtime2.interstitialLoading || runtime2.interstitialShowing) return runtime2.interstitialReady;
+    runtime2.interstitialLoading = true;
     emitStatus();
     try {
       await AdMob.prepareInterstitial({
@@ -1101,33 +1334,33 @@
         isTesting: !IS_PRODUCTION,
         immersiveMode: true
       });
-      runtime.interstitialLoading = false;
-      runtime.interstitialReady = true;
-      runtime.interstitialFailures = 0;
-      runtime.lastInterstitialReason = "loaded";
+      runtime2.interstitialLoading = false;
+      runtime2.interstitialReady = true;
+      runtime2.interstitialFailures = 0;
+      runtime2.lastInterstitialReason = "loaded";
       emitStatus();
       return true;
     } catch (error) {
-      runtime.interstitialLoading = false;
-      runtime.interstitialReady = false;
-      runtime.interstitialFailures += 1;
-      diagnostic("interstitial", "load_failed", error?.message || error);
+      runtime2.interstitialLoading = false;
+      runtime2.interstitialReady = false;
+      runtime2.interstitialFailures += 1;
+      diagnostic2("interstitial", "load_failed", error?.message || error);
       scheduleReload("interstitial");
       return false;
     }
   }
   async function showRewarded({ placement = "rewarded_crystals" } = {}) {
-    if (!isNativeAndroid()) return diagnostic("rewarded", "not_native_android");
-    if (!isForeground()) return diagnostic("rewarded", "app_background");
-    if (!hasAuthenticatedUser()) return diagnostic("rewarded", "not_authenticated");
-    if (!rewardedAccessAllowed()) return diagnostic("rewarded", "daily_limit_reached");
-    if (runtime.rewardedShowing || runtime.rewardRequest) return diagnostic("rewarded", "already_showing");
-    if (!await initialize()) return diagnostic("rewarded", "consent_not_ready");
-    if (!runtime.rewardedReady && !await prepareRewarded()) return diagnostic("rewarded", "not_loaded");
-    runtime.rewardedShowing = true;
+    if (!isNativeAndroid2()) return diagnostic2("rewarded", "not_native_android");
+    if (!isForeground()) return diagnostic2("rewarded", "app_background");
+    if (!hasAuthenticatedUser()) return diagnostic2("rewarded", "not_authenticated");
+    if (!rewardedAccessAllowed()) return diagnostic2("rewarded", "daily_limit_reached");
+    if (runtime2.rewardedShowing || runtime2.rewardRequest) return diagnostic2("rewarded", "already_showing");
+    if (!await initialize2()) return diagnostic2("rewarded", "consent_not_ready");
+    if (!runtime2.rewardedReady && !await prepareRewarded()) return diagnostic2("rewarded", "not_loaded");
+    runtime2.rewardedShowing = true;
     emitStatus();
     return new Promise(async (resolve) => {
-      runtime.rewardRequest = {
+      runtime2.rewardRequest = {
         claimId: claimId(),
         placement,
         rewardEventReceived: false,
@@ -1136,67 +1369,67 @@
       try {
         await AdMob.showRewardVideoAd();
       } catch (error) {
-        const request = runtime.rewardRequest;
-        runtime.rewardRequest = null;
-        runtime.rewardedShowing = false;
-        runtime.rewardedReady = false;
+        const request = runtime2.rewardRequest;
+        runtime2.rewardRequest = null;
+        runtime2.rewardedShowing = false;
+        runtime2.rewardedReady = false;
         if (request) request.resolve(false);
-        diagnostic("rewarded", "show_failed", error?.message || error);
+        diagnostic2("rewarded", "show_failed", error?.message || error);
         scheduleReload("rewarded");
       }
     });
   }
   async function showInterstitial({ reason = "natural_break" } = {}) {
-    if (!isNativeAndroid()) return diagnostic("interstitial", "not_native_android", reason);
-    if (!isForeground()) return diagnostic("interstitial", "app_background", reason);
-    if (!interstitialAccessAllowed()) return diagnostic("interstitial", "access_not_ad_supported", reason);
-    if (runtime.interstitialShowing || runtime.interstitialRequest) return diagnostic("interstitial", "already_showing", reason);
-    if (window.LevelingWorkoutGuard?.criticalModalOpen?.()) return diagnostic("interstitial", "critical_modal_open", reason);
-    if (window.LevelingWorkoutGuard?.isPowerSessionActive?.()) return diagnostic("interstitial", "power_session_active", reason);
-    if (!await initialize()) return diagnostic("interstitial", "consent_not_ready", reason);
-    if (!runtime.interstitialReady && !await prepareInterstitial()) return diagnostic("interstitial", "not_loaded", reason);
-    if (window.LevelingWorkoutGuard?.criticalModalOpen?.()) return diagnostic("interstitial", "critical_modal_open", reason);
-    if (window.LevelingWorkoutGuard?.isPowerSessionActive?.()) return diagnostic("interstitial", "power_session_active", reason);
-    runtime.interstitialShowing = true;
+    if (!isNativeAndroid2()) return diagnostic2("interstitial", "not_native_android", reason);
+    if (!isForeground()) return diagnostic2("interstitial", "app_background", reason);
+    if (!interstitialAccessAllowed()) return diagnostic2("interstitial", "access_not_ad_supported", reason);
+    if (runtime2.interstitialShowing || runtime2.interstitialRequest) return diagnostic2("interstitial", "already_showing", reason);
+    if (window.LevelingWorkoutGuard?.criticalModalOpen?.()) return diagnostic2("interstitial", "critical_modal_open", reason);
+    if (window.LevelingWorkoutGuard?.isPowerSessionActive?.()) return diagnostic2("interstitial", "power_session_active", reason);
+    if (!await initialize2()) return diagnostic2("interstitial", "consent_not_ready", reason);
+    if (!runtime2.interstitialReady && !await prepareInterstitial()) return diagnostic2("interstitial", "not_loaded", reason);
+    if (window.LevelingWorkoutGuard?.criticalModalOpen?.()) return diagnostic2("interstitial", "critical_modal_open", reason);
+    if (window.LevelingWorkoutGuard?.isPowerSessionActive?.()) return diagnostic2("interstitial", "power_session_active", reason);
+    runtime2.interstitialShowing = true;
     emitStatus();
     return new Promise(async (resolve) => {
-      runtime.interstitialRequest = { shown: false, resolve };
+      runtime2.interstitialRequest = { shown: false, resolve };
       try {
         await AdMob.showInterstitial();
       } catch (error) {
-        const request = runtime.interstitialRequest;
-        runtime.interstitialRequest = null;
-        runtime.interstitialShowing = false;
-        runtime.interstitialReady = false;
+        const request = runtime2.interstitialRequest;
+        runtime2.interstitialRequest = null;
+        runtime2.interstitialShowing = false;
+        runtime2.interstitialReady = false;
         if (request) request.resolve(false);
-        diagnostic("interstitial", "show_failed", error?.message || error);
+        diagnostic2("interstitial", "show_failed", error?.message || error);
         scheduleReload("interstitial");
       }
     });
   }
   async function showPrivacyOptions() {
-    if (!isNativeAndroid()) return false;
-    if (!runtime.initialized) await initialize();
-    if (!runtime.privacyOptionsRequired) return false;
+    if (!isNativeAndroid2()) return false;
+    if (!runtime2.initialized) await initialize2();
+    if (!runtime2.privacyOptionsRequired) return false;
     try {
       await AdMob.showPrivacyOptionsForm();
       const consent = await AdMob.requestConsentInfo();
-      runtime.consentStatus = String(consent.status || "UNKNOWN");
-      runtime.canRequestAds = consent.canRequestAds === true;
-      runtime.privacyOptionsRequired = consent.privacyOptionsRequirementStatus === "REQUIRED";
-      runtime.lastConsentReason = runtime.canRequestAds ? "ads_allowed" : "ads_blocked";
-      diagnostic("consent", runtime.lastConsentReason, `status=${runtime.consentStatus} privacy=${runtime.privacyOptionsRequired ? "required" : "not_required"}`);
-      if (runtime.canRequestAds) await refreshEligibility();
+      runtime2.consentStatus = String(consent.status || "UNKNOWN");
+      runtime2.canRequestAds = consent.canRequestAds === true;
+      runtime2.privacyOptionsRequired = consent.privacyOptionsRequirementStatus === "REQUIRED";
+      runtime2.lastConsentReason = runtime2.canRequestAds ? "ads_allowed" : "ads_blocked";
+      diagnostic2("consent", runtime2.lastConsentReason, `status=${runtime2.consentStatus} privacy=${runtime2.privacyOptionsRequired ? "required" : "not_required"}`);
+      if (runtime2.canRequestAds) await refreshEligibility();
       return true;
     } catch (error) {
-      diagnostic("consent", "privacy_options_failed", error?.message || error);
+      diagnostic2("consent", "privacy_options_failed", error?.message || error);
       return false;
     }
   }
   async function refreshEligibility() {
-    if (!isNativeAndroid()) return false;
-    if (!runtime.initialized && !await initialize()) return false;
-    if (!runtime.canRequestAds) return false;
+    if (!isNativeAndroid2()) return false;
+    if (!runtime2.initialized && !await initialize2()) return false;
+    if (!runtime2.canRequestAds) return false;
     const preparations = [];
     if (rewardedAccessAllowed({ includeQuota: false })) preparations.push(prepareRewarded());
     if (interstitialAccessAllowed()) preparations.push(prepareInterstitial());
@@ -1205,19 +1438,19 @@
   }
   window.LevelingNativeAds = Object.freeze({
     mode: ADS_MODE,
-    isNativeAndroid,
-    initialize,
+    isNativeAndroid: isNativeAndroid2,
+    initialize: initialize2,
     prepareRewarded,
     prepareInterstitial,
     showRewarded,
     showInterstitial,
     showPrivacyOptions,
     refreshEligibility,
-    status
+    status: status2
   });
   function boot() {
     emitStatus();
-    if (isNativeAndroid()) initialize();
+    if (isNativeAndroid2()) initialize2();
   }
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", boot, { once: true });
   else boot();

@@ -16,6 +16,7 @@ await mkdir(dist, { recursive: true });
 
 for (const file of [
   'index.html',
+  'delete-account.html',
   'manifest.webmanifest',
   'service-worker.js',
   'icon-192.png',

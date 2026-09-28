@@ -1,0 +1,44 @@
+
+[functions.google-play-products]
+enabled = true
+verify_jwt = false
+import_map = "./functions/google-play-products/deno.json"
+# Uncomment to specify a custom file path to the entrypoint.
+# Supported file extensions are: .ts, .js, .mjs, .jsx, .tsx
+entrypoint = "./functions/google-play-products/index.ts"
+# Specifies static files to be bundled with the function. Supports glob patterns.
+# For example, if you want to serve static HTML pages in your function:
+# static_files = [ "./functions/google-play-products/*.html" ]
+
+[functions.google-play-verify-purchase]
+enabled = true
+verify_jwt = false
+import_map = "./functions/google-play-verify-purchase/deno.json"
+# Uncomment to specify a custom file path to the entrypoint.
+# Supported file extensions are: .ts, .js, .mjs, .jsx, .tsx
+entrypoint = "./functions/google-play-verify-purchase/index.ts"
+# Specifies static files to be bundled with the function. Supports glob patterns.
+# For example, if you want to serve static HTML pages in your function:
+# static_files = [ "./functions/google-play-verify-purchase/*.html" ]
+
+[functions.google-play-rtdn]
+enabled = true
+verify_jwt = false
+import_map = "./functions/google-play-rtdn/deno.json"
+# Uncomment to specify a custom file path to the entrypoint.
+# Supported file extensions are: .ts, .js, .mjs, .jsx, .tsx
+entrypoint = "./functions/google-play-rtdn/index.ts"
+# Specifies static files to be bundled with the function. Supports glob patterns.
+# For example, if you want to serve static HTML pages in your function:
+# static_files = [ "./functions/google-play-rtdn/*.html" ]
+
+[functions.delete-account]
+enabled = true
+verify_jwt = false
+import_map = "./functions/delete-account/deno.json"
+# Uncomment to specify a custom file path to the entrypoint.
+# Supported file extensions are: .ts, .js, .mjs, .jsx, .tsx
+entrypoint = "./functions/delete-account/index.ts"
+# Specifies static files to be bundled with the function. Supports glob patterns.
+# For example, if you want to serve static HTML pages in your function:
+# static_files = [ "./functions/delete-account/*.html" ]

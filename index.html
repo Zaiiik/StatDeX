@@ -4733,6 +4733,11 @@ body.v233-verifying #v233-verify{display:flex}
                     <div id="cloud-sync-detail" style="margin-top:8px;font-size:.62rem;color:#777;text-align:center">Initialisation du cloud…</div>
                     <div style="margin-top:5px;font-size:.58rem;color:#555;text-align:center">LEVELING-APP V16.1.0</div>
                     <button class="btn-action" onclick="logoutLeveling()" style="border-color:#ff5555;color:#ff7777">Se déconnecter</button>
+                    <div style="margin-top:14px;padding-top:12px;border-top:1px solid rgba(255,85,85,.22)">
+                        <div style="font-size:.62rem;font-weight:900;color:#ff7777">ZONE SENSIBLE</div>
+                        <p style="font-size:.58rem;color:#8f7b80;line-height:1.5">La suppression est définitive. Un abonnement Google Play ou Stripe doit être résilié séparément.</p>
+                        <button class="btn-action" type="button" onclick="deleteLevelingAccount()" style="border-color:#ff334f;background:rgba(255,30,65,.10);color:#ff6377">SUPPRIMER MON COMPTE</button>
+                    </div>
                 </div>
 
                 <div class="profile-card install-card">
@@ -7219,6 +7224,7 @@ function v214ApplyAccessInfo(info){
   try{renderHudCrystalBalance(currentAccessInfo?.crystals||0)}catch(e){}
   try{window.LevelingAccessV214?.refresh?.()}catch(e){}
   try{setTimeout(()=>{window.LevelingRewardedAdsV2141?.retryPending?.();window.LevelingNativeAds?.refreshEligibility?.();window.LevelingCrystalShop?.refresh?.()},0)}catch(e){}
+  try{window.dispatchEvent(new CustomEvent('leveling-access-changed',{detail:{state,userId:cloudUser?.id||null}}))}catch(e){}
   return cloudLicensed;
 }
 window.getLevelingCloudAccessState=()=>({user:cloudUser,licensed:cloudLicensed,premium:v214StateOf()==='SUBSCRIBED',access_state:v214StateOf(),access:{...currentAccessInfo}});
@@ -7431,6 +7437,10 @@ async function v17111CallStripeFunction(slug,payload){
 async function startStripeCheckout(planId){
   try{
     if(!cloudUser)throw new Error(v1654TestLang()==='fr'?'Connecte-toi à ton compte avant de lancer le paiement.':'Sign in before starting payment.');
+    if(window.LevelingBilling?.isNativeAndroid?.()){
+      try{showSocialToast?.('GOOGLE PLAY',v1654TestLang()==='fr'?'Ouverture du paiement sécurisé Google Play…':'Opening secure Google Play checkout…')}catch(e){}
+      return await window.LevelingBilling.purchasePlan(planId);
+    }
     const plan=LEVELING_STRIPE_PLAN_MAP[planId];
     if(!plan)throw new Error(v1654TestLang()==='fr'?'Offre invalide.':'Invalid plan.');
     try{showSocialToast?.('STRIPE',v1654TestLang()==='fr'?'Ouverture du paiement sécurisé Stripe…':'Opening secure Stripe checkout…')}catch(e){}
@@ -7447,6 +7457,10 @@ window.startStripeCheckout=startStripeCheckout;
 
 async function manageStripeSubscription(action='manage'){
   try{
+    if(window.LevelingBilling?.isNativeAndroid?.()){
+      try{showSocialToast?.('GOOGLE PLAY',v1654TestLang()==='fr'?'Ouverture de tes abonnements Google Play…':'Opening your Google Play subscriptions…')}catch(e){}
+      return await window.LevelingBilling.openSubscriptionCenter();
+    }
     const cancel=action==='cancel';
     try{showSocialToast?.('STRIPE',v1654TestLang()==='fr'?(cancel?'Ouverture de la résiliation sécurisée…':'Ouverture du portail Stripe…'):(cancel?'Opening secure cancellation…':'Opening Stripe portal…'))}catch(e){}
     const data=await v17111CallStripeFunction('create-billing-portal',{action:cancel?'cancel':'manage'});
@@ -7902,6 +7916,37 @@ async function logoutLeveling(){
   sessionStorage.removeItem('leveling_manual_onboarding_replay');
   location.reload();
 }
+
+async function deleteLevelingAccount(){
+  const en=localStorage.getItem('leveling_language')==='en';
+  const first=en
+    ?'This action permanently deletes your LEVELING-APP account and associated data that does not have to be legally retained. Google Play or Stripe subscriptions are not canceled automatically. Continue?'
+    :'Cette action supprimera définitivement ton compte LEVELING-APP et les données associées qui ne doivent pas être légalement conservées. Les abonnements Google Play ou Stripe ne sont pas annulés automatiquement. Continuer ?';
+  if(!confirm(first))return false;
+  const expected=en?'DELETE':'SUPPRIMER';
+  const typed=prompt(en?'Type DELETE to confirm permanently.':'Tape SUPPRIMER pour confirmer définitivement.','');
+  if(String(typed||'').trim().toUpperCase()!==expected){
+    try{showSocialToast?.(en?'DELETION CANCELED':'SUPPRESSION ANNULÉE',en?'The confirmation did not match.':'La confirmation ne correspond pas.')}catch(e){}
+    return false;
+  }
+  try{
+    const {data,error}=await sb.auth.getSession();if(error)throw error;
+    const token=data?.session?.access_token;if(!token)throw new Error(en?'Sign in again first.':'Reconnecte-toi d’abord.');
+    const response=await fetch(`${SUPABASE_URL}/functions/v1/delete-account`,{method:'POST',headers:{'Content-Type':'application/json','Authorization':`Bearer ${token}`,'apikey':SUPABASE_PUBLISHABLE_KEY},body:JSON.stringify({confirmation:'DELETE_LEVELING_ACCOUNT'})});
+    let payload={};try{payload=await response.json()}catch(e){}
+    if(!response.ok||payload?.ok!==true)throw new Error(payload?.error||(en?'Deletion failed.':'Suppression impossible.'));
+    try{await sb.auth.signOut({scope:'local'})}catch(e){}
+    cloudUser=null;cloudLicensed=false;cloudLoadedOnce=false;clearActiveLicenseCache();stopLicenseWatch();
+    clearLevelingAccountLocalData();localStorage.removeItem('leveling_local_owner');localStorage.removeItem(ACCESS_CACHE_KEY);localStorage.removeItem(V2141_PENDING_EMAIL);
+    alert(en?'Your LEVELING-APP account has been deleted.':'Ton compte LEVELING-APP a été supprimé.');
+    location.reload();return true;
+  }catch(error){
+    console.warn('Account deletion:',error?.message||error);
+    try{showSocialToast?.(en?'DELETION FAILED':'SUPPRESSION IMPOSSIBLE',error?.message||(en?'Try again later.':'Réessaie plus tard.'))}catch(e){}
+    return false;
+  }
+}
+window.deleteLevelingAccount=deleteLevelingAccount;
 
 let releaseCheckBusy=false;
 async function checkAppRelease(){
@@ -12450,10 +12495,10 @@ window.v1612ViewPlan=function(id){
  const root=document.getElementById('v1612-subscription-root');if(!root)return;
  root.querySelectorAll('.v1612-plan-card').forEach(card=>card.classList.toggle('selected',card.dataset.plan===id));
  const old=root.querySelector('#v1612-plan-detail');if(!old)return;
- const c=PLAN_COPY[lang()],storedPromo=promoActive(),currentMap={month:'4w','1y':'1y',lifetime:'life'},current=currentMap[String(currentSubscriptionPlan||'')]||'',promo=!current&&storedPromo;
+ const c=PLAN_COPY[lang()],storedPromo=promoActive(),nativePlay=window.LevelingBilling?.isNativeAndroid?.()===true,currentMap={month:'4w','1y':'1y',lifetime:'life'},current=currentMap[String(currentSubscriptionPlan||'')]||'',promo=!nativePlay&&!current&&storedPromo;
  const p=plans.find(x=>x.id===id),isCurrent=current===p.id,isSelected=!isCurrent&&selectedPlan()===p.id,hasCurrent=!!current,final=promo?p.base*.70:p.base,benefits=[...c.benefits,...(p.lifetime?[c.life_extra]:[])];
  const detail=document.createElement('div');detail.id='v1612-plan-detail';detail.className=`v1612-plan-detail ${p.cls} ${isCurrent?'current':''}`;
- detail.innerHTML=`<div class="v1612-detail-top"><div><div class="v1612-detail-title">${c[p.title]}</div><div class="v1612-detail-sub">${isCurrent?c.active_account:c[p.sub]}</div></div><div><div class="v1612-detail-price">${price(final)}</div>${promo?'<div class="v1612-detail-promo">-30 % · premier paiement</div>':''}</div></div><div class="v1612-benefits">${benefits.map(x=>`<div class="v1612-benefit">${x}</div>`).join('')}</div><button type="button" class="v1612-plan-action ${isCurrent?'current':''}" ${(isCurrent||hasCurrent)?'disabled':''} onclick="v1610SelectPlan('${p.id}')">${isCurrent?(p.id==='life'?c.active_button:(lang()==='fr'?' ABONNEMENT ACTIF':' SUBSCRIPTION ACTIVE')):(hasCurrent?c.already_active:(isSelected?' '+c.selected:c.choose))}</button>`;
+ detail.innerHTML=`<div class="v1612-detail-top"><div><div class="v1612-detail-title">${c[p.title]}</div><div class="v1612-detail-sub">${isCurrent?c.active_account:c[p.sub]}</div></div><div><div class="v1612-detail-price">${nativePlay?(window.LevelingBilling?.priceForPlan?.(p.id)||'—'):price(final)}</div>${promo?'<div class="v1612-detail-promo">-30 % · premier paiement</div>':''}</div></div><div class="v1612-benefits">${benefits.map(x=>`<div class="v1612-benefit">${x}</div>`).join('')}</div><button type="button" class="v1612-plan-action ${isCurrent?'current':''}" ${(isCurrent||hasCurrent)?'disabled':''} onclick="v1610SelectPlan('${p.id}')">${isCurrent?(p.id==='life'?c.active_button:(lang()==='fr'?' ABONNEMENT ACTIF':' SUBSCRIPTION ACTIVE')):(hasCurrent?c.already_active:(isSelected?' '+c.selected:c.choose))}</button>`;
  old.replaceWith(detail);
 };
 
@@ -12482,7 +12527,7 @@ window.v1612RenderSubscription();
 
 const c=PLAN_COPY[lang()];
 try{
-  if(typeof showSocialToast==='function')showSocialToast('Stripe',`${c.selected_msg}${c[p.title]} · ${price(p.base*(promoActive()?.70:1))}`);
+  if(typeof showSocialToast==='function')showSocialToast(window.LevelingBilling?.isNativeAndroid?.()?'GOOGLE PLAY':'Stripe',`${c.selected_msg}${c[p.title]} · ${window.LevelingBilling?.isNativeAndroid?.()?(window.LevelingBilling?.priceForPlan?.(p.id)||'—'):price(p.base*(promoActive()?.70:1))}`);
 }catch(e){}
 
 await startStripeCheckout(id);
@@ -12490,10 +12535,10 @@ await startStripeCheckout(id);
 
 window.v1612RenderSubscription=function(){
 const root=document.getElementById('v1612-subscription-root');if(!root)return;
-const c=PLAN_COPY[lang()],storedPromo=promoActive(),selected=selectedPlan();
+const c=PLAN_COPY[lang()],storedPromo=promoActive(),selected=selectedPlan(),nativePlay=window.LevelingBilling?.isNativeAndroid?.()===true;
 const currentMap={month:'4w','1y':'1y',lifetime:'life'};
 const current=currentMap[String(currentSubscriptionPlan||'')]||'';
-const promo=!current&&storedPromo;
+const promo=!nativePlay&&!current&&storedPromo;
 let view=localStorage.getItem('leveling_plan_view')||current||selected||'4w';
 if(!plans.some(p=>p.id===view))view='4w';
 const p=plans.find(x=>x.id===view),isCurrent=current===p.id,isSelected=!isCurrent&&selected===p.id,hasCurrent=!!current;
@@ -12501,9 +12546,9 @@ const final=promo?p.base*.70:p.base;
 const benefits=[...c.benefits,...(p.lifetime?[c.life_extra]:[])];
 root.innerHTML=`<div class="v1612-shell">
 <div class="v1653-test-banner v17111-live-banner">
-  <div class="v1653-test-title">${lang()==='fr'?'PAIEMENT SÉCURISÉ · STRIPE LIVE':'SECURE PAYMENT · STRIPE LIVE'}</div>
-  <div class="v1653-test-copy">${lang()==='fr'?'Les paiements sont désormais réels. Le montant et l’offre sont confirmés sur la page sécurisée Stripe avant validation.':'Payments are now real. The amount and plan are confirmed on Stripe’s secure page before payment.'}</div>
-  <div class="v1653-test-card"><b>${lang()==='fr'?'Sécurisé par Stripe':'Secured by Stripe'}</b> · ${lang()==='fr'?'LEVELING-APP ne stocke pas tes données complètes de carte bancaire.':'LEVELING-APP does not store your full card details.'}</div>
+  <div class="v1653-test-title">${nativePlay?(lang()==='fr'?'PAIEMENT SÉCURISÉ · GOOGLE PLAY':'SECURE PAYMENT · GOOGLE PLAY'):(lang()==='fr'?'PAIEMENT SÉCURISÉ · STRIPE LIVE':'SECURE PAYMENT · STRIPE LIVE')}</div>
+  <div class="v1653-test-copy">${nativePlay?(lang()==='fr'?'Les achats Android sont traités par Google Play puis vérifiés par le serveur LEVELING-APP.':'Android purchases are processed by Google Play and then verified by the LEVELING-APP server.'):(lang()==='fr'?'Les paiements sont désormais réels. Le montant et l’offre sont confirmés sur la page sécurisée Stripe avant validation.':'Payments are now real. The amount and plan are confirmed on Stripe’s secure page before payment.')}</div>
+  <div class="v1653-test-card"><b>${nativePlay?(lang()==='fr'?'Sécurisé par Google Play':'Secured by Google Play'):(lang()==='fr'?'Sécurisé par Stripe':'Secured by Stripe')}</b> · ${lang()==='fr'?'LEVELING-APP ne stocke pas tes données complètes de paiement.':'LEVELING-APP does not store your full payment details.'}</div>
 </div>
 <section class="v1612-box">
 <div class="v1612-box-head"><b>${c.offers}</b><small>${c.offers_sub}</small></div>
@@ -12512,7 +12557,7 @@ ${plans.map(x=>{const xp=promo?x.base*.70:x.base,xc=current===x.id,xs=view===x.i
 <button type="button" class="v1612-plan-card ${xs?'selected':''} ${xc?'current':''}" data-plan="${x.id}" onclick="v1612ViewPlan('${x.id}')">
 <span class="v1612-plan-badge">${xc?' '+c.active:c[x.badge]}</span>
 <span class="v1612-plan-name">${c[x.short]}</span>
-<span class="v1612-plan-price">${price(xp)}</span>
+<span class="v1612-plan-price">${nativePlay?(window.LevelingBilling?.priceForPlan?.(x.id)||'—'):price(xp)}</span>
 <span class="v1612-plan-old">${promo?price(x.base):' '}</span>
 <span class="v1612-plan-state">${xc?c.active_account:(xs?c.selected:c[x.sub])}</span>
 </button>`}).join('')}
@@ -12521,7 +12566,7 @@ ${plans.map(x=>{const xp=promo?x.base*.70:x.base,xc=current===x.id,xs=view===x.i
 <div id="v1612-plan-detail" class="v1612-plan-detail ${p.cls} ${isCurrent?'current':''}">
 <div class="v1612-detail-top">
 <div><div class="v1612-detail-title">${c[p.title]}</div><div class="v1612-detail-sub">${isCurrent?c.active_account:c[p.sub]}</div></div>
-<div><div class="v1612-detail-price">${price(final)}</div>${promo?`<div class="v1612-detail-promo">-30 % · premier paiement</div>`:''}</div>
+<div><div class="v1612-detail-price">${nativePlay?(window.LevelingBilling?.priceForPlan?.(p.id)||'—'):price(final)}</div>${promo?`<div class="v1612-detail-promo">-30 % · premier paiement</div>`:''}</div>
 </div>
 <div class="v1612-benefits">${benefits.map(x=>`<div class="v1612-benefit">${x}</div>`).join('')}</div>
 <button type="button" class="v1612-plan-action ${isCurrent?'current':''}" ${(isCurrent||hasCurrent)?'disabled':''} onclick="v1610SelectPlan('${p.id}')">${isCurrent?(p.id==='life'?c.active_button:(lang()==='fr'?' ABONNEMENT ACTIF':' SUBSCRIPTION ACTIVE')):(hasCurrent?c.already_active:(isSelected?' '+c.selected:c.choose))}</button>
@@ -12610,7 +12655,7 @@ window.v1648RenderLegal=function(){
       <p><strong>Email:</strong> ${V1648_LEGAL.email}</p><p><strong>Business phone:</strong> <span class="v1648-legal-pending">to be added before publication.</span></p>
       <p><strong>Publication director:</strong> ${V1648_LEGAL.editor}.</p>
       <p><strong>Web app hosting:</strong> GitHub Pages. <span class="v1648-legal-pending">The host's complete legal details will be finalized in the production version.</span></p>
-      <p><strong>Infrastructure / authentication / database:</strong> Supabase. <strong>Payments:</strong> Stripe. Full payment-card details are entered on Stripe's secure pages and are not stored directly by LEVELINGAPP.</p>
+      <p><strong>Infrastructure / authentication / database:</strong> Supabase. <strong>Payments:</strong> Google Play for purchases made in the Android application and Stripe on the web. Full payment details are handled by the original payment provider and are not stored directly by LEVELINGAPP.</p>
       <p><strong>Consumer mediator:</strong> <span class="v1648-legal-pending">to be appointed and listed before the first public sale.</span></p>
     </div></details>
     <details class="v1648-legal-doc"><summary>2. Terms of Use</summary><div class="v1648-legal-body">
@@ -12623,9 +12668,9 @@ window.v1648RenderLegal=function(){
     </div></details>
     <details class="v1648-legal-doc"><summary>3. Terms of Sale · subscriptions</summary><div class="v1648-legal-body">
       <p>The currently available offers are:</p><div class="v1648-legal-price-grid"><div class="v1648-legal-price"><b>€6.99</b><span>1 month · monthly renewal</span></div><div class="v1648-legal-price"><b>€49.99</b><span>1 year · annual renewal</span></div><div class="v1648-legal-price"><b>€149.99</b><span>Lifetime · one-time payment</span></div></div>
-      <p><strong>Order and payment.</strong> Payments are processed through Stripe. Paid access is activated after payment confirmation. The price and plan features are displayed before the order is confirmed.</p>
+      <p><strong>Order and payment.</strong> Android purchases are processed through Google Play; web purchases are processed through Stripe. Paid access is activated only after server-side payment confirmation. The price and plan features are displayed by the payment provider before the order is confirmed.</p>
       <p><strong>Renewal.</strong> The 1-month and 1-year plans renew automatically at the end of each billing period until cancelled. Lifetime is a one-time payment with no automatic renewal.</p>
-      <p><strong>Cancellation.</strong> For recurring plans, users can go to Settings → Subscription → <em>Manage / cancel my subscription</em> at any time. Management is handled through the Stripe portal. Cancellation takes effect at the end of the period already paid for, unless the law provides otherwise.</p>
+      <p><strong>Cancellation.</strong> For recurring plans, users can go to Settings → Subscription → <em>Manage / cancel my subscription</em> at any time. Management is handled by the original provider, in Google Play for an Android purchase or in the Stripe portal for a web purchase. Cancellation takes effect at the end of the period already paid for, unless the law provides otherwise.</p>
       <p><strong>Access keys.</strong> A Lifetime key provided by LEVELINGAPP can be linked to one account only. It is not a payment method and may not be resold without authorization.</p>
       <p><strong>Billing and tax.</strong> <span class="v1648-legal-pending">Final tax wording, including VAT where applicable, will be added after the micro-enterprise is registered.</span></p>
     </div></details>
@@ -12643,10 +12688,10 @@ Date: [date].</div>
     </div></details>
     <details class="v1648-legal-doc"><summary>5. Privacy Policy · GDPR</summary><div class="v1648-legal-body">
       <h4>Data controller</h4><p>${V1648_LEGAL.editor} / ${V1648_LEGAL.trade} — contact: <strong>${V1648_LEGAL.email}</strong>.</p>
-      <h4>Data processed</h4><ul><li>Account: email, username and technical authentication identifiers.</li><li>Sports profile: weight, height, age, sex used for metabolic formulas, body-fat value entered by the user, goals, Squat/Bench/Deadlift, programs, sets, repetitions, loads, history, records and progression.</li><li>Well-being / recovery: sleep, fatigue/feeling and recovery indicators entered or calculated.</li><li>Nutrition & daily activity: calorie/macro targets, manual daily intake entries, daily step counts entered or synchronized, and estimated training energy expenditure.</li><li>Community: public profile, ranking, team, messages and published activity when those features are used.</li><li>Subscription: status, plan and Stripe identifiers required to manage access. LEVELINGAPP does not directly store full payment-card numbers.</li><li>Local technical data: preferences, language, theme and information required for the application to operate.</li></ul>
+      <h4>Data processed</h4><ul><li>Account: email, username and technical authentication identifiers.</li><li>Sports profile: weight, height, age, sex used for metabolic formulas, body-fat value entered by the user, goals, Squat/Bench/Deadlift, programs, sets, repetitions, loads, history, records and progression.</li><li>Well-being / recovery: sleep, fatigue/feeling and recovery indicators entered or calculated.</li><li>Nutrition & daily activity: calorie/macro targets, manual daily intake entries, daily step counts entered or synchronized, and estimated training energy expenditure.</li><li>Community: public profile, ranking, team, messages and published activity when those features are used.</li><li>Subscription: status, plan and the Google Play or Stripe identifiers required to verify payment and manage access. LEVELINGAPP does not directly store full payment details.</li><li>Local technical data: preferences, language, theme and information required for the application to operate.</li></ul>
       <h4>Purposes and legal bases</h4><p>Account and training data are used to provide the requested service and save progression. Data required for billing are used to perform the contract and comply with applicable legal obligations. Community features are used at the user's request and may involve processing necessary for security and moderation.</p>
       <p><span class="v1648-legal-pending">Before production, the consent flow will be finalized for sports/well-being data that may require explicit consent because of their nature.</span></p>
-      <h4>Service providers</h4><p>LEVELINGAPP notably uses <strong>Supabase</strong> for authentication and the database, <strong>Stripe</strong> for payments and the subscription portal, <strong>Google AdMob</strong> for advertising in the Android application, and <strong>GitHub Pages</strong> to host the web application. Any transfers outside the European Economic Area must be covered by the safeguards applicable to the relevant providers.</p>
+      <h4>Service providers</h4><p>LEVELINGAPP notably uses <strong>Supabase</strong> for authentication and the database, <strong>Google Play</strong> for Android purchases and subscription management, <strong>Stripe</strong> for web payments and the web subscription portal, <strong>Google AdMob</strong> for advertising in the Android application, and <strong>GitHub Pages</strong> to host the web application. Any transfers outside the European Economic Area must be covered by the safeguards applicable to the relevant providers.</p>
       <h4>Retention</h4><p>Account data are kept for the period in which the service is used, then deleted or archived in accordance with legal obligations and evidentiary needs. Billing data may be retained for statutory periods. Community content is kept for as long as it is needed for the feature, moderation or account management.</p>
       <h4>Your rights</h4><p>Users may request access, rectification, erasure, restriction and portability, or exercise a right to object where applicable. Consent may be withdrawn when processing relies on consent. Requests should be sent to <strong>${V1648_LEGAL.email}</strong>. Users may also lodge a complaint with the CNIL.</p>
       <h4>Security</h4><p>Reasonable technical and organizational measures are used to protect accounts and data. No information system can guarantee zero risk.</p>
@@ -12678,7 +12723,7 @@ Date: [date].</div>
         <p><strong>Téléphone professionnel :</strong> <span class="v1648-legal-pending">à compléter avant publication.</span></p>
         <p><strong>Directeur de la publication :</strong> ${V1648_LEGAL.editor}.</p>
         <p><strong>Hébergement de l’application web :</strong> GitHub Pages. <span class="v1648-legal-pending">Coordonnées légales complètes de l’hébergeur à figer dans la version de production.</span></p>
-        <p><strong>Infrastructure / authentification / base de données :</strong> Supabase. <strong>Paiements :</strong> Stripe. Les données de carte bancaire sont saisies sur les pages sécurisées de Stripe et ne sont pas stockées directement par LEVELINGAPP.</p>
+        <p><strong>Infrastructure / authentification / base de données :</strong> Supabase. <strong>Paiements :</strong> Google Play pour les achats réalisés dans l’application Android et Stripe sur le Web. Les données complètes de paiement sont traitées par le prestataire d’origine et ne sont pas stockées directement par LEVELINGAPP.</p>
         <p><strong>Médiateur de la consommation :</strong> <span class="v1648-legal-pending">à désigner et à renseigner avant la première vente au public.</span></p>
       </div>
     </details>
@@ -12700,9 +12745,9 @@ Date: [date].</div>
       <div class="v1648-legal-body">
         <p>Les offres actuellement disponibles sont :</p>
         <div class="v1648-legal-price-grid"><div class="v1648-legal-price"><b>6,99 €</b><span>1 mois · renouvellement mensuel</span></div><div class="v1648-legal-price"><b>49,99 €</b><span>1 an · renouvellement annuel</span></div><div class="v1648-legal-price"><b>149,99 €</b><span>Lifetime · paiement unique</span></div></div>
-        <p><strong>Commande et paiement.</strong> Le paiement est traité via Stripe. L’accès payant est activé après confirmation du paiement. Le prix et les caractéristiques de l’offre sont affichés avant validation de la commande.</p>
+        <p><strong>Commande et paiement.</strong> Les achats Android sont traités par Google Play ; les achats Web sont traités par Stripe. L’accès payant est activé uniquement après confirmation du paiement par le serveur. Le prix et les caractéristiques de l’offre sont affichés par le prestataire avant validation de la commande.</p>
         <p><strong>Renouvellement.</strong> Les offres 1 mois et 1 an sont renouvelées automatiquement à leur échéance jusqu’à résiliation. L’offre Lifetime est un paiement unique sans renouvellement automatique.</p>
-        <p><strong>Résiliation.</strong> Pour une offre récurrente, l’utilisateur peut utiliser à tout moment Réglages → Abonnement → <em>Gérer / résilier mon abonnement</em>. La gestion est effectuée sur le portail Stripe. La résiliation prend effet à la fin de la période déjà payée, sauf disposition légale contraire.</p>
+        <p><strong>Résiliation.</strong> Pour une offre récurrente, l’utilisateur peut utiliser à tout moment Réglages → Abonnement → <em>Gérer / résilier mon abonnement</em>. La gestion est effectuée chez le prestataire d’origine : Google Play pour un achat Android ou le portail Stripe pour un achat Web. La résiliation prend effet à la fin de la période déjà payée, sauf disposition légale contraire.</p>
         <p><strong>Codes d’accès.</strong> Une clé Lifetime offerte par LEVELINGAPP peut être liée à un seul compte. Elle n’est pas un moyen de paiement et ne peut pas être revendue sans autorisation.</p>
         <p><strong>Facturation et fiscalité.</strong> <span class="v1648-legal-pending">Les mentions fiscales définitives, dont TVA le cas échéant, seront ajoutées après immatriculation de la micro-entreprise.</span></p>
       </div>
@@ -12728,10 +12773,10 @@ Date : [date].</div>
       <summary>5. Politique de confidentialité · RGPD</summary>
       <div class="v1648-legal-body">
         <h4>Responsable du traitement</h4><p>${V1648_LEGAL.editor} / ${V1648_LEGAL.trade} — contact : <strong>${V1648_LEGAL.email}</strong>.</p>
-        <h4>Données traitées</h4><ul><li>Compte : e-mail, pseudo, identifiants techniques d’authentification.</li><li>Profil sportif : poids, taille, body fat saisi, objectifs, Squat/Bench/Deadlift, programmes, séries, répétitions, charges, historique, records et progression.</li><li>Bien-être / récupération : sommeil, fatigue/ressenti et indicateurs de récupération saisis ou calculés.</li><li>Nutrition & activité quotidienne : objectifs calories/macros, saisies nutritionnelles manuelles, nombre de pas saisi ou synchronisé et estimation de la dépense énergétique d’entraînement.</li><li>Communauté : profil public, classement, équipe, messages et activités publiées lorsque ces fonctions sont utilisées.</li><li>Abonnement : statut, offre, identifiants Stripe utiles à la gestion de l’accès. LEVELINGAPP ne stocke pas directement les numéros complets de carte bancaire.</li><li>Données techniques locales : préférences, langue, thème et éléments nécessaires au fonctionnement de l’application.</li></ul>
+        <h4>Données traitées</h4><ul><li>Compte : e-mail, pseudo, identifiants techniques d’authentification.</li><li>Profil sportif : poids, taille, body fat saisi, objectifs, Squat/Bench/Deadlift, programmes, séries, répétitions, charges, historique, records et progression.</li><li>Bien-être / récupération : sommeil, fatigue/ressenti et indicateurs de récupération saisis ou calculés.</li><li>Nutrition & activité quotidienne : objectifs calories/macros, saisies nutritionnelles manuelles, nombre de pas saisi ou synchronisé et estimation de la dépense énergétique d’entraînement.</li><li>Communauté : profil public, classement, équipe, messages et activités publiées lorsque ces fonctions sont utilisées.</li><li>Abonnement : statut, offre et identifiants Google Play ou Stripe nécessaires à la vérification du paiement et à la gestion de l’accès. LEVELINGAPP ne stocke pas directement les données complètes de paiement.</li><li>Données techniques locales : préférences, langue, thème et éléments nécessaires au fonctionnement de l’application.</li></ul>
         <h4>Finalités et bases</h4><p>Les données de compte et d’entraînement sont utilisées pour fournir le service demandé et sauvegarder la progression. Les données nécessaires à la facturation sont utilisées pour exécuter le contrat et respecter les obligations légales applicables. Les fonctions communautaires sont utilisées à la demande de l’utilisateur et peuvent faire l’objet de traitements nécessaires à la sécurité et à la modération.</p>
         <p><span class="v1648-legal-pending">Avant production, le parcours de consentement sera finalisé pour les données de sport/bien-être susceptibles de nécessiter un consentement explicite au regard de leur nature.</span></p>
-        <h4>Prestataires</h4><p>LEVELINGAPP utilise notamment <strong>Supabase</strong> pour l’authentification et la base de données, <strong>Stripe</strong> pour les paiements et le portail d’abonnement, <strong>Google AdMob</strong> pour la publicité dans l’application Android, et <strong>GitHub Pages</strong> pour l’hébergement de l’application web. Les transferts éventuels hors Espace économique européen doivent être encadrés par les garanties applicables des prestataires concernés.</p>
+        <h4>Prestataires</h4><p>LEVELINGAPP utilise notamment <strong>Supabase</strong> pour l’authentification et la base de données, <strong>Google Play</strong> pour les achats Android et la gestion des abonnements Android, <strong>Stripe</strong> pour les paiements Web et le portail d’abonnement Web, <strong>Google AdMob</strong> pour la publicité dans l’application Android, et <strong>GitHub Pages</strong> pour l’hébergement de l’application web. Les transferts éventuels hors Espace économique européen doivent être encadrés par les garanties applicables des prestataires concernés.</p>
         <h4>Durée de conservation</h4><p>Les données nécessaires au compte sont conservées pendant la durée d’utilisation du service puis supprimées ou archivées selon les obligations légales et les besoins de preuve. Les données de facturation peuvent être conservées pendant les durées imposées par la loi. Les contenus communautaires sont conservés tant qu’ils sont nécessaires à la fonctionnalité, à la modération ou à la gestion du compte.</p>
         <h4>Droits</h4><p>L’utilisateur peut demander l’accès, la rectification, l’effacement, la limitation, la portabilité ou exercer son droit d’opposition lorsque celui-ci s’applique. Il peut retirer son consentement lorsque le traitement repose sur ce consentement. Les demandes sont adressées à <strong>${V1648_LEGAL.email}</strong>. L’utilisateur peut également introduire une réclamation auprès de la CNIL.</p>
         <h4>Sécurité</h4><p>Des mesures techniques et organisationnelles raisonnables sont mises en œuvre pour protéger les comptes et les données. Aucun système informatique ne peut toutefois garantir un risque nul.</p>

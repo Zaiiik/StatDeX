@@ -10,15 +10,21 @@ const warnings = [];
 
 const requiredFiles = [
   'index.html',
+  'delete-account.html',
   'service-worker.js',
   'native-ads.js',
   'src/native-ads.js',
+  'src/native-billing.js',
   'capacitor.config.json',
   'android/app/src/main/AndroidManifest.xml',
   'android/app/src/main/res/values/strings.xml',
   'supabase/migrations/202609260001_rewarded_ad_claim_v1.sql',
   'supabase/migrations/20260927000100_crystal_shop_v1.sql',
   'supabase/migrations/20260927000200_crystal_shop_v1_hardening.sql',
+  'supabase/migrations/20260928160356_google_play_billing_and_account_deletion.sql',
+  'supabase/functions/google-play-verify-purchase/index.ts',
+  'supabase/functions/google-play-rtdn/index.ts',
+  'supabase/functions/delete-account/index.ts',
   'manifest.webmanifest',
   'notification-badge.png',
   'icon-192.png',
@@ -147,9 +153,9 @@ const metrics = {
 };
 
 const nonRegressionBudgets = {
-  // V22.1.5 ajoute le pont AdMob externe et les garde-fous POWER/UMP bornés.
-  // Les libellés anglais canoniques et les états visuels Boutique/Thèmes restent bornés ici.
-  indexBytes: 8_500_000,
+  // V22.1.5 ajoute les ponts natifs AdMob/Play Billing et la suppression de compte.
+  // Le budget reste serré et n'autorise pas de nouvelle couche massive dans index.html.
+  indexBytes: 8_520_000,
   styleBlocks: 103,
   scriptBlocks: 56,
   importantRules: 3_593,

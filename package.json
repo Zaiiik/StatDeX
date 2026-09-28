@@ -15,8 +15,9 @@
     "test:shop": "node scripts/crystal-shop-regression.mjs",
     "test:build-modes": "node scripts/build-mode-regression.mjs",
     "test:runtime": "node scripts/runtime-regression.mjs",
+    "test:billing": "node scripts/billing-regression.mjs",
     "test:sync": "node scripts/sync-regression.mjs",
-    "test": "node scripts/check-inline-scripts.mjs && node scripts/audit.mjs && node scripts/sync-regression.mjs && node scripts/build-mode-regression.mjs && node scripts/admob-regression.mjs && node scripts/crystal-shop-regression.mjs && node scripts/runtime-regression.mjs"
+    "test": "node scripts/check-inline-scripts.mjs && node scripts/audit.mjs && node scripts/sync-regression.mjs && node scripts/build-mode-regression.mjs && node scripts/admob-regression.mjs && node scripts/crystal-shop-regression.mjs && node scripts/runtime-regression.mjs && node scripts/billing-regression.mjs"
   },
   "dependencies": {
     "@capacitor-community/admob": "8.1.0",
