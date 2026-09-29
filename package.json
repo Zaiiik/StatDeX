@@ -1,6 +1,6 @@
 {
   "name": "leveling-app",
-  "version": "22.1.5",
+  "version": "22.2.0",
   "private": true,
   "type": "module",
   "scripts": {
@@ -16,8 +16,9 @@
     "test:build-modes": "node scripts/build-mode-regression.mjs",
     "test:runtime": "node scripts/runtime-regression.mjs",
     "test:billing": "node scripts/billing-regression.mjs",
+    "test:mission": "node scripts/mission-regression.mjs",
     "test:sync": "node scripts/sync-regression.mjs",
-    "test": "node scripts/check-inline-scripts.mjs && node scripts/audit.mjs && node scripts/sync-regression.mjs && node scripts/build-mode-regression.mjs && node scripts/admob-regression.mjs && node scripts/crystal-shop-regression.mjs && node scripts/runtime-regression.mjs && node scripts/billing-regression.mjs"
+    "test": "node scripts/check-inline-scripts.mjs && node scripts/audit.mjs && node scripts/sync-regression.mjs && node scripts/build-mode-regression.mjs && node scripts/admob-regression.mjs && node scripts/crystal-shop-regression.mjs && node scripts/runtime-regression.mjs && node scripts/billing-regression.mjs && node scripts/mission-regression.mjs"
   },
   "dependencies": {
     "@capacitor-community/admob": "8.1.0",

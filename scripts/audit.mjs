@@ -25,6 +25,7 @@ const requiredFiles = [
   'supabase/functions/google-play-verify-purchase/index.ts',
   'supabase/functions/google-play-rtdn/index.ts',
   'supabase/functions/delete-account/index.ts',
+  'supabase/functions/access-provenance/index.ts',
   'manifest.webmanifest',
   'notification-badge.png',
   'icon-192.png',
@@ -153,9 +154,9 @@ const metrics = {
 };
 
 const nonRegressionBudgets = {
-  // V22.1.5 ajoute les ponts natifs AdMob/Play Billing et la suppression de compte.
+  // V22.2 ajoute le multi-blocs, les splits stricts et la provenance d'accès.
   // Le budget reste serré et n'autorise pas de nouvelle couche massive dans index.html.
-  indexBytes: 8_520_000,
+  indexBytes: 8_540_000,
   styleBlocks: 103,
   scriptBlocks: 56,
   importantRules: 3_593,

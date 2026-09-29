@@ -1,4 +1,4 @@
-<!-- LEVELING-APP V22.1.5 — ACCOUNT ENTRY + SETTINGS RESTORE · BASE V21.9.2 VALIDATED -->
+<!-- LEVELING-APP V22.2.0 — RUNTIME, PROGRAM AI, MULTI-BLOCKS, RECOVERY & ACCESS PROVENANCE -->
 <!-- LEVELING-APP V18.6.0 CLEAN CORE + PROGRAM AI — consolidated coaching core, safer progression flow, PROGRAM AI assistant -->
 <!-- LEVELING-APP V17.4.0 AUTH + I18N + ONBOARDING REPLAY TEST
      - hard account gate after first-run discovery
@@ -17,7 +17,7 @@
 
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>LEVELING-APP — V22.1.5 ACCESS+</title>
+    <title>LEVELING-APP — V22.2.0 ACCESS+</title>
     <meta name="theme-color" content="#09090f">
     <meta name="application-name" content="LEVELING-APP">
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -433,6 +433,7 @@
 .power-program-card.custom{border-color:#00d2ff;box-shadow:0 0 10px rgba(0,210,255,.18)}
 .power-program-card.custom .program-title{color:#00d2ff;text-shadow:0 0 8px rgba(0,210,255,.45)}
 .custom-builder{display:flex;flex-direction:column;gap:10px}
+.custom-block-nav{display:flex;gap:7px;overflow-x:auto;margin:10px 0;padding-bottom:3px;scrollbar-width:none}.custom-block-nav::-webkit-scrollbar{display:none}.custom-block-tab{flex:0 0 auto;border:1px solid #313b4a;border-radius:10px;background:#090d14;color:#8d98aa;padding:8px 11px;font-size:.55rem;font-weight:900}.custom-block-tab.active{border-color:#00d2ff;color:#fff;background:rgba(0,210,255,.1)}
 .custom-day{background:rgba(0,0,0,.32);border:1px solid #333;border-radius:12px;padding:11px}
 .custom-day-head{display:flex;gap:7px;align-items:center;margin-bottom:8px}
 .custom-builder input{background:#09090e;border:1px solid #383846;color:#fff;border-radius:8px;padding:8px;outline:none}
@@ -5503,6 +5504,47 @@ body.v233-verifying #v233-verify{display:flex}
                 ]}
             ]
         };
+        let activeProgramSelection = {key:activeProgramKey, updatedAt:0};
+        let customProgramUpdatedAt = 0;
+
+        function normalizeCustomProgramData(input){
+            const source=input&&typeof input==='object'?input:{};
+            const legacyDays=Array.isArray(source.days)?source.days:[];
+            const rawBlocks=Array.isArray(source.blocks)&&source.blocks.length
+                ? source.blocks
+                : [{name:'Bloc 1',days:legacyDays}];
+            const blocks=rawBlocks.map((raw,index)=>{
+                const block=raw&&typeof raw==='object'?raw:{};
+                const days=Array.isArray(block.days)?block.days:[];
+                return{
+                    ...block,
+                    name:String(block.name||`Bloc ${index+1}`),
+                    days:days.map((day,dayIndex)=>({
+                        ...(day&&typeof day==='object'?day:{}),
+                        dayName:`Jour ${dayIndex+1}`,
+                        title:String(day?.title||day?.dayName||`Jour ${dayIndex+1} - Personnalisé`),
+                        exercises:Array.isArray(day?.exercises)?day.exercises:[]
+                    }))
+                };
+            });
+            if(!blocks.length)blocks.push({name:'Bloc 1',days:[]});
+            const editorBlockIndex=Math.max(0,Math.min(blocks.length-1,Number(source.editorBlockIndex)||0));
+            const normalized={...source,name:String(source.name||'Mon programme'),blocks,editorBlockIndex};
+            /* Alias de lecture pour les anciennes versions et les codes partagés V1. */
+            normalized.days=blocks[0].days;
+            return normalized;
+        }
+        function customProgramBlocks(){
+            customProgramData=normalizeCustomProgramData(customProgramData);
+            return customProgramData.blocks;
+        }
+        function customEditorBlock(){
+            const blocks=customProgramBlocks();
+            const index=Math.max(0,Math.min(blocks.length-1,Number(customProgramData.editorBlockIndex)||0));
+            customProgramData.editorBlockIndex=index;
+            return blocks[index];
+        }
+        customProgramData=normalizeCustomProgramData(customProgramData);
 
         function getProgramMeta(key) {
             return {
@@ -5510,7 +5552,7 @@ body.v233-verifying #v233-verify{display:flex}
                 powerbuilding:{title:'Powerbuilding', color:'#ff0033', icon:'', subtitle:'Programme Powerbuilding actuel · 5–6 jours'},
                 hypertrophie:{title:'Hypertrophie', color:'#00ff66', icon:'', subtitle:'5 jours · Pectoraux / Dos / Jambes / Épaules'},
                 fitgirl:{title:'Fit Girl', color:'#ff66b2', icon:'', subtitle:'3–5 jours · 70% bas / 30% haut'},
-                custom:{title:(customProgramData.name || 'Mon programme'), color:'#00d2ff', icon:'', subtitle:`${customProgramData.days.length} jour(s) · Programme personnalisé`}
+                custom:{title:(customProgramData.name || 'Mon programme'), color:'#00d2ff', icon:'', subtitle:`${customProgramBlocks().length} bloc(s) · ${customProgramBlocks().reduce((n,b)=>n+b.days.length,0)} jour(s)`}
             }[key];
         }
 
@@ -5538,7 +5580,7 @@ body.v233-verifying #v233-verify{display:flex}
             const en=localStorage.getItem('leveling_language')==='en';
             const powerEn=['Base · technique & volume','Progressive volume · clean reps','Intensification · strength & tension','Consolidation · controlled performance'];
             if(key==='powerbuilding')return blocksData.map((block,i)=>({...block,name:`${en?'Block':'Bloc'} ${i+1}`,subtitle:en?powerEn[i]:block.subtitle}));
-            if(key==='custom')return [{name:en?'Block 1':'Bloc 1',subtitle:en?'Custom program':getProgramMeta(key)?.subtitle||'Programme personnalisé'}];
+            if(key==='custom')return customProgramBlocks().map((block,index)=>({name:String(block.name||`${en?'Block':'Bloc'} ${index+1}`),subtitle:`${block.days.length} ${en?'day(s) · Custom program':'jour(s) · Programme personnalisé'}`}));
             const rows=PROGRAM_BLOCKS[key]||[{name:'Bloc 1',subtitle:getProgramMeta(key)?.subtitle||'Programme',subtitleEn:'Program'}];
             return rows.map((block,i)=>({...block,name:`${en?'Block':'Bloc'} ${i+1}`,subtitle:en?(block.subtitleEn||block.subtitle):block.subtitle,rir:en?(block.rirEn||block.rir):block.rir}));
         }
@@ -5586,7 +5628,7 @@ body.v233-verifying #v233-verify{display:flex}
    programs=v261BuildBlocks(base,'sbd');
  }else if(activeProgramKey==='fitgirl') programs=v261BuildBlocks(fitGirlProgram,'fitgirl');
  else if(activeProgramKey==='hypertrophie') programs=v261BuildBlocks(hypertrophieProgram,'hypertrophie');
- else if(activeProgramKey==='custom') programs=[customProgramData.days];
+  else if(activeProgramKey==='custom') programs=customProgramBlocks().map(block=>block.days);
  else programs=[[]];
  const extras=userData?.programExtraExercises?.[activeProgramKey]||{};
  return programs.map((block,bi)=>(block||[]).map((day,di)=>{
@@ -5616,6 +5658,7 @@ function saveActiveProgramState() {
         function selectTrainingProgram(key) {
             saveActiveProgramState();
             activeProgramKey = key;
+            activeProgramSelection={key,updatedAt:Date.now()};
             loadActiveProgramState();
             initAutoDateAndBlock(true);
             saveToLocalStorage();scheduleCloudSaveImmediate();updateResumeWorkoutBanner();
@@ -5653,6 +5696,11 @@ function saveActiveProgramState() {
 
                 const savedActiveProgram = localStorage.getItem('solo_leveling_active_program');
                 if (savedActiveProgram) activeProgramKey = savedActiveProgram;
+                const savedProgramSelection=localStorage.getItem('solo_leveling_active_program_selection');
+                if(savedProgramSelection){
+                    const parsed=JSON.parse(savedProgramSelection);
+                    if(parsed&&typeof parsed==='object'&&parsed.key){activeProgramSelection={key:String(parsed.key),updatedAt:Math.max(0,Number(parsed.updatedAt)||0)};activeProgramKey=activeProgramSelection.key;}
+                }else activeProgramSelection={key:activeProgramKey,updatedAt:Math.max(0,Number(localStorage.getItem('leveling_last_local_save'))||0)};
 
                 const savedProgramStates = localStorage.getItem('solo_leveling_program_states');
                 if (savedProgramStates) programWorkoutStates = JSON.parse(savedProgramStates);
@@ -5661,7 +5709,9 @@ function saveActiveProgramState() {
                 if (savedProgramCustom) programCustomSetData = JSON.parse(savedProgramCustom);
 
                 const savedCustomProgram = localStorage.getItem('solo_leveling_custom_program');
-                if (savedCustomProgram) customProgramData = JSON.parse(savedCustomProgram);
+                if (savedCustomProgram) customProgramData = normalizeCustomProgramData(JSON.parse(savedCustomProgram));
+                else customProgramData=normalizeCustomProgramData(customProgramData);
+                customProgramUpdatedAt=Math.max(0,Number(localStorage.getItem('solo_leveling_custom_program_updated_at'))||0);
 
                 const savedWorkouts = localStorage.getItem('solo_leveling_state');
                 if (savedWorkouts) workoutState = JSON.parse(savedWorkouts);
@@ -5691,9 +5741,12 @@ function saveActiveProgramState() {
                 localStorage.setItem('solo_leveling_custom_sets', JSON.stringify(customSetData));
                 localStorage.setItem('solo_leveling_history', JSON.stringify(workoutHistory));
                 localStorage.setItem('solo_leveling_active_program', activeProgramKey);
+                activeProgramSelection={key:activeProgramKey,updatedAt:Math.max(0,Number(activeProgramSelection?.updatedAt)||0)};
+                localStorage.setItem('solo_leveling_active_program_selection',JSON.stringify(activeProgramSelection));
                 localStorage.setItem('solo_leveling_program_states', JSON.stringify(programWorkoutStates));
                 localStorage.setItem('solo_leveling_program_custom_sets', JSON.stringify(programCustomSetData));
                 localStorage.setItem('solo_leveling_custom_program', JSON.stringify(customProgramData));
+                localStorage.setItem('solo_leveling_custom_program_updated_at',String(Math.max(0,Number(customProgramUpdatedAt)||0)));
                 localStorage.setItem('leveling_last_local_save', String(Date.now()));
                 if(typeof window.updateV128SaveLabel==='function') window.updateV128SaveLabel();
             } catch (e) { console.log(e); }
@@ -5867,10 +5920,12 @@ function saveActiveProgramState() {
 
         function setTheme(themeName) {
             userData.theme = themeName;
+            userData.themeUpdatedAt=Date.now();
             document.body.setAttribute('data-theme', themeName);
             const metaTheme=document.querySelector('meta[name="theme-color"]');
             if(metaTheme) metaTheme.setAttribute('content', themeName==='mono' ? '#030303' : '#09090f');
             saveToLocalStorage();
+            try{scheduleCloudSave?.()}catch(e){}
         }
 
         function updateProfileUI() {
@@ -6370,11 +6425,14 @@ function saveActiveProgramState() {
         function renderCustomProgramBuilder() {
             const detail = document.getElementById('power-program-detail');
             if (!detail) return;
-            const days = customProgramData.days || [];
+            const blocks=customProgramBlocks(),block=customEditorBlock(),blockIndex=customProgramData.editorBlockIndex;
+            const days = block.days || [];
             detail.innerHTML = `
                 <div class="profile-card" style="border-color:#00d2ff;box-shadow:0 0 12px rgba(0,210,255,.14)">
-                    <div style="color:#00d2ff;font-weight:900;margin-bottom:8px"> MON PROGRAMME PERSONNALISÉ</div>
-                    <div class="settings-input-group"><label>Nom du programme</label><input value="${escCustom(customProgramData.name||'Mon programme')}" onchange="setCustomProgramName(this.value)"></div>
+                     <div style="color:#00d2ff;font-weight:900;margin-bottom:8px"> MON PROGRAMME PERSONNALISÉ</div>
+                     <div class="settings-input-group"><label>Nom du programme</label><input value="${escCustom(customProgramData.name||'Mon programme')}" onchange="setCustomProgramName(this.value)"></div>
+                    <div class="custom-block-nav">${blocks.map((item,index)=>`<button type="button" class="custom-block-tab ${index===blockIndex?'active':''}" onclick="selectCustomBlock(${index})">${escCustom(item.name||`Bloc ${index+1}`)}</button>`).join('')}</div>
+                    <div class="settings-input-group"><label>Nom du bloc</label><input value="${escCustom(block.name||`Bloc ${blockIndex+1}`)}" onchange="setCustomBlockName(this.value)"></div>
                     <div class="custom-builder">
                         ${days.map((day,d)=>`
                             <div class="custom-day">
@@ -6398,6 +6456,8 @@ function saveActiveProgramState() {
                     </div>
                     <div class="custom-builder-actions" style="margin-top:10px">
                         <button class="btn-action" onclick="addCustomDay()" style="margin-top:0"> Ajouter un jour</button>
+                        <button class="btn-action" onclick="addCustomBlock()" style="margin-top:0"> Ajouter un bloc</button>
+                        <button class="btn-action" onclick="removeCustomBlock()" style="margin-top:0"> Supprimer ce bloc</button>
                         <button class="btn-action" onclick="useCustomProgram()" style="margin-top:0;background:#00d2ff;color:#00151a;border-color:#00d2ff">▶ Utiliser ce programme</button>
                     </div>
                     <div style="font-size:.62rem;color:#777;margin-top:9px">Les modifications sont sauvegardées automatiquement dans ton compte.</div>
@@ -6405,39 +6465,58 @@ function saveActiveProgramState() {
         }
 
         function persistCustomProgram(){
-            customProgramData.days.forEach((d,i)=>{d.dayName=`Jour ${i+1}`; if(!d.title)d.title=`Jour ${i+1} - Personnalisé`;});
+            customProgramData=normalizeCustomProgramData(customProgramData);
+            customProgramData.blocks.forEach((block,blockIndex)=>{
+                block.name=String(block.name||`Bloc ${blockIndex+1}`);
+                block.days.forEach((d,i)=>{d.dayName=`Jour ${i+1}`; if(!d.title)d.title=`Jour ${i+1} - Personnalisé`;});
+            });
+            customProgramData.days=customProgramData.blocks[0].days;
+            customProgramUpdatedAt=Date.now();
             saveToLocalStorage();
+            try{scheduleCloudSave?.()}catch(e){}
         }
         function setCustomProgramName(v){customProgramData.name=(v||'Mon programme').trim()||'Mon programme';persistCustomProgram();}
-        function setCustomDayTitle(d,v){if(customProgramData.days[d])customProgramData.days[d].title=(v||`Jour ${d+1}`).trim();persistCustomProgram();}
+        function selectCustomBlock(index){customProgramData.editorBlockIndex=Math.max(0,Math.min(customProgramBlocks().length-1,Number(index)||0));saveToLocalStorage();renderCustomProgramBuilder();}
+        function setCustomBlockName(v){const block=customEditorBlock();block.name=(v||`Bloc ${customProgramData.editorBlockIndex+1}`).trim()||`Bloc ${customProgramData.editorBlockIndex+1}`;persistCustomProgram();}
+        function addCustomBlock(){
+            const blocks=customProgramBlocks(),number=blocks.length+1;
+            blocks.push({name:`Bloc ${number}`,days:[{dayName:'Jour 1',title:'Jour 1 - Personnalisé',exercises:[{name:'Nouvel exercice',defaultReps:10,defaultWeight:0,sets:3,note:'Programme personnalisé'}]}]});
+            customProgramData.editorBlockIndex=blocks.length-1;persistCustomProgram();renderCustomProgramBuilder();
+        }
+        function removeCustomBlock(){
+            const blocks=customProgramBlocks();if(blocks.length<=1)return alert('Garde au moins un bloc dans ton programme.');
+            blocks.splice(customProgramData.editorBlockIndex,1);customProgramData.editorBlockIndex=Math.max(0,customProgramData.editorBlockIndex-1);persistCustomProgram();renderCustomProgramBuilder();
+        }
+        function setCustomDayTitle(d,v){const days=customEditorBlock().days;if(days[d])days[d].title=(v||`Jour ${d+1}`).trim();persistCustomProgram();}
         function setCustomExercise(d,e,field,v){
-            const ex=customProgramData.days?.[d]?.exercises?.[e]; if(!ex)return;
+            const ex=customEditorBlock().days?.[d]?.exercises?.[e]; if(!ex)return;
             if(field==='name')ex.name=(v||'Exercice').trim()||'Exercice';
             else ex[field]=Math.max(field==='defaultWeight'?0:1,Number(v)||0);
             ex.note='Programme personnalisé'; persistCustomProgram();
         }
         function addCustomDay(){
-            const n=customProgramData.days.length+1;
-            customProgramData.days.push({dayName:`Jour ${n}`,title:`Jour ${n} - Personnalisé`,exercises:[{name:'Nouvel exercice',defaultReps:10,defaultWeight:0,sets:3,note:'Programme personnalisé'}]});
+            const days=customEditorBlock().days,n=days.length+1;
+            days.push({dayName:`Jour ${n}`,title:`Jour ${n} - Personnalisé`,exercises:[{name:'Nouvel exercice',defaultReps:10,defaultWeight:0,sets:3,note:'Programme personnalisé'}]});
             persistCustomProgram();renderCustomProgramBuilder();
         }
         function removeCustomDay(d){
-            if(customProgramData.days.length<=1)return alert('Garde au moins un jour dans ton programme.');
-            customProgramData.days.splice(d,1);persistCustomProgram();renderCustomProgramBuilder();
+            const days=customEditorBlock().days;if(days.length<=1)return alert('Garde au moins un jour dans ce bloc.');
+            days.splice(d,1);persistCustomProgram();renderCustomProgramBuilder();
         }
         function addCustomExercise(d){
-            const day=customProgramData.days[d]; if(!day)return;
+            const day=customEditorBlock().days[d]; if(!day)return;
             day.exercises.push({name:'Nouvel exercice',defaultReps:10,defaultWeight:0,sets:3,note:'Programme personnalisé'});
             persistCustomProgram();renderCustomProgramBuilder();
         }
         function removeCustomExercise(d,e){
-            const day=customProgramData.days[d];if(!day)return;
+            const day=customEditorBlock().days[d];if(!day)return;
             if(day.exercises.length<=1)return alert('Garde au moins un exercice dans cette séance.');
             day.exercises.splice(e,1);persistCustomProgram();renderCustomProgramBuilder();
         }
         function useCustomProgram(){
-            if(!customProgramData.days.length)return alert('Ajoute au moins un jour.');
-            if(customProgramData.days.some(d=>!d.exercises?.length))return alert('Chaque jour doit contenir au moins un exercice.');
+            const blocks=customProgramBlocks();
+            if(blocks.some(block=>!block.days.length))return alert('Ajoute au moins un jour dans chaque bloc.');
+            if(blocks.some(block=>block.days.some(d=>!d.exercises?.length)))return alert('Chaque jour doit contenir au moins un exercice.');
             selectTrainingProgram('custom');
         }
 
@@ -7322,8 +7401,8 @@ function setAppUnlockedShell(){
   document.getElementById('app-container')?.classList.remove('auth-locked');
 }
 
-const APP_VERSION='22.1.5';
-const ACCOUNT_LOCAL_KEYS=['solo_leveling_user','solo_leveling_smart_refs','solo_leveling_body_hist','solo_leveling_inv','solo_leveling_block','solo_leveling_day','solo_leveling_state','solo_leveling_custom_sets','solo_leveling_history','solo_leveling_active_program','solo_leveling_program_states','solo_leveling_program_custom_sets','solo_leveling_custom_program','leveling_last_local_save','leveling_last_cloud_sync','solo_leveling_v10','leveling_v181_core','leveling_v182_core'];
+const APP_VERSION='22.2.0';
+const ACCOUNT_LOCAL_KEYS=['solo_leveling_user','solo_leveling_smart_refs','solo_leveling_body_hist','solo_leveling_inv','solo_leveling_block','solo_leveling_day','solo_leveling_state','solo_leveling_custom_sets','solo_leveling_history','solo_leveling_active_program','solo_leveling_active_program_selection','solo_leveling_program_states','solo_leveling_program_custom_sets','solo_leveling_custom_program','solo_leveling_custom_program_updated_at','leveling_last_local_save','leveling_last_cloud_sync','solo_leveling_v10','leveling_v181_core','leveling_v182_core'];
 function clearLevelingAccountLocalData(){
   try{ACCOUNT_LOCAL_KEYS.forEach(k=>localStorage.removeItem(k));sessionStorage.removeItem('leveling_pending_license')}catch(e){console.warn('Local account cleanup:',e)}
 }
@@ -7457,10 +7536,13 @@ window.startStripeCheckout=startStripeCheckout;
 
 async function manageStripeSubscription(action='manage'){
   try{
-    if(window.LevelingBilling?.isNativeAndroid?.()){
+    const provider=String(currentAccessInfo?.access_provider||'').toLowerCase();
+    if(provider==='google_play'){
+      if(!window.LevelingBilling?.isNativeAndroid?.())throw new Error(v1654TestLang()==='fr'?'Gère cet abonnement depuis Google Play sur ton appareil Android.':'Manage this subscription from Google Play on your Android device.');
       try{showSocialToast?.('GOOGLE PLAY',v1654TestLang()==='fr'?'Ouverture de tes abonnements Google Play…':'Opening your Google Play subscriptions…')}catch(e){}
       return await window.LevelingBilling.openSubscriptionCenter();
     }
+    if(provider!=='stripe')throw new Error(v1654TestLang()==='fr'?'Cet accès ne provient pas de Stripe et ne possède aucun portail Stripe.':'This access is not provided by Stripe and has no Stripe portal.');
     const cancel=action==='cancel';
     try{showSocialToast?.('STRIPE',v1654TestLang()==='fr'?(cancel?'Ouverture de la résiliation sécurisée…':'Ouverture du portail Stripe…'):(cancel?'Opening secure cancellation…':'Opening Stripe portal…'))}catch(e){}
     const data=await v17111CallStripeFunction('create-billing-portal',{action:cancel?'cancel':'manage'});
@@ -7569,12 +7651,20 @@ async function loginLevelingAccount(){
 }
 async function getCurrentLicenseStatus(){
   if(!cloudUser)return{status:'NO_SESSION',has_license:false,enabled:false,access_state:'NONE',full_access:false,premium:false,ad_supported:false,crystals:0,days_remaining:0};
-  const normalizeRich=row=>{const state=String(row?.access_state||'FREE').toUpperCase(),status=state==='SUBSCRIBED'?'ACTIVE':state;return{status,has_license:state==='SUBSCRIBED',enabled:true,access_state:state,plan_code:row?.plan_code||null,subscription_status:row?.status||null,current_period_end:row?.current_period_end||null,lifetime:row?.lifetime===true,trial_started_at:row?.trial_started_at||null,trial_expires_at:row?.trial_expires_at||null,temporary_access_until:row?.temporary_access_until||null,crystals:Number(row?.crystals||0),days_remaining:Number(row?.days_remaining||0),full_access:row?.full_access===true,premium:row?.premium===true,ad_supported:row?.ad_supported===true,email_verified:row?.email_verified===true,trial_available:row?.trial_available===true,verified_reward_claimed:row?.verified_reward_claimed===true,referral_code:row?.referral_code||null,referral_rewarded_count:Number(row?.referral_rewarded_count||0),rewarded_ads_today:Number(row?.rewarded_ads_today||0),rewarded_ads_limit:Number(row?.rewarded_ads_limit||3),rewarded_ad_crystals:Number(row?.rewarded_ad_crystals||10)} };
+  const normalizeRich=row=>{const state=String(row?.access_state||'FREE').toUpperCase(),status=state==='SUBSCRIBED'?'ACTIVE':state;return{status,has_license:state==='SUBSCRIBED',enabled:true,access_state:state,plan_code:row?.plan_code||null,subscription_status:row?.status||null,current_period_end:row?.current_period_end||null,lifetime:row?.lifetime===true,trial_started_at:row?.trial_started_at||null,trial_expires_at:row?.trial_expires_at||null,temporary_access_until:row?.temporary_access_until||null,crystals:Number(row?.crystals||0),days_remaining:Number(row?.days_remaining||0),full_access:row?.full_access===true,premium:row?.premium===true,ad_supported:row?.ad_supported===true,email_verified:row?.email_verified===true,trial_available:row?.trial_available===true,verified_reward_claimed:row?.verified_reward_claimed===true,referral_code:row?.referral_code||null,referral_rewarded_count:Number(row?.referral_rewarded_count||0),rewarded_ads_today:Number(row?.rewarded_ads_today||0),rewarded_ads_limit:Number(row?.rewarded_ads_limit||3),rewarded_ad_crystals:Number(row?.rewarded_ad_crystals||10),access_source:row?.access_source||null,access_provider:row?.access_provider||null,commercial_subscription:row?.commercial_subscription===true,can_manage_stripe:row?.can_manage_stripe===true,can_manage_google_play:row?.can_manage_google_play===true,can_purchase_lifetime:row?.can_purchase_lifetime===true} };
+  const withProvenance=async info=>{
+    try{
+      const {data}=await sb.auth.getSession(),token=data?.session?.access_token;if(!token)return info;
+      const response=await fetch(`${SUPABASE_URL}/functions/v1/access-provenance`,{method:'POST',headers:{'Content-Type':'application/json','Authorization':`Bearer ${token}`,'apikey':SUPABASE_PUBLISHABLE_KEY},body:'{}'});
+      const provenance=await response.json().catch(()=>({}));if(response.ok&&!provenance.error)return{...info,...provenance};
+    }catch(e){console.warn('Access provenance:',e?.message||e)}
+    return info;
+  };
   try{
     // If the session was obtained through the mailbox link/OTP, this call proves ownership server-side.
     try{const proof=await sb.rpc('confirm_app_email_v2141');if(proof?.error&&!/EMAIL_PROOF_REQUIRED|EMAIL_NOT_VERIFIED/i.test(String(proof.error.message||'')))console.warn('Email proof:',proof.error.message)}catch(e){}
     const rich=await sb.rpc('get_my_access_v2141');
-    if(!rich.error){const row=Array.isArray(rich.data)?rich.data[0]:rich.data,info=normalizeRich(row||{});if(info.email_verified)try{localStorage.removeItem(V2141_PENDING_EMAIL)}catch(e){};v214CacheAccess(info);return info}
+    if(!rich.error){const row=Array.isArray(rich.data)?rich.data[0]:rich.data,info=await withProvenance(normalizeRich(row||{}));if(info.email_verified)try{localStorage.removeItem(V2141_PENDING_EMAIL)}catch(e){};v214CacheAccess(info);return info}
     console.warn('Access V21.4.1 RPC fallback:',rich.error?.message||rich.error);
     const old=await sb.rpc('get_my_access_v214');
     if(!old.error){const row=Array.isArray(old.data)?old.data[0]:old.data,state=String(row?.access_state||'FREE').toUpperCase();return normalizeRich({...row,access_state:state==='SUBSCRIBED'?'SUBSCRIBED':'FREE',full_access:state==='SUBSCRIBED',premium:state==='SUBSCRIBED',ad_supported:state!=='SUBSCRIBED'})}
@@ -7602,7 +7692,7 @@ async function retryLicenseCheck(){
 function exportAppData(){
   if(typeof saveActiveProgramState==='function')saveActiveProgramState();
   let v182=null;try{v182=window.LevelingCoreV182?.exportState?.()||JSON.parse(localStorage.getItem('leveling_v182_core')||'null')}catch(e){}
-  return{version:'18.6.0',cycleNumber:Math.max(1,Number(localStorage.getItem('leveling_cycle_number')||1)),userData,smartHypertrophyRefs,bodyHistory,inventoryItems,currentBlockIndex,currentDayIndex,activeProgramKey,programWorkoutStates,programCustomSetData,customProgramData,workoutState,customSetData,workoutHistory,v182,v10:(typeof window.__levelingV10Export==='function'?window.__levelingV10Export():null)};
+  return{version:'22.2.0',cycleNumber:Math.max(1,Number(localStorage.getItem('leveling_cycle_number')||1)),userData,smartHypertrophyRefs,bodyHistory,inventoryItems,currentBlockIndex,currentDayIndex,activeProgramKey,activeProgramSelection:{key:activeProgramKey,updatedAt:Math.max(0,Number(activeProgramSelection?.updatedAt)||0)},programWorkoutStates,programCustomSetData,customProgramData,customProgramUpdatedAt:Math.max(0,Number(customProgramUpdatedAt)||0),workoutState,customSetData,workoutHistory,v182,v10:(typeof window.__levelingV10Export==='function'?window.__levelingV10Export():null)};
 }
 const v2214Obj=v=>!!v&&typeof v==='object'&&!Array.isArray(v);
 const v2214Map=(older,newer)=>({...((v2214Obj(older))?older:{}),...((v2214Obj(newer))?newer:{})});
@@ -7615,6 +7705,7 @@ function v2214Cycle(d){return Math.max(1,Number(d?.cycleNumber)||1)}
 function v2214Xp(d){return Math.max(0,Number(d?.v10?.totalXp)||0,Number(d?.v10?.xp)||0)}
 function v2214Progress(d){return [v2214Cycle(d),Math.max(0,Number(d?.userData?.workoutsCompleted)||0),v2214Xp(d),Array.isArray(d?.v10?.sessions)?d.v10.sessions.length:0]}
 function v2214CompareProgress(a,b){const x=v2214Progress(a),y=v2214Progress(b);for(let i=0;i<x.length;i++){if(x[i]!==y[i])return x[i]>y[i]?1:-1}return 0}
+function v2220ProgramSelection(d){const row=v2214Obj(d?.activeProgramSelection)?d.activeProgramSelection:{};return{key:String(row.key||d?.activeProgramKey||'powerbuilding'),updatedAt:Math.max(0,Number(row.updatedAt)||0)}}
 function v2214MergeTree(older,newer){
   if(v2214Obj(older)&&v2214Obj(newer)){const out={...older};Object.keys(newer).forEach(k=>{out[k]=k in out?v2214MergeTree(out[k],newer[k]):newer[k]});return out}
   if(typeof older==='boolean'&&typeof newer==='boolean')return older||newer;
@@ -7633,6 +7724,11 @@ function v2214MergeAppData(incoming,local,{preferLocalOnTie=false}={}){
   const cmp=v2214CompareProgress(device,remote),deviceWins=cmp>0||(cmp===0&&preferLocalOnTie);
   const older=deviceWins?remote:device,newer=deviceWins?device:remote;
   const olderCycle=v2214Cycle(older),newerCycle=v2214Cycle(newer),out={...older,...newer};
+  const oldSelection=v2220ProgramSelection(older),newSelection=v2220ProgramSelection(newer);
+  const selected=newSelection.updatedAt>oldSelection.updatedAt?newSelection:oldSelection.updatedAt>newSelection.updatedAt?oldSelection:(deviceWins?v2220ProgramSelection(device):newSelection);
+  out.activeProgramSelection=selected;out.activeProgramKey=selected.key;
+  const oldCustomAt=Math.max(0,Number(older.customProgramUpdatedAt)||0),newCustomAt=Math.max(0,Number(newer.customProgramUpdatedAt)||0);
+  if(oldCustomAt>newCustomAt){out.customProgramData=older.customProgramData;out.customProgramUpdatedAt=oldCustomAt}else{out.customProgramData=newer.customProgramData??older.customProgramData;out.customProgramUpdatedAt=newCustomAt}
   /* currentBlockIndex/currentDayIndex sont une sélection d'interface, pas une preuve
      de progression. Ne jamais choisir le pointeur numérique le plus élevé. */
   out.currentBlockIndex=Math.max(0,Number(newer.currentBlockIndex)||0);
@@ -7640,6 +7736,10 @@ function v2214MergeAppData(incoming,local,{preferLocalOnTie=false}={}){
   const ou=v2214Obj(older.userData)?older.userData:{},nu=v2214Obj(newer.userData)?newer.userData:{};
   out.cycleNumber=Math.max(olderCycle,newerCycle);
   out.userData={...ou,...nu};
+  for(const [field,stamp] of [['theme','themeUpdatedAt'],['visualTheme','visualThemeUpdatedAt']]){
+    const oldAt=Math.max(0,Number(ou[stamp])||0),newAt=Math.max(0,Number(nu[stamp])||0);
+    if(oldAt>newAt){out.userData[field]=ou[field];out.userData[stamp]=oldAt}
+  }
   ['workoutsCompleted','prCount','trophies'].forEach(k=>{out.userData[k]=Math.max(0,Number(ou[k])||0,Number(nu[k])||0)});
   out.userData.validatedSessions=v2214CycleMap(ou.validatedSessions,nu.validatedSessions,olderCycle,newerCycle);
   out.userData.absentSessions=v2214CycleMap(ou.absentSessions,nu.absentSessions,olderCycle,newerCycle);
@@ -7674,7 +7774,8 @@ function importAppData(d,options={}){
     if(Number.isInteger(Number(d.cycleNumber))&&Number(d.cycleNumber)>0)localStorage.setItem('leveling_cycle_number',String(Number(d.cycleNumber)));
     if(d.userData)userData=d.userData;if(d.smartHypertrophyRefs)smartHypertrophyRefs=d.smartHypertrophyRefs;if(d.bodyHistory)bodyHistory=d.bodyHistory;if(d.inventoryItems)inventoryItems=d.inventoryItems;
     if(Number.isInteger(d.currentBlockIndex))currentBlockIndex=d.currentBlockIndex;if(Number.isInteger(d.currentDayIndex))currentDayIndex=d.currentDayIndex;if(d.activeProgramKey)activeProgramKey=d.activeProgramKey;
-    if(d.programWorkoutStates)programWorkoutStates=d.programWorkoutStates;if(d.programCustomSetData)programCustomSetData=d.programCustomSetData;if(d.customProgramData)customProgramData=d.customProgramData;if(d.workoutState)workoutState=d.workoutState;if(d.customSetData)customSetData=d.customSetData;if(d.workoutHistory)workoutHistory=d.workoutHistory;
+    activeProgramSelection=v2220ProgramSelection(d);activeProgramKey=activeProgramSelection.key;
+    if(d.programWorkoutStates)programWorkoutStates=d.programWorkoutStates;if(d.programCustomSetData)programCustomSetData=d.programCustomSetData;if(d.customProgramData)customProgramData=normalizeCustomProgramData(d.customProgramData);if(Number.isFinite(Number(d.customProgramUpdatedAt)))customProgramUpdatedAt=Math.max(0,Number(d.customProgramUpdatedAt));if(d.workoutState)workoutState=d.workoutState;if(d.customSetData)customSetData=d.customSetData;if(d.workoutHistory)workoutHistory=d.workoutHistory;
     if(d.v182){try{localStorage.setItem('leveling_v182_core',JSON.stringify(d.v182));window.LevelingCoreV182?.importState?.(d.v182)}catch(e){console.warn('[V18.6.0] import core',e)}}
     if(d.v10){try{localStorage.setItem('solo_leveling_v10',JSON.stringify(d.v10))}catch(e){console.warn('[V22.1.4] progression persist',e)};if(typeof window.__levelingV10Import==='function')window.__levelingV10Import(d.v10)}
     if(typeof loadActiveProgramState==='function')loadActiveProgramState();if(typeof initAutoDateAndBlock==='function')initAutoDateAndBlock(true);if(typeof saveToLocalStorage==='function')saveToLocalStorage();
@@ -12489,6 +12590,15 @@ window.v1648ActivateAccessKey=async function(){
   }finally{if(btn)btn.disabled=false}
 };
 
+function v2220AccessProvider(){return String(window.getLevelingAccessInfo?.()?.access_provider||'').toLowerCase()}
+function v2220CanPurchasePlan(id){
+ const info=window.getLevelingAccessInfo?.()||{},active=String(currentSubscriptionPlan||'');
+ if(!active)return true;if(active==='lifetime')return false;
+ return id==='life'&&info.can_purchase_lifetime===true&&!info.commercial_subscription;
+}
+function v2220AccessOriginLabel(){const info=window.getLevelingAccessInfo?.()||{},source=String(info.access_source||'').toLowerCase();if(source==='stripe')return'STRIPE';if(source==='google_play')return'GOOGLE PLAY';if(source==='access_key')return lang()==='fr'?'CLÉ OFFERTE':'ACCESS KEY';if(source==='admin')return lang()==='fr'?'ACCÈS ADMIN':'ADMIN ACCESS';if(source==='trial')return lang()==='fr'?'ESSAI':'TRIAL';if(source==='pass')return'PASS SYSTEM';return''}
+window.v2220CanPurchasePlan=v2220CanPurchasePlan;
+
 window.v1612ViewPlan=function(id){
  if(!plans.some(x=>x.id===id))return;
  localStorage.setItem('leveling_plan_view',id);
@@ -12496,9 +12606,9 @@ window.v1612ViewPlan=function(id){
  root.querySelectorAll('.v1612-plan-card').forEach(card=>card.classList.toggle('selected',card.dataset.plan===id));
  const old=root.querySelector('#v1612-plan-detail');if(!old)return;
  const c=PLAN_COPY[lang()],storedPromo=promoActive(),nativePlay=window.LevelingBilling?.isNativeAndroid?.()===true,currentMap={month:'4w','1y':'1y',lifetime:'life'},current=currentMap[String(currentSubscriptionPlan||'')]||'',promo=!nativePlay&&!current&&storedPromo;
- const p=plans.find(x=>x.id===id),isCurrent=current===p.id,isSelected=!isCurrent&&selectedPlan()===p.id,hasCurrent=!!current,final=promo?p.base*.70:p.base,benefits=[...c.benefits,...(p.lifetime?[c.life_extra]:[])];
+ const p=plans.find(x=>x.id===id),isCurrent=current===p.id,isSelected=!isCurrent&&selectedPlan()===p.id,hasCurrent=!!current,canPurchase=v2220CanPurchasePlan(p.id),final=promo?p.base*.70:p.base,benefits=[...c.benefits,...(p.lifetime?[c.life_extra]:[])];
  const detail=document.createElement('div');detail.id='v1612-plan-detail';detail.className=`v1612-plan-detail ${p.cls} ${isCurrent?'current':''}`;
- detail.innerHTML=`<div class="v1612-detail-top"><div><div class="v1612-detail-title">${c[p.title]}</div><div class="v1612-detail-sub">${isCurrent?c.active_account:c[p.sub]}</div></div><div><div class="v1612-detail-price">${nativePlay?(window.LevelingBilling?.priceForPlan?.(p.id)||'—'):price(final)}</div>${promo?'<div class="v1612-detail-promo">-30 % · premier paiement</div>':''}</div></div><div class="v1612-benefits">${benefits.map(x=>`<div class="v1612-benefit">${x}</div>`).join('')}</div><button type="button" class="v1612-plan-action ${isCurrent?'current':''}" ${(isCurrent||hasCurrent)?'disabled':''} onclick="v1610SelectPlan('${p.id}')">${isCurrent?(p.id==='life'?c.active_button:(lang()==='fr'?' ABONNEMENT ACTIF':' SUBSCRIPTION ACTIVE')):(hasCurrent?c.already_active:(isSelected?' '+c.selected:c.choose))}</button>`;
+ detail.innerHTML=`<div class="v1612-detail-top"><div><div class="v1612-detail-title">${c[p.title]}</div><div class="v1612-detail-sub">${isCurrent?c.active_account:c[p.sub]}</div></div><div><div class="v1612-detail-price">${nativePlay?(window.LevelingBilling?.priceForPlan?.(p.id)||'—'):price(final)}</div>${promo?'<div class="v1612-detail-promo">-30 % · premier paiement</div>':''}</div></div><div class="v1612-benefits">${benefits.map(x=>`<div class="v1612-benefit">${x}</div>`).join('')}</div><button type="button" class="v1612-plan-action ${isCurrent?'current':''}" ${isCurrent||!canPurchase?'disabled':''} onclick="v1610SelectPlan('${p.id}')">${isCurrent?(p.id==='life'?c.active_button:(lang()==='fr'?' ACCÈS ACTIF':' ACTIVE ACCESS')):(!canPurchase?c.already_active:(isSelected?' '+c.selected:c.choose))}</button>`;
  old.replaceWith(detail);
 };
 
@@ -12509,7 +12619,7 @@ const activePlan=String(currentSubscriptionPlan||'');
 const activeId=currentMap[activePlan]||'';
 
 if(activeId===id)return;
-if(activePlan){
+if(activePlan&&!v2220CanPurchasePlan(id)){
   const msg=lang()==='fr'
     ?(activePlan==='lifetime'
       ?'Ton accès Lifetime est déjà actif.'
@@ -12541,14 +12651,14 @@ const current=currentMap[String(currentSubscriptionPlan||'')]||'';
 const promo=!nativePlay&&!current&&storedPromo;
 let view=localStorage.getItem('leveling_plan_view')||current||selected||'4w';
 if(!plans.some(p=>p.id===view))view='4w';
-const p=plans.find(x=>x.id===view),isCurrent=current===p.id,isSelected=!isCurrent&&selected===p.id,hasCurrent=!!current;
+ const p=plans.find(x=>x.id===view),isCurrent=current===p.id,isSelected=!isCurrent&&selected===p.id,hasCurrent=!!current,canPurchase=v2220CanPurchasePlan(p.id),provider=v2220AccessProvider(),origin=v2220AccessOriginLabel();
 const final=promo?p.base*.70:p.base;
 const benefits=[...c.benefits,...(p.lifetime?[c.life_extra]:[])];
 root.innerHTML=`<div class="v1612-shell">
 <div class="v1653-test-banner v17111-live-banner">
   <div class="v1653-test-title">${nativePlay?(lang()==='fr'?'PAIEMENT SÉCURISÉ · GOOGLE PLAY':'SECURE PAYMENT · GOOGLE PLAY'):(lang()==='fr'?'PAIEMENT SÉCURISÉ · STRIPE LIVE':'SECURE PAYMENT · STRIPE LIVE')}</div>
   <div class="v1653-test-copy">${nativePlay?(lang()==='fr'?'Les achats Android sont traités par Google Play puis vérifiés par le serveur LEVELING-APP.':'Android purchases are processed by Google Play and then verified by the LEVELING-APP server.'):(lang()==='fr'?'Les paiements sont désormais réels. Le montant et l’offre sont confirmés sur la page sécurisée Stripe avant validation.':'Payments are now real. The amount and plan are confirmed on Stripe’s secure page before payment.')}</div>
-  <div class="v1653-test-card"><b>${nativePlay?(lang()==='fr'?'Sécurisé par Google Play':'Secured by Google Play'):(lang()==='fr'?'Sécurisé par Stripe':'Secured by Stripe')}</b> · ${lang()==='fr'?'LEVELING-APP ne stocke pas tes données complètes de paiement.':'LEVELING-APP does not store your full payment details.'}</div>
+  <div class="v1653-test-card"><b>${nativePlay?(lang()==='fr'?'Paiements disponibles via Google Play':'Payments available through Google Play'):(lang()==='fr'?'Paiements disponibles via Stripe':'Payments available through Stripe')}</b> · ${lang()==='fr'?'LEVELING-APP ne stocke pas tes données complètes de paiement.':'LEVELING-APP does not store your full payment details.'}${origin?`<br>${lang()==='fr'?'Origine de ton accès actuel':'Current access source'} : <strong>${origin}</strong>`:''}</div>
 </div>
 <section class="v1612-box">
 <div class="v1612-box-head"><b>${c.offers}</b><small>${c.offers_sub}</small></div>
@@ -12569,14 +12679,14 @@ ${plans.map(x=>{const xp=promo?x.base*.70:x.base,xc=current===x.id,xs=view===x.i
 <div><div class="v1612-detail-price">${nativePlay?(window.LevelingBilling?.priceForPlan?.(p.id)||'—'):price(final)}</div>${promo?`<div class="v1612-detail-promo">-30 % · premier paiement</div>`:''}</div>
 </div>
 <div class="v1612-benefits">${benefits.map(x=>`<div class="v1612-benefit">${x}</div>`).join('')}</div>
-<button type="button" class="v1612-plan-action ${isCurrent?'current':''}" ${(isCurrent||hasCurrent)?'disabled':''} onclick="v1610SelectPlan('${p.id}')">${isCurrent?(p.id==='life'?c.active_button:(lang()==='fr'?' ABONNEMENT ACTIF':' SUBSCRIPTION ACTIVE')):(hasCurrent?c.already_active:(isSelected?' '+c.selected:c.choose))}</button>
-${isCurrent && (currentSubscriptionPlan==='month' || currentSubscriptionPlan==='1y') ? `
+<button type="button" class="v1612-plan-action ${isCurrent?'current':''}" ${isCurrent||!canPurchase?'disabled':''} onclick="v1610SelectPlan('${p.id}')">${isCurrent?(p.id==='life'?c.active_button:(lang()==='fr'?' ACCÈS ACTIF':' ACTIVE ACCESS')):(!canPurchase?c.already_active:(isSelected?' '+c.selected:c.choose))}</button>
+${isCurrent && (currentSubscriptionPlan==='month' || currentSubscriptionPlan==='1y') && (provider==='stripe'||provider==='google_play') ? `
 <div class="v1612-manage-wrap">
-  <div class="v1612-manage-title">MON ABONNEMENT</div>
-  <div class="v1612-manage-sub">Tu peux gérer ton paiement et tes factures, ou lancer directement la résiliation. La résiliation prend effet à la fin de la période déjà payée.</div>
+  <div class="v1612-manage-title">${provider==='stripe'?'STRIPE':'GOOGLE PLAY'} · MON ABONNEMENT</div>
+  <div class="v1612-manage-sub">${provider==='stripe'?'Tu peux gérer ton paiement et tes factures dans le portail Stripe.':'Tu peux gérer ou résilier cet abonnement dans Google Play.'}</div>
   <div class="v1612-manage-actions">
     <button type="button" class="v1612-manage-btn" onclick="manageStripeSubscription('manage')">GÉRER MON ABONNEMENT</button>
-    <button type="button" class="v1612-manage-btn cancel" onclick="cancelStripeSubscription()">RÉSILIER MON ABONNEMENT</button>
+    ${provider==='stripe'?'<button type="button" class="v1612-manage-btn cancel" onclick="cancelStripeSubscription()">RÉSILIER MON ABONNEMENT</button>':''}
   </div>
 </div>` : ''}
 ${isCurrent && currentSubscriptionPlan==='lifetime' ? `
@@ -12852,7 +12962,7 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
   window.addEventListener('pageshow',()=>setTimeout(refreshCloud,500));
 })();
 </script><script id="v17111-version-tools">
-const V17111_PUBLIC_VERSION='22.1.5';
+const V17111_PUBLIC_VERSION='22.2.0';
 function v17111MountVersionTools(target){
   if(!target||target.querySelector('#v17111-version-card'))return;
   const en=localStorage.getItem('leveling_language')==='en';
@@ -13415,10 +13525,15 @@ function recoveryBand(score){
   return{icon:'',label:'CRITIQUE',color:'#ff6363'};
 }
 function recoveryScore(sleep,feeling){
+  if(sleep&&typeof sleep==='object'){
+    const q=sleep,values=['sleep','energy','soreness','motivation','pain'].map(k=>Number(q[k]));
+    if(!values.every(v=>Number.isFinite(v)&&v>=0&&v<=10))return null;
+    const [rest,energy,soreness,motivation,pain]=values;
+    return Math.max(0,Math.min(100,Math.round(rest*2.5+energy*2.5+motivation*2+(10-soreness)*1.5+(10-pain)*1.5)));
+  }
   sleep=Number(sleep);feeling=Number(feeling);
   if(!(sleep>=1&&sleep<=10&&feeling>=1&&feeling<=10))return null;
-  // V16.0.24 : les deux échelles vont dans le même sens.
-  // 10/10 sommeil = excellent, 10/10 ressenti = parfait/frais.
+  // Compatibilité des anciens bilans à deux valeurs : 10/10 = meilleur état.
   const sleepNorm=(sleep-1)/9, feelingNorm=(feeling-1)/9;
   return Math.max(0,Math.min(100,Math.round((sleepNorm*.55+feelingNorm*.45)*100)));
 }
@@ -13434,8 +13549,10 @@ function recoveryEntry(day){
   state.recovery=(state.recovery&&typeof state.recovery==='object')?state.recovery:{};
   const raw=state.recovery[day]&&typeof state.recovery[day]==='object'?state.recovery[day]:{};
   const sleep=Number(raw.sleep),feeling=Number(raw.fatigue);
-  const complete=sleep>=1&&sleep<=10&&feeling>=1&&feeling<=10;
-  return{day,raw,sleep:complete||sleep>=1?sleep:null,fatigue:complete||feeling>=1?feeling:null,complete,dailyScore:complete?recoveryScore(sleep,feeling):null};
+  const extended=['sleep','energy','soreness','motivation','pain'].every(k=>Number.isFinite(Number(raw[k]))&&Number(raw[k])>=0&&Number(raw[k])<=10);
+  const legacy=sleep>=1&&sleep<=10&&feeling>=1&&feeling<=10;
+  const complete=extended||legacy;
+  return{day,raw,sleep:complete||sleep>=1?sleep:null,fatigue:legacy?feeling:null,energy:extended?Number(raw.energy):null,soreness:extended?Number(raw.soreness):null,motivation:extended?Number(raw.motivation):null,pain:extended?Number(raw.pain):null,complete,dailyScore:extended?recoveryScore(raw):(legacy?recoveryScore(sleep,feeling):null),extended};
 }
 function recoveryInertia(day){
   // Inertie sur 3 jours : aujourd'hui 65 %, hier 25 %, avant-hier 10 %.
@@ -13465,6 +13582,10 @@ function recoveryToday(day=localDay()){
     day,
     sleep:current.sleep,
     fatigue:current.fatigue,
+    energy:current.energy,
+    soreness:current.soreness,
+    motivation:current.motivation,
+    pain:current.pain,
     complete:current.complete,
     dailyScore:current.dailyScore,
     score,
@@ -13524,6 +13645,19 @@ function setRecoveryMetric(type,value){
   const keys=Object.keys(state.recovery).sort();while(keys.length>180){delete state.recovery[keys.shift()]}
   persist();renderRecovery();
   try{window.LevelingRPG?.render?.()}catch(e){}
+}
+function setRecoveryEvaluation(values){
+  const clean={};
+  for(const key of ['sleep','energy','soreness','motivation','pain']){
+    const value=Number(values?.[key]);if(!Number.isFinite(value)||value<0||value>10)return false;clean[key]=value;
+  }
+  const day=localDay();state.recovery=(state.recovery&&typeof state.recovery==='object')?state.recovery:{};
+  state.recovery[day]={...(state.recovery[day]||{}),...clean,fatigue:clean.energy,updatedAt:Date.now(),source:'system_checkin_v2'};
+  const keys=Object.keys(state.recovery).sort();while(keys.length>180){delete state.recovery[keys.shift()]}
+  persist();renderRecovery();
+  try{window.scheduleCloudSaveImmediate?.()}catch(e){}
+  try{window.dispatchEvent(new CustomEvent('leveling-recovery-changed',{detail:recoveryToday(day)}))}catch(e){}
+  return recoveryToday(day);
 }
 function prepareRecoveryModal(){
   const r=recoveryToday();
@@ -13939,6 +14073,7 @@ window.LevelingProgressionV15={
 window.LevelingRecoveryV1622={
   today:()=>recoveryToday(),
   set:setRecoveryMetric,
+  setEvaluation:setRecoveryEvaluation,
   render:renderRecovery,
   prepareModal:prepareRecoveryModal,
   score:recoveryScore,
@@ -14769,7 +14904,7 @@ async function mountStatus(){
   const en=localStorage.getItem('leveling_language')==='en',email=window.getLevelingCloudAccessState?.()?.user?.email||(en?'LEVELING-APP account':'Compte LEVELING-APP'),days=Math.max(0,Number(a.days_remaining||0)),crystals=Number(a.crystals||0);
   const trialEligible=a.trial_available===true||(!a.trial_started_at&&['FREE','PRETRIAL'].includes(s));
   let title='',desc='',pill='';
-  if(s==='SUBSCRIBED'){title=en?'PREMIUM · FULL ACCESS':'PREMIUM · ACCÈS COMPLET';desc=en?`${email} · no interstitial ads · cloud and data preserved`:`${email} · aucune publicité interstitielle · cloud et données conservés`;pill=String(currentSubscriptionPlan||'PREMIUM').toUpperCase()}
+  if(s==='SUBSCRIBED'){const source=String(a.access_source||'').toLowerCase(),origin=source==='stripe'?'Stripe':source==='google_play'?'Google Play':source==='access_key'?(en?'gifted access key':'clé offerte'):source==='admin'?(en?'admin access':'accès admin'):(en?'verified access':'accès vérifié');title=en?'PREMIUM · FULL ACCESS':'PREMIUM · ACCÈS COMPLET';desc=en?`${email} · source: ${origin} · no interstitial ads · cloud and data preserved`:`${email} · origine : ${origin} · aucune publicité interstitielle · cloud et données conservés`;pill=String(currentSubscriptionPlan||'PREMIUM').toUpperCase()}
   else if(s==='TRIAL'){title=en?'TRIAL HUNTER · FULL ACCESS':'TRIAL HUNTER · ACCÈS COMPLET';desc=en?`${email} · ${days} day${days===1?'':'s'} remaining · ads limited to once every 5 min at natural breaks`:`${email} · ${days} jour${days>1?'s':''} restant${days>1?'s':''} · publicité max 1 fois / 5 min aux coupures naturelles`;pill=`TRIAL ${days}${en?'D':'J'}`}
   else if(s==='PASS'){title=en?'SYSTEM PASS · TEMPORARY ACCESS':'PASS SYSTEM · ACCÈS TEMPORAIRE';desc=en?`${email} · full access with ads · until ${fmtDate(a.current_period_end)}`:`${email} · accès complet avec publicité · jusqu’au ${fmtDate(a.current_period_end)}`;pill=`PASS ${days}${en?'D':'J'}`}
   else{title=en?'FREE HUNTER · DATA PRESERVED':'FREE HUNTER · DONNÉES CONSERVÉES';desc=en?`${email} · Power, Program and Community remain viewable, but primary actions are locked`:`${email} · Power, Programme et Communauté restent consultables mais les actions principales sont verrouillées`;pill='FREE'}
@@ -15540,7 +15675,8 @@ function deloadAssessment(){
   if(currentPv!==null&&currentPv<45)signals.push(`PV actuel ${Math.round(currentPv)}/100`);
   if(avgPv!==null&&scores.length>=2&&avgPv<55)signals.push(`récupération moyenne ${avgPv.toFixed(0)}/100`);
   if(avgSleep!==null&&sleeps.length>=2&&avgSleep<5.5)signals.push(`sommeil moyen ${avgSleep.toFixed(1)}/10`);
-  if(avgFatigue!==null&&fatigues.length>=2&&avgFatigue>=7)signals.push(`fatigue moyenne ${avgFatigue.toFixed(1)}/10`);
+  /* Le champ historique "fatigue" est en réalité un ressenti/fraîcheur : 10 = parfait. */
+  if(avgFatigue!==null&&fatigues.length>=2&&avgFatigue<4.5)signals.push(`ressenti moyen faible ${avgFatigue.toFixed(1)}/10`);
   if(planned>=12&&completion<.8)signals.push(`${Math.round(completion*100)}% des séries réalisées`);
   if(planned>=12&&skipped/planned>=.15)signals.push(`${Math.round(skipped/planned*100)}% de séries skippées`);
   if(absences>=2)signals.push(`${absences} séances manquées en 14 jours`);
@@ -15824,7 +15960,7 @@ const MUSCLES={
 function groupFor(name){const n=norm(name);for(const [g,keys] of Object.entries(MUSCLES))if(keys.some(k=>n.includes(norm(k))))return g;return'other'}
 function detailedSets(days=7){const cut=Date.now()-days*DAY,out={};for(const s of sessions()){const dt=Date.parse(s.date||s.isoDate||s.completedAt||'');if(!dt||dt<cut)continue;for(const ex of s.exercises||[]){const g=groupFor(ex.name);const n=(ex.sets||[]).filter(x=>!x.skipped).length||Number(ex.doneSets||0)||0;out[g]=(out[g]||0)+n}}return out}
 function muscleLabel(g){return({chest:'Pecs',back:'Dos',quads:'Quadriceps',hamstrings:'Ischios',glutes:'Fessiers',shoulders:'Épaules',biceps:'Biceps',triceps:'Triceps',calves:'Mollets',core:'Abdos',other:'Autres'})[g]||g}
-function readiness(){const r=recovery(),q=state.readiness[todayKey()]||{};let score=r.complete?Number(r.score||60):60;if(q.sleep)score+=(q.sleep-5)*2.2;if(q.energy)score+=(q.energy-5)*2;if(q.soreness)score-=(q.soreness-5)*2;if(q.pain)score-=q.pain*4;if(q.motivation)score+=(q.motivation-5)*1.2;return clamp(Math.round(score),0,100)}
+function readiness(){const r=recovery();if(r.complete)return clamp(Math.round(Number(r.score)),0,100);const q=state.readiness[todayKey()]||{},legacyScore=window.LevelingRecoveryV1622?.score?.(q);return Number.isFinite(legacyScore)?clamp(legacyScore,0,100):60}
 function fatigueMap(){const sets=detailedSets(4),out={};for(const [g,n] of Object.entries(sets))out[g]=clamp(Math.round(n*5.5),0,100);return out}
 function coachToday(){const pv=readiness(),sets=detailedSets(7),fat=fatigueMap(),high=Object.entries(fat).sort((a,b)=>b[1]-a[1])[0];let mode='NORMAL',advice='Suis ta séance prévue et garde 1 à 3 RIR.';if(pv>=85){mode='PRÊT';advice='Bonne fenêtre pour progresser si les échauffements sont rapides.'}else if(pv<50){mode='DELOAD';advice='Réduis charge et volume. Pas de PR aujourd’hui.'}else if(pv<68){mode='ALLÉGÉ';advice='Garde la technique et enlève environ 20 % du volume.'}if(high&&high[1]>=65)advice+=` Fatigue locale élevée : ${muscleLabel(high[0])}.`;return{pv,mode,advice,sets,fat,program:currentProgram()}}
 function ensureHomeCoach(){const p=document.getElementById('panel-profile');if(!p)return;let el=document.getElementById('v190-coach-today');if(!el){el=document.createElement('section');el.id='v190-coach-today';p.prepend(el)}const c=coachToday();el.innerHTML=`<div class="v190-head"><b>SYSTEM · COACH DU JOUR</b><span class="v190-badge">${c.mode}</span></div><div class="v190-grid"><div class="v190-kpi"><span>READINESS</span><b>${c.pv}/100</b></div><div class="v190-kpi"><span>PROGRAMME</span><b>${esc(String(c.program).toUpperCase())}</b></div></div><div class="v190-note">${esc(c.advice)}</div><button class="v190-action" onclick="LevelingV190.openReadiness()">CHECK-IN AVANT SÉANCE</button>`}
@@ -15834,7 +15970,7 @@ function ensureAchievements(){const p=document.getElementById('panel-profile');i
 function goalForecast(){const u=user(),goals=u.goals||{};const lifts=['squat','bench','deadlift'];const out=[];for(const k of lifts){const cur=Number(u[k]||0),target=Number(goals[k]||u?.[k+'Goal']||0);if(target>cur&&cur>0){const diff=target-cur,weeks=Math.max(2,Math.ceil(diff/2.5));out.push({k,cur,target,weeks})}}return out}
 function ensureGoals(){const p=document.getElementById('panel-profile');if(!p)return;let el=document.getElementById('v190-goals-card');if(!el){el=document.createElement('section');el.id='v190-goals-card';p.appendChild(el)}const rows=goalForecast();el.innerHTML=`<div class="v190-head"><b>OBJECTIFS INTELLIGENTS</b><span class="v190-badge">FORECAST</span></div>${rows.length?rows.map(x=>`<div class="v190-kpi" style="margin-top:7px"><span>${x.k.toUpperCase()} · ${x.cur} → ${x.target} KG</span><b>≈ ${x.weeks} semaines au rythme cible</b></div>`).join(''):'<div class="v190-note">Renseigne tes objectifs SBD pour obtenir une estimation de progression et des mini-objectifs.</div>'}`}
 function ensureReadinessModal(){if(document.getElementById('v190-readiness-modal'))return;const d=document.createElement('div');d.id='v190-readiness-modal';d.innerHTML=`<div class="v190-modal"><div class="v190-modal-head"><div><b>CHECK-IN AVANT SÉANCE</b><small>Sommeil, énergie, courbatures, motivation, douleur</small></div><button class="v190-close" onclick="LevelingV190.closeReadiness()">×</button></div>${[['sleep','Sommeil'],['energy','Énergie'],['soreness','Courbatures'],['motivation','Motivation'],['pain','Douleur']].map(([k,l])=>`<div class="v190-slider"><div><label>${l}</label><input id="v190-r-${k}" type="range" min="0" max="10" value="${k==='pain'?0:5}" oninput="this.parentElement.nextElementSibling.value=this.value"></div><output>${k==='pain'?0:5}</output></div>`).join('')}<button class="v190-action" onclick="LevelingV190.saveReadiness()">ANALYSER MA PRÉPARATION</button></div>`;document.body.appendChild(d)}
-function openReadiness(){ensureReadinessModal();document.getElementById('v190-readiness-modal').classList.add('show')}function closeReadiness(){document.getElementById('v190-readiness-modal')?.classList.remove('show')}function saveReadiness(){const q={};for(const k of ['sleep','energy','soreness','motivation','pain'])q[k]=Number(document.getElementById('v190-r-'+k)?.value||0);state.readiness[todayKey()]=q;save();closeReadiness();refresh()}
+function openReadiness(){ensureReadinessModal();const r=recovery(),saved=state.readiness[todayKey()]||{};for(const key of ['sleep','energy','soreness','motivation','pain']){const input=document.getElementById('v190-r-'+key),value=Number.isFinite(Number(r[key]))?Number(r[key]):Number.isFinite(Number(saved[key]))?Number(saved[key]):(key==='pain'?0:5);if(input){input.value=String(value);const output=input.parentElement?.nextElementSibling;if(output)output.value=String(value)}}document.getElementById('v190-readiness-modal').classList.add('show')}function closeReadiness(){document.getElementById('v190-readiness-modal')?.classList.remove('show')}function saveReadiness(){const q={};for(const k of ['sleep','energy','soreness','motivation','pain'])q[k]=Number(document.getElementById('v190-r-'+k)?.value||0);const result=window.LevelingRecoveryV1622?.setEvaluation?.(q);if(!result)return;state.readiness[todayKey()]=q;save();closeReadiness();refresh()}
 function programContext(){const u=user();return{weight:Number(u.weight||0),squat:Number(u.squat||0),bench:Number(u.bench||0),deadlift:Number(u.deadlift||0),readiness:readiness(),muscles:detailedSets(7)}}
 const PROGRAM_GROUP_ALIASES={chest:['pec','pecs','pectoraux','chest'],back:['dos','dorsaux','back'],quads:['quad','quadriceps','cuisses','jambes'],hamstrings:['ischio','ischios','ischiojambiers'],glutes:['fessier','fessiers','glute'],shoulders:['epaule','epaules','deltoide','deltoides'],biceps:['biceps','bras'],triceps:['triceps','bras'],calves:['mollet','mollets'],core:['abdo','abdos','gainage','core']};
 const PROGRAM_KNOWN=[
@@ -15845,6 +15981,7 @@ const unique=a=>[...new Set((a||[]).filter(Boolean))];
 function parseDaysValue(t){const n=norm(t);let m=n.match(/\b([2-6])\s*(?:j|jour|jours|fois(?:\s*par\s*semaine)?)\b/);if(m)return Number(m[1]);const names=['lundi','mardi','mercredi','jeudi','vendredi','samedi','dimanche'].filter(x=>new RegExp('\\b'+x+'\\b').test(n));return names.length>=2&&names.length<=6?names.length:null}
 function parseDurationValue(t){const n=norm(t);let m=n.match(/\b([1-2])\s*h(?:\s*(\d{1,2}))?\b/);if(m)return Number(m[1])*60+Number(m[2]||0);m=n.match(/\b(30|35|40|45|50|55|60|65|70|75|80|90|100|105|120)\s*(?:min|minute|minutes)\b/);if(m)return Number(m[1]);if(/\b(?:une|1)\s*heure\b/.test(n))return 60;return null}
 function explicitGoal(t){const n=norm(t);if(/powerbuilding|power lifting|powerlifting|sbd|force\s*\+\s*hypertroph|force et hypertroph/.test(n))return'powerbuilding';if(/hypertroph|prise de masse|muscle|bodybuilding/.test(n))return'hypertrophy';if(/force pure|programme force|strength/.test(n))return'strength';if(/perte de poids|seche|recomposition|fitness|remise en forme/.test(n))return'fitness';return null}
+function explicitSplit(t){const n=norm(t);if(/\bppl\b|push\s*[\/-]?\s*pull\s*[\/-]?\s*legs?|poussee\s*[\/-]?\s*tirage\s*[\/-]?\s*jambes?/.test(n))return'ppl';if(/upper\s*[\/-]?\s*lower|haut\s*(?:du corps)?\s*[\/-]?\s*bas\s*(?:du corps)?/.test(n))return'upper_lower';if(/full\s*body|corps\s*entier/.test(n))return'full_body';if(/push\s*[\/-]?\s*pull|poussee\s*[\/-]?\s*tirage/.test(n))return'push_pull';return null}
 function groupsMentioned(t){const n=norm(t),out=[];for(const [g,arr] of Object.entries(PROGRAM_GROUP_ALIASES))if(arr.some(a=>new RegExp('\\b'+norm(a).replace(/\s+/g,'\\s+')+'\\b').test(n)))out.push(g);return unique(out)}
 function keyMentioned(n,k){return k.aliases.some(a=>new RegExp('\\b'+norm(a).replace(/\s+/g,'\\s+')+'\\b').test(n))}
 function avoidList(t){const n=norm(t),out=[];for(const k of PROGRAM_KNOWN){if(!keyMentioned(n,k))continue;const a=k.aliases.map(x=>norm(x).replace(/\s+/g,'\\s+')).join('|');if(new RegExp('(?:sans|pas de|evite(?:r)?|retire|enleve|supprime)[^.!?;]{0,22}(?:'+a+')').test(n)||new RegExp('(?:'+a+')[^.!?;]{0,14}(?:a eviter|interdit)').test(n))out.push(k.key)}let r=unique(out);const directSquat=/(?:sans|pas de|evite(?:r)?|retire|enleve|supprime)\s+(?:le\s+)?squat\b/.test(n),directDead=/(?:sans|pas de|evite(?:r)?|retire|enleve|supprime)\s+(?:le\s+)?(?:deadlift|souleve de terre)(?!\s+roumain)\b/.test(n);if(r.includes('frontsquat')&&!directSquat)r=r.filter(x=>x!=='squat');if(r.includes('rdl')&&!directDead)r=r.filter(x=>x!=='deadlift');return r}
@@ -15857,20 +15994,42 @@ function parseMaxExercises(t){const m=norm(t).match(/(?:max(?:imum)?\s*)?([3-8])
 function parseExperience(t){const n=norm(t);if(/debutant|novice/.test(n))return'débutant';if(/avance|experimente|confirme/.test(n))return'avancé';if(/intermediaire/.test(n))return'intermédiaire';return null}
 function parseSetAdjustments(t){const n=norm(t),out={};for(const [g,arr] of Object.entries(PROGRAM_GROUP_ALIASES)){const a=arr.map(x=>norm(x).replace(/\s+/g,'\\s+')).join('|');let m=n.match(new RegExp('(?:ajoute|rajoute)\\s+([1-4])\\s+series?[^.!?;]{0,15}(?:'+a+')'));if(m)out[g]=(out[g]||0)+Number(m[1]);m=n.match(new RegExp('(?:enleve|retire|reduis de)\\s+([1-4])\\s+series?[^.!?;]{0,15}(?:'+a+')'));if(m)out[g]=(out[g]||0)-Number(m[1])}return out}
 function parsePrescriptions(t){const n=norm(t),out={};for(const k of PROGRAM_KNOWN){const a=k.aliases.map(x=>norm(x).replace(/\s+/g,'\\s+')).join('|');let m=n.match(new RegExp('(?:'+a+')[^0-9.!?;]{0,16}(\\d+)\\s*[x×]\\s*(\\d+)'));if(!m)m=n.match(new RegExp('(\\d+)\\s*[x×]\\s*(\\d+)[^.!?;]{0,20}(?:'+a+')'));if(m)out[k.key]={sets:Number(m[1]),reps:Number(m[2])}}return out}
-function parseProgramRequest(text,prev={}){const n=norm(text),days=parseDaysValue(n),duration=parseDurationValue(n),goal=explicitGoal(n),avoid=avoidList(n),must=requestedExercises(n),prio=reprioritize(n),deem=deemphasizeGroups(n),freq=parseFrequency(n),rir=parseRir(n),maxExercises=parseMaxExercises(n),experience=parseExperience(n),setAdj=parseSetAdjustments(n),prescriptions=parsePrescriptions(n),all2=/\b(?:tous|chaque)\s+(?:les\s+)?muscles?[^.!?;]{0,25}(?:2|deux)\s*(?:x|fois)/.test(n)||/\b2\s*(?:x|fois)[^.!?;]{0,20}(?:chaque|tous les)\s+muscles?/.test(n);let mergedAvoid=unique([...(prev.avoid||[]),...avoid]);for(const k of PROGRAM_KNOWN){if(keyMentioned(n,k)&&/(?:remets|remet|autorise|garde)[^.!?;]{0,20}/.test(n))mergedAvoid=mergedAvoid.filter(x=>x!==k.key)}const merged={goal:goal||prev.goal||'hypertrophy',days:days||prev.days||4,duration:duration||prev.duration||75,priorities:unique([...(prev.priorities||[]),...prio]),deemphasize:unique([...(prev.deemphasize||[]),...deem]),avoid:mergedAvoid,mustHave:unique([...(prev.mustHave||[]),...must]),frequency:{...(prev.frequency||{}),...freq},allMuscles2x:all2||!!prev.allMuscles2x,rir:rir||prev.rir||[1,3],maxExercises:maxExercises||prev.maxExercises||null,experience:experience||prev.experience||'intermédiaire',setAdjustments:{...(prev.setAdjustments||{})},prescriptions:{...(prev.prescriptions||{}),...prescriptions},recognized:[]};for(const [g,v] of Object.entries(setAdj))merged.setAdjustments[g]=Number(merged.setAdjustments[g]||0)+v;if(goal)merged.recognized.push('objectif '+goal);if(days)merged.recognized.push(days+' jours');if(duration)merged.recognized.push(duration+' min');if(prio.length)merged.recognized.push('priorité '+prio.map(muscleLabel).join('/'));if(avoid.length)merged.recognized.push('sans '+avoid.join('/'));if(must.length)merged.recognized.push('ajout '+must.join('/'));if(Object.keys(freq).length)merged.recognized.push('fréquence SBD');if(all2)merged.recognized.push('muscles 2×/sem.');if(rir)merged.recognized.push(rir[0]===rir[1]?rir[0]+' RIR':rir[0]+'–'+rir[1]+' RIR');if(maxExercises)merged.recognized.push(maxExercises+' exos max');if(Object.keys(setAdj).length)merged.recognized.push('volume ajusté');if(Object.keys(prescriptions).length)merged.recognized.push('séries/reps imposées');merged.lastText=String(text||'');return merged}
+function parseProgramRequest(text,prev={}){const n=norm(text),days=parseDaysValue(n),duration=parseDurationValue(n),goal=explicitGoal(n),split=explicitSplit(n),avoid=avoidList(n),must=requestedExercises(n),prio=reprioritize(n),deem=deemphasizeGroups(n),freq=parseFrequency(n),rir=parseRir(n),maxExercises=parseMaxExercises(n),experience=parseExperience(n),setAdj=parseSetAdjustments(n),prescriptions=parsePrescriptions(n),all2=/\b(?:tous|chaque)\s+(?:les\s+)?muscles?[^.!?;]{0,25}(?:2|deux)\s*(?:x|fois)/.test(n)||/\b2\s*(?:x|fois)[^.!?;]{0,20}(?:chaque|tous les)\s+muscles?/.test(n);let mergedAvoid=unique([...(prev.avoid||[]),...avoid]);for(const k of PROGRAM_KNOWN){if(keyMentioned(n,k)&&/(?:remets|remet|autorise|garde)[^.!?;]{0,20}/.test(n))mergedAvoid=mergedAvoid.filter(x=>x!==k.key)}const merged={goal:goal||prev.goal||'hypertrophy',split:split||prev.split||null,days:days||prev.days||4,duration:duration||prev.duration||75,priorities:unique([...(prev.priorities||[]),...prio]),deemphasize:unique([...(prev.deemphasize||[]),...deem]),avoid:mergedAvoid,mustHave:unique([...(prev.mustHave||[]),...must]),frequency:{...(prev.frequency||{}),...freq},allMuscles2x:all2||!!prev.allMuscles2x,rir:rir||prev.rir||[1,3],maxExercises:maxExercises||prev.maxExercises||null,experience:experience||prev.experience||'intermédiaire',setAdjustments:{...(prev.setAdjustments||{})},prescriptions:{...(prev.prescriptions||{}),...prescriptions},recognized:[]};for(const [g,v] of Object.entries(setAdj))merged.setAdjustments[g]=Number(merged.setAdjustments[g]||0)+v;if(goal)merged.recognized.push('objectif '+goal);if(split)merged.recognized.push('split '+split.replace('_','/'));if(days)merged.recognized.push(days+' jours');if(duration)merged.recognized.push(duration+' min');if(prio.length)merged.recognized.push('priorité '+prio.map(muscleLabel).join('/'));if(avoid.length)merged.recognized.push('sans '+avoid.join('/'));if(must.length)merged.recognized.push('ajout '+must.join('/'));if(Object.keys(freq).length)merged.recognized.push('fréquence SBD');if(all2)merged.recognized.push('muscles 2×/sem.');if(rir)merged.recognized.push(rir[0]===rir[1]?rir[0]+' RIR':rir[0]+'–'+rir[1]+' RIR');if(maxExercises)merged.recognized.push(maxExercises+' exos max');if(Object.keys(setAdj).length)merged.recognized.push('volume ajusté');if(Object.keys(prescriptions).length)merged.recognized.push('séries/reps imposées');merged.lastText=String(text||'');return merged}
 function knownByKey(key){return PROGRAM_KNOWN.find(x=>x.key===key)}
 function exerciseKey(name){const n=norm(name);return PROGRAM_KNOWN.find(k=>k.aliases.some(a=>n.includes(norm(a))))?.key||null}
 function isAvoided(name,avoid){const k=exerciseKey(name);return k?avoid.includes(k):false}
 function splitGroups(days){if(days<=3)return[['chest','back','quads','shoulders'],['back','hamstrings','glutes','biceps'],['chest','quads','hamstrings','triceps']];if(days===4)return[['chest','back','shoulders','triceps'],['quads','hamstrings','glutes','calves'],['chest','back','shoulders','biceps'],['quads','hamstrings','glutes','core']];if(days===5)return[['chest','back','shoulders'],['quads','hamstrings','glutes'],['chest','shoulders','triceps'],['back','biceps','hamstrings'],['quads','glutes','calves','core']];return[['chest','shoulders','triceps'],['back','biceps'],['quads','hamstrings','glutes'],['chest','shoulders','triceps'],['back','biceps','hamstrings'],['quads','glutes','calves','core']]}
+function splitStructure(req){
+ const count=Math.max(2,Math.min(6,Number(req.days)||4));
+ const repeat=(rows)=>Array.from({length:count},(_,i)=>rows[i%rows.length]);
+ if(req.split==='ppl')return repeat([{role:'PUSH / POUSSÉE',groups:['chest','shoulders','triceps']},{role:'PULL / TIRAGE',groups:['back','biceps']},{role:'LEGS / JAMBES',groups:['quads','hamstrings','glutes','calves']}]);
+ if(req.split==='upper_lower')return repeat([{role:'UPPER / HAUT DU CORPS',groups:['chest','back','shoulders','biceps','triceps']},{role:'LOWER / BAS DU CORPS',groups:['quads','hamstrings','glutes','calves','core']}]);
+ if(req.split==='full_body')return repeat([{role:'FULL BODY / CORPS ENTIER',groups:['chest','back','quads','hamstrings','shoulders']}]);
+ if(req.split==='push_pull')return repeat([{role:'PUSH / POUSSÉE',groups:['chest','shoulders','triceps','quads']},{role:'PULL / TIRAGE',groups:['back','biceps','hamstrings','glutes']}]);
+ return splitGroups(count).map(groups=>({role:req.goal==='powerbuilding'?'FORCE + HYPERTROPHIE':req.goal==='strength'?'FORCE':'DÉVELOPPEMENT CIBLÉ',groups}));
+}
 function pick(g,avoid,seed=0){const arr=(EX[g]||['Exercice']).filter(x=>!isAvoided(x,avoid));return arr.length?arr[seed%arr.length]:(EX[g]||['Exercice'])[0]}
 function prescriptionFor(name,req){const k=exerciseKey(name);return k&&req.prescriptions?.[k]||null}
 function makeExercise(name,group,req,{main=false,exposure=1,priority=false}={}){const custom=prescriptionFor(name,req);let sets=custom?.sets||(main?(exposure===1?4:3):(priority?4:3)),reps=custom?.reps||(req.goal==='powerbuilding'||req.goal==='strength'?(main?(exposure===1?5:6):8):req.goal==='fitness'?12:10);sets=Math.max(2,Math.min(6,sets+Number(req.setAdjustments?.[group]||0)));if(req.deemphasize?.includes(group)&&!main)sets=Math.max(2,sets-1);const rr=req.rir||[1,3],rir=rr[0]===rr[1]?`${rr[0]} RIR`:`${rr[0]}–${rr[1]} RIR`;return{name,sets,defaultReps:reps,defaultWeight:0,note:main?`${exposure===1?'Exposition principale':'Exposition technique / volume'} · ${rir}`:`Progression double · ${rir}`,mainLift:main,group}}
 function desiredLiftFrequency(req){const base=req.goal==='powerbuilding'?{squat:req.days>=4?2:1,bench:req.days>=3?2:1,deadlift:req.days>=4?2:1}:req.goal==='strength'?{squat:1,bench:req.days>=4?2:1,deadlift:1}:{};const out={...base,...(req.frequency||{})};for(const k of ['squat','bench','deadlift'])if(req.avoid.includes(k))out[k]=0;return out}
 function exposureDays(days,count,offset){const out=[];for(let i=0;i<count;i++){let d=Math.floor((i*days/count+offset)%days);while(out.includes(d))d=(d+1)%days;out.push(d)}return out}
-function buildProgramFromRequest(req){const groups=splitGroups(req.days),ctx=programContext(),maxEx=req.maxExercises|| (req.duration<=45?4:req.duration<=65?5:6),p={name:`SYSTEM ${req.goal==='powerbuilding'?'POWERBUILDING':req.goal==='strength'?'FORCE':req.goal==='fitness'?'FITNESS':'HYPERTROPHIE'} ${req.days}J`,days:[],meta:{...req,createdAt:new Date().toISOString(),readiness:ctx.readiness,contextSbd:{squat:ctx.squat,bench:ctx.bench,deadlift:ctx.deadlift}}};p.days=groups.map((gs,i)=>{const priorityGs=unique([...gs,...req.priorities.filter(g=>!gs.includes(g)).slice(0,2)]),ex=[];for(const g of priorityGs){const name=pick(g,req.avoid,i);if(!ex.some(x=>x.name===name))ex.push(makeExercise(name,g,req,{priority:req.priorities.includes(g)}));if(req.priorities.includes(g)&&ex.length<maxEx){const second=pick(g,req.avoid,i+1);if(second!==name&&!ex.some(x=>x.name===second))ex.push(makeExercise(second,g,req,{priority:true}))}}return{dayName:`Jour ${i+1}`,title:`Jour ${i+1} · ${req.goal==='powerbuilding'?'Force + hypertrophie':req.goal==='strength'?'Force':'Développement ciblé'}`,exercises:ex}});
- const freq=desiredLiftFrequency(req),liftDefs={squat:{names:['Squat','Squat pause'],group:'quads',offset:0},bench:{names:['Développé couché','Développé couché pause'],group:'chest',offset:.45},deadlift:{names:['Deadlift','Deadlift technique'],group:'hamstrings',offset:.9}};for(const [key,count0] of Object.entries(freq)){const count=Math.max(0,Math.min(req.days,Number(count0)||0)),def=liftDefs[key];if(!def||!count)continue;for(const day of p.days)day.exercises=day.exercises.filter(e=>exerciseKey(e.name)!==key);const days=exposureDays(req.days,count,def.offset);days.forEach((di,j)=>{const name=def.names[Math.min(j,def.names.length-1)],day=p.days[di];day.exercises.unshift(makeExercise(name,def.group,req,{main:true,exposure:j+1,priority:true}))})}
- for(const key of req.mustHave||[]){if(req.avoid.includes(key))continue;const k=knownByKey(key);if(!k)continue;let best=p.days.map((d,i)=>({i,n:d.exercises.length,fit:d.exercises.filter(e=>e.group===k.group).length})).sort((a,b)=>b.fit-a.fit||a.n-b.n)[0]?.i??0;if(!p.days[best].exercises.some(e=>exerciseKey(e.name)===key))p.days[best].exercises.splice(Math.min(1,p.days[best].exercises.length),0,makeExercise(k.canonical,k.group,req,{priority:true}))}
- for(const d of p.days){d.exercises=d.exercises.filter((e,i,a)=>a.findIndex(x=>norm(x.name)===norm(e.name))===i);const pri=d.exercises.filter(e=>e.mainLift||req.mustHave.includes(exerciseKey(e.name))),rest=d.exercises.filter(e=>!pri.includes(e));d.exercises=[...pri,...rest].slice(0,maxEx)}return p}
+function compatibleExposureDays(structure,group,count,offset=0){const candidates=structure.map((row,index)=>row.groups.includes(group)?index:null).filter(Number.isInteger);if(!candidates.length)return[];const out=[];for(let i=0;i<count;i++){const start=Math.floor((i*candidates.length/Math.max(1,count)+offset)%candidates.length);let pickIndex=candidates[start];for(let step=0;step<candidates.length&&out.includes(pickIndex);step++)pickIndex=candidates[(start+step+1)%candidates.length];if(!out.includes(pickIndex))out.push(pickIndex)}return out}
+function validateSplitProgram(program,structure){
+ const violations=[];
+ program.days.forEach((day,index)=>{const allowed=new Set(structure[index].groups);day.exercises=day.exercises.filter(ex=>{const ok=allowed.has(ex.group||groupFor(ex.name));if(!ok)violations.push({day:index+1,exercise:ex.name,group:ex.group||groupFor(ex.name)});return ok})});
+ program.meta.splitValidation={valid:violations.length===0,removed:violations};
+ return program;
+}
+function buildProgramFromRequest(req){
+ const structure=splitStructure(req),ctx=programContext(),maxEx=req.maxExercises||(req.duration<=45?4:req.duration<=65?5:6);
+ const p={name:`SYSTEM ${req.split?req.split.replace('_','/').toUpperCase():req.goal==='powerbuilding'?'POWERBUILDING':req.goal==='strength'?'FORCE':req.goal==='fitness'?'FITNESS':'HYPERTROPHIE'} ${req.days}J`,days:[],meta:{...req,createdAt:new Date().toISOString(),readiness:ctx.readiness,contextSbd:{squat:ctx.squat,bench:ctx.bench,deadlift:ctx.deadlift}}};
+ p.days=structure.map((row,i)=>{const allowed=new Set(row.groups),priorityGs=unique([...row.groups,...req.priorities.filter(g=>allowed.has(g)&&!row.groups.includes(g)).slice(0,2)]),ex=[];for(const g of priorityGs){const name=pick(g,req.avoid,i);if(!ex.some(x=>x.name===name))ex.push(makeExercise(name,g,req,{priority:req.priorities.includes(g)}));if(req.priorities.includes(g)&&ex.length<maxEx){const second=pick(g,req.avoid,i+1);if(second!==name&&!ex.some(x=>x.name===second))ex.push(makeExercise(second,g,req,{priority:true}))}}return{dayName:`Jour ${i+1}`,title:`Jour ${i+1} · ${row.role}`,exercises:ex}});
+ const freq=desiredLiftFrequency(req),liftDefs={squat:{names:['Squat','Squat pause'],group:'quads',offset:0},bench:{names:['Développé couché','Développé couché pause'],group:'chest',offset:.45},deadlift:{names:['Deadlift','Deadlift technique'],group:'hamstrings',offset:.9}};
+ for(const [key,count0] of Object.entries(freq)){const count=Math.max(0,Math.min(req.days,Number(count0)||0)),def=liftDefs[key];if(!def||!count)continue;for(const day of p.days)day.exercises=day.exercises.filter(e=>exerciseKey(e.name)!==key);const days=compatibleExposureDays(structure,def.group,count,def.offset);days.forEach((di,j)=>{const name=def.names[Math.min(j,def.names.length-1)],day=p.days[di];day.exercises.unshift(makeExercise(name,def.group,req,{main:true,exposure:j+1,priority:true}))})}
+ for(const key of req.mustHave||[]){if(req.avoid.includes(key))continue;const k=knownByKey(key);if(!k)continue;const candidates=p.days.map((d,i)=>({i,n:d.exercises.length,fit:d.exercises.filter(e=>e.group===k.group).length,allowed:structure[i].groups.includes(k.group)})).filter(x=>x.allowed).sort((a,b)=>b.fit-a.fit||a.n-b.n);const best=candidates[0]?.i;if(best==null)continue;if(!p.days[best].exercises.some(e=>exerciseKey(e.name)===key))p.days[best].exercises.splice(Math.min(1,p.days[best].exercises.length),0,makeExercise(k.canonical,k.group,req,{priority:true}))}
+ for(const d of p.days){d.exercises=d.exercises.filter((e,i,a)=>a.findIndex(x=>norm(x.name)===norm(e.name))===i);const pri=d.exercises.filter(e=>e.mainLift||req.mustHave.includes(exerciseKey(e.name))),rest=d.exercises.filter(e=>!pri.includes(e));d.exercises=[...pri,...rest].slice(0,maxEx)}
+ return validateSplitProgram(p,structure)
+}
 function buildProgram(text,base){const prev=base?.meta||{},req=parseProgramRequest(text,prev);return buildProgramFromRequest(req)}
 function volumeAudit(p){const v={},daysHit={};for(const [di,d] of (p?.days||[]).entries())for(const e of d.exercises||[]){const g=e.group||groupFor(e.name);v[g]=(v[g]||0)+Number(e.sets||3);daysHit[g]=daysHit[g]||new Set();daysHit[g].add(di)}const flags=[],major=['chest','back','quads','hamstrings','shoulders'];for(const [g,n] of Object.entries(v)){if(g==='other')continue;if(n>24)flags.push(`${muscleLabel(g)} très haut (${n} séries)`);if(n<5&&major.includes(g))flags.push(`${muscleLabel(g)} faible (${n} séries)`)}if(p?.meta?.allMuscles2x)for(const g of major)if((daysHit[g]?.size||0)<2)flags.push(`${muscleLabel(g)} travaillé moins de 2×`);return{v,daysHit:Object.fromEntries(Object.entries(daysHit).map(([k,v])=>[k,v.size])),flags}}
 function programSummary(p){const m=p?.meta||{},a=volumeAudit(p),freq=desiredLiftFrequency(m),parts=[`${p?.days?.length||0} jours`,`${m.duration||75} min`,m.goal==='powerbuilding'?'powerbuilding':m.goal==='strength'?'force':m.goal==='fitness'?'fitness':'hypertrophie'];if(m.priorities?.length)parts.push('priorité '+m.priorities.map(muscleLabel).join('/'));if(Object.values(freq).some(Boolean))parts.push(`S/B/D ${freq.squat||0}/${freq.bench||0}/${freq.deadlift||0}×`);if(m.allMuscles2x)parts.push('muscles 2×');return{parts,a}}
@@ -15889,14 +16048,14 @@ function restoreProgramChat(){const c=document.getElementById('v190-program-chat
 function renderProgramUnderstood(){const root=document.getElementById('v212-program-understood'),m=state.draft?.meta;if(!root)return;if(!m){root.innerHTML='';return}const chips=[`${m.days} jours`,`${m.duration} min`,m.goal==='powerbuilding'?'Powerbuilding':m.goal==='strength'?'Force':m.goal==='fitness'?'Fitness':'Hypertrophie',...(m.priorities||[]).map(g=>'Priorité '+muscleLabel(g)),...(m.avoid||[]).map(x=>'Sans '+x)];const f=desiredLiftFrequency(m);if(Object.values(f).some(Boolean))chips.push(`S/B/D ${f.squat||0}/${f.bench||0}/${f.deadlift||0}×`);if(m.allMuscles2x)chips.push('Muscles 2×/sem.');root.innerHTML=`<div class="v212-program-understood"><span>SYSTEM A COMPRIS</span><div class="v212-program-chips">${unique(chips).map((x,i)=>`<b class="v212-program-chip ${i<3?'strong':''}">${esc(x)}</b>`).join('')}</div><div class="v212-program-context">Contexte actuel : SBD ${Number(user().squat||0)+Number(user().bench||0)+Number(user().deadlift||0)} kg · préparation ${readiness()}/100 · ${m.experience||'intermédiaire'}.</div></div>`}
 function renderProgramPreview(){const root=document.getElementById('v190-program-preview'),p=state.draft;if(!root)return;if(!p){root.innerHTML='<div class="v212-program-empty">Décris ton programme idéal : SYSTEM AI construira le brouillon ici.</div>';return}const {parts,a}=programSummary(p),warn=a.flags.length;root.innerHTML=`<div class="v190-note"><b>${esc(p.name)}</b><br>${esc(parts.join(' · '))}<div class="v212-program-audit"><div><span>Volume</span><b class="${warn?'v212-program-warning':'v212-program-ok'}">${warn?warn+' alerte(s)':'Cohérent'}</b></div><div><span>Readiness</span><b>${Number(p.meta?.readiness??readiness())}/100</b></div><div><span>Exos / séance</span><b>≤ ${p.meta?.maxExercises|| (p.meta?.duration<=45?4:p.meta?.duration<=65?5:6)}</b></div></div>${warn?`<div class="v212-program-context v212-program-warning">${esc(a.flags.join(' · '))}</div>`:''}</div>${p.days.map(d=>`<div class="v190-day"><div class="v212-program-dayhead"><h4>${esc(d.title)}</h4><small>${d.exercises.length} exercices</small></div>${d.exercises.map(e=>`<div class="v190-ex"><span class="${e.mainLift?'v212-main-lift':''}">${esc(e.name)}<small class="v212-program-exmeta">${esc(e.note||'')}</small></span><b>${e.sets}×${e.defaultReps}</b></div>`).join('')}</div>`).join('')}`}
 function modifyProgram(text){state.draft=buildProgram(text,state.draft);return state.draft}
-function programTests(){const a=parseProgramRequest('5 jours powerbuilding, 1h15, SBD 2 fois par semaine, priorité bras épaules, pas de front squat'),b=parseProgramRequest('passe en 4 jours, 60 min, ajoute 2 séries biceps, bench 3x8',a),p=buildProgramFromRequest(a);return[['5 jours compris',a.days===5],['1h15 = 75 min',a.duration===75],['Powerbuilding compris',a.goal==='powerbuilding'],['SBD 2× compris',a.frequency.squat===2&&a.frequency.bench===2&&a.frequency.deadlift===2],['Bras/épaules compris',a.priorities.includes('biceps')&&a.priorities.includes('shoulders')],['Front squat évité sans supprimer le squat',a.avoid.includes('frontsquat')&&!a.avoid.includes('squat')],['Follow-up 4 jours',b.days===4],['Follow-up 60 min',b.duration===60],['Ajout séries biceps',Number(b.setAdjustments.biceps||0)>=2],['Prescription bench 3×8',b.prescriptions.bench?.sets===3&&b.prescriptions.bench?.reps===8],['Programme construit',p.days.length===5&&p.days.every(d=>d.exercises.length>0)]]}
+function programTests(){const a=parseProgramRequest('5 jours powerbuilding, 1h15, SBD 2 fois par semaine, priorité bras épaules, pas de front squat'),b=parseProgramRequest('passe en 4 jours, 60 min, ajoute 2 séries biceps, bench 3x8',a),p=buildProgramFromRequest(a),pplReq=parseProgramRequest('Fais-moi un programme PPL sur 3 jours'),ppl=buildProgramFromRequest(pplReq),ul=buildProgramFromRequest(parseProgramRequest('Upper Lower sur 4 jours')),fb=buildProgramFromRequest(parseProgramRequest('Full Body 3 jours'));const pplAllowed=[new Set(['chest','shoulders','triceps']),new Set(['back','biceps']),new Set(['quads','hamstrings','glutes','calves'])];return[['5 jours compris',a.days===5],['1h15 = 75 min',a.duration===75],['Powerbuilding compris',a.goal==='powerbuilding'],['SBD 2× compris',a.frequency.squat===2&&a.frequency.bench===2&&a.frequency.deadlift===2],['Bras/épaules compris',a.priorities.includes('biceps')&&a.priorities.includes('shoulders')],['Front squat évité sans supprimer le squat',a.avoid.includes('frontsquat')&&!a.avoid.includes('squat')],['Follow-up 4 jours',b.days===4],['Follow-up 60 min',b.duration===60],['Ajout séries biceps',Number(b.setAdjustments.biceps||0)>=2],['Prescription bench 3×8',b.prescriptions.bench?.sets===3&&b.prescriptions.bench?.reps===8],['Programme construit',p.days.length===5&&p.days.every(d=>d.exercises.length>0)],['PPL 3 jours détecté',pplReq.split==='ppl'&&ppl.days.length===3],['PPL ordonné Push/Pull/Legs',/PUSH/.test(ppl.days[0].title)&&/PULL/.test(ppl.days[1].title)&&/LEGS/.test(ppl.days[2].title)],['PPL sans exercice incompatible',ppl.days.every((day,i)=>day.exercises.every(ex=>pplAllowed[i].has(ex.group)))],['Upper/Lower strict',ul.days.every((day,i)=>day.exercises.every(ex=>(i%2?['quads','hamstrings','glutes','calves','core']:['chest','back','shoulders','biceps','triceps']).includes(ex.group)))],['Full Body construit',fb.days.length===3&&fb.days.every(day=>day.exercises.some(ex=>ex.group==='chest')&&day.exercises.some(ex=>ex.group==='back')&&day.exercises.some(ex=>ex.group==='quads'))]]}
 window.LevelingProgramAI={version:'V21.2.5',engine:'PROGRAM_AI_V2',open(){ensureProgramModal();const modal=document.getElementById('v190-program-modal');modal.classList.add('show');restoreProgramChat();renderProgramUnderstood();renderProgramPreview();setProgramMobileView(state.draft?'program':'chat')},close(){document.getElementById('v190-program-modal')?.classList.remove('show')},quick(t){const i=document.getElementById('v190-program-input');if(i)i.value=t;this.send()},send(){const i=document.getElementById('v190-program-input'),txt=i?.value.trim();if(!txt)return;programMsg(txt,'user');state.draft=modifyProgram(txt);state.draft.meta.readiness=readiness();save();renderProgramUnderstood();renderProgramPreview();const {parts,a}=programSummary(state.draft),recognized=state.draft.meta?.recognized||[];programMsg(`Compris : ${parts.join(' · ')}.${recognized.length?` J’ai détecté : ${recognized.join(', ')}.`:''} ${a.flags.length?`À surveiller : ${a.flags.join(' · ')}.`:'Le volume principal reste cohérent.'} Tu peux continuer avec une phrase courte : « passe en 4 jours », « ajoute 2 séries biceps », « bench 3x8 », « retire le deadlift »…`);i.value='';if(matchMedia('(max-width:600px)').matches)setProgramMobileView('program')},periodize(){if(!state.draft){programMsg('Crée d’abord un programme.');return}const goal=state.draft.meta?.goal;state.draft.periodization=goal==='hypertrophy'?[{block:1,name:'Base technique',weeks:3,intensity:'modérée',volume:'modéré'},{block:2,name:'Accumulation',weeks:4,intensity:'modérée',volume:'haut'},{block:3,name:'Surcharge progressive',weeks:3,intensity:'modérée à haute',volume:'modéré'},{block:4,name:'Consolidation',weeks:2,intensity:'modérée',volume:'modéré à bas'}]:[{block:1,name:'Base / volume',weeks:3,intensity:'modérée',volume:'haut'},{block:2,name:'Progression',weeks:3,intensity:'modérée à haute',volume:'modéré'},{block:3,name:'Intensification',weeks:2,intensity:'haute',volume:'modéré à bas'},{block:4,name:'Consolidation / performance',weeks:2,intensity:'haute contrôlée',volume:'bas'}];save();programMsg('Périodisation ajoutée. Aucun deload fixe : SYSTEM AI le recommandera seulement si récupération, sommeil, fatigue, réalisation et performances donnent plusieurs signaux concordants.');renderProgramPreview();if(matchMedia('(max-width:600px)').matches)setProgramMobileView('program')},reset(){state.draft=null;state.programChat=[];save();const c=document.getElementById('v190-program-chat');if(c)c.innerHTML='';restoreProgramChat();renderProgramUnderstood();renderProgramPreview();setProgramMobileView('chat')},apply(){if(!state.draft){programMsg('Aucun programme à enregistrer.');return}try{window.customProgramData=JSON.parse(JSON.stringify(state.draft));if(typeof customProgramData!=='undefined')customProgramData=JSON.parse(JSON.stringify(state.draft));try{persistCustomProgram?.()}catch(e){try{saveToLocalStorage?.()}catch(_){}}try{saveCloudData?.()}catch(e){}programMsg('Programme enregistré dans Mon programme. Tes données existantes restent intactes.');setTimeout(()=>{this.close();try{openPowerProgram('custom')}catch(e){}},250)}catch(e){programMsg('Impossible d’enregistrer le programme : '+String(e?.message||e))}},mobileView:setProgramMobileView,parse:parseProgramRequest,tests:programTests,build:buildProgramFromRequest};
 /* CLEAN CORE V21: obsolete V19 SYSTEM AI engine physically removed. Program/readiness support kept. */
 function addProgramEntry(){return false} // V19.2: carte canonique statique unique
 function addShareButton(){const detail=document.getElementById('power-program-detail');if(!detail||document.getElementById('v190-share-program'))return;const b=document.createElement('button');b.id='v190-share-program';b.className='v190-action';b.textContent='SHARE / IMPORT PROGRAM';b.onclick=()=>openShare();detail.appendChild(b)}
 function ensureShareModal(){if(document.getElementById('v190-share-modal'))return;const d=document.createElement('div');d.id='v190-share-modal';d.innerHTML=`<div class="v190-modal"><div class="v190-modal-head"><div><b>PROGRAMME PARTAGEABLE</b><small>Exporte un code ou importe celui d’un ami</small></div><button class="v190-close" onclick="LevelingV190.closeShare()">×</button></div><div class="v190-input"><textarea id="v190-share-code" rows="7" placeholder="Code programme"></textarea></div><div class="v190-actions"><button class="v190-action" onclick="LevelingV190.exportProgram()">GÉNÉRER LE CODE</button><button class="v190-action" onclick="LevelingV190.importProgram()">IMPORTER</button></div></div>`;document.body.appendChild(d)}
 function openShare(){ensureShareModal();document.getElementById('v190-share-modal').classList.add('show')}function closeShare(){document.getElementById('v190-share-modal')?.classList.remove('show')}function exportProgram(){try{const p=typeof customProgramData!=='undefined'?customProgramData:window.customProgramData;const code=btoa(unescape(encodeURIComponent(JSON.stringify({v:1,p}))));document.getElementById('v190-share-code').value=code}catch(e){alert('Export impossible')}}function importProgram(){try{const code=document.getElementById('v190-share-code').value.trim(),obj=JSON.parse(decodeURIComponent(escape(atob(code))));if(!obj?.p?.days)throw new Error('Code invalide');if(typeof customProgramData!=='undefined')customProgramData=obj.p;window.customProgramData=obj.p;try{persistCustomProgram?.()}catch(e){saveToLocalStorage?.()}closeShare();try{openPowerProgram('custom')}catch(e){}}catch(e){alert('Code programme invalide')}}
-function refresh(){addShareButton()}
+function refresh(){addShareButton();try{window.LevelingSystemAI?.refresh?.()}catch(e){}}
 window.LevelingV190={version:'25.6.25',refresh,openReadiness,closeReadiness,saveReadiness,openShare,closeShare,exportProgram,importProgram,debug:()=>({readiness:readiness(),coach:coachToday(),muscles:detailedSets(7),fatigue:fatigueMap(),achievements:achievements(),state:JSON.parse(JSON.stringify(state))})};
 window.LevelingReadinessProgramSupport=window.LevelingV190;
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',()=>setTimeout(refresh,700),{once:true});else setTimeout(refresh,400);window.addEventListener('pageshow',()=>setTimeout(refresh,150));document.addEventListener('click',()=>setTimeout(()=>{addShareButton()},80),{passive:true});
@@ -16212,15 +16371,15 @@ function readSnapshot(){const u=profile(),core=appCore()?.exportState?.()||{};re
 function labGroups(){const before=readSnapshot(),labGoals=()=>Array.isArray(profile().systemAI?.goals)?profile().systemAI.goals:[],coachTests=selfTests().map(([name,ok])=>({name,ok:!!ok}));const groups=[
  ['COACH V6 · PARSER',coachTests],
  ['OBJECTIFS & DONNÉES',[['Structure userData.systemAI.goals',()=>Array.isArray(labGoals())],['Cibles numériques valides',()=>labGoals().filter(g=>g?.status==='active').every(g=>Number.isFinite(Number(g.target))&&Number(g.target)>0)],['Échéances lisibles',()=>labGoals().filter(g=>g?.status==='active').every(g=>!g.deadline||!Number.isNaN(Date.parse(g.deadline)))],['Historique Coach lisible',()=>Array.isArray(history())]]],
- ['RÉCUPÉRATION',[['PV borné 0–100',()=>pv()>=0&&pv()<=100],['Moteur récupération disponible',()=>!!window.LevelingRecoveryV1622||Number.isFinite(pv())],['Mode Coach lisible',()=>typeof coachState().mode==='string']]],
+  ['RÉCUPÉRATION',[['PV borné 0–100',()=>pv()>=0&&pv()<=100],['Moteur récupération disponible',()=>!!window.LevelingRecoveryV1622||Number.isFinite(pv())],['État parfait sans charge = 100',()=>window.LevelingRecoveryV1622?.score?.({sleep:10,energy:10,motivation:10,soreness:0,pain:0})===100],['État moyen cohérent',()=>window.LevelingRecoveryV1622?.score?.({sleep:5,energy:5,motivation:5,soreness:5,pain:0})===58],['Douleur et courbatures réduisent le score',()=>window.LevelingRecoveryV1622?.score?.({sleep:8,energy:8,motivation:8,soreness:9,pain:9})<window.LevelingRecoveryV1622?.score?.({sleep:8,energy:8,motivation:8,soreness:1,pain:1})],['Mode Coach lisible',()=>typeof coachState().mode==='string']]],
  ['SÉANCES & PROGRESSION',[['Historique canonique lisible',()=>Array.isArray(canonicalSessions())],['Historique détaillé lisible',()=>Array.isArray(detailedSessions())],['Aucune séance LAB injectée',()=>!canonicalSessions().some(x=>String(x?.id||'').startsWith('lab_'))],['Core progression conservé',()=>!!appCore()],['Tendance SBD callable',()=>typeof appCore()?.exerciseTrend==='function']]],
- ['PROGRAMMES MULTI-BLOCS',[['Powerbuilding · 4 blocs',()=>window.LevelingProgramArchitecture?.blocks?.('powerbuilding')?.length===4],['SBD · 4 blocs',()=>window.LevelingProgramArchitecture?.blocks?.('sbd')?.length===4],['Hypertrophy · 4 blocs',()=>window.LevelingProgramArchitecture?.blocks?.('hypertrophie')?.length===4],['Fit Girl · 4 blocs',()=>window.LevelingProgramArchitecture?.blocks?.('fitgirl')?.length===4],['Bloc canonique calculable',()=>Number.isInteger(window.LevelingProgramArchitecture?.canonicalBlock?.())],['Jour calendrier calculable',()=>Number.isInteger(window.v1618CalendarDayIndex?.())]]],
+  ['PROGRAMMES MULTI-BLOCS',[['Powerbuilding · 4 blocs',()=>window.LevelingProgramArchitecture?.blocks?.('powerbuilding')?.length===4],['SBD · 4 blocs',()=>window.LevelingProgramArchitecture?.blocks?.('sbd')?.length===4],['Hypertrophy · 4 blocs',()=>window.LevelingProgramArchitecture?.blocks?.('hypertrophie')?.length===4],['Fit Girl · 4 blocs',()=>window.LevelingProgramArchitecture?.blocks?.('fitgirl')?.length===4],['Legacy custom devient Bloc 1',()=>normalizeCustomProgramData({name:'Legacy',days:[{dayName:'Jour 1',exercises:[]}]}).blocks.length===1],['Custom multi-blocs conservé',()=>normalizeCustomProgramData({name:'Multi',blocks:[{name:'Bloc 1',days:[]},{name:'Bloc 2',days:[]}]}).blocks.length===2],['Sélection programme horodatée',()=>typeof activeProgramSelection?.updatedAt==='number'&&activeProgramSelection?.key===activeProgramKey],['Bloc canonique calculable',()=>Number.isInteger(window.LevelingProgramArchitecture?.canonicalBlock?.())],['Jour calendrier calculable',()=>Number.isInteger(window.v1618CalendarDayIndex?.())]]],
  ['COACH REPORT & DELOAD',[['Section rapport montée',()=>!!window.LevelingCoreV182?.ensureReportsSection?.()],['Rapport semaine calculable',()=>window.LevelingCoreV182?.reportData?.('week')?.kind==='week'],['Export rapport disponible',()=>typeof window.LevelingCoreV182?.downloadReport==='function'&&typeof window.LevelingCoreV182?.shareReport==='function'],['Deload multi-signal calculable',()=>typeof window.LevelingCoreV182?.deloadAssessment?.().recommended==='boolean'],['Deload explique ses signaux',()=>Array.isArray(window.LevelingCoreV182?.deloadAssessment?.().signals)]]],
  ['BOUTIQUE CRISTAUX',[['Compteur Cristaux présent',()=>!!document.getElementById('hud-crystals-badge')],['Boutique existante unique',()=>document.querySelectorAll('#v2147-crystal-modal').length===1],['Ouverture Boutique disponible',()=>typeof window.LevelingCrystalShop?.open==='function'],['Fermeture Boutique disponible',()=>typeof window.LevelingCrystalShop?.close==='function'],['Solde Boutique numérique',()=>Number.isFinite(Number(window.LevelingCrystalShop?.status?.().balance||0))]]],
  ['PROGRAM AI V2',[['Moteur Program AI disponible',()=>window.LevelingProgramAI?.engine==='PROGRAM_AI_V2'],['Parser conversationnel testé',()=>Array.isArray(window.LevelingProgramAI?.tests?.())&&window.LevelingProgramAI.tests().every(x=>x[1]===true)],['Brouillon isolé des programmes actifs',()=>!window.LevelingProgramAI?.build?.(window.LevelingProgramAI.parse('4 jours hypertrophie 60 min'))?.days?.some(d=>!Array.isArray(d.exercises))]]],
  ['NUTRITION / PAS / NOTIFICATIONS',[['Module Wellness disponible',()=>!!window.LevelingWellnessV2130],['Cible calories calculable',()=>Number.isFinite(Number(window.LevelingWellnessV2130?.summary?.().calories||0))],['Macros cohérentes',()=>window.LevelingWellnessV2130?.tests?.().every(x=>x[1]===true)],['Pas du jour bornés',()=>Number(window.LevelingWellnessV2130?.summary?.().steps||0)>=0],['Journée locale stable',()=>/^\d{4}-\d{2}-\d{2}$/.test(window.LevelingWellnessV2130?.dayKey?.()||'')],['Push existant conservé',()=>('serviceWorker' in navigator)&&('Notification' in window)&&typeof v1352EnablePush==='function'],['Badge notification dédié',()=>true],['Pont Health Connect prêt',()=>typeof window.LevelingWellnessV2130?.syncPhoneSteps==='function']]],
  ['XP / RANGS',[['XP numérique',()=>Number.isFinite(Number(window.LevelingProgressionV15?.getXp?.()??profile().xp??0))],['Niveau numérique',()=>Number.isFinite(Number(profile().level??1))],['SBD profil intact',()=>[profile().squat,profile().bench,profile().deadlift].every(v=>Number.isFinite(Number(v??0)))]]],
- ['ACCESS SYSTEM V21.4.5',[['État accès lisible',()=>['SUBSCRIBED','TRIAL','PASS','FREE','PRETRIAL','EMAIL_UNVERIFIED','UNKNOWN'].includes(String(window.getLevelingAccessInfo?.()?.access_state||'UNKNOWN').toUpperCase())],['Cloud indépendant du Premium',()=>typeof window.getLevelingCloudAccessState==='function'],['Trial/PASS plein accès',()=>typeof window.LevelingAccessV214?.full==='function'],['FREE guard disponible',()=>typeof window.LevelingAccessV214?.guard==='function'],['Cristaux serveur lisibles',()=>Number.isFinite(Number(window.getLevelingAccessInfo?.()?.crystals||0))],['Bridge pubs 5 min',()=>window.LevelingAdsV214?.minGapMs===300000],['Garde POWER native',()=>typeof window.LevelingWorkoutGuard?.isPowerSessionActive==='function'],['Lancement POWER explicite',()=>typeof window.startPowerWorkoutSession==='function'&&typeof window.isExplicitWorkoutSessionActive==='function'],['Aucune fausse séance au démarrage',()=>window.isExplicitWorkoutSessionActive?.()===false],['Trial manuel',()=>typeof window.activateLevelingTrial==='function'],['Parrainage V21.4.1',()=>typeof window.LevelingReferralV2141?.render==='function'],['Rewarded Ads préparées',()=>typeof window.LevelingRewardedAdsV2141?.watch==='function'],['Icône Cristaux',()=>!!document.getElementById('ui-crystals')],['Icône Steps patte',()=>!!document.getElementById('ui-paw')]]],
+  ['ACCESS SYSTEM V21.4.5',[['État accès lisible',()=>['SUBSCRIBED','TRIAL','PASS','FREE','PRETRIAL','EMAIL_UNVERIFIED','UNKNOWN'].includes(String(window.getLevelingAccessInfo?.()?.access_state||'UNKNOWN').toUpperCase())],['Cloud indépendant du Premium',()=>typeof window.getLevelingCloudAccessState==='function'],['Trial/PASS plein accès',()=>typeof window.LevelingAccessV214?.full==='function'],['FREE guard disponible',()=>typeof window.LevelingAccessV214?.guard==='function'],['Cristaux serveur lisibles',()=>Number.isFinite(Number(window.getLevelingAccessInfo?.()?.crystals||0))],['Provenance accès supportée',()=>window.getLevelingAccessInfo?.()?.access_source==null||typeof window.getLevelingAccessInfo().access_source==='string'],['Upgrade Lifetime décidé côté accès',()=>typeof window.v2220CanPurchasePlan==='function'],['Bridge pubs 5 min',()=>window.LevelingAdsV214?.minGapMs===300000],['Garde POWER native',()=>typeof window.LevelingWorkoutGuard?.isPowerSessionActive==='function'],['Lancement POWER explicite',()=>typeof window.startPowerWorkoutSession==='function'&&typeof window.isExplicitWorkoutSessionActive==='function'],['Aucune fausse séance au démarrage',()=>window.isExplicitWorkoutSessionActive?.()===false],['Trial manuel',()=>typeof window.activateLevelingTrial==='function'],['Parrainage V21.4.1',()=>typeof window.LevelingReferralV2141?.render==='function'],['Rewarded Ads préparées',()=>typeof window.LevelingRewardedAdsV2141?.watch==='function'],['Icône Cristaux',()=>!!document.getElementById('ui-crystals')],['Icône Steps patte',()=>!!document.getElementById('ui-paw')]]],
  ['SAUVEGARDE / CLOUD',[['Sauvegarde locale disponible',()=>typeof window.saveLocal==='function'||typeof window.saveToLocalStorage==='function'],['Sauvegarde cloud disponible',()=>typeof window.scheduleCloudSave==='function'||typeof window.scheduleCloudSaveImmediate==='function'||typeof window.saveCloudData==='function'],['Auth conservée',()=>!!document.getElementById('auth-gate')||document.documentElement.innerHTML.includes('supabase')],['Checkout Stripe conservé',()=>document.documentElement.innerHTML.includes('create-checkout')],['Portail Stripe conservé',()=>document.documentElement.innerHTML.includes('create-billing-portal')]]],
  ['PWA / MOBILE',[['viewport-fit=cover conservé',()=>document.querySelector('meta[name="viewport"]')?.content?.includes('viewport-fit=cover')],['Manifest conservé',()=>!!document.querySelector('link[rel="manifest"]')],['Mode web-app Apple conservé',()=>document.querySelector('meta[name="apple-mobile-web-app-capable"]')?.content==='yes'],['100dvh supporté ou fallback CSS présent',()=>CSS.supports?.('height','100dvh')||document.documentElement.innerHTML.includes('100dvh')]]],
  ['CLEAN CORE',[['SYSTEM AI unique',()=>window.LevelingSystemAI===SYSTEM_API],['Coach V6 unique',()=>window.LevelingCoachV6?.engine==='V6'],['Ancien modal V181 absent',()=>!document.getElementById('v181-ai-modal')],['Ancien modal V190 absent',()=>!document.getElementById('v190-system-modal')],['Ancien modal V193 absent',()=>!document.getElementById('v193-system-modal')],['Core V200 retiré',()=>!window.LevelingSystemCoreV200],['Données réelles non modifiées par LAB',()=>readSnapshot()===before]]]
@@ -16278,6 +16437,7 @@ document.addEventListener('keydown',onKey,true);
 document.addEventListener('visibilitychange',()=>{if(!document.hidden)resume()});
 window.addEventListener('pageshow',pageShow);
 window.addEventListener('online',resume,{passive:true});
+window.addEventListener('leveling-recovery-changed',resume);
 window.addEventListener('leveling-ui-changed',scheduleUiRefresh);
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',()=>{recoverState();resume();scheduleMidnight()},{once:true});else{recoverState();resume();scheduleMidnight()}
 })();
@@ -17408,12 +17568,18 @@ function premiumAllowed(id){if(purchased(id))return true;if(!PREMIUM_REQ[id])ret
 function skinOpen(id){return ['none','system'].includes(id)||premiumAllowed(id)}
 function fxHost(){let h=document.getElementById('v25613-fx');if(!h){h=document.createElement('div');h.id='v25613-fx';document.body.appendChild(h)}return h}function el(c,css=''){const n=document.createElement('i');n.className=c;n.style.cssText=css;return n}
 function buildFx(id){const h=fxHost();h.replaceChildren();if(document.hidden||['none','system','void'].includes(id))return;if(id==='shadow'){h.append(el('v25613-shadow-core'));for(let i=0;i<5;i++)h.append(el('v25613-particle',`color:#bd6cff;--x:${10+(i*21)%84}vw;--d:${15+i*2}s;--drift:${i%2?15:-12}px;opacity:${.20+(i%3)*.07};animation-delay:-${i*2.2}s`))}else if(id==='electric'){h.append(el('v25613-electric-edge'),el('v25613-bolt'));for(let i=0;i<5;i++)h.append(el('v25613-particle',`color:#8be5ff;--x:${8+(i*23)%88}vw;--d:${13+i}s;--drift:${i%2?10:-9}px;opacity:${.26+(i%2)*.09};animation-delay:-${i*1.6}s`))}else if(id==='winter'){h.append(el('v25612-frost'));const cracks=[[0,7,72,24],[100,10,66,158],[0,86,62,-22],[100,91,58,202],[0,28,34,9]];cracks.forEach(([x,y,w,r])=>h.append(el('v25612-crack',`left:${x}%;top:${y}%;width:${w}px;transform:rotate(${r}deg)`)));for(let i=0;i<18;i++)h.append(el('v25612-snow',`--x:${(i*37)%101}vw;--drift:${i%2?18:-14}px;--d:${9+(i%6)*1.4}s;animation-delay:-${(i*1.13)%8}s;opacity:${.35+(i%4)*.12};width:${2+i%3}px;height:${2+i%3}px`))}else if(id==='sakura'){h.append(el('v25615-sakura-mist'),el('v25617-sakura-bloom'));for(let i=0;i<26;i++){const near=i%6===0,mid=i%3===0;h.append(el('v25615-petal',`--x:${2+(i*23)%98}vw;--d:${near?11+(i%4):14+(i%7)*1.5}s;--drift:${i%2?30:-25}px;--r:${i*43}deg;--pw:${near?15:mid?11:7+(i%3)}px;--ph:${near?19:mid?14:10+(i%3)}px;--po:${near?.92:mid?.80:.60+(i%4)*.06};animation-delay:-${(i*1.61)%17}s`))}}else if(id==='bloodmoon'){h.append(el('v25617-blood-sky'),el('v25617-blood-fog'),el('v25617-blood-fog2'));for(let i=0;i<14;i++)h.append(el('v25615-ash',`--x:${3+(i*17)%96}vw;--d:${16+(i%6)*2}s;--drift:${i%2?12:-10}px;--ash:${i%5===0?3:1.5}px;animation-delay:-${i*1.9}s;opacity:${.17+(i%4)*.045}`))}else if(id==='sakuraelite'){h.append(el('v25618-scene v25618-sakuraelite'));for(let i=0;i<18;i++)h.append(el('v25618-spark',`--x:${2+(i*29)%97}vw;--d:${10+(i%7)*1.7}s;--drift:${i%2?26:-22}px;--c:${i%3?'#ff4ca8':'#ffd2ea'};animation-delay:-${(i*1.4)%12}s`))}else if(id==='abyssblue'){h.append(el('v25618-scene v25618-abyssblue'));for(let i=0;i<14;i++)h.append(el('v25618-bluewisp',`--x:${4+(i*31)%94}vw;--d:${12+(i%6)*1.8}s;--drift:${i%2?18:-16}px;animation-delay:-${(i*1.7)%13}s`))}else if(id==='eternalcrown'){h.append(el('v25618-scene v25618-eternalcrown'));for(let i=0;i<16;i++){const g=i%2===0;h.append(el('v25618-royal',`--x:${3+(i*19)%96}vw;--d:${13+(i%6)*1.9}s;--drift:${i%2?16:-13}px;--c:${g?'#ffd96a':'#62ffc4'};animation-delay:-${(i*1.55)%14}s`))}}else if(id==='monarch'){h.append(el('v25615-monarch-glow'));for(let i=0;i<8;i++){const gold=i%2===0;h.append(el('v25615-metal',`--x:${6+(i*12)%90}vw;--d:${14+(i%4)*2}s;--drift:${i%2?8:-6}px;--r:${i*31}deg;--m1:${gold?'#ffe28a':'#eef4fb'};--m2:${gold?'#b98116':'#8793a2'};animation-delay:-${i*1.8}s`))}}}
-function apply(id,save=true){if(!SKINS.some(x=>x[0]===id))id='none';if(!skinOpen(id))return false;document.body.setAttribute('data-clean-theme',id);buildFx(id);if(save){['leveling_v25613_visual_theme','leveling_v25612_visual_theme','leveling_v25610_visual_theme','leveling_v2568_visual_theme','leveling_v2566_visual_theme'].forEach(k=>localStorage.setItem(k,id));if(window.userData){userData.visualTheme=id;try{saveToLocalStorage()}catch(e){}}}sync();return true}
+function apply(id,save=true){if(!SKINS.some(x=>x[0]===id))id='none';if(!skinOpen(id))return false;document.body.setAttribute('data-clean-theme',id);buildFx(id);if(save){['leveling_v25613_visual_theme','leveling_v25612_visual_theme','leveling_v25610_visual_theme','leveling_v2568_visual_theme','leveling_v2566_visual_theme'].forEach(k=>localStorage.setItem(k,id));if(window.userData){userData.visualTheme=id;userData.visualThemeUpdatedAt=Date.now();try{saveToLocalStorage();scheduleCloudSave?.()}catch(e){}}}sync();return true}
 function host(){const p=document.getElementById('panel-settings');if(!p)return null;const sec=[...p.querySelectorAll('.compact-setting-section')].find(x=>(x.querySelector('.compact-setting-title')?.textContent||'').toLowerCase().includes('ambiance'));return sec?.querySelector('.compact-setting-body')||null}
 function markup(){const lang=isEnglish()?'en':'fr';return `<div class="v25612-personalization" data-lang="${lang}"><section class="v25612-block"><div class="v25612-head"><b>${tr('COULEUR PRINCIPALE','MAIN COLOR')}</b><span>${tr('9 VARIANTES','9 VARIANTS')}</span></div><div class="v25612-colors">${COLORS.map(([id,n,a,b])=>`<button type="button" class="v25612-color" data-v25612-color="${id}" style="--c1:${a};--c2:${b}"><i></i><b>${isEnglish()?({pink:'PINK',red:'RED',green:'GREEN',gold:'GOLD',ice:'ICE'}[id]||n):n}</b></button>`).join('')}</div></section><section class="v25612-block"><div class="v25612-head"><b>${tr('THÈMES VISUELS','VISUAL THEMES')}</b><span>${SKINS.length} ${tr('THÈMES','THEMES')}</span></div><div class="v25612-themes">${SKINS.map(([id,n,fr,en])=>`<button type="button" class="v25612-theme ${PREMIUM_REQ[id]?'v25618-premium':''}" data-v25612-skin="${id}"><span class="v25612-badge"></span><div class="v25612-theme-preview"></div><b>${n}</b><small>${isEnglish()?en:fr}</small></button>`).join('')}</div>${moderator()?`<div class="v25612-modcard">♛ ${tr('MODE MODÉRATEUR ACTIF','MODERATOR MODE ACTIVE')}<small>${tr('Tous les thèmes sont débloqués sur ce compte.','All themes are unlocked on this account.')}</small></div>`:`<div class="v25612-access"><input id="v25612-code" placeholder="${tr('CODE ALLIÉ','ALLY CODE')}"><button id="v25612-unlock" type="button">${tr('DÉBLOQUER','UNLOCK')}</button></div><div class="v25612-status" id="v25612-status">${tr('AUCUN et SYSTEM sont gratuits.','NONE and SYSTEM are free.')}</div>`}</section></div>`}
-function mount(){const h=host();if(!h)return false;h.querySelectorAll('.settings-theme-top,.v2562-personal-palette,.v2566-personalization,.v2568-personalization').forEach(x=>x.remove());document.querySelectorAll('.v25612-personalization').forEach(x=>{if(x.parentElement!==h||x.dataset.lang!==(isEnglish()?'en':'fr'))x.remove()});let r=h.querySelector('.v25612-personalization');if(!r){h.insertAdjacentHTML('afterbegin',markup());r=h.querySelector('.v25612-personalization');r.addEventListener('click',e=>{const c=e.target.closest('[data-v25612-color]');if(c){e.preventDefault();window.setTheme?.(c.dataset.v25612Color);sync();return}const t=e.target.closest('[data-v25612-skin]');if(t){e.preventDefault();if(!apply(t.dataset.v25612Skin,true)){const st=r.querySelector('#v25612-status');if(st)st.textContent=tr('Thème verrouillé · utilise le code allié.','Theme locked · use the ally code.')}}});const u=r.querySelector('#v25612-unlock');if(u)u.onclick=()=>{const i=r.querySelector('#v25612-code'),st=r.querySelector('#v25612-status');if(String(i?.value||'').trim().toUpperCase()===CODE){localStorage.setItem(KEY,'1');if(window.userData){userData.themeMasterUnlock=true;try{saveToLocalStorage()}catch(e){}}r.remove();mount()}else if(st)st.textContent=tr('Code invalide.','Invalid code.')}}sync();return true}
+function mount(){const h=host();if(!h)return false;h.querySelectorAll('.settings-theme-top,.v2562-personal-palette,.v2566-personalization,.v2568-personalization').forEach(x=>x.remove());document.querySelectorAll('.v25612-personalization').forEach(x=>{if(x.parentElement!==h||x.dataset.lang!==(isEnglish()?'en':'fr'))x.remove()});let r=h.querySelector('.v25612-personalization');if(!r){h.insertAdjacentHTML('afterbegin',markup());r=h.querySelector('.v25612-personalization')}sync();return true}
+function handleAction(e){
+ const c=e.target.closest?.('[data-v25612-color]');if(c){e.preventDefault();window.setTheme?.(c.dataset.v25612Color);sync();return true}
+ const t=e.target.closest?.('[data-v25612-skin]');if(t){e.preventDefault();if(!apply(t.dataset.v25612Skin,true)){const st=t.closest('.v25612-personalization')?.querySelector('#v25612-status');if(st)st.textContent=tr('Thème verrouillé · utilise le code allié.','Theme locked · use the ally code.')}return true}
+ const u=e.target.closest?.('#v25612-unlock');if(u){e.preventDefault();const r=u.closest('.v25612-personalization'),i=r?.querySelector('#v25612-code'),st=r?.querySelector('#v25612-status');if(String(i?.value||'').trim().toUpperCase()===CODE){localStorage.setItem(KEY,'1');if(window.userData){userData.themeMasterUnlock=true;try{saveToLocalStorage()}catch(error){}}r?.remove();mount()}else if(st)st.textContent=tr('Code invalide.','Invalid code.');return true}
+ return false
+}
 function sync(){const col=window.userData?.theme||document.body.dataset.theme||'purple',skin=current();document.querySelectorAll('[data-v25612-color]').forEach(x=>x.classList.toggle('active',x.dataset.v25612Color===col));document.querySelectorAll('[data-v25612-skin]').forEach(x=>{const id=x.dataset.v25612Skin,open=skinOpen(id),active=id===skin,owned=purchased(id),free=['none','system'].includes(id),b=x.querySelector('.v25612-badge');x.classList.toggle('active',active);x.classList.toggle('equipped',active);x.classList.toggle('owned',owned&&!active);x.classList.toggle('unlocked',open&&!owned&&!active&&!free);x.classList.toggle('locked',!open);if(b)b.textContent=active?tr('✓ ÉQUIPÉ','✓ EQUIPPED'):owned?tr('POSSÉDÉ','OWNED'):PREMIUM_REQ[id]?(open?tr('INCLUS · ','INCLUDED · ')+PREMIUM_LABEL[id]:PREMIUM_LABEL[id]):(free?tr('GRATUIT','FREE'):(open?tr('DÉBLOQUÉ','UNLOCKED'):tr('VERROUILLÉ','LOCKED')))})}
-function boot(){if(current()==='holo')localStorage.setItem('leveling_v25613_visual_theme','sakura');apply(current()==='holo'?'sakura':current(),false);mount()}if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot,{once:true});else boot();document.addEventListener('click',e=>{if(e.target.closest('[data-key="personalization"],[data-group="personalize"]'))requestAnimationFrame(mount)},true);document.addEventListener('visibilitychange',()=>{if(document.hidden){document.getElementById('v25613-fx')?.replaceChildren()}else buildFx(current())},{passive:true});window.addEventListener('leveling-language-changed',()=>{document.querySelectorAll('.v25612-personalization').forEach(x=>x.remove());mount()});window.LevelingPersonalizationV25613={mount,sync,apply,moderator,unlocked,canUse:skinOpen};
+function boot(){if(current()==='holo')localStorage.setItem('leveling_v25613_visual_theme','sakura');apply(current()==='holo'?'sakura':current(),false);mount()}if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot,{once:true});else boot();document.addEventListener('click',e=>{if(handleAction(e))return;if(e.target.closest('[data-key="personalization"],[data-group="personalize"]'))requestAnimationFrame(mount)},true);document.addEventListener('visibilitychange',()=>{if(document.hidden){document.getElementById('v25613-fx')?.replaceChildren()}else buildFx(current())},{passive:true});window.addEventListener('leveling-language-changed',()=>{document.querySelectorAll('.v25612-personalization').forEach(x=>x.remove());mount()});window.LevelingPersonalizationV25613={mount,sync,apply,moderator,unlocked,canUse:skinOpen};
 })();
 </script>
 

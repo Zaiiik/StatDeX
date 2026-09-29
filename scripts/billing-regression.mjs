@@ -17,7 +17,7 @@ const rtdn = read('supabase/functions/google-play-rtdn/index.ts');
 
 const checks = [
   ['Play Billing 9.1', () => androidBuild.includes('com.android.billingclient:billing:9.1.0')],
-  ['Version Android alignée', () => androidBuild.includes('versionName "22.1.5"')],
+  ['Version Android alignée', () => androidBuild.includes('versionName "22.2.0"')],
   ['Plugin natif enregistré', () => mainActivity.includes('registerPlugin(LevelingBillingPlugin.class)')],
   ['Aucun droit accordé localement', () => !plugin.includes('acknowledgePurchase') && !plugin.includes('consumeAsync')],
   ['Compte d’achat masqué', () => plugin.includes('setObfuscatedAccountId(accountId)') && billingSource.includes("crypto.subtle.digest('SHA-256'")],

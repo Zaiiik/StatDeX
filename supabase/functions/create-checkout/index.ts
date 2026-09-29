@@ -73,7 +73,7 @@ Deno.serve(async (req) => {
     const selected = PRICES[plan];
     if (!selected) throw new Error("Plan invalide");
 
-    const { data: accessData, error: accessError } = await supabase.rpc("get_my_access");
+    const { data: accessData, error: accessError } = await supabase.rpc("get_my_access_v2141");
     if (accessError) throw accessError;
     const access = Array.isArray(accessData) ? accessData[0] : accessData;
     const accessState = String(access?.access_state || "none").toLowerCase();
@@ -81,7 +81,23 @@ Deno.serve(async (req) => {
       if (access?.lifetime === true || String(access?.plan_code || "") === "lifetime") {
         throw new Error("ACCÈS_LIFETIME_DÉJÀ_ACTIF");
       }
-      throw new Error("ABONNEMENT_DÉJÀ_ACTIF");
+      const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+      const admin = createClient(supabaseUrl, serviceKey, { auth: { persistSession: false } });
+      const { data: rows, error: rowsError } = await admin
+        .from("user_subscriptions")
+        .select("provider,plan_code,status,current_period_end")
+        .eq("user_id", user.id)
+        .in("provider", ["stripe", "google_play"]);
+      if (rowsError) throw rowsError;
+      const hasCommercial = (rows || []).some((row: any) => {
+        const status = String(row?.status || "").toLowerCase();
+        if (String(row?.plan_code || "").toLowerCase() === "lifetime") return status === "active";
+        const end = Date.parse(String(row?.current_period_end || ""));
+        return ["active", "trialing"].includes(status) && (!Number.isFinite(end) || end > Date.now());
+      });
+      /* Une clé/admin temporaire reste active pendant le Checkout Lifetime.
+         Seul le webhook Stripe validé attribuera ensuite l'accès permanent. */
+      if (plan !== "lifetime" || hasCommercial) throw new Error("ABONNEMENT_DÉJÀ_ACTIF");
     }
 
     const stripe = new Stripe(stripeSecret, { apiVersion: "2025-08-27.basil" });
